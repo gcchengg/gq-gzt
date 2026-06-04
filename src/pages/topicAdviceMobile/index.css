@@ -1,0 +1,374 @@
+html,
+body,
+#root {
+  min-width: 0;
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background: #edf3f2;
+}
+
+.topic-mobile-page {
+  min-height: 100vh;
+  padding-bottom: calc(92px + env(safe-area-inset-bottom));
+  background:
+    linear-gradient(180deg, rgba(13, 92, 85, 0.14) 0, rgba(237, 243, 242, 0) 252px),
+    #edf3f2;
+  color: #14201f;
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+
+.topic-mobile-hero {
+  padding: 18px 16px 16px;
+  background:
+    linear-gradient(135deg, #fdfefe 0%, #f4faf8 54%, #e2efec 100%);
+  border-bottom: 1px solid rgba(175, 197, 194, 0.72);
+}
+
+.topic-mobile-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.topic-mobile-status > span:last-child {
+  flex: none;
+  color: #46615d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.topic-mobile-hero h1 {
+  margin: 0;
+  color: #102522;
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 34px;
+  letter-spacing: 0;
+}
+
+.topic-mobile-hero p {
+  margin: 6px 0 0;
+  color: #60716f;
+  font-size: 13px;
+  line-height: 21px;
+}
+
+.topic-mobile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+
+.topic-mobile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.topic-mobile-stat {
+  min-width: 0;
+  padding: 10px 6px;
+  border: 1px solid #d5e3e0;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(18, 43, 39, 0.055);
+  text-align: center;
+}
+
+.topic-mobile-stat span {
+  display: block;
+  margin-bottom: 4px;
+  color: #647572;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.topic-mobile-stat strong {
+  color: #102522;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 24px;
+}
+
+.topic-mobile-stat small {
+  margin-left: 2px;
+  color: #687976;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.topic-mobile-section {
+  padding: 14px;
+  border: 1px solid #d8e4e1;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 26px rgba(18, 43, 39, 0.06);
+}
+
+.topic-mobile-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.topic-mobile-section-title > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: #0d675f;
+  background: #e7f5f2;
+  font-size: 15px;
+}
+
+.topic-mobile-section-title h2 {
+  margin: 0;
+  color: #14201f;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 24px;
+}
+
+.topic-mobile-info-card,
+.topic-mobile-list,
+.topic-mobile-meeting-list,
+.topic-mobile-person-list,
+.topic-mobile-reviewer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topic-mobile-info-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid #edf2f1;
+}
+
+.topic-mobile-info-row:last-child {
+  border-bottom: 0;
+}
+
+.topic-mobile-info-row span {
+  flex: none;
+  color: #667673;
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.topic-mobile-info-row strong {
+  min-width: 0;
+  color: #162523;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: right;
+  word-break: break-word;
+}
+
+.topic-mobile-file,
+.topic-mobile-topic,
+.topic-mobile-meeting,
+.topic-mobile-person,
+.topic-mobile-reviewer,
+.topic-mobile-reply-card {
+  border: 1px solid #dfe9e7;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.topic-mobile-file {
+  padding: 12px;
+}
+
+.topic-mobile-file h3,
+.topic-mobile-topic h3,
+.topic-mobile-meeting h3,
+.topic-mobile-person h3 {
+  margin: 0;
+  color: #152522;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 22px;
+  word-break: break-word;
+}
+
+.topic-mobile-file p,
+.topic-mobile-topic p,
+.topic-mobile-meeting p,
+.topic-mobile-person p {
+  margin: 5px 0 0;
+  color: #657673;
+  font-size: 12px;
+  line-height: 19px;
+}
+
+.topic-mobile-file-meta,
+.topic-mobile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.topic-mobile-file-meta {
+  margin-top: 10px;
+}
+
+.topic-mobile-topic {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+}
+
+.topic-mobile-topic-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: #0d675f;
+  background: #e7f5f2;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.topic-mobile-topic-body {
+  min-width: 0;
+}
+
+.topic-mobile-topic-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.topic-mobile-meeting {
+  padding: 12px;
+}
+
+.topic-mobile-meeting-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.topic-mobile-meeting-grid {
+  margin-top: 8px;
+  padding-top: 4px;
+  border-top: 1px solid #edf2f1;
+}
+
+.topic-mobile-collapse {
+  --adm-color-background: transparent;
+  --adm-border-color: #edf2f1;
+  overflow: hidden;
+  border: 1px solid #dfe9e7;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.topic-mobile-collapse .adm-list-item-content {
+  padding-right: 0;
+}
+
+.topic-mobile-collapse .adm-collapse-panel-content {
+  padding: 0 12px 12px;
+}
+
+.topic-mobile-person {
+  padding: 11px;
+}
+
+.topic-mobile-person .topic-mobile-tags {
+  margin-top: 9px;
+}
+
+.topic-mobile-reviewer {
+  padding: 11px;
+}
+
+.topic-mobile-reviewer strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #162523;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.topic-mobile-reply-card {
+  padding: 12px;
+}
+
+.topic-mobile-reply-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #667673;
+  font-size: 12px;
+}
+
+.topic-mobile-reply-card .adm-text-area {
+  padding: 10px;
+  border: 1px solid #dce8e5;
+  border-radius: 8px;
+  background: #ffffff;
+  --font-size: 14px;
+  --color: #152522;
+  --placeholder-color: #97a7a4;
+}
+
+.topic-mobile-saved-at {
+  margin: 9px 0 0;
+  color: #667673;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.topic-mobile-actions {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(202, 218, 214, 0.9);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -10px 26px rgba(18, 43, 39, 0.09);
+  backdrop-filter: blur(10px);
+}
+
+.topic-mobile-actions .adm-button {
+  height: 44px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+@media (max-width: 340px) {
+  .topic-mobile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .topic-mobile-topic {
+    grid-template-columns: 1fr;
+  }
+}

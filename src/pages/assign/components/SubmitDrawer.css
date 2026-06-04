@@ -1,0 +1,241 @@
+.submit-drawer {
+  min-height: 560px;
+  padding: 2px;
+}
+
+.submit-company {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #828290;
+  font-size: 12px;
+}
+
+.submit-company-title {
+  color: #262629;
+  font-size: 18px;
+}
+
+.submit-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.submit-prompt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #e8ebff;
+  border-radius: 8px;
+  background: #f6f7ff;
+  color: #4b5563;
+}
+
+.submit-prompt-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  border-radius: 6px;
+  background: #6155e9;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.submit-table {
+  background: #fff;
+}
+
+.submit-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 48px;
+  padding-top: 8px;
+}
+
+.submit-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) 250px;
+  gap: 12px;
+  align-items: end;
+}
+
+.submit-filter-actions {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 24px;
+  justify-content: flex-end;
+}
+
+.meeting-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.meeting-card {
+  padding: 14px;
+  border: 1px solid #e7ebf3;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.meeting-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.meeting-card-head > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meeting-card-mark {
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  border-radius: 999px;
+  background: #6155e9;
+}
+
+.distribution-layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.distribution-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 65%;
+  padding-right: 20px;
+}
+
+.distribution-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 35%;
+}
+
+.distribution-title {
+  position: relative;
+  margin-bottom: 8px;
+  padding-left: 10px;
+  color: #262629;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.distribution-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5px;
+  width: 3px;
+  height: 14px;
+  border-radius: 999px;
+  background: #6155e9;
+}
+
+.distribution-notice {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 24px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  font-family: "PingFang SC", sans-serif;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.distribution-notice.danger {
+  color: #e12535;
+}
+
+.distribution-notice.warning {
+  color: #ff7d00;
+}
+
+.distribution-notice-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.distribution-reviewer-card {
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.distribution-card-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  min-height: 32px;
+  margin-bottom: 10px;
+}
+
+.distribution-card-item:last-child {
+  margin-bottom: 0;
+}
+
+.distribution-org-name {
+  flex: 0 0 180px;
+  width: 180px;
+  padding-right: 8px;
+  color: #262629;
+  font-size: small;
+}
+
+.distribution-user-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 1500px) {
+  .submit-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .meeting-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .distribution-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .distribution-left,
+  .distribution-right {
+    width: 100%;
+    padding-right: 0;
+  }
+}

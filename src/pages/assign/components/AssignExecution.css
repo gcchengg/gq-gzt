@@ -1,0 +1,91 @@
+.assign-execution {
+  min-height: 520px;
+  padding: 16px;
+  border: 1px solid #e7ebf3;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.assign-execution-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.assign-execution-head h3 {
+  margin: 0 0 6px;
+  color: #1f2430;
+  font-size: 18px;
+}
+
+.assign-execution-head p {
+  margin: 0;
+  color: #7a8496;
+  font-size: 13px;
+}
+
+.assign-decision {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.assign-warning {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #ffe1a6;
+  border-radius: 6px;
+  background: #fff8e6;
+  color: #7a4f00;
+}
+
+.assign-decision-ok {
+  color: #389e0d;
+  font-weight: 700;
+}
+
+.assign-decision-bad {
+  color: #cf1322;
+  font-weight: 700;
+}
+
+.assign-decision-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.assign-file-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.assign-file-card {
+  padding: 14px;
+  border: 1px solid #e7ebf3;
+  border-radius: 8px;
+  background: #f8faff;
+}
+
+.assign-file-name {
+  margin-bottom: 8px;
+  color: #1f3fb8;
+  font-weight: 600;
+}
+
+.assign-file-meta,
+.assign-file-date {
+  color: #7a8496;
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.assign-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

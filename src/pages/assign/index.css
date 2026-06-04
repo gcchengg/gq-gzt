@@ -1,0 +1,93 @@
+.assign-page {
+  min-height: 100vh;
+  padding: 20px;
+  background: #f5f7fb;
+  color: #1f2430;
+  font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+}
+
+.assign-search,
+.assign-table-card {
+  border: 1px solid #e7ebf3;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(31, 36, 48, 0.05);
+}
+
+.assign-search {
+  margin-bottom: 14px;
+  padding: 16px 18px 4px;
+}
+
+.assign-search-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) 172px;
+  gap: 12px;
+  align-items: end;
+}
+
+.assign-search-actions {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 24px;
+  justify-content: flex-end;
+}
+
+.assign-table-card {
+  padding: 14px;
+}
+
+.assign-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.assign-table-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2430;
+}
+
+.assign-table-total {
+  color: #7a8496;
+  font-size: 13px;
+}
+
+.assign-drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.assign-drawer-title span {
+  color: #262629;
+  font-size: 18px;
+}
+
+.assign-drawer-title em {
+  color: #d8d8d8;
+  font-style: normal;
+}
+
+.assign-drawer-title small {
+  color: #828290;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.assign-detail-drawer .ant-drawer-body {
+  padding: 0;
+  background: #f5f7fb;
+}
+
+@media (max-width: 1500px) {
+  .assign-search-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .assign-search-actions {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,196 @@
+.advice-review-page {
+  min-height: 100vh;
+  padding: 22px;
+  background:
+    linear-gradient(135deg, rgba(38, 58, 96, 0.06), transparent 32%),
+    linear-gradient(180deg, #f6f8fb 0%, #eef2f7 100%);
+}
+
+.advice-review-shell {
+  display: flex;
+  min-height: calc(100vh - 44px);
+  flex-direction: column;
+  gap: 14px;
+}
+
+.advice-review-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid #dde4ef;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(31, 45, 68, 0.08);
+}
+
+.advice-review-kicker {
+  color: #596b84;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.advice-review-header h1 {
+  margin: 4px 0 4px;
+  color: #162033;
+  font-size: 24px;
+  line-height: 32px;
+}
+
+.advice-review-header p {
+  margin: 0;
+  color: #637085;
+  font-size: 14px;
+}
+
+.advice-review-page .contentHeader {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+.advice-pdf-card {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #dde4ef;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(31, 45, 68, 0.08);
+}
+
+.advice-pdf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #e7ecf3;
+  background: #fbfcff;
+}
+
+.advice-pdf-toolbar > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: #263348;
+  font-weight: 600;
+}
+
+.advice-pdf-toolbar span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.advice-pdf-frame {
+  min-height: 720px;
+  width: 100%;
+  flex: 1;
+  border: 0;
+  background: #eef2f7;
+}
+
+.advice-annotation-card {
+  margin-bottom: 12px;
+}
+
+.advice-annotation-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f2a3d;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.advice-annotation-title span {
+  display: block;
+  width: 3px;
+  height: 16px;
+  background: #315efb;
+}
+
+.advice-annotation-tool {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #3a4658;
+}
+
+.advice-annotation-tool input {
+  width: 38px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.advice-canvas-wrap {
+  position: relative;
+  max-height: 58vh;
+  overflow: auto;
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  background: #f7f9fc;
+}
+
+.advice-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  max-width: 1200px;
+  cursor: crosshair;
+}
+
+.advice-annotation-popover {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  width: 224px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(31, 45, 68, 0.16);
+}
+
+.advice-task-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+  margin-top: 16px;
+}
+
+.advice-task-form .ant-form-item:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+.advice-drawer-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 6px;
+}
+
+@media (max-width: 760px) {
+  .advice-review-page {
+    padding: 12px;
+  }
+
+  .advice-review-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .advice-task-form {
+    grid-template-columns: 1fr;
+  }
+}
