@@ -484,14 +484,16 @@ export async function saveFollow(record) {
         followListByMgmtId[sanhuiMgmtId] = [];
     }
     const mgmtList = followListByMgmtId[sanhuiMgmtId];
+    let savedRecord = null;
     if (record.id) {
         const index = mgmtList.findIndex((item) => item.id === record.id);
         if (index >= 0) {
             mgmtList[index] = { ...mgmtList[index], ...record };
+            savedRecord = mgmtList[index];
         }
     }
     else {
-        mgmtList.unshift({
+        savedRecord = {
             id: `follow-${Date.now()}`,
             followName: record.followName || "新增交办事项",
             followDetail: record.followDetail || "",
@@ -504,9 +506,12 @@ export async function saveFollow(record) {
             execDetail: record.execDetail,
             status: "0",
             followFromType: "300",
-        });
+            aiSourceFileName: record.aiSourceFileName,
+            aiSourceFileType: record.aiSourceFileType,
+        };
+        mgmtList.unshift(savedRecord);
     }
-    return ok(true);
+    return ok(clone(savedRecord || record));
 }
 export async function saveExec(params = {}) {
     await sleep();

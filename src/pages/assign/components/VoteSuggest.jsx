@@ -1,5 +1,6 @@
 import { Button, Form, Input, Spin, Table, message } from "antd";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { suggestGet, suggestSave } from "../mockApi";
 import "./VoteSuggest.css";
 
@@ -27,9 +28,9 @@ function VoteResult({ enabled, result, elusion }) {
 export default function VoteSuggest({
   id,
   editStatus,
-  onCloseDetail,
   disabled,
 }) {
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [dataSource, setDataSource] = useState([]);
   const [detailData, setDetailData] = useState(null);
@@ -137,7 +138,7 @@ export default function VoteSuggest({
     message.success(res.message || "保存成功");
 
     if (status === "1") {
-      onCloseDetail?.("submit");
+      navigate("/GztHome");
       return;
     }
 

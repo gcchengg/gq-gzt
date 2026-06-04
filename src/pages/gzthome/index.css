@@ -105,6 +105,11 @@ input {
 
 .nav-item {
   height: 56px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 7px;

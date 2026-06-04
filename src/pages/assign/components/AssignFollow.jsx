@@ -226,22 +226,26 @@ export default function AssignFollow({ id, editStatus }) {
         fileType: isAudio ? "audio" : "pdf",
       });
       const record = parseRes.data;
-      await saveFollow({
+      const saveRes = await saveFollow({
         ...record,
         sanhuiMgmtId: id,
       });
+      const nextRecord = saveRes.data || {
+        ...record,
+        id: `follow-${Date.now()}`,
+      };
+      setAssignList((current) => [nextRecord, ...current]);
       setParsedFiles((current) => [
         {
           id: `${file.uid}-${Date.now()}`,
           name: fileName,
           type: isAudio ? "audio" : "pdf",
           parsedAt: dayjs().format("HH:mm:ss"),
-          followName: record.followName,
+          followName: nextRecord.followName,
         },
         ...current,
       ]);
       message.success("AI 解析完成，已补充到交办事项表格");
-      fetchData();
     } finally {
       setAiParsing(false);
     }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./index.css";
 const taskTabs = [
     "议题反馈建议",
@@ -80,6 +80,7 @@ function Avatar() {
     </svg>);
 }
 function Topbar() {
+    const navigate = useNavigate();
     return (<header className="topbar">
       <div className="brand">
         <div className="brand-mark" aria-hidden="true">
@@ -95,12 +96,12 @@ function Topbar() {
           </svg>
           <span>首页</span>
         </div>
-        <div className="nav-item">
+        <button className="nav-item" type="button" onClick={() => navigate("/assign")}>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
           </svg>
           <span>应用</span>
-        </div>
+        </button>
         <div className="nav-item">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 21s7-5.2 7-11.2A7 7 0 1 0 5 9.8C5 15.8 12 21 12 21zm0-8a3.1 3.1 0 1 1 0-6.2 3.1 3.1 0 0 1 0 6.2z"/>
