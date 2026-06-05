@@ -1,15 +1,19 @@
 import "antd-mobile/es/global";
 import {
     AuditOutlined,
+    AudioOutlined,
     CalendarOutlined,
     CheckCircleOutlined,
+    CloseOutlined,
     FileTextOutlined,
+    MessageOutlined,
     SendOutlined,
     TeamOutlined,
+    UploadOutlined,
 } from "@ant-design/icons";
 import { Button, Collapse, Dialog, Tag, TextArea, Toast } from "antd-mobile";
 import dayjs from "dayjs";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
 
 const topicFileTypes = {
@@ -170,6 +174,37 @@ const reviewerNotifyRows = [
     },
 ];
 
+const feedbackRecords = [
+    {
+        id: "feedback-001",
+        role: "leader",
+        sender: "张总",
+        time: "2026-04-24 09:18",
+        content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。",
+    },
+    {
+        id: "feedback-002",
+        role: "manager",
+        sender: "股权运营部 王明",
+        time: "2026-04-24 10:06",
+        content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。",
+    },
+    {
+        id: "feedback-003",
+        role: "leader",
+        sender: "李董",
+        time: "2026-04-24 14:32",
+        content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。",
+    },
+    {
+        id: "feedback-004",
+        role: "manager",
+        sender: "法律合规部 李娜",
+        time: "2026-04-24 15:11",
+        content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。",
+    },
+];
+
 const stripHtml = (value) =>
     value
         .replace(/<style[\s\S]*?<\/style>/gi, "")
@@ -211,9 +246,15 @@ function MeetingTags({ topic }) {
 
 export default function TopicAdviceMobilePage() {
     const [replyText, setReplyText] = useState("建议围绕基金退出节奏、董事会审议材料完整性及股东会沟通安排进一步补充说明。");
+    const [voiceFiles, setVoiceFiles] = useState([]);
+    const [isListening, setIsListening] = useState(false);
     const [lastSavedAt, setLastSavedAt] = useState("");
+    const voiceInputRef = useRef(null);
+    const voiceUrlRef = useRef([]);
+    const recognitionRef = useRef(null);
     const enabledMeetings = useMemo(() => meetings.filter((item) => item.enabled), []);
     const conveyCount = useMemo(() => distributionRows.filter((item) => item.hasConvey).length, []);
+    const hasReplyContent = stripHtml(replyText) || voiceFiles.length > 0;
     const summaryStats = [
         { key: "files", label: "文件", value: smartFiles.length, suffix: "份" },
         { key: "topics", label: "议题", value: topics.length, suffix: "项" },
@@ -221,9 +262,88 @@ export default function TopicAdviceMobilePage() {
         { key: "people", label: "传达", value: conveyCount, suffix: "人" },
     ];
 
+    useEffect(() => {
+        return () => {
+            recognitionRef.current?.stop();
+            voiceUrlRef.current.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, []);
+
+    const appendReplyText = (text) => {
+        const nextText = text.trim();
+        if (!nextText) return;
+        setReplyText((current) => {
+            const prefix = current.trim();
+            return [prefix, nextText].filter(Boolean).join(prefix ? "\n" : "").slice(0, 500);
+        });
+    };
+
+    const handleVoiceUpload = (event) => {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+        const uploadedFiles = files.map((file) => {
+            const url = URL.createObjectURL(file);
+            voiceUrlRef.current.push(url);
+            return {
+                id: `${file.name}-${file.lastModified}-${Date.now()}`,
+                name: file.name,
+                size: file.size,
+                url,
+            };
+        });
+        setVoiceFiles((current) => [...current, ...uploadedFiles]);
+        Toast.show(`已上传 ${files.length} 条语音`);
+        event.target.value = "";
+    };
+
+    const handleRemoveVoice = (id) => {
+        setVoiceFiles((current) => {
+            const target = current.find((item) => item.id === id);
+            if (target?.url) URL.revokeObjectURL(target.url);
+            voiceUrlRef.current = voiceUrlRef.current.filter((url) => url !== target?.url);
+            return current.filter((item) => item.id !== id);
+        });
+    };
+
+    const handleSpeechToText = () => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+            return;
+        }
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            Toast.show("当前浏览器不支持语音转文字");
+            return;
+        }
+        const recognition = new SpeechRecognition();
+        recognition.lang = "zh-CN";
+        recognition.interimResults = false;
+        recognition.continuous = false;
+        recognition.onstart = () => {
+            setIsListening(true);
+            Toast.show("正在听取语音");
+        };
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map((result) => result[0]?.transcript || "")
+                .join("");
+            appendReplyText(transcript);
+            Toast.show("已转为文字");
+        };
+        recognition.onerror = () => {
+            Toast.show("语音识别失败，请重试");
+        };
+        recognition.onend = () => {
+            setIsListening(false);
+            recognitionRef.current = null;
+        };
+        recognitionRef.current = recognition;
+        recognition.start();
+    };
+
     const handleSave = () => {
-        if (!stripHtml(replyText)) {
-            Toast.show("请填写回复内容后再保存");
+        if (!hasReplyContent) {
+            Toast.show("请填写回复内容或上传语音后再保存");
             return;
         }
         const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
@@ -232,8 +352,8 @@ export default function TopicAdviceMobilePage() {
     };
 
     const handleSubmit = async () => {
-        if (!stripHtml(replyText)) {
-            Toast.show("请填写回复内容后再提交");
+        if (!hasReplyContent) {
+            Toast.show("请填写回复内容或上传语音后再提交");
             return;
         }
         const confirmed = await Dialog.confirm({
@@ -377,10 +497,25 @@ export default function TopicAdviceMobilePage() {
                     </Collapse>
                 </Section>
 
+                <Section title="问答记录" icon={<MessageOutlined />}>
+                    <div className="topic-mobile-feedback-list">
+                        {feedbackRecords.map((item) => (
+                            <article className={`topic-mobile-feedback ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
+                                <div className="topic-mobile-feedback-meta">
+                                    <span>{item.role === "manager" ? "管护回答" : "领导回复"}</span>
+                                    <strong>{item.sender}</strong>
+                                </div>
+                                <p>{item.content}</p>
+                                <time>{item.time}</time>
+                            </article>
+                        ))}
+                    </div>
+                </Section>
+
                 <Section title="领导回复" icon={<SendOutlined />}>
                     <div className="topic-mobile-reply-card">
                         <div className="topic-mobile-reply-meta">
-                            <span>回复内容为必填项</span>
+                            <span>文字或语音至少填写一项</span>
                             {lastSavedAt ? <Tag color="success">已保存</Tag> : <Tag>未保存</Tag>}
                         </div>
                         <TextArea
@@ -391,6 +526,36 @@ export default function TopicAdviceMobilePage() {
                             showCount
                             maxLength={500}
                         />
+                        <div className="topic-mobile-voice-actions">
+                            <input ref={voiceInputRef} className="topic-mobile-voice-input" type="file" accept="audio/*" capture="microphone" multiple onChange={handleVoiceUpload} />
+                            <Button size="small" fill="outline" onClick={() => voiceInputRef.current?.click()}>
+                                <UploadOutlined />
+                                上传语音
+                            </Button>
+                            <Button size="small" color={isListening ? "warning" : "primary"} fill={isListening ? "solid" : "outline"} onClick={handleSpeechToText}>
+                                <AudioOutlined />
+                                {isListening ? "停止识别" : "语音转文字"}
+                            </Button>
+                        </div>
+                        {voiceFiles.length ? (
+                            <div className="topic-mobile-voice-list">
+                                {voiceFiles.map((file) => (
+                                    <article className="topic-mobile-voice-item" key={file.id}>
+                                        <div className="topic-mobile-voice-info">
+                                            <AudioOutlined />
+                                            <div>
+                                                <strong>{file.name}</strong>
+                                                <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                                            </div>
+                                        </div>
+                                        <audio controls src={file.url} />
+                                        <button type="button" className="topic-mobile-voice-remove" onClick={() => handleRemoveVoice(file.id)} aria-label={`移除${file.name}`}>
+                                            <CloseOutlined />
+                                        </button>
+                                    </article>
+                                ))}
+                            </div>
+                        ) : null}
                         {lastSavedAt ? <p className="topic-mobile-saved-at">最近保存：{lastSavedAt}</p> : null}
                     </div>
                 </Section>

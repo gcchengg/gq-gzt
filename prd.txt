@@ -1,2 +1,4 @@
-/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/assign/components/SubmitDrawer.jsx
-把保存改成提交，点击提交后，跳转到/GztHome页面
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/ddmsgMobile/index.jsx
+页面中dingTalkMessages中
+点击id: "topic-director"卡片，跳转到/TopicAdviceMobile
+点击id: "vote-director"卡片，跳转到/adviceReview1Mobile

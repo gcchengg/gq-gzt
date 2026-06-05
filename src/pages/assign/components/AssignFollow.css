@@ -91,6 +91,28 @@
   font-size: 13px;
 }
 
+.assign-follow-cell-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  color: #263348;
+  line-height: 20px;
+  text-align: left;
+}
+
+.assign-follow-cell-stack.is-center {
+  align-items: center;
+  text-align: center;
+}
+
+.assign-follow-cell-stack span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
 @media (max-width: 900px) {
   .assign-follow-ai {
     grid-template-columns: 1fr;

@@ -34,6 +34,24 @@ const fileKindText = {
   pdf: "PDF",
 };
 
+const voteSuggestionFeedbackFollow = {
+  id: "follow-vote-feedback-001",
+  followFromType: "200",
+  followName: "表决建议反馈跟进",
+  followDetail:
+    "领导反馈：表决建议中请明确本次基金退出的表决倾向，并补充收益测算依据、风险兜底安排及授权条件。",
+  itemType: "voteFeedback",
+  toipcName: "关于推进基金退出事项的表决建议单",
+  assignUserName: "张总",
+  deadlineDate: "2026-04-30",
+  planStartDate: "2026-04-25",
+  planEndDate: "2026-04-30",
+  execDetail:
+    "管护回复：已将表决倾向调整为建议同意，补充收益测算底稿、风险处置预案及授权条件，交易价格和协议文本将提交法务复核。",
+  status: "1",
+  feedbackKind: "voteSuggestion",
+};
+
 export default function AssignFollow({ id, editStatus }) {
   const [loading, setLoading] = useState(false);
   const [aiParsing, setAiParsing] = useState(false);
@@ -61,6 +79,15 @@ export default function AssignFollow({ id, editStatus }) {
   useEffect(() => {
     fetchData();
   }, [id]);
+
+  const tableData = useMemo(() => {
+    const hasVoteFeedback = assignList.some(
+      (item) => item.id === voteSuggestionFeedbackFollow.id,
+    );
+    return hasVoteFeedback
+      ? assignList
+      : [voteSuggestionFeedbackFollow, ...assignList];
+  }, [assignList]);
 
   const columns = useMemo(
     () => [
@@ -92,22 +119,47 @@ export default function AssignFollow({ id, editStatus }) {
         dataIndex: "followName",
         key: "followName",
         align: "center",
-        width: 180,
+        width: 210,
+        render: (value, row) =>
+          row.feedbackKind === "voteSuggestion" ? (
+            <div className="assign-follow-cell-stack is-center">
+              <Tag color="purple">表决建议反馈</Tag>
+              <span>{value}</span>
+            </div>
+          ) : (
+            value
+          ),
       },
       {
         title: "交办内容",
         dataIndex: "followDetail",
         key: "followDetail",
-        width: 280,
-        ellipsis: true,
+        width: 360,
+        render: (value, row) =>
+          row.feedbackKind === "voteSuggestion" ? (
+            <div className="assign-follow-cell-stack">
+              <Tag color="blue">领导反馈</Tag>
+              <span>{value}</span>
+            </div>
+          ) : (
+            value
+          ),
       },
       {
         title: "相关分类",
         dataIndex: "itemType",
         key: "itemType",
         align: "center",
-        width: 120,
-        render: (value) => itemTypeText[value] || "",
+        width: 160,
+        render: (value, row) =>
+          row.feedbackKind === "voteSuggestion" ? (
+            <Space size={4} direction="vertical">
+              <Tag color="cyan">反馈闭环</Tag>
+              <Tag color="purple">表决建议</Tag>
+            </Space>
+          ) : (
+            itemTypeText[value] || ""
+          ),
       },
       {
         title: "相关议题/会议名称",
@@ -145,8 +197,16 @@ export default function AssignFollow({ id, editStatus }) {
         title: "执行总结",
         dataIndex: "execDetail",
         key: "execDetail",
-        width: 260,
-        ellipsis: true,
+        width: 340,
+        render: (value, row) =>
+          row.feedbackKind === "voteSuggestion" ? (
+            <div className="assign-follow-cell-stack">
+              <Tag color="green">管护回复</Tag>
+              <span>{value}</span>
+            </div>
+          ) : (
+            value
+          ),
       },
       {
         title: "状态",
@@ -272,51 +332,11 @@ export default function AssignFollow({ id, editStatus }) {
 
   return (
     <div className="assign-follow">
-      {editStatus ? (
-        <div className="assign-follow-ai">
-          <div className="assign-follow-ai-copy">
-            <strong>AI 交办解析</strong>
-            <span>上传会议录音或 PDF，自动识别交办事项并补充到下方列表。</span>
-          </div>
-          <Upload.Dragger
-            className="assign-follow-upload"
-            accept=".pdf,audio/*,.mp3,.wav,.m4a,.aac,.flac"
-            multiple={false}
-            showUploadList={false}
-            disabled={aiParsing}
-            beforeUpload={handleUpload}
-          >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">
-              {aiParsing ? "AI 正在解析..." : "点击或拖拽录音 / PDF 到这里"}
-            </p>
-            <p className="ant-upload-hint">
-              当前为本地模拟解析，不会上传到真实接口。
-            </p>
-          </Upload.Dragger>
-          {parsedFiles.length > 0 ? (
-            <div className="assign-follow-files">
-              {parsedFiles.map((file) => (
-                <div className="assign-follow-file" key={file.id}>
-                  <Tag color={file.type === "audio" ? "purple" : "blue"}>
-                    {fileKindText[file.type]}
-                  </Tag>
-                  <span>{file.name}</span>
-                  <em>{file.parsedAt}</em>
-                  <strong>{file.followName}</strong>
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
 
       <div className="assign-follow-toolbar">
         <div>
           <strong>交办事项</strong>
-          <span>共 {assignList.length} 条</span>
+          <span>共 {tableData.length} 条</span>
         </div>
         {editStatus ? (
           <Button
@@ -336,7 +356,7 @@ export default function AssignFollow({ id, editStatus }) {
       <Table
         loading={loading || aiParsing}
         columns={columns}
-        dataSource={assignList}
+        dataSource={tableData}
         rowKey="id"
         size="small"
         scroll={{ x: 1800 }}

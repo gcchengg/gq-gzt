@@ -98,6 +98,14 @@
   background: #f6f8fc;
 }
 
+.assign-feedback-tabs > .ant-tabs-nav {
+  margin-bottom: 12px;
+}
+
+.assign-feedback-tabs .ant-tabs-content-holder {
+  overflow: auto;
+}
+
 .assign-feedback-chat-head {
   display: flex;
   align-items: flex-start;
@@ -201,4 +209,24 @@
   border-color: #cce9d9;
   border-radius: 8px 8px 2px 8px;
   background: #eefaf3;
+}
+
+.assign-feedback-reply {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #e5eaf2;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.assign-feedback-reply .ant-input {
+  color: #1f2430;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.assign-feedback-reply-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
 }

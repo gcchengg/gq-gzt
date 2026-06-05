@@ -1,5 +1,5 @@
 import "antd/dist/reset.css";
-import { BoldOutlined, CalendarOutlined, FileDoneOutlined, ItalicOutlined, LinkOutlined, OrderedListOutlined, SaveOutlined, SendOutlined, TeamOutlined, UnorderedListOutlined, } from "@ant-design/icons";
+import { BoldOutlined, CalendarOutlined, FileDoneOutlined, ItalicOutlined, LinkOutlined, MessageOutlined, OrderedListOutlined, SaveOutlined, SendOutlined, TeamOutlined, UnorderedListOutlined, } from "@ant-design/icons";
 import { Button, Descriptions, Divider, Modal, Space, Table, Tag, message, } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -154,6 +154,36 @@ const reviewerNotifyRows = [
         orgName: "审计风控部",
         hasJoin: true,
         userList: [{ fullName: "周静", loginId: "zhoujing" }],
+    },
+];
+const feedbackRecords = [
+    {
+        id: "feedback-001",
+        role: "leader",
+        sender: "张总",
+        time: "2026-04-24 09:18",
+        content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。",
+    },
+    {
+        id: "feedback-002",
+        role: "manager",
+        sender: "股权运营部 王明",
+        time: "2026-04-24 10:06",
+        content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。",
+    },
+    {
+        id: "feedback-003",
+        role: "leader",
+        sender: "李董",
+        time: "2026-04-24 14:32",
+        content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。",
+    },
+    {
+        id: "feedback-004",
+        role: "manager",
+        sender: "法律合规部 李娜",
+        time: "2026-04-24 15:11",
+        content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。",
     },
 ];
 const stripHtml = (value) => value
@@ -458,6 +488,28 @@ export default function TopicAdvicePage() {
               </div>))}
           </div>
         </ReadonlySection>
+
+        <section className="topic-advice-section topic-feedback-section">
+          <div className="topic-advice-section-head">
+            <div>
+              <h2>问答记录</h2>
+              <p>左侧为领导回复，右侧为管护回答，保留每次沟通痕迹。</p>
+            </div>
+            <Tag icon={<MessageOutlined />} color="processing">
+              {feedbackRecords.length} 条
+            </Tag>
+          </div>
+          <div className="topic-feedback-list">
+            {feedbackRecords.map((item) => (<div className={`topic-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
+                <div className="topic-feedback-meta">
+                  <span>{item.role === "manager" ? "管护回答" : "领导回复"}</span>
+                  <strong>{item.sender}</strong>
+                  <em>{item.time}</em>
+                </div>
+                <div className="topic-feedback-bubble">{item.content}</div>
+              </div>))}
+          </div>
+        </section>
 
         <section className="topic-advice-section topic-reply-section">
           <div className="topic-advice-section-head">

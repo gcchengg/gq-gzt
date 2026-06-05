@@ -23,7 +23,7 @@ const taskCopyByCard = {
     表决建议单: {
         title: "表决建议单",
         description: "批注表决建议单",
-        href: "/AdviceReview",
+        href: "/adviceReview1",
     },
     基金股权转让: {
         title: "基金股权转让",

@@ -3,57 +3,100 @@ const Index = lazy(() => import("@/pages/index"));
 const GztHome = lazy(() => import("@/pages/gzthome"));
 const Assign = lazy(() => import("@/pages/assign"));
 const AdviceReview = lazy(() => import("@/pages/adviceReview"));
+const AdviceReview1 = lazy(() => import("@/pages/adviceReview1"));
+const AdviceReview1Mobile = lazy(() => import("@/pages/adviceReview1Mobile"));
 const TopicAdvice = lazy(() => import("@/pages/topicAdvice"));
 const TopicAdviceMobile = lazy(() => import("@/pages/topicAdviceMobile"));
+const DdMsgMobile = lazy(() => import("@/pages/ddmsgMobile"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
-    {
-        index: true,
-        element: (<Suspense>
+  {
+    index: true,
+    element: (
+      <Suspense>
         <Index />
-      </Suspense>),
-    },
-    {
-        path: "gzthome",
-        element: (<Suspense>
+      </Suspense>
+    ),
+  },
+  {
+    path: "gzthome",
+    element: (
+      <Suspense>
         <GztHome />
-      </Suspense>),
-    },
-    {
-        path: "GztHome",
-        element: (<Suspense>
+      </Suspense>
+    ),
+  },
+  {
+    path: "GztHome",
+    element: (
+      <Suspense>
         <GztHome />
-      </Suspense>),
-    },
-    {
-        path: "assign",
-        element: (<Suspense>
+      </Suspense>
+    ),
+  },
+  {
+    path: "assign",
+    element: (
+      <Suspense>
         <Assign />
-      </Suspense>),
-    },
-    {
-        path: "AdviceReview",
-        element: (<Suspense>
+      </Suspense>
+    ),
+  },
+  {
+    path: "AdviceReview",
+    element: (
+      <Suspense>
         <AdviceReview />
-      </Suspense>),
-    },
-    {
-        path: "topicAdvice",
-        element: (<Suspense>
+      </Suspense>
+    ),
+  },
+  {
+    path: "adviceReview1",
+    element: (
+      <Suspense>
+        <AdviceReview1 />
+      </Suspense>
+    ),
+  },
+  {
+    path: "adviceReview1Mobile",
+    element: (
+      <Suspense>
+        <AdviceReview1Mobile />
+      </Suspense>
+    ),
+  },
+  {
+    path: "topicAdvice",
+    element: (
+      <Suspense>
         <TopicAdvice />
-      </Suspense>),
-    },
-    {
-        path: "TopicAdviceMobile",
-        element: (<Suspense>
+      </Suspense>
+    ),
+  },
+  {
+    path: "TopicAdviceMobile",
+    element: (
+      <Suspense>
         <TopicAdviceMobile />
-      </Suspense>),
-    },
-    {
-        path: "*",
-        element: (<Suspense>
+      </Suspense>
+    ),
+  },
+  {
+    path: "ddmsgMobile",
+    element: (
+      <Suspense>
+        <DdMsgMobile />
+      </Suspense>
+    ),
+  },
+  {
+    path: "*",
+    element: (
+      <Suspense>
         <Notfound />
-      </Suspense>),
-    },
+      </Suspense>
+    ),
+  },
 ];
 export default routes;

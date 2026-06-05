@@ -1,4 +1,4 @@
-import { Button, Descriptions, Drawer, Empty, Steps, Tabs, Tag, Timeline, message } from "antd";
+import { Button, Descriptions, Drawer, Empty, Input, Steps, Tabs, Tag, Timeline, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import AssignExecution from "./AssignExecution";
@@ -57,6 +57,65 @@ const directorFeedbackRecords = [
         content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。",
     },
 ];
+const voteFeedbackRecords = [
+    {
+        id: "vote-feedback-001",
+        role: "leader",
+        sender: "张总",
+        time: "2026-04-25 09:42",
+        content: "表决建议中请明确本次基金退出的表决倾向，并补充收益测算依据和风险兜底安排。",
+    },
+    {
+        id: "vote-feedback-002",
+        role: "manager",
+        sender: "股权运营部 王明",
+        time: "2026-04-25 10:18",
+        content: "已收到，表决倾向拟调整为建议同意，并同步补充收益测算底稿及风险处置预案。",
+    },
+    {
+        id: "vote-feedback-003",
+        role: "leader",
+        sender: "李董",
+        time: "2026-04-25 14:05",
+        content: "请在表决建议单中说明是否需要附带授权条件，避免后续执行口径不一致。",
+    },
+    {
+        id: "vote-feedback-004",
+        role: "manager",
+        sender: "法律合规部 李娜",
+        time: "2026-04-25 15:26",
+        content: "已补充授权条件：交易价格、付款节点及协议签署文本需经法务复核后方可执行。",
+    },
+];
+function FeedbackChat({ title, records, draft, onDraftChange, onSend, status = "沟通中" }) {
+    return (<div className="assign-feedback-chat">
+      <div className="assign-feedback-chat-head">
+        <div>
+          <h3>{title}</h3>
+          <p>左侧为领导返回，右侧为管护回复。</p>
+        </div>
+        <Tag color="processing">{status}</Tag>
+      </div>
+      <div className="assign-feedback-chat-body">
+        {records.map((item) => (<div className={`assign-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
+            <div className="assign-feedback-meta">
+              <span>{item.role === "manager" ? "管护回复" : "领导返回"}</span>
+              <strong>{item.sender}</strong>
+              <em>{item.time}</em>
+            </div>
+            <div className="assign-feedback-bubble">{item.content}</div>
+          </div>))}
+      </div>
+      <div className="assign-feedback-reply">
+        <Input.TextArea value={draft} onChange={(event) => onDraftChange(event.target.value)} placeholder="请输入管护回复内容" autoSize={{ minRows: 3, maxRows: 5 }} maxLength={500} showCount/>
+        <div className="assign-feedback-reply-actions">
+          <Button type="primary" onClick={onSend}>
+            发送管护回复
+          </Button>
+        </div>
+      </div>
+    </div>);
+}
 function StagePlaceholder({ title, projectData, status, }) {
     return (<div className="assign-stage-card">
       <Descriptions bordered size="small" column={2} title={title}>
@@ -85,6 +144,9 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
     const [meetingOpen, setMeetingOpen] = useState(false);
     const [feedbackOpen, setFeedbackOpen] = useState(false);
     const [voteList, setVoteList] = useState([]);
+    const [topicFeedbackRecords, setTopicFeedbackRecords] = useState(directorFeedbackRecords);
+    const [voteFeedbackRecordsState, setVoteFeedbackRecordsState] = useState(voteFeedbackRecords);
+    const [feedbackDrafts, setFeedbackDrafts] = useState({ topic: "", vote: "" });
     const currentStep = String(progStatus) === "99999" ? "15000" : String(progStatus);
     useEffect(() => {
         getOtherInfo({ id }).then((res) => setProjectData(res.data));
@@ -109,6 +171,31 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
                 ? "当前节点"
                 : "待处理",
     })), [currentStep]);
+    const updateFeedbackDraft = (key, value) => {
+        setFeedbackDrafts((current) => ({ ...current, [key]: value }));
+    };
+    const sendFeedbackReply = (key) => {
+        const content = feedbackDrafts[key]?.trim();
+        if (!content) {
+            message.warning("请输入管护回复内容");
+            return;
+        }
+        const nextRecord = {
+            id: `${key}-feedback-${Date.now()}`,
+            role: "manager",
+            sender: "管护 王明",
+            time: dayjs().format("YYYY-MM-DD HH:mm"),
+            content,
+        };
+        if (key === "topic") {
+            setTopicFeedbackRecords((current) => [...current, nextRecord]);
+        }
+        else {
+            setVoteFeedbackRecordsState((current) => [...current, nextRecord]);
+        }
+        updateFeedbackDraft(key, "");
+        message.success("管护回复已添加");
+    };
     const tabItems = [
         {
             key: "1",
@@ -190,25 +277,18 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
       </Drawer>
 
       <Drawer title="董事反馈记录" open={feedbackOpen} width={720} onClose={() => setFeedbackOpen(false)} destroyOnClose>
-        <div className="assign-feedback-chat">
-          <div className="assign-feedback-chat-head">
-            <div>
-              <h3>{projectData.topicName || "关于推进基金退出事项的议案"}</h3>
-              <p>左侧为领导返回，右侧为管护回复。</p>
-            </div>
-            <Tag color="processing">沟通中</Tag>
-          </div>
-          <div className="assign-feedback-chat-body">
-            {directorFeedbackRecords.map((item) => (<div className={`assign-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
-                <div className="assign-feedback-meta">
-                  <span>{item.role === "manager" ? "管护回复" : "领导返回"}</span>
-                  <strong>{item.sender}</strong>
-                  <em>{item.time}</em>
-                </div>
-                <div className="assign-feedback-bubble">{item.content}</div>
-              </div>))}
-          </div>
-        </div>
+        <Tabs className="assign-feedback-tabs" defaultActiveKey="topic" items={[
+            {
+                key: "topic",
+                label: "议题建议反馈",
+                children: (<FeedbackChat title={projectData.topicName || "关于推进基金退出事项的议案"} records={topicFeedbackRecords} draft={feedbackDrafts.topic} onDraftChange={(value) => updateFeedbackDraft("topic", value)} onSend={() => sendFeedbackReply("topic")}/>),
+            },
+            {
+                key: "vote",
+                label: "表决建议反馈",
+                children: (<FeedbackChat title="表决建议单反馈记录" records={voteFeedbackRecordsState} draft={feedbackDrafts.vote} onDraftChange={(value) => updateFeedbackDraft("vote", value)} onSend={() => sendFeedbackReply("vote")}/>),
+            },
+        ]}/>
       </Drawer>
 
       <Drawer title="一汽股权会议纪要" open={meetingOpen} width={760} onClose={() => setMeetingOpen(false)} destroyOnClose footer={<div className="assign-meeting-footer">
