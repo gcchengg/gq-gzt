@@ -487,7 +487,7 @@ export default function TopicAdviceMobilePage() {
                     </Collapse>
                 </Section>
 
-                <Section title="逐议题问答与回复" icon={<MessageOutlined />}>
+                <Section title="议题意见反馈与答复" icon={<MessageOutlined />}>
                     <input ref={fileInputRef} className="topic-mobile-file-input" type="file" onChange={handleReferenceFileChange} />
                     <div className="topic-mobile-feedback-topics">
                         {topics.map((topic, index) => {

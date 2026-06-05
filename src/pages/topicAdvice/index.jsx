@@ -510,7 +510,7 @@ export default function TopicAdvicePage() {
         <section className="topic-advice-section topic-feedback-section">
           <div className="topic-advice-section-head">
             <div>
-              <h2>逐议题问答与回复</h2>
+              <h2>议题意见反馈与答复</h2>
               <p>每个议题独立上传参考文件、查看问答记录并填写反馈建议。</p>
             </div>
             <Tag icon={<MessageOutlined />} color="processing">

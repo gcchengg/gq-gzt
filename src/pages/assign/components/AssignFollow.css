@@ -91,6 +91,25 @@
   font-size: 13px;
 }
 
+.assign-follow-column-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.assign-follow-column-title .anticon {
+  color: #718096;
+  cursor: help;
+  font-size: 13px;
+}
+
+.assign-follow-column-help {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 72px;
+}
+
 .assign-follow-cell-stack {
   display: flex;
   flex-direction: column;

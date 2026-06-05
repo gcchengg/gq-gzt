@@ -3,9 +3,11 @@ import {
   AudioOutlined,
   DownOutlined,
   FilePdfOutlined,
+  PaperClipOutlined,
   RightOutlined,
   SaveOutlined,
   SendOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import { Button, Dialog, Tag, TextArea, Toast } from "antd-mobile";
 import dayjs from "dayjs";
@@ -34,6 +36,14 @@ const adviceTopics = [
     initialReply: "请填写本议题的表决建议。",
   },
 ];
+const initialTopicFiles = {
+  "topic-001": [
+    { id: "advice-reference-001", name: "羿动科技董事会会议材料.pdf", url: pdfUrl },
+  ],
+  "topic-002": [
+    { id: "advice-reference-002", name: "羿动科技临时股东会表决材料.pdf", url: pdfUrl },
+  ],
+};
 
 const stripHtml = (value) =>
   value
@@ -62,10 +72,13 @@ export default function AdviceReview1MobilePage() {
       adviceTopics.map((topic) => [topic.id, topic.initialReply]),
     ),
   );
+  const [topicFiles, setTopicFiles] = useState(initialTopicFiles);
   const [listeningTopicId, setListeningTopicId] = useState("");
+  const [uploadTopicId, setUploadTopicId] = useState("");
   const [savedAtByTopic, setSavedAtByTopic] = useState({});
   const [collapsedTopicIds, setCollapsedTopicIds] = useState(() => new Set());
   const recognitionRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -137,6 +150,27 @@ export default function AdviceReview1MobilePage() {
     });
   };
 
+  const handleReferenceUpload = (topicId) => {
+    setUploadTopicId(topicId);
+    fileInputRef.current?.click();
+  };
+
+  const handleReferenceFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file || !uploadTopicId) return;
+    const nextFile = {
+      id: `${uploadTopicId}-${Date.now()}`,
+      name: file.name,
+      url: URL.createObjectURL(file),
+    };
+    setTopicFiles((current) => ({
+      ...current,
+      [uploadTopicId]: [...(current[uploadTopicId] || []), nextFile],
+    }));
+    event.target.value = "";
+    Toast.show(`已上传参考文件：${file.name}`);
+  };
+
   const handleSave = () => {
     const incompleteTopic = getIncompleteTopic();
     if (incompleteTopic) {
@@ -181,6 +215,10 @@ export default function AdviceReview1MobilePage() {
           <span>SH-2026-004</span>
         </div>
         <h1>表决建议单审阅</h1>
+        <p className="advice1-mobile-meeting-info">
+          <strong>会议信息：</strong>
+          羿动新能源科技有限公司羿动科技第二届董事会第六次会议、羿动科技2025第三次临时股东会会会议以通讯表决、通讯表决召开
+        </p>
       </header>
 
       <main className="advice1-mobile-content">
@@ -200,9 +238,15 @@ export default function AdviceReview1MobilePage() {
         </Section>
 
         <Section
-          title={`建议反馈`}
+          title={`董事建议与交办`}
           icon={<SendOutlined />}
         >
+          <input
+            ref={fileInputRef}
+            className="advice1-mobile-file-input"
+            type="file"
+            onChange={handleReferenceFileChange}
+          />
           <div className="advice1-mobile-topic-list">
             {adviceTopics.map((topic, index) => {
               const isCollapsed = collapsedTopicIds.has(topic.id);
@@ -222,6 +266,26 @@ export default function AdviceReview1MobilePage() {
                   </Button>
                 </div>
                 <div className="advice1-mobile-topic-body" hidden={isCollapsed}>
+                  <div className="advice1-mobile-reference">
+                    <div className="advice1-mobile-reference-head">
+                      <strong><PaperClipOutlined /> 参考文件</strong>
+                      <Button
+                        size="mini"
+                        fill="outline"
+                        color="primary"
+                        onClick={() => handleReferenceUpload(topic.id)}
+                      >
+                        <UploadOutlined /> 上传
+                      </Button>
+                    </div>
+                    <div className="advice1-mobile-reference-list">
+                      {(topicFiles[topic.id] || []).map((file) => (
+                        <a href={file.url} target="_blank" rel="noreferrer" key={file.id}>
+                          {file.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                   <div className="advice1-mobile-reply-meta">
                     <Tag color="primary">{topic.meeting}</Tag>
                     {savedAtByTopic[topic.id] ? (

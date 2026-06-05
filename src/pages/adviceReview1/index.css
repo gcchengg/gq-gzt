@@ -52,9 +52,9 @@ body,
 .advice1-header h1 {
   margin: 0;
   color: #142033;
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 750;
-  line-height: 38px;
+  line-height: 32px;
 }
 
 .advice1-header p {
@@ -62,6 +62,15 @@ body,
   color: #5e6c7d;
   font-size: 13px;
   line-height: 22px;
+}
+
+.advice1-meeting-info {
+  max-width: 980px;
+}
+
+.advice1-meeting-info strong {
+  color: #314b69;
+  font-weight: 700;
 }
 
 .advice1-content {
@@ -212,6 +221,45 @@ body,
   color: #758295;
   font-size: 12px;
   line-height: 18px;
+}
+
+.advice1-reference-files {
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #e1e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.advice1-reference-files-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.advice1-reference-files-head strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #314056;
+  font-size: 13px;
+}
+
+.advice1-reference-file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+}
+
+.advice1-reference-file-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #245de4;
+  font-size: 13px;
+  text-decoration: none;
 }
 
 .advice1-rich-editor {

@@ -280,12 +280,12 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
         <Tabs className="assign-feedback-tabs" defaultActiveKey="topic" items={[
             {
                 key: "topic",
-                label: "议题建议反馈",
+                label: "董事意见反馈 ",
                 children: <DirectorFeedbackPanel type="topic" directors={feedbackGroups.topic} drafts={feedbackDrafts} onDraftChange={updateFeedbackDraft} onSend={sendFeedbackReply}/>,
             },
             {
                 key: "vote",
-                label: "表决建议反馈",
+                label: "三会情况反馈",
                 children: <DirectorFeedbackPanel type="vote" directors={feedbackGroups.vote} drafts={feedbackDrafts} onDraftChange={updateFeedbackDraft} onSend={sendFeedbackReply}/>,
             },
         ]}/>

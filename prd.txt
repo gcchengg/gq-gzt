@@ -1,4 +1,4 @@
-/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/ddmsgMobile/index.jsx
-页面中dingTalkMessages中
-点击id: "topic-director"卡片，跳转到/TopicAdviceMobile
-点击id: "vote-director"卡片，跳转到/adviceReview1Mobile
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/assign/components/AssignFollow.jsx
+页面中【交办来源】列添加？，鼠标移入 显示 三会反馈 专题汇报 决策执行
+
+【相关分类】列添加？，鼠标移入 显示 议题相关 会议相关

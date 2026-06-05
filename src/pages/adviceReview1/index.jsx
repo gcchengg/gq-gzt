@@ -2,16 +2,19 @@ import "antd/dist/reset.css";
 import {
     BoldOutlined,
     DownOutlined,
+    FileDoneOutlined,
     FilePdfOutlined,
     ItalicOutlined,
     LinkOutlined,
     OrderedListOutlined,
+    PaperClipOutlined,
     RightOutlined,
     SaveOutlined,
     SendOutlined,
     UnorderedListOutlined,
+    UploadOutlined,
 } from "@ant-design/icons";
-import { Button, Modal, Tag, message } from "antd";
+import { Button, Modal, Tag, Upload, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import "./index.css";
@@ -24,7 +27,7 @@ const adviceTopics = [
         name: "测试1",
         category: "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
         meeting: "董事会",
-        reviewLevel: "业务总监",
+        reviewLevel: "",
         initialReply: "<p>请填写本议题的表决建议。</p>",
     },
     {
@@ -32,10 +35,14 @@ const adviceTopics = [
         name: "测试1",
         category: "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
         meeting: "董事会",
-        reviewLevel: "业务总监",
+        reviewLevel: "",
         initialReply: "<p>请填写本议题的表决建议。</p>",
     },
 ];
+const initialTopicFiles = {
+    "topic-001": [{ uid: "advice-reference-001", name: "羿动科技董事会会议材料.pdf", url: pdfUrl }],
+    "topic-002": [{ uid: "advice-reference-002", name: "羿动科技临时股东会表决材料.pdf", url: pdfUrl }],
+};
 
 const stripHtml = (value) =>
     value
@@ -90,6 +97,7 @@ function RichTextEditor({ value, onChange }) {
 export default function AdviceReview1Page() {
     const [messageApi, messageContextHolder] = message.useMessage();
     const [topicReplies, setTopicReplies] = useState(() => Object.fromEntries(adviceTopics.map((topic) => [topic.id, topic.initialReply])));
+    const [topicFiles, setTopicFiles] = useState(initialTopicFiles);
     const [savedAtByTopic, setSavedAtByTopic] = useState({});
     const [collapsedTopicIds, setCollapsedTopicIds] = useState(() => new Set());
     const [submitOpen, setSubmitOpen] = useState(false);
@@ -103,6 +111,20 @@ export default function AdviceReview1Page() {
             else next.add(topicId);
             return next;
         });
+    };
+
+    const addTopicFile = (topicId, file) => {
+        const nextFile = {
+            uid: `${topicId}-${Date.now()}`,
+            name: file.name,
+            url: URL.createObjectURL(file),
+        };
+        setTopicFiles((current) => ({
+            ...current,
+            [topicId]: [...(current[topicId] || []), nextFile],
+        }));
+        messageApi.success(`已上传参考文件：${file.name}`);
+        return Upload.LIST_IGNORE;
     };
 
     const handleSave = () => {
@@ -142,7 +164,10 @@ export default function AdviceReview1Page() {
                         表决建议单
                     </span>
                     <h1>表决建议单审阅</h1>
-                    <p>查看表决建议单 PDF，并按议题分别填写富文本表决建议。</p>
+                    <p className="advice1-meeting-info">
+                        <strong>会议信息：</strong>
+                        羿动新能源科技有限公司羿动科技第二届董事会第六次会议、羿动科技2025第三次临时股东会会会议以通讯表决、通讯表决召开
+                    </p>
                 </div>
                 <Tag color="processing">待填写</Tag>
             </header>
@@ -163,7 +188,7 @@ export default function AdviceReview1Page() {
                 <section className="advice1-card advice1-editor-card">
                     <div className="advice1-section-head">
                         <div>
-                            <h2>建议反馈</h2>
+                            <h2>董事建议与交办</h2>
                             <p>共 {adviceTopics.length} 个议题，每个议题均需单独回复。</p>
                         </div>
                         <Tag color="processing">{adviceTopics.length} 个议题</Tag>
@@ -181,7 +206,7 @@ export default function AdviceReview1Page() {
                                     </div>
                                     <div className="advice1-topic-tags">
                                         <Tag color="blue">{topic.meeting}</Tag>
-                                        <Tag color="processing">{topic.reviewLevel}</Tag>
+                                        {/* <Tag color="processing">{topic.reviewLevel}</Tag> */}
                                         {savedAtByTopic[topic.id] ? <Tag color="success">已保存</Tag> : <Tag>未保存</Tag>}
                                         <Button type="text" size="small" icon={isCollapsed ? <RightOutlined /> : <DownOutlined />} aria-expanded={!isCollapsed} onClick={() => toggleTopicCollapsed(topic.id)}>
                                             {isCollapsed ? "展开" : "收起"}
@@ -189,6 +214,21 @@ export default function AdviceReview1Page() {
                                     </div>
                                 </div>
                                 <div className="advice1-topic-body" hidden={isCollapsed}>
+                                    <div className="advice1-reference-files">
+                                        <div className="advice1-reference-files-head">
+                                            <strong><PaperClipOutlined /> 参考文件</strong>
+                                            <Upload showUploadList={false} beforeUpload={(file) => addTopicFile(topic.id, file)}>
+                                                <Button size="small" icon={<UploadOutlined />}>上传文件</Button>
+                                            </Upload>
+                                        </div>
+                                        <div className="advice1-reference-file-list">
+                                            {(topicFiles[topic.id] || []).map((file) => (
+                                                <a href={file.url} target="_blank" rel="noreferrer" key={file.uid}>
+                                                    <FileDoneOutlined /> {file.name}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
                                     <RichTextEditor
                                         value={topicReplies[topic.id]}
                                         onChange={(value) => setTopicReplies((current) => ({ ...current, [topic.id]: value }))}
