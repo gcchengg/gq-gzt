@@ -113,6 +113,26 @@
   -webkit-box-orient: vertical;
 }
 
+.assign-follow-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.assign-follow-attachments a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: #245de4;
+}
+
+.assign-follow-attachments a span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 900px) {
   .assign-follow-ai {
     grid-template-columns: 1fr;

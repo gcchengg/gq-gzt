@@ -11,7 +11,7 @@ import {
   Upload,
   message,
 } from "antd";
-import { InboxOutlined, PlusOutlined } from "@ant-design/icons";
+import { InboxOutlined, PaperClipOutlined, PlusOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
 import { getFollowList, parseAssignFile, saveFollow } from "../mockApi";
@@ -50,6 +50,18 @@ const voteSuggestionFeedbackFollow = {
     "管护回复：已将表决倾向调整为建议同意，补充收益测算底稿、风险处置预案及授权条件，交易价格和协议文本将提交法务复核。",
   status: "1",
   feedbackKind: "voteSuggestion",
+  referenceAttachments: [
+    {
+      id: "vote-review-attachment-001",
+      name: "表决建议单审阅附件-反馈建议.pdf",
+      url: "/advice-review/6a2133fde4b0cb6abf664a41.pdf",
+    },
+    {
+      id: "vote-review-attachment-002",
+      name: "表决建议单审阅附件-补充说明.pdf",
+      url: "/advice-review/6a2133fde4b0cb6abf664a41.pdf",
+    },
+  ],
 };
 
 export default function AssignFollow({ id, editStatus }) {
@@ -167,6 +179,31 @@ export default function AssignFollow({ id, editStatus }) {
         key: "toipcName",
         width: 220,
         ellipsis: true,
+      },
+      {
+        title: "参考附件",
+        dataIndex: "referenceAttachments",
+        key: "referenceAttachments",
+        width: 260,
+        render: (attachments) =>
+          attachments?.length ? (
+            <div className="assign-follow-attachments">
+              {attachments.map((attachment) => (
+                <a
+                  href={attachment.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={attachment.id || attachment.name}
+                  title={attachment.name}
+                >
+                  <PaperClipOutlined />
+                  <span>{attachment.name}</span>
+                </a>
+              ))}
+            </div>
+          ) : (
+            "-"
+          ),
       },
       {
         title: "交办人",
@@ -359,7 +396,7 @@ export default function AssignFollow({ id, editStatus }) {
         dataSource={tableData}
         rowKey="id"
         size="small"
-        scroll={{ x: 1800 }}
+        scroll={{ x: 2060 }}
         pagination={false}
       />
 

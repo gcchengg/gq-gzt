@@ -1,11 +1,11 @@
 import "antd-mobile/es/global";
 import {
-    AudioOutlined,
-    CloseOutlined,
-    FilePdfOutlined,
-    SaveOutlined,
-    SendOutlined,
-    UploadOutlined,
+  AudioOutlined,
+  DownOutlined,
+  FilePdfOutlined,
+  RightOutlined,
+  SaveOutlined,
+  SendOutlined,
 } from "@ant-design/icons";
 import { Button, Dialog, Tag, TextArea, Toast } from "antd-mobile";
 import dayjs from "dayjs";
@@ -14,231 +14,271 @@ import "./index.css";
 
 const pdfUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf";
 const pdfPreviewUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf.png";
+const adviceTopics = [
+  {
+    id: "topic-001",
+    name: "测试1",
+    category:
+      "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+    meeting: "董事会",
+    reviewLevel: "业务总监",
+    initialReply: "请填写本议题的表决建议。",
+  },
+  {
+    id: "topic-002",
+    name: "测试1",
+    category:
+      "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+    meeting: "董事会",
+    reviewLevel: "业务总监",
+    initialReply: "请填写本议题的表决建议。",
+  },
+];
 
 const stripHtml = (value) =>
-    value
-        .replace(/<style[\s\S]*?<\/style>/gi, "")
-        .replace(/<script[\s\S]*?<\/script>/gi, "")
-        .replace(/<[^>]+>/g, "")
-        .replace(/&nbsp;/g, " ")
-        .trim();
+  value
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
 
 function Section({ title, icon, children, extra }) {
-    return (
-        <section className="advice1-mobile-section">
-            <div className="advice1-mobile-section-title">
-                <span>{icon}</span>
-                <h2>{title}</h2>
-                {extra}
-            </div>
-            {children}
-        </section>
-    );
+  return (
+    <section className="advice1-mobile-section">
+      <div className="advice1-mobile-section-title">
+        <span>{icon}</span>
+        <h2>{title}</h2>
+        {extra}
+      </div>
+      {children}
+    </section>
+  );
 }
 
 export default function AdviceReview1MobilePage() {
-    const [replyText, setReplyText] = useState("建议结合表决建议单内容，补充本次议题的风险提示、表决倾向及后续跟踪要求。");
-    const [voiceFiles, setVoiceFiles] = useState([]);
-    const [isListening, setIsListening] = useState(false);
-    const [lastSavedAt, setLastSavedAt] = useState("");
-    const voiceInputRef = useRef(null);
-    const voiceUrlRef = useRef([]);
-    const recognitionRef = useRef(null);
-    const hasReplyContent = stripHtml(replyText) || voiceFiles.length > 0;
+  const [topicReplies, setTopicReplies] = useState(() =>
+    Object.fromEntries(
+      adviceTopics.map((topic) => [topic.id, topic.initialReply]),
+    ),
+  );
+  const [listeningTopicId, setListeningTopicId] = useState("");
+  const [savedAtByTopic, setSavedAtByTopic] = useState({});
+  const [collapsedTopicIds, setCollapsedTopicIds] = useState(() => new Set());
+  const recognitionRef = useRef(null);
 
-    useEffect(() => {
-        return () => {
-            recognitionRef.current?.stop();
-            voiceUrlRef.current.forEach((url) => URL.revokeObjectURL(url));
-        };
-    }, []);
-
-    const appendReplyText = (text) => {
-        const nextText = text.trim();
-        if (!nextText) return;
-        setReplyText((current) => {
-            const prefix = current.trim();
-            return [prefix, nextText].filter(Boolean).join(prefix ? "\n" : "").slice(0, 500);
-        });
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
     };
+  }, []);
 
-    const handleVoiceUpload = (event) => {
-        const files = Array.from(event.target.files || []);
-        if (!files.length) return;
-        const uploadedFiles = files.map((file) => {
-            const url = URL.createObjectURL(file);
-            voiceUrlRef.current.push(url);
-            return {
-                id: `${file.name}-${file.lastModified}-${Date.now()}`,
-                name: file.name,
-                size: file.size,
-                url,
-            };
-        });
-        setVoiceFiles((current) => [...current, ...uploadedFiles]);
-        Toast.show(`已上传 ${files.length} 条语音`);
-        event.target.value = "";
+  const appendReplyText = (topicId, text) => {
+    const nextText = text.trim();
+    if (!nextText) return;
+    setTopicReplies((current) => {
+      const prefix = current[topicId]?.trim() || "";
+      return {
+        ...current,
+        [topicId]: [prefix, nextText]
+          .filter(Boolean)
+          .join(prefix ? "\n" : "")
+          .slice(0, 500),
+      };
+    });
+  };
+
+  const handleSpeechToText = (topicId) => {
+    if (listeningTopicId) {
+      recognitionRef.current?.stop();
+      return;
+    }
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      Toast.show("当前浏览器不支持语音转文字");
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = "zh-CN";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.onstart = () => {
+      setListeningTopicId(topicId);
+      Toast.show("正在听取语音");
     };
-
-    const handleRemoveVoice = (id) => {
-        setVoiceFiles((current) => {
-            const target = current.find((item) => item.id === id);
-            if (target?.url) URL.revokeObjectURL(target.url);
-            voiceUrlRef.current = voiceUrlRef.current.filter((url) => url !== target?.url);
-            return current.filter((item) => item.id !== id);
-        });
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0]?.transcript || "")
+        .join("");
+      appendReplyText(topicId, transcript);
+      Toast.show("已转为文字");
     };
-
-    const handleSpeechToText = () => {
-        if (isListening) {
-            recognitionRef.current?.stop();
-            return;
-        }
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-            Toast.show("当前浏览器不支持语音转文字");
-            return;
-        }
-        const recognition = new SpeechRecognition();
-        recognition.lang = "zh-CN";
-        recognition.interimResults = false;
-        recognition.continuous = false;
-        recognition.onstart = () => {
-            setIsListening(true);
-            Toast.show("正在听取语音");
-        };
-        recognition.onresult = (event) => {
-            const transcript = Array.from(event.results)
-                .map((result) => result[0]?.transcript || "")
-                .join("");
-            appendReplyText(transcript);
-            Toast.show("已转为文字");
-        };
-        recognition.onerror = () => {
-            Toast.show("语音识别失败，请重试");
-        };
-        recognition.onend = () => {
-            setIsListening(false);
-            recognitionRef.current = null;
-        };
-        recognitionRef.current = recognition;
-        recognition.start();
+    recognition.onerror = () => {
+      Toast.show("语音识别失败，请重试");
     };
-
-    const handleSave = () => {
-        if (!hasReplyContent) {
-            Toast.show("请填写表决建议或上传语音后再保存");
-            return;
-        }
-        setLastSavedAt(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-        Toast.show("表决建议已保存");
+    recognition.onend = () => {
+      setListeningTopicId("");
+      recognitionRef.current = null;
     };
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
 
-    const handleSubmit = async () => {
-        if (!hasReplyContent) {
-            Toast.show("请填写表决建议或上传语音后再提交");
-            return;
-        }
-        const confirmed = await Dialog.confirm({
-            title: "确认提交表决建议？",
-            content: "提交后将保存当前文字和语音表决建议。",
-            confirmText: "确认提交",
-            cancelText: "取消",
-        });
-        if (confirmed) {
-            setLastSavedAt(dayjs().format("YYYY-MM-DD HH:mm:ss"));
-            Toast.show("提交成功");
-        }
-    };
+  const getIncompleteTopic = () =>
+    adviceTopics.find((topic) => !stripHtml(topicReplies[topic.id] || ""));
 
-    return (
-        <div className="advice1-mobile-page">
-            <header className="advice1-mobile-hero">
-                <div className="advice1-mobile-status">
-                    <Tag color="primary" fill="solid">
-                        表决建议单
-                    </Tag>
-                    <span>SH-2026-004</span>
-                </div>
-                <h1>表决建议单审阅</h1>
-                <p>查看 PDF，并填写文字或语音表决建议。</p>
-            </header>
+  const toggleTopicCollapsed = (topicId) => {
+    setCollapsedTopicIds((current) => {
+      const next = new Set(current);
+      if (next.has(topicId)) next.delete(topicId);
+      else next.add(topicId);
+      return next;
+    });
+  };
 
-            <main className="advice1-mobile-content">
-                <Section
-                    title="表决建议单 PDF"
-                    icon={<FilePdfOutlined />}
-                    extra={
-                        <a href={pdfUrl} target="_blank" rel="noreferrer">
-                            打开
-                        </a>
-                    }
-                >
-                    <div className="advice1-mobile-pdf">
-                        <iframe title="表决建议单 PDF" src={pdfUrl} />
-                        <img src={pdfPreviewUrl} alt="表决建议单预览" />
-                    </div>
-                </Section>
-
-                <Section title="表决建议" icon={<SendOutlined />}>
-                    <div className="advice1-mobile-reply-card">
-                        <div className="advice1-mobile-reply-meta">
-                            <span>文字或语音至少填写一项</span>
-                            {lastSavedAt ? <Tag color="success">已保存</Tag> : <Tag>未保存</Tag>}
-                        </div>
-                        <TextArea
-                            value={replyText}
-                            onChange={setReplyText}
-                            placeholder="请输入表决建议"
-                            autoSize={{ minRows: 5, maxRows: 8 }}
-                            showCount
-                            maxLength={500}
-                        />
-                        <div className="advice1-mobile-voice-actions">
-                            <input ref={voiceInputRef} className="advice1-mobile-voice-input" type="file" accept="audio/*" capture="microphone" multiple onChange={handleVoiceUpload} />
-                            <Button size="small" fill="outline" onClick={() => voiceInputRef.current?.click()}>
-                                <UploadOutlined />
-                                上传语音
-                            </Button>
-                            <Button size="small" color={isListening ? "warning" : "primary"} fill={isListening ? "solid" : "outline"} onClick={handleSpeechToText}>
-                                <AudioOutlined />
-                                {isListening ? "停止识别" : "语音转文字"}
-                            </Button>
-                        </div>
-                        {voiceFiles.length ? (
-                            <div className="advice1-mobile-voice-list">
-                                {voiceFiles.map((file) => (
-                                    <article className="advice1-mobile-voice-item" key={file.id}>
-                                        <div className="advice1-mobile-voice-info">
-                                            <AudioOutlined />
-                                            <div>
-                                                <strong>{file.name}</strong>
-                                                <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
-                                            </div>
-                                        </div>
-                                        <audio controls src={file.url} />
-                                        <button type="button" className="advice1-mobile-voice-remove" onClick={() => handleRemoveVoice(file.id)} aria-label={`移除${file.name}`}>
-                                            <CloseOutlined />
-                                        </button>
-                                    </article>
-                                ))}
-                            </div>
-                        ) : null}
-                        {lastSavedAt ? <p className="advice1-mobile-saved-at">最近保存：{lastSavedAt}</p> : null}
-                    </div>
-                </Section>
-            </main>
-
-            <footer className="advice1-mobile-actions">
-                <Button block size="large" fill="outline" onClick={handleSave}>
-                    <SaveOutlined />
-                    保存
-                </Button>
-                <Button block size="large" color="primary" onClick={handleSubmit}>
-                    <SendOutlined />
-                    提交
-                </Button>
-            </footer>
-        </div>
+  const handleSave = () => {
+    const incompleteTopic = getIncompleteTopic();
+    if (incompleteTopic) {
+      Toast.show(`请填写“${incompleteTopic.name}”的表决建议`);
+      return;
+    }
+    const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
+    setSavedAtByTopic(
+      Object.fromEntries(adviceTopics.map((topic) => [topic.id, savedAt])),
     );
+    Toast.show("各议题表决建议已保存");
+  };
+
+  const handleSubmit = async () => {
+    const incompleteTopic = getIncompleteTopic();
+    if (incompleteTopic) {
+      Toast.show(`请填写“${incompleteTopic.name}”的表决建议`);
+      return;
+    }
+    const confirmed = await Dialog.confirm({
+      title: "确认提交表决建议？",
+      content: `提交后将保存全部 ${adviceTopics.length} 个议题的表决建议。`,
+      confirmText: "确认提交",
+      cancelText: "取消",
+    });
+    if (confirmed) {
+      const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
+      setSavedAtByTopic(
+        Object.fromEntries(adviceTopics.map((topic) => [topic.id, savedAt])),
+      );
+      Toast.show("提交成功");
+    }
+  };
+
+  return (
+    <div className="advice1-mobile-page">
+      <header className="advice1-mobile-hero">
+        <div className="advice1-mobile-status">
+          <Tag color="primary" fill="solid">
+            表决建议单
+          </Tag>
+          <span>SH-2026-004</span>
+        </div>
+        <h1>表决建议单审阅</h1>
+      </header>
+
+      <main className="advice1-mobile-content">
+        <Section
+          title="表决建议单 PDF"
+          icon={<FilePdfOutlined />}
+          extra={
+            <a href={pdfUrl} target="_blank" rel="noreferrer">
+              打开
+            </a>
+          }
+        >
+          <div className="advice1-mobile-pdf">
+            <iframe title="表决建议单 PDF" src={pdfUrl} />
+            <img src={pdfPreviewUrl} alt="表决建议单预览" />
+          </div>
+        </Section>
+
+        <Section
+          title={`建议反馈`}
+          icon={<SendOutlined />}
+        >
+          <div className="advice1-mobile-topic-list">
+            {adviceTopics.map((topic, index) => {
+              const isCollapsed = collapsedTopicIds.has(topic.id);
+              return (
+              <article className="advice1-mobile-reply-card" key={topic.id}>
+                <div className="advice1-mobile-topic-head">
+                  <div className="advice1-mobile-topic-index">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <div>
+                    <h3>{topic.name}</h3>
+                    <p>{topic.category}</p>
+                  </div>
+                  <Button size="mini" fill="none" aria-expanded={!isCollapsed} onClick={() => toggleTopicCollapsed(topic.id)}>
+                    {isCollapsed ? <RightOutlined /> : <DownOutlined />}
+                    {isCollapsed ? "展开" : "收起"}
+                  </Button>
+                </div>
+                <div className="advice1-mobile-topic-body" hidden={isCollapsed}>
+                  <div className="advice1-mobile-reply-meta">
+                    <Tag color="primary">{topic.meeting}</Tag>
+                    {savedAtByTopic[topic.id] ? (
+                      <Tag color="success">已保存</Tag>
+                    ) : (
+                      <Tag>未保存</Tag>
+                    )}
+                  </div>
+                  <TextArea
+                    value={topicReplies[topic.id]}
+                    onChange={(value) =>
+                      setTopicReplies((current) => ({
+                        ...current,
+                        [topic.id]: value,
+                      }))
+                    }
+                    placeholder={`请输入“${topic.name}”的表决建议`}
+                    autoSize={{ minRows: 4, maxRows: 7 }}
+                    showCount
+                    maxLength={500}
+                  />
+                  <div className="advice1-mobile-voice-actions">
+                    <Button
+                      size="small"
+                      color={
+                        listeningTopicId === topic.id ? "warning" : "primary"
+                      }
+                      fill={listeningTopicId === topic.id ? "solid" : "outline"}
+                      onClick={() => handleSpeechToText(topic.id)}
+                    >
+                      <AudioOutlined />
+                      {listeningTopicId === topic.id ? "停止识别" : "语音转文字"}
+                    </Button>
+                  </div>
+                  {savedAtByTopic[topic.id] ? (
+                    <p className="advice1-mobile-saved-at">
+                      最近保存：{savedAtByTopic[topic.id]}
+                    </p>
+                  ) : null}
+                </div>
+              </article>
+              );
+            })}
+          </div>
+        </Section>
+      </main>
+
+      <footer className="advice1-mobile-actions">
+        <Button block size="large" fill="outline" onClick={handleSave}>
+          <SaveOutlined />
+          保存
+        </Button>
+        <Button block size="large" color="primary" onClick={handleSubmit}>
+          <SendOutlined />
+          提交
+        </Button>
+      </footer>
+    </div>
+  );
 }

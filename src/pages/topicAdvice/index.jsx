@@ -1,6 +1,6 @@
 import "antd/dist/reset.css";
-import { BoldOutlined, CalendarOutlined, FileDoneOutlined, ItalicOutlined, LinkOutlined, MessageOutlined, OrderedListOutlined, SaveOutlined, SendOutlined, TeamOutlined, UnorderedListOutlined, } from "@ant-design/icons";
-import { Button, Descriptions, Divider, Modal, Space, Table, Tag, message, } from "antd";
+import { BoldOutlined, CalendarOutlined, DownOutlined, FileDoneOutlined, ItalicOutlined, LinkOutlined, MessageOutlined, OrderedListOutlined, PaperClipOutlined, RightOutlined, SaveOutlined, SendOutlined, TeamOutlined, UnorderedListOutlined, UploadOutlined, } from "@ant-design/icons";
+import { Button, Descriptions, Divider, Modal, Space, Table, Tag, Upload, message, } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./index.css";
@@ -36,24 +36,24 @@ const smartFiles = [
 const topics = [
     {
         id: "topic-001",
-        categoryLv1Name: "基金管理",
-        categoryLv2Name: "基金退出",
-        categoryLv3Name: "退出决策",
-        toipcName: "关于推进基金退出事项的议案",
-        reviewLevel2: "董事会",
+        categoryLv1Name: "1. 经营类",
+        categoryLv2Name: "1.3 定期监管报告",
+        categoryLv3Name: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        toipcName: "测试1",
+        reviewLevel2: "业务总监",
         board: true,
         supervisor: false,
-        shareholder: true,
+        shareholder: false,
     },
     {
         id: "topic-002",
-        categoryLv1Name: "公司治理",
-        categoryLv2Name: "董事会事项",
-        categoryLv3Name: "方案审议",
-        toipcName: "关于补充外部董事意见采纳情况的议案",
-        reviewLevel2: "集团总办会",
+        categoryLv1Name: "1. 经营类",
+        categoryLv2Name: "1.3 定期监管报告",
+        categoryLv3Name: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        toipcName: "测试1",
+        reviewLevel2: "业务总监",
         board: true,
-        supervisor: true,
+        supervisor: false,
         shareholder: false,
     },
 ];
@@ -156,36 +156,24 @@ const reviewerNotifyRows = [
         userList: [{ fullName: "周静", loginId: "zhoujing" }],
     },
 ];
-const feedbackRecords = [
-    {
-        id: "feedback-001",
-        role: "leader",
-        sender: "张总",
-        time: "2026-04-24 09:18",
-        content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。",
-    },
-    {
-        id: "feedback-002",
-        role: "manager",
-        sender: "股权运营部 王明",
-        time: "2026-04-24 10:06",
-        content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。",
-    },
-    {
-        id: "feedback-003",
-        role: "leader",
-        sender: "李董",
-        time: "2026-04-24 14:32",
-        content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。",
-    },
-    {
-        id: "feedback-004",
-        role: "manager",
-        sender: "法律合规部 李娜",
-        time: "2026-04-24 15:11",
-        content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。",
-    },
-];
+const topicFeedbackRecords = {
+    "topic-001": [
+        { id: "feedback-001", role: "leader", sender: "张总", time: "2026-04-24 09:18", content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。" },
+        { id: "feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-24 10:06", content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。" },
+    ],
+    "topic-002": [
+        { id: "feedback-003", role: "leader", sender: "李董", time: "2026-04-24 14:32", content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。" },
+        { id: "feedback-004", role: "manager", sender: "法律合规部 李娜", time: "2026-04-24 15:11", content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。" },
+    ],
+};
+const initialTopicFiles = {
+    "topic-001": [{ uid: "reference-001", name: "基金退出方案补充材料.pdf", url: "/advice-review/6a2133fde4b0cb6abf664a41.pdf" }],
+    "topic-002": [{ uid: "reference-002", name: "外部董事意见采纳情况说明.pdf", url: "/advice-review/6a2133fde4b0cb6abf664a41.pdf" }],
+};
+const initialTopicReplies = {
+    "topic-001": "<p>建议围绕基金退出节奏、交易对手资信及年度收益影响进一步补充说明。</p>",
+    "topic-002": "<p>建议补充外部董事意见采纳情况及法律合规部门书面意见。</p>",
+};
 const stripHtml = (value) => value
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/<script[\s\S]*?<\/script>/gi, "")
@@ -228,13 +216,15 @@ function RichReplyEditor({ value, onChange, }) {
         <Button title="有序列表" icon={<OrderedListOutlined />} onClick={() => exec("insertOrderedList")}/>
         <Button title="插入链接" icon={<LinkOutlined />} onClick={addLink}/>
       </div>
-      <div ref={editorRef} className="topic-rich-body" contentEditable data-placeholder="请输入领导回复意见，可使用上方工具进行简单排版" onInput={(event) => onChange(event.currentTarget.innerHTML)} onBlur={(event) => onChange(event.currentTarget.innerHTML)} suppressContentEditableWarning/>
+      <div ref={editorRef} className="topic-rich-body" contentEditable data-placeholder="请输入反馈建议意见，可使用上方工具进行简单排版" onInput={(event) => onChange(event.currentTarget.innerHTML)} onBlur={(event) => onChange(event.currentTarget.innerHTML)} suppressContentEditableWarning/>
     </div>);
 }
 export default function TopicAdvicePage() {
     const [messageApi, messageContextHolder] = message.useMessage();
-    const [replyHtml, setReplyHtml] = useState("<p>建议围绕基金退出节奏、董事会审议材料完整性及股东会沟通安排进一步补充说明。</p>");
-    const [lastSavedAt, setLastSavedAt] = useState("");
+    const [topicReplies, setTopicReplies] = useState(initialTopicReplies);
+    const [topicFiles, setTopicFiles] = useState(initialTopicFiles);
+    const [savedAtByTopic, setSavedAtByTopic] = useState({});
+    const [collapsedTopicIds, setCollapsedTopicIds] = useState(() => new Set());
     const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
     const enabledMeetings = meetings.filter((item) => item.enabled);
     const summaryStats = [
@@ -297,16 +287,22 @@ export default function TopicAdvicePage() {
         { title: "议题分类（中）", dataIndex: "categoryLv2Name" },
         { title: "议题分类（小）", dataIndex: "categoryLv3Name" },
         { title: "议题名称", dataIndex: "toipcName", width: 300 },
-        { title: "审批层级", dataIndex: "reviewLevel2" },
         {
-            title: "涉及会议",
-            width: 220,
-            render: (_value, record) => (<Space size={4} wrap>
-            {record.board ? <Tag color="blue">董事会</Tag> : null}
-            {record.supervisor ? <Tag color="purple">监事会</Tag> : null}
-            {record.shareholder ? <Tag color="cyan">股东会</Tag> : null}
-          </Space>),
+            title: "董事会",
+            dataIndex: "board",
+            render: (value) => (value ? "√" : "-"),
         },
+        {
+            title: "监事会",
+            dataIndex: "supervisor",
+            render: (value) => (value ? "√" : "-"),
+        },
+        {
+            title: "股东会",
+            dataIndex: "shareholder",
+            render: (value) => (value ? "√" : "-"),
+        },
+        { title: "审批层级", dataIndex: "reviewLevel2" },
     ], []);
     const distributionColumns = useMemo(() => [
         { title: "序号", width: 70, render: (_value, _row, index) => index + 1 },
@@ -336,25 +332,47 @@ export default function TopicAdvicePage() {
             render: (value) => (value ? <Tag color="success">是</Tag> : "否"),
         },
     ], []);
+    const updateTopicReply = (topicId, value) => {
+        setTopicReplies((current) => ({ ...current, [topicId]: value }));
+    };
+    const toggleTopicCollapsed = (topicId) => {
+        setCollapsedTopicIds((current) => {
+            const next = new Set(current);
+            if (next.has(topicId)) {
+                next.delete(topicId);
+            }
+            else {
+                next.add(topicId);
+            }
+            return next;
+        });
+    };
+    const addTopicFile = (topicId, file) => {
+        const nextFile = { uid: `${topicId}-${Date.now()}`, name: file.name, url: URL.createObjectURL(file) };
+        setTopicFiles((current) => ({ ...current, [topicId]: [...(current[topicId] || []), nextFile] }));
+        messageApi.success(`已上传参考文件：${file.name}`);
+        return Upload.LIST_IGNORE;
+    };
     const handleSave = () => {
-        if (!stripHtml(replyHtml)) {
-            messageApi.error("请填写回复内容后再保存");
+        if (topics.some((topic) => !stripHtml(topicReplies[topic.id] || ""))) {
+            messageApi.error("请填写每个议题的回复内容后再保存");
             return;
         }
         const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
-        setLastSavedAt(savedAt);
-        messageApi.success("回复内容已保存到本地假数据");
+        setSavedAtByTopic(Object.fromEntries(topics.map((topic) => [topic.id, savedAt])));
+        messageApi.success("各议题回复已保存到本地假数据");
     };
     const handleSubmit = () => {
-        if (!stripHtml(replyHtml)) {
-            messageApi.error("请填写回复内容后再提交");
+        if (topics.some((topic) => !stripHtml(topicReplies[topic.id] || ""))) {
+            messageApi.error("请填写每个议题的回复内容后再提交");
             return;
         }
         setSubmitConfirmOpen(true);
     };
     const handleConfirmSubmit = () => {
         setSubmitConfirmOpen(false);
-        setLastSavedAt(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+        const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
+        setSavedAtByTopic(Object.fromEntries(topics.map((topic) => [topic.id, savedAt])));
         messageApi.success("提交成功，已写入本地假数据");
     };
     return (<div className="topic-advice-page">
@@ -365,7 +383,7 @@ export default function TopicAdvicePage() {
           <p>参股公司议题提报内容、三会安排与回复意见集中处理。</p>
         </div>
         <div className="topic-advice-header-meta">
-          <Tag color="processing">待领导回复</Tag>
+          <Tag color="processing">待反馈建议</Tag>
         </div>
       </header>
 
@@ -492,34 +510,59 @@ export default function TopicAdvicePage() {
         <section className="topic-advice-section topic-feedback-section">
           <div className="topic-advice-section-head">
             <div>
-              <h2>问答记录</h2>
-              <p>左侧为领导回复，右侧为管护回答，保留每次沟通痕迹。</p>
+              <h2>逐议题问答与回复</h2>
+              <p>每个议题独立上传参考文件、查看问答记录并填写反馈建议。</p>
             </div>
             <Tag icon={<MessageOutlined />} color="processing">
-              {feedbackRecords.length} 条
+              {topics.length} 个议题
             </Tag>
           </div>
-          <div className="topic-feedback-list">
-            {feedbackRecords.map((item) => (<div className={`topic-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
-                <div className="topic-feedback-meta">
-                  <span>{item.role === "manager" ? "管护回答" : "领导回复"}</span>
-                  <strong>{item.sender}</strong>
-                  <em>{item.time}</em>
+          <div className="topic-feedback-topic-list">
+            {topics.map((topic, index) => {
+            const isCollapsed = collapsedTopicIds.has(topic.id);
+            return (<article className="topic-feedback-topic" key={topic.id}>
+              <div className="topic-feedback-topic-head">
+                <div>
+                  <span>议题 {String(index + 1).padStart(2, "0")}</span>
+                  <h3>{topic.toipcName}</h3>
                 </div>
-                <div className="topic-feedback-bubble">{item.content}</div>
-              </div>))}
+                <div className="topic-feedback-topic-actions">
+                  {savedAtByTopic[topic.id] ? <Tag color="green">已保存 {savedAtByTopic[topic.id]}</Tag> : <Tag>未保存</Tag>}
+                  <Button type="text" size="small" icon={isCollapsed ? <RightOutlined /> : <DownOutlined />} aria-expanded={!isCollapsed} onClick={() => toggleTopicCollapsed(topic.id)}>
+                    {isCollapsed ? "展开" : "收起"}
+                  </Button>
+                </div>
+              </div>
+              <div className="topic-feedback-topic-body" hidden={isCollapsed}>
+                <div className="topic-reference-files">
+                <div className="topic-reference-files-head">
+                  <strong><PaperClipOutlined /> 参考文件</strong>
+                  <Upload showUploadList={false} beforeUpload={(file) => addTopicFile(topic.id, file)}>
+                    <Button size="small" icon={<UploadOutlined />}>上传参考文件</Button>
+                  </Upload>
+                </div>
+                <div className="topic-reference-file-list">
+                  {(topicFiles[topic.id] || []).map((file) => <a href={file.url} target="_blank" rel="noreferrer" key={file.uid}><FileDoneOutlined /> {file.name}</a>)}
+                </div>
+              </div>
+              <div className="topic-feedback-list">
+                {(topicFeedbackRecords[topic.id] || []).map((item) => (<div className={`topic-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
+                  <div className="topic-feedback-meta">
+                    <span>{item.role === "manager" ? "管护回复" : "反馈建议"}</span>
+                    <strong>{item.sender}</strong>
+                    <em>{item.time}</em>
+                  </div>
+                  <div className="topic-feedback-bubble">{item.content}</div>
+                </div>))}
+              </div>
+              <div className="topic-feedback-editor">
+                <h4>本议题反馈建议</h4>
+                <RichReplyEditor value={topicReplies[topic.id] || ""} onChange={(value) => updateTopicReply(topic.id, value)}/>
+              </div>
+              </div>
+            </article>);
+        })}
           </div>
-        </section>
-
-        <section className="topic-advice-section topic-reply-section">
-          <div className="topic-advice-section-head">
-            <div>
-              <h2>领导回复</h2>
-              <p>回复内容为必填项，支持基础富文本排版。</p>
-            </div>
-            {lastSavedAt ? <Tag color="green">已保存 {lastSavedAt}</Tag> : <Tag>未保存</Tag>}
-          </div>
-          <RichReplyEditor value={replyHtml} onChange={setReplyHtml}/>
         </section>
       </main>
 

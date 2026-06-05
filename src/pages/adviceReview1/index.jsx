@@ -1,10 +1,12 @@
 import "antd/dist/reset.css";
 import {
     BoldOutlined,
+    DownOutlined,
     FilePdfOutlined,
     ItalicOutlined,
     LinkOutlined,
     OrderedListOutlined,
+    RightOutlined,
     SaveOutlined,
     SendOutlined,
     UnorderedListOutlined,
@@ -16,6 +18,24 @@ import "./index.css";
 
 const pdfUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf";
 const pdfPreviewUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf.png";
+const adviceTopics = [
+    {
+        id: "topic-001",
+        name: "测试1",
+        category: "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        meeting: "董事会",
+        reviewLevel: "业务总监",
+        initialReply: "<p>请填写本议题的表决建议。</p>",
+    },
+    {
+        id: "topic-002",
+        name: "测试1",
+        category: "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        meeting: "董事会",
+        reviewLevel: "业务总监",
+        initialReply: "<p>请填写本议题的表决建议。</p>",
+    },
+];
 
 const stripHtml = (value) =>
     value
@@ -69,23 +89,37 @@ function RichTextEditor({ value, onChange }) {
 
 export default function AdviceReview1Page() {
     const [messageApi, messageContextHolder] = message.useMessage();
-    const [replyHtml, setReplyHtml] = useState("<p>建议结合表决建议单内容，补充本次议题的风险提示、表决倾向及后续跟踪要求。</p>");
-    const [lastSavedAt, setLastSavedAt] = useState("");
+    const [topicReplies, setTopicReplies] = useState(() => Object.fromEntries(adviceTopics.map((topic) => [topic.id, topic.initialReply])));
+    const [savedAtByTopic, setSavedAtByTopic] = useState({});
+    const [collapsedTopicIds, setCollapsedTopicIds] = useState(() => new Set());
     const [submitOpen, setSubmitOpen] = useState(false);
 
+    const getIncompleteTopic = () => adviceTopics.find((topic) => !stripHtml(topicReplies[topic.id] || ""));
+
+    const toggleTopicCollapsed = (topicId) => {
+        setCollapsedTopicIds((current) => {
+            const next = new Set(current);
+            if (next.has(topicId)) next.delete(topicId);
+            else next.add(topicId);
+            return next;
+        });
+    };
+
     const handleSave = () => {
-        if (!stripHtml(replyHtml)) {
-            messageApi.error("请填写表决建议内容后再保存");
+        const incompleteTopic = getIncompleteTopic();
+        if (incompleteTopic) {
+            messageApi.error(`请填写“${incompleteTopic.name}”的表决建议`);
             return;
         }
         const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
-        setLastSavedAt(savedAt);
-        messageApi.success("表决建议已保存");
+        setSavedAtByTopic(Object.fromEntries(adviceTopics.map((topic) => [topic.id, savedAt])));
+        messageApi.success("各议题表决建议已保存");
     };
 
     const handleSubmit = () => {
-        if (!stripHtml(replyHtml)) {
-            messageApi.error("请填写表决建议内容后再提交");
+        const incompleteTopic = getIncompleteTopic();
+        if (incompleteTopic) {
+            messageApi.error(`请填写“${incompleteTopic.name}”的表决建议`);
             return;
         }
         setSubmitOpen(true);
@@ -93,7 +127,8 @@ export default function AdviceReview1Page() {
 
     const handleConfirmSubmit = () => {
         setSubmitOpen(false);
-        setLastSavedAt(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+        const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
+        setSavedAtByTopic(Object.fromEntries(adviceTopics.map((topic) => [topic.id, savedAt])));
         messageApi.success("提交成功");
     };
 
@@ -107,7 +142,7 @@ export default function AdviceReview1Page() {
                         表决建议单
                     </span>
                     <h1>表决建议单审阅</h1>
-                    <p>查看表决建议单 PDF，并在下方填写富文本表决建议。</p>
+                    <p>查看表决建议单 PDF，并按议题分别填写富文本表决建议。</p>
                 </div>
                 <Tag color="processing">待填写</Tag>
             </header>
@@ -128,12 +163,42 @@ export default function AdviceReview1Page() {
                 <section className="advice1-card advice1-editor-card">
                     <div className="advice1-section-head">
                         <div>
-                            <h2>表决建议</h2>
-                            <p>支持基础富文本排版，内容为必填项。</p>
+                            <h2>建议反馈</h2>
+                            <p>共 {adviceTopics.length} 个议题，每个议题均需单独回复。</p>
                         </div>
-                        {lastSavedAt ? <Tag color="success">已保存 {lastSavedAt}</Tag> : <Tag>未保存</Tag>}
+                        <Tag color="processing">{adviceTopics.length} 个议题</Tag>
                     </div>
-                    <RichTextEditor value={replyHtml} onChange={setReplyHtml} />
+                    <div className="advice1-topic-list">
+                        {adviceTopics.map((topic, index) => {
+                            const isCollapsed = collapsedTopicIds.has(topic.id);
+                            return (
+                            <article className="advice1-topic-item" key={topic.id}>
+                                <div className="advice1-topic-head">
+                                    <div className="advice1-topic-index">{String(index + 1).padStart(2, "0")}</div>
+                                    <div className="advice1-topic-title">
+                                        <h3>{topic.name}</h3>
+                                        <p>{topic.category}</p>
+                                    </div>
+                                    <div className="advice1-topic-tags">
+                                        <Tag color="blue">{topic.meeting}</Tag>
+                                        <Tag color="processing">{topic.reviewLevel}</Tag>
+                                        {savedAtByTopic[topic.id] ? <Tag color="success">已保存</Tag> : <Tag>未保存</Tag>}
+                                        <Button type="text" size="small" icon={isCollapsed ? <RightOutlined /> : <DownOutlined />} aria-expanded={!isCollapsed} onClick={() => toggleTopicCollapsed(topic.id)}>
+                                            {isCollapsed ? "展开" : "收起"}
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="advice1-topic-body" hidden={isCollapsed}>
+                                    <RichTextEditor
+                                        value={topicReplies[topic.id]}
+                                        onChange={(value) => setTopicReplies((current) => ({ ...current, [topic.id]: value }))}
+                                    />
+                                    {savedAtByTopic[topic.id] ? <p className="advice1-topic-saved">最近保存：{savedAtByTopic[topic.id]}</p> : null}
+                                </div>
+                            </article>
+                            );
+                        })}
+                    </div>
                 </section>
             </main>
 
@@ -147,7 +212,7 @@ export default function AdviceReview1Page() {
             </footer>
 
             <Modal title="确认提交表决建议？" open={submitOpen} okText="确认提交" cancelText="取消" onOk={handleConfirmSubmit} onCancel={() => setSubmitOpen(false)}>
-                <p>提交后将保存当前富文本表决建议内容。</p>
+                <p>提交后将保存全部 {adviceTopics.length} 个议题的表决建议内容。</p>
             </Modal>
         </div>
     );

@@ -4,9 +4,11 @@ import {
     AudioOutlined,
     CalendarOutlined,
     CheckCircleOutlined,
-    CloseOutlined,
+    DownOutlined,
     FileTextOutlined,
     MessageOutlined,
+    PaperClipOutlined,
+    RightOutlined,
     SendOutlined,
     TeamOutlined,
     UploadOutlined,
@@ -50,24 +52,24 @@ const smartFiles = [
 const topics = [
     {
         id: "topic-001",
-        categoryLv1Name: "基金管理",
-        categoryLv2Name: "基金退出",
-        categoryLv3Name: "退出决策",
-        toipcName: "关于推进基金退出事项的议案",
-        reviewLevel2: "董事会",
+        categoryLv1Name: "1. 经营类",
+        categoryLv2Name: "1.3 定期监管报告",
+        categoryLv3Name: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        toipcName: "测试1",
+        reviewLevel2: "业务总监",
         board: true,
         supervisor: false,
-        shareholder: true,
+        shareholder: false,
     },
     {
         id: "topic-002",
-        categoryLv1Name: "公司治理",
-        categoryLv2Name: "董事会事项",
-        categoryLv3Name: "方案审议",
-        toipcName: "关于补充外部董事意见采纳情况的议案",
-        reviewLevel2: "集团总办会",
+        categoryLv1Name: "1. 经营类",
+        categoryLv2Name: "1.3 定期监管报告",
+        categoryLv3Name: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        toipcName: "测试1",
+        reviewLevel2: "业务总监",
         board: true,
-        supervisor: true,
+        supervisor: false,
         shareholder: false,
     },
 ];
@@ -174,36 +176,24 @@ const reviewerNotifyRows = [
     },
 ];
 
-const feedbackRecords = [
-    {
-        id: "feedback-001",
-        role: "leader",
-        sender: "张总",
-        time: "2026-04-24 09:18",
-        content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。",
-    },
-    {
-        id: "feedback-002",
-        role: "manager",
-        sender: "股权运营部 王明",
-        time: "2026-04-24 10:06",
-        content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。",
-    },
-    {
-        id: "feedback-003",
-        role: "leader",
-        sender: "李董",
-        time: "2026-04-24 14:32",
-        content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。",
-    },
-    {
-        id: "feedback-004",
-        role: "manager",
-        sender: "法律合规部 李娜",
-        time: "2026-04-24 15:11",
-        content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。",
-    },
-];
+const topicFeedbackRecords = {
+    "topic-001": [
+        { id: "feedback-001", role: "leader", sender: "张总", time: "2026-04-24 09:18", content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。" },
+        { id: "feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-24 10:06", content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。" },
+    ],
+    "topic-002": [
+        { id: "feedback-003", role: "leader", sender: "李董", time: "2026-04-24 14:32", content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。" },
+        { id: "feedback-004", role: "manager", sender: "法律合规部 李娜", time: "2026-04-24 15:11", content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。" },
+    ],
+};
+const initialTopicFiles = {
+    "topic-001": [{ id: "reference-001", name: "基金退出方案补充材料.pdf", url: "/advice-review/6a2133fde4b0cb6abf664a41.pdf" }],
+    "topic-002": [{ id: "reference-002", name: "外部董事意见采纳情况说明.pdf", url: "/advice-review/6a2133fde4b0cb6abf664a41.pdf" }],
+};
+const initialTopicReplies = {
+    "topic-001": "建议围绕基金退出节奏、交易对手资信及年度收益影响进一步补充说明。",
+    "topic-002": "建议补充外部董事意见采纳情况及法律合规部门书面意见。",
+};
 
 const stripHtml = (value) =>
     value
@@ -245,16 +235,16 @@ function MeetingTags({ topic }) {
 }
 
 export default function TopicAdviceMobilePage() {
-    const [replyText, setReplyText] = useState("建议围绕基金退出节奏、董事会审议材料完整性及股东会沟通安排进一步补充说明。");
-    const [voiceFiles, setVoiceFiles] = useState([]);
-    const [isListening, setIsListening] = useState(false);
-    const [lastSavedAt, setLastSavedAt] = useState("");
-    const voiceInputRef = useRef(null);
-    const voiceUrlRef = useRef([]);
+    const [topicReplies, setTopicReplies] = useState(initialTopicReplies);
+    const [topicFiles, setTopicFiles] = useState(initialTopicFiles);
+    const [listeningTopicId, setListeningTopicId] = useState("");
+    const [uploadTopicId, setUploadTopicId] = useState("");
+    const [savedAtByTopic, setSavedAtByTopic] = useState({});
+    const [collapsedTopicIds, setCollapsedTopicIds] = useState(() => new Set());
     const recognitionRef = useRef(null);
+    const fileInputRef = useRef(null);
     const enabledMeetings = useMemo(() => meetings.filter((item) => item.enabled), []);
     const conveyCount = useMemo(() => distributionRows.filter((item) => item.hasConvey).length, []);
-    const hasReplyContent = stripHtml(replyText) || voiceFiles.length > 0;
     const summaryStats = [
         { key: "files", label: "文件", value: smartFiles.length, suffix: "份" },
         { key: "topics", label: "议题", value: topics.length, suffix: "项" },
@@ -265,48 +255,33 @@ export default function TopicAdviceMobilePage() {
     useEffect(() => {
         return () => {
             recognitionRef.current?.stop();
-            voiceUrlRef.current.forEach((url) => URL.revokeObjectURL(url));
         };
     }, []);
 
-    const appendReplyText = (text) => {
+    const updateTopicReply = (topicId, value) => {
+        setTopicReplies((current) => ({ ...current, [topicId]: value }));
+    };
+
+    const toggleTopicCollapsed = (topicId) => {
+        setCollapsedTopicIds((current) => {
+            const next = new Set(current);
+            if (next.has(topicId)) next.delete(topicId);
+            else next.add(topicId);
+            return next;
+        });
+    };
+
+    const appendReplyText = (topicId, text) => {
         const nextText = text.trim();
         if (!nextText) return;
-        setReplyText((current) => {
-            const prefix = current.trim();
-            return [prefix, nextText].filter(Boolean).join(prefix ? "\n" : "").slice(0, 500);
+        setTopicReplies((current) => {
+            const prefix = (current[topicId] || "").trim();
+            return { ...current, [topicId]: [prefix, nextText].filter(Boolean).join(prefix ? "\n" : "").slice(0, 500) };
         });
     };
 
-    const handleVoiceUpload = (event) => {
-        const files = Array.from(event.target.files || []);
-        if (!files.length) return;
-        const uploadedFiles = files.map((file) => {
-            const url = URL.createObjectURL(file);
-            voiceUrlRef.current.push(url);
-            return {
-                id: `${file.name}-${file.lastModified}-${Date.now()}`,
-                name: file.name,
-                size: file.size,
-                url,
-            };
-        });
-        setVoiceFiles((current) => [...current, ...uploadedFiles]);
-        Toast.show(`已上传 ${files.length} 条语音`);
-        event.target.value = "";
-    };
-
-    const handleRemoveVoice = (id) => {
-        setVoiceFiles((current) => {
-            const target = current.find((item) => item.id === id);
-            if (target?.url) URL.revokeObjectURL(target.url);
-            voiceUrlRef.current = voiceUrlRef.current.filter((url) => url !== target?.url);
-            return current.filter((item) => item.id !== id);
-        });
-    };
-
-    const handleSpeechToText = () => {
-        if (isListening) {
+    const handleSpeechToText = (topicId) => {
+        if (listeningTopicId === topicId) {
             recognitionRef.current?.stop();
             return;
         }
@@ -320,40 +295,54 @@ export default function TopicAdviceMobilePage() {
         recognition.interimResults = false;
         recognition.continuous = false;
         recognition.onstart = () => {
-            setIsListening(true);
+            setListeningTopicId(topicId);
             Toast.show("正在听取语音");
         };
         recognition.onresult = (event) => {
             const transcript = Array.from(event.results)
                 .map((result) => result[0]?.transcript || "")
                 .join("");
-            appendReplyText(transcript);
+            appendReplyText(topicId, transcript);
             Toast.show("已转为文字");
         };
         recognition.onerror = () => {
             Toast.show("语音识别失败，请重试");
         };
         recognition.onend = () => {
-            setIsListening(false);
+            setListeningTopicId("");
             recognitionRef.current = null;
         };
         recognitionRef.current = recognition;
         recognition.start();
     };
 
+    const handleReferenceUpload = (topicId) => {
+        setUploadTopicId(topicId);
+        fileInputRef.current?.click();
+    };
+
+    const handleReferenceFileChange = (event) => {
+        const file = event.target.files?.[0];
+        if (!file || !uploadTopicId) return;
+        const nextFile = { id: `${uploadTopicId}-${Date.now()}`, name: file.name, url: URL.createObjectURL(file) };
+        setTopicFiles((current) => ({ ...current, [uploadTopicId]: [...(current[uploadTopicId] || []), nextFile] }));
+        event.target.value = "";
+        Toast.show(`已上传参考文件：${file.name}`);
+    };
+
     const handleSave = () => {
-        if (!hasReplyContent) {
-            Toast.show("请填写回复内容或上传语音后再保存");
+        if (topics.some((topic) => !stripHtml(topicReplies[topic.id] || ""))) {
+            Toast.show("请填写每个议题的回复内容后再保存");
             return;
         }
         const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
-        setLastSavedAt(savedAt);
-        Toast.show("回复内容已保存");
+        setSavedAtByTopic(Object.fromEntries(topics.map((topic) => [topic.id, savedAt])));
+        Toast.show("各议题回复已保存");
     };
 
     const handleSubmit = async () => {
-        if (!hasReplyContent) {
-            Toast.show("请填写回复内容或上传语音后再提交");
+        if (topics.some((topic) => !stripHtml(topicReplies[topic.id] || ""))) {
+            Toast.show("请填写每个议题的回复内容后再提交");
             return;
         }
         const confirmed = await Dialog.confirm({
@@ -363,7 +352,8 @@ export default function TopicAdviceMobilePage() {
             cancelText: "取消",
         });
         if (confirmed) {
-            setLastSavedAt(dayjs().format("YYYY-MM-DD HH:mm:ss"));
+            const savedAt = dayjs().format("YYYY-MM-DD HH:mm:ss");
+            setSavedAtByTopic(Object.fromEntries(topics.map((topic) => [topic.id, savedAt])));
             Toast.show("提交成功");
         }
     };
@@ -373,7 +363,7 @@ export default function TopicAdviceMobilePage() {
             <header className="topic-mobile-hero">
                 <div className="topic-mobile-status">
                     <Tag color="primary" fill="solid">
-                        待领导回复
+                        待反馈建议
                     </Tag>
                     <span>SH-2026-004</span>
                 </div>
@@ -497,66 +487,64 @@ export default function TopicAdviceMobilePage() {
                     </Collapse>
                 </Section>
 
-                <Section title="问答记录" icon={<MessageOutlined />}>
-                    <div className="topic-mobile-feedback-list">
-                        {feedbackRecords.map((item) => (
-                            <article className={`topic-mobile-feedback ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
-                                <div className="topic-mobile-feedback-meta">
-                                    <span>{item.role === "manager" ? "管护回答" : "领导回复"}</span>
-                                    <strong>{item.sender}</strong>
+                <Section title="逐议题问答与回复" icon={<MessageOutlined />}>
+                    <input ref={fileInputRef} className="topic-mobile-file-input" type="file" onChange={handleReferenceFileChange} />
+                    <div className="topic-mobile-feedback-topics">
+                        {topics.map((topic, index) => {
+                            const isCollapsed = collapsedTopicIds.has(topic.id);
+                            return (
+                            <article className="topic-mobile-feedback-topic" key={topic.id}>
+                                <div className="topic-mobile-feedback-topic-head">
+                                    <div>
+                                        <span>议题 {String(index + 1).padStart(2, "0")}</span>
+                                        <h3>{topic.toipcName}</h3>
+                                    </div>
+                                    <div className="topic-mobile-feedback-topic-actions">
+                                        {savedAtByTopic[topic.id] ? <Tag color="success">已保存</Tag> : <Tag>未保存</Tag>}
+                                        <Button size="mini" fill="none" aria-expanded={!isCollapsed} onClick={() => toggleTopicCollapsed(topic.id)}>
+                                            {isCollapsed ? <RightOutlined /> : <DownOutlined />}
+                                            {isCollapsed ? "展开" : "收起"}
+                                        </Button>
+                                    </div>
                                 </div>
-                                <p>{item.content}</p>
-                                <time>{item.time}</time>
-                            </article>
-                        ))}
-                    </div>
-                </Section>
-
-                <Section title="领导回复" icon={<SendOutlined />}>
-                    <div className="topic-mobile-reply-card">
-                        <div className="topic-mobile-reply-meta">
-                            <span>文字或语音至少填写一项</span>
-                            {lastSavedAt ? <Tag color="success">已保存</Tag> : <Tag>未保存</Tag>}
-                        </div>
-                        <TextArea
-                            value={replyText}
-                            onChange={setReplyText}
-                            placeholder="请输入领导回复意见"
-                            autoSize={{ minRows: 5, maxRows: 8 }}
-                            showCount
-                            maxLength={500}
-                        />
-                        <div className="topic-mobile-voice-actions">
-                            <input ref={voiceInputRef} className="topic-mobile-voice-input" type="file" accept="audio/*" capture="microphone" multiple onChange={handleVoiceUpload} />
-                            <Button size="small" fill="outline" onClick={() => voiceInputRef.current?.click()}>
-                                <UploadOutlined />
-                                上传语音
-                            </Button>
-                            <Button size="small" color={isListening ? "warning" : "primary"} fill={isListening ? "solid" : "outline"} onClick={handleSpeechToText}>
-                                <AudioOutlined />
-                                {isListening ? "停止识别" : "语音转文字"}
-                            </Button>
-                        </div>
-                        {voiceFiles.length ? (
-                            <div className="topic-mobile-voice-list">
-                                {voiceFiles.map((file) => (
-                                    <article className="topic-mobile-voice-item" key={file.id}>
-                                        <div className="topic-mobile-voice-info">
-                                            <AudioOutlined />
-                                            <div>
-                                                <strong>{file.name}</strong>
-                                                <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                                <div className="topic-mobile-feedback-topic-body" hidden={isCollapsed}>
+                                  <div className="topic-mobile-reference">
+                                    <div className="topic-mobile-reference-head">
+                                        <strong><PaperClipOutlined /> 参考文件</strong>
+                                        <Button size="mini" fill="outline" color="primary" onClick={() => handleReferenceUpload(topic.id)}>
+                                            <UploadOutlined /> 上传
+                                        </Button>
+                                    </div>
+                                    <div className="topic-mobile-reference-list">
+                                        {(topicFiles[topic.id] || []).map((file) => <a href={file.url} target="_blank" rel="noreferrer" key={file.id}>{file.name}</a>)}
+                                    </div>
+                                </div>
+                                <div className="topic-mobile-feedback-list">
+                                    {(topicFeedbackRecords[topic.id] || []).map((item) => (
+                                        <article className={`topic-mobile-feedback ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
+                                            <div className="topic-mobile-feedback-meta">
+                                                <span>{item.role === "manager" ? "管护回复" : "反馈建议"}</span>
+                                                <strong>{item.sender}</strong>
                                             </div>
-                                        </div>
-                                        <audio controls src={file.url} />
-                                        <button type="button" className="topic-mobile-voice-remove" onClick={() => handleRemoveVoice(file.id)} aria-label={`移除${file.name}`}>
-                                            <CloseOutlined />
-                                        </button>
-                                    </article>
-                                ))}
-                            </div>
-                        ) : null}
-                        {lastSavedAt ? <p className="topic-mobile-saved-at">最近保存：{lastSavedAt}</p> : null}
+                                            <p>{item.content}</p>
+                                            <time>{item.time}</time>
+                                        </article>
+                                    ))}
+                                </div>
+                                <div className="topic-mobile-reply-card">
+                                    <div className="topic-mobile-reply-meta"><span>本议题反馈建议</span><span>支持语音转文字</span></div>
+                                    <TextArea value={topicReplies[topic.id] || ""} onChange={(value) => updateTopicReply(topic.id, value)} placeholder="请输入本议题反馈建议意见" autoSize={{ minRows: 4, maxRows: 8 }} showCount maxLength={500} />
+                                    <div className="topic-mobile-voice-actions">
+                                        <Button size="small" color={listeningTopicId === topic.id ? "warning" : "primary"} fill={listeningTopicId === topic.id ? "solid" : "outline"} onClick={() => handleSpeechToText(topic.id)}>
+                                            <AudioOutlined />{listeningTopicId === topic.id ? "停止识别" : "语音转文字"}
+                                        </Button>
+                                    </div>
+                                    {savedAtByTopic[topic.id] ? <p className="topic-mobile-saved-at">最近保存：{savedAtByTopic[topic.id]}</p> : null}
+                                  </div>
+                                </div>
+                            </article>
+                            );
+                        })}
                     </div>
                 </Section>
             </main>

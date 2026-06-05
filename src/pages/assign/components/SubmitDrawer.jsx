@@ -11,22 +11,26 @@ const topicFileTypes = [
     { value: "400", label: "补充材料" },
 ];
 const reviewLevelOptions = [
+    { value: "400", label: "业务总监" },
     { value: "100", label: "董事会" },
     { value: "200", label: "股东会" },
     { value: "300", label: "集团总办会" },
 ];
 const categoryOptions = {
     lv1: [
+        { value: "operation", label: "1. 经营类" },
         { value: "fund", label: "基金管理" },
         { value: "asset", label: "资产处置" },
         { value: "governance", label: "公司治理" },
     ],
     lv2: [
+        { value: "regular-report", label: "1.3 定期监管报告" },
         { value: "exit", label: "基金退出" },
         { value: "transfer", label: "股权转让" },
         { value: "board", label: "董事会事项" },
     ],
     lv3: [
+        { value: "regulatory-report", label: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）" },
         { value: "decision", label: "退出决策" },
         { value: "review", label: "方案审议" },
         { value: "execute", label: "决策执行" },
@@ -64,24 +68,24 @@ const initialSmartFiles = [
 const initialTopics = [
     {
         id: "topic-001",
-        categoryLv1Name: "基金管理",
-        categoryLv2Name: "基金退出",
-        categoryLv3Name: "退出决策",
-        toipcName: "关于推进基金退出事项的议案",
-        reviewLevel2: "董事会",
+        categoryLv1Name: "1. 经营类",
+        categoryLv2Name: "1.3 定期监管报告",
+        categoryLv3Name: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        toipcName: "测试1",
+        reviewLevel2: "业务总监",
         board: true,
         supervisor: false,
-        shareholder: true,
+        shareholder: false,
     },
     {
         id: "topic-002",
-        categoryLv1Name: "公司治理",
-        categoryLv2Name: "董事会事项",
-        categoryLv3Name: "方案审议",
-        toipcName: "关于补充外部董事意见采纳情况的议案",
-        reviewLevel2: "集团总办会",
+        categoryLv1Name: "1. 经营类",
+        categoryLv2Name: "1.3 定期监管报告",
+        categoryLv3Name: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+        toipcName: "测试1",
+        reviewLevel2: "业务总监",
         board: true,
-        supervisor: true,
+        supervisor: false,
         shareholder: false,
     },
 ];
@@ -377,11 +381,11 @@ function TopicManage({ disabled, onPrev, onNext, }) {
                 setTopics((current) => [
                     {
                         id: `topic-${Date.now()}`,
-                        categoryLv1Name: "基金管理",
-                        categoryLv2Name: "基金退出",
-                        categoryLv3Name: "决策执行",
-                        toipcName: "新增基金退出执行跟踪议题",
-                        reviewLevel2: "董事会",
+                        categoryLv1Name: "1. 经营类",
+                        categoryLv2Name: "1.3 定期监管报告",
+                        categoryLv3Name: "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+                        toipcName: "测试1",
+                        reviewLevel2: "业务总监",
                         board: true,
                         supervisor: false,
                         shareholder: false,

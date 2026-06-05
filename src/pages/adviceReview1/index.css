@@ -140,6 +140,80 @@ body,
   margin: 0 auto;
 }
 
+.advice1-topic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.advice1-topic-item {
+  padding: 14px;
+  border: 1px solid #dce5ef;
+  border-radius: 8px;
+  background: #fbfdff;
+}
+
+.advice1-topic-head {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.advice1-topic-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: #0e6f68;
+  background: #e8f6f3;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.advice1-topic-title {
+  min-width: 0;
+}
+
+.advice1-topic-tags {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.advice1-topic-tags .ant-tag {
+  margin-inline-end: 0;
+}
+
+.advice1-topic-tags .ant-btn {
+  color: #52657a;
+}
+
+.advice1-topic-body[hidden] {
+  display: none;
+}
+
+.advice1-topic-title h3 {
+  margin: 0;
+  color: #172235;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.advice1-topic-title p,
+.advice1-topic-saved {
+  margin: 3px 0 0;
+  color: #758295;
+  font-size: 12px;
+  line-height: 18px;
+}
+
 .advice1-rich-editor {
   overflow: hidden;
   border: 1px solid #cfd8e5;
@@ -161,7 +235,7 @@ body,
 }
 
 .advice1-rich-body {
-  min-height: 220px;
+  min-height: 150px;
   padding: 16px 18px;
   outline: none;
   color: #182230;

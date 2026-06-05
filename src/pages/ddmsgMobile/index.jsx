@@ -18,7 +18,7 @@ const dingTalkMessages = [
         avatarText: "管",
         avatarTone: "green",
         receiver: "管护端",
-        content: "王经理您好，领导已完成议题反馈建议回复，请及时查看回复内容，并补充管护回答。",
+        content: "王经理您好，领导已完成议题反馈建议回复，请及时查看回复内容，并补充管护回复。",
         buttonText: "查看详情",
     },
     {

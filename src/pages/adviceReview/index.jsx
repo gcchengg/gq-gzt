@@ -8,6 +8,7 @@ import {
   Select,
   Space,
   Spin,
+  Table,
   message,
 } from "antd";
 import {
@@ -24,6 +25,43 @@ import "./index.css";
 
 const pdfUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf";
 const previewUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf.png";
+const adviceTopics = [
+  {
+    id: "topic-001",
+    categoryLv1Name: "1. 经营类",
+    categoryLv2Name: "1.3 定期监管报告",
+    categoryLv3Name:
+      "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+    topicName: "测试1",
+    board: true,
+    supervisor: false,
+    shareholder: false,
+    reviewLevel: "业务总监",
+  },
+  {
+    id: "topic-002",
+    categoryLv1Name: "1. 经营类",
+    categoryLv2Name: "1.3 定期监管报告",
+    categoryLv3Name:
+      "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
+    topicName: "测试1",
+    board: true,
+    supervisor: false,
+    shareholder: false,
+    reviewLevel: "业务总监",
+  },
+];
+const adviceTopicColumns = [
+  { title: "序号", width: 64, render: (_value, _record, index) => index + 1 },
+  { title: "议题分类（大）", dataIndex: "categoryLv1Name", width: 140 },
+  { title: "议题分类（中）", dataIndex: "categoryLv2Name", width: 180 },
+  { title: "议题分类（小）", dataIndex: "categoryLv3Name", width: 720 },
+  { title: "议题名称", dataIndex: "topicName", width: 120 },
+  { title: "董事会", dataIndex: "board", width: 88, render: (value) => (value ? "√" : "-") },
+  { title: "监事会", dataIndex: "supervisor", width: 88, render: (value) => (value ? "√" : "-") },
+  { title: "股东会", dataIndex: "shareholder", width: 88, render: (value) => (value ? "√" : "-") },
+  { title: "审批层级", dataIndex: "reviewLevel", width: 120 },
+];
 
 function ScreenshotButton({ onClick }) {
   return (
@@ -344,12 +382,22 @@ export default function AdviceReview() {
         <div className="advice-review-header">
           <div>
             <h1>表决建议审阅</h1>
-            <p>在线查看 PDF 内容，并对当前材料截图进行框选标注。</p>
           </div>
           <div className="contentHeader">
             <ScreenshotButton onClick={handleCapture} />
           </div>
         </div>
+
+        <Card title={`议题列表（${adviceTopics.length}）`} className="advice-pdf-card">
+          <Table
+            rowKey="id"
+            columns={adviceTopicColumns}
+            dataSource={adviceTopics}
+            pagination={false}
+            size="small"
+            scroll={{ x: 1616 }}
+          />
+        </Card>
 
         <div className="advice-pdf-card">
           <div className="advice-pdf-toolbar">

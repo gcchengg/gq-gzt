@@ -1,3 +1,4 @@
+import { FileOutlined } from "@ant-design/icons";
 import { Button, Descriptions, Drawer, Empty, Input, Steps, Tabs, Tag, Timeline, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
@@ -27,94 +28,75 @@ const tabStepThreshold = {
     "6": 18000,
     "7": 19000,
 };
-const directorFeedbackRecords = [
-    {
-        id: "feedback-001",
-        role: "leader",
-        sender: "张总",
-        time: "2026-04-24 09:18",
-        content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。",
-    },
-    {
-        id: "feedback-002",
-        role: "manager",
-        sender: "股权运营部 王明",
-        time: "2026-04-24 10:06",
-        content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。",
-    },
-    {
-        id: "feedback-003",
-        role: "leader",
-        sender: "李董",
-        time: "2026-04-24 14:32",
-        content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。",
-    },
-    {
-        id: "feedback-004",
-        role: "manager",
-        sender: "法律合规部 李娜",
-        time: "2026-04-24 15:11",
-        content: "已核对章程及投资协议，不触发其他股东优先购买权。书面意见已随补充材料上传。",
-    },
-];
-const voteFeedbackRecords = [
-    {
-        id: "vote-feedback-001",
-        role: "leader",
-        sender: "张总",
-        time: "2026-04-25 09:42",
-        content: "表决建议中请明确本次基金退出的表决倾向，并补充收益测算依据和风险兜底安排。",
-    },
-    {
-        id: "vote-feedback-002",
-        role: "manager",
-        sender: "股权运营部 王明",
-        time: "2026-04-25 10:18",
-        content: "已收到，表决倾向拟调整为建议同意，并同步补充收益测算底稿及风险处置预案。",
-    },
-    {
-        id: "vote-feedback-003",
-        role: "leader",
-        sender: "李董",
-        time: "2026-04-25 14:05",
-        content: "请在表决建议单中说明是否需要附带授权条件，避免后续执行口径不一致。",
-    },
-    {
-        id: "vote-feedback-004",
-        role: "manager",
-        sender: "法律合规部 李娜",
-        time: "2026-04-25 15:26",
-        content: "已补充授权条件：交易价格、付款节点及协议签署文本需经法务复核后方可执行。",
-    },
-];
-function FeedbackChat({ title, records, draft, onDraftChange, onSend, status = "沟通中" }) {
-    return (<div className="assign-feedback-chat">
+const referenceUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf";
+const initialFeedbackGroups = {
+    topic: [
+        { key: "zhang", name: "张总", topics: [
+            { id: "topic-001", name: "关于推进基金退出事项的议案", files: [{ name: "基金退出方案补充材料.pdf", url: referenceUrl }], records: [
+                { id: "feedback-001", role: "leader", sender: "张总", time: "2026-04-24 09:18", content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。" },
+                { id: "feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-24 10:06", content: "已收到，管护团队正在补充资信核查表和收益测算口径。" },
+            ] },
+            { id: "topic-002", name: "关于补充外部董事意见采纳情况的议案", files: [{ name: "外部董事意见采纳情况说明.pdf", url: referenceUrl }], records: [
+                { id: "feedback-003", role: "leader", sender: "张总", time: "2026-04-24 11:20", content: "请逐项标注外部董事意见是否采纳以及未采纳原因。" },
+            ] },
+        ] },
+        { key: "li", name: "李董", topics: [
+            { id: "topic-001", name: "关于推进基金退出事项的议案", files: [{ name: "交易协议法律意见.pdf", url: referenceUrl }], records: [
+                { id: "feedback-004", role: "leader", sender: "李董", time: "2026-04-24 14:32", content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。" },
+                { id: "feedback-005", role: "manager", sender: "法律合规部 李娜", time: "2026-04-24 15:11", content: "已核对章程及投资协议，不触发其他股东优先购买权。" },
+            ] },
+        ] },
+    ],
+    vote: [
+        { key: "zhang", name: "张总", topics: [
+            { id: "topic-001", name: "关于推进基金退出事项的议案", files: [{ name: "表决建议单-基金退出.pdf", url: referenceUrl }], records: [
+                { id: "vote-feedback-001", role: "leader", sender: "张总", time: "2026-04-25 09:42", content: "表决建议中请明确本次基金退出的表决倾向，并补充收益测算依据和风险兜底安排。" },
+                { id: "vote-feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-25 10:18", content: "已收到，表决倾向拟调整为建议同意，并同步补充收益测算底稿。" },
+            ] },
+        ] },
+        { key: "li", name: "李董", topics: [
+            { id: "topic-002", name: "关于补充外部董事意见采纳情况的议案", files: [{ name: "表决建议单-董事意见采纳.pdf", url: referenceUrl }], records: [
+                { id: "vote-feedback-003", role: "leader", sender: "李董", time: "2026-04-25 14:05", content: "请在表决建议单中说明是否需要附带授权条件，避免后续执行口径不一致。" },
+                { id: "vote-feedback-004", role: "manager", sender: "法律合规部 李娜", time: "2026-04-25 15:26", content: "已补充授权条件，协议签署文本需经法务复核后方可执行。" },
+            ] },
+        ] },
+    ],
+};
+function FeedbackChat({ topic, draft, onDraftChange }) {
+    return (<section className="assign-feedback-topic">
       <div className="assign-feedback-chat-head">
-        <div>
-          <h3>{title}</h3>
-          <p>左侧为领导返回，右侧为管护回复。</p>
-        </div>
-        <Tag color="processing">{status}</Tag>
+        <div><h3>{topic.name}</h3><p>按议题保留董事建议、参考文件和管护回复。</p></div>
+        <Tag color="processing">沟通中</Tag>
+      </div>
+      <div className="assign-feedback-files">
+        <strong>议题文件</strong>
+        {topic.files.map((file) => <a href={file.url} target="_blank" rel="noreferrer" key={file.name}><FileOutlined /> {file.name}</a>)}
       </div>
       <div className="assign-feedback-chat-body">
-        {records.map((item) => (<div className={`assign-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
-            <div className="assign-feedback-meta">
-              <span>{item.role === "manager" ? "管护回复" : "领导返回"}</span>
-              <strong>{item.sender}</strong>
-              <em>{item.time}</em>
-            </div>
-            <div className="assign-feedback-bubble">{item.content}</div>
-          </div>))}
+        {topic.records.map((item) => (<div className={`assign-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
+          <div className="assign-feedback-meta"><span>{item.role === "manager" ? "管护回复" : "反馈建议"}</span><strong>{item.sender}</strong><em>{item.time}</em></div>
+          <div className="assign-feedback-bubble">{item.content}</div>
+        </div>))}
       </div>
       <div className="assign-feedback-reply">
-        <Input.TextArea value={draft} onChange={(event) => onDraftChange(event.target.value)} placeholder="请输入管护回复内容" autoSize={{ minRows: 3, maxRows: 5 }} maxLength={500} showCount/>
-        <div className="assign-feedback-reply-actions">
-          <Button type="primary" onClick={onSend}>
-            发送管护回复
-          </Button>
-        </div>
+        <Input.TextArea value={draft} onChange={(event) => onDraftChange(event.target.value)} placeholder="请输入对本议题的管护回复内容" autoSize={{ minRows: 3, maxRows: 5 }} maxLength={500} showCount/>
       </div>
-    </div>);
+    </section>);
+}
+function DirectorFeedbackPanel({ type, directors, drafts, onDraftChange, onSend }) {
+    return <Tabs className="assign-director-tabs" defaultActiveKey={directors[0]?.key} items={directors.map((director) => ({
+        key: director.key,
+        label: director.name,
+        children: <div className="assign-feedback-panel">
+          <div className="assign-feedback-chat">{director.topics.map((topic) => {
+              const draftKey = `${type}-${director.key}-${topic.id}`;
+              return <FeedbackChat key={topic.id} topic={topic} draft={drafts[draftKey] || ""} onDraftChange={(value) => onDraftChange(draftKey, value)}/>;
+          })}</div>
+          <div className="assign-feedback-panel-actions">
+            <Button type="primary" onClick={() => onSend(type, director.key)}>发送管护回复</Button>
+          </div>
+        </div>,
+    }))}/>;
 }
 function StagePlaceholder({ title, projectData, status, }) {
     return (<div className="assign-stage-card">
@@ -144,9 +126,8 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
     const [meetingOpen, setMeetingOpen] = useState(false);
     const [feedbackOpen, setFeedbackOpen] = useState(false);
     const [voteList, setVoteList] = useState([]);
-    const [topicFeedbackRecords, setTopicFeedbackRecords] = useState(directorFeedbackRecords);
-    const [voteFeedbackRecordsState, setVoteFeedbackRecordsState] = useState(voteFeedbackRecords);
-    const [feedbackDrafts, setFeedbackDrafts] = useState({ topic: "", vote: "" });
+    const [feedbackGroups, setFeedbackGroups] = useState(initialFeedbackGroups);
+    const [feedbackDrafts, setFeedbackDrafts] = useState({});
     const currentStep = String(progStatus) === "99999" ? "15000" : String(progStatus);
     useEffect(() => {
         getOtherInfo({ id }).then((res) => setProjectData(res.data));
@@ -174,27 +155,46 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
     const updateFeedbackDraft = (key, value) => {
         setFeedbackDrafts((current) => ({ ...current, [key]: value }));
     };
-    const sendFeedbackReply = (key) => {
-        const content = feedbackDrafts[key]?.trim();
-        if (!content) {
+    const sendFeedbackReply = (type, directorKey) => {
+        const director = feedbackGroups[type].find((item) => item.key === directorKey);
+        const replies = director?.topics
+            .map((topic) => {
+            const draftKey = `${type}-${directorKey}-${topic.id}`;
+            return { topicId: topic.id, draftKey, content: feedbackDrafts[draftKey]?.trim() };
+        })
+            .filter((item) => item.content) || [];
+        if (!replies.length) {
             message.warning("请输入管护回复内容");
             return;
         }
-        const nextRecord = {
-            id: `${key}-feedback-${Date.now()}`,
-            role: "manager",
-            sender: "管护 王明",
-            time: dayjs().format("YYYY-MM-DD HH:mm"),
-            content,
-        };
-        if (key === "topic") {
-            setTopicFeedbackRecords((current) => [...current, nextRecord]);
-        }
-        else {
-            setVoteFeedbackRecordsState((current) => [...current, nextRecord]);
-        }
-        updateFeedbackDraft(key, "");
-        message.success("管护回复已添加");
+        const sentAt = dayjs().format("YYYY-MM-DD HH:mm");
+        setFeedbackGroups((current) => ({
+            ...current,
+            [type]: current[type].map((director) => director.key === directorKey ? {
+                ...director,
+                topics: director.topics.map((topic) => {
+                    const reply = replies.find((item) => item.topicId === topic.id);
+                    return reply ? {
+                        ...topic,
+                        records: [...topic.records, {
+                            id: `${reply.draftKey}-feedback-${Date.now()}`,
+                            role: "manager",
+                            sender: "管护 王明",
+                            time: sentAt,
+                            content: reply.content,
+                        }],
+                    } : topic;
+                }),
+            } : director),
+        }));
+        setFeedbackDrafts((current) => {
+            const nextDrafts = { ...current };
+            replies.forEach((reply) => {
+                nextDrafts[reply.draftKey] = "";
+            });
+            return nextDrafts;
+        });
+        message.success(`已发送 ${replies.length} 条管护回复`);
     };
     const tabItems = [
         {
@@ -281,12 +281,12 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
             {
                 key: "topic",
                 label: "议题建议反馈",
-                children: (<FeedbackChat title={projectData.topicName || "关于推进基金退出事项的议案"} records={topicFeedbackRecords} draft={feedbackDrafts.topic} onDraftChange={(value) => updateFeedbackDraft("topic", value)} onSend={() => sendFeedbackReply("topic")}/>),
+                children: <DirectorFeedbackPanel type="topic" directors={feedbackGroups.topic} drafts={feedbackDrafts} onDraftChange={updateFeedbackDraft} onSend={sendFeedbackReply}/>,
             },
             {
                 key: "vote",
                 label: "表决建议反馈",
-                children: (<FeedbackChat title="表决建议单反馈记录" records={voteFeedbackRecordsState} draft={feedbackDrafts.vote} onDraftChange={(value) => updateFeedbackDraft("vote", value)} onSend={() => sendFeedbackReply("vote")}/>),
+                children: <DirectorFeedbackPanel type="vote" directors={feedbackGroups.vote} drafts={feedbackDrafts} onDraftChange={updateFeedbackDraft} onSend={sendFeedbackReply}/>,
             },
         ]}/>
       </Drawer>

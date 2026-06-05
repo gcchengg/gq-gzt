@@ -311,6 +311,111 @@ body,
   box-shadow: 0 8px 18px rgba(18, 43, 39, 0.045);
 }
 
+.topic-mobile-file-input {
+  display: none;
+}
+
+.topic-mobile-feedback-topics {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.topic-mobile-feedback-topic-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.topic-mobile-feedback-topic-actions .adm-button {
+  padding: 0 2px;
+  color: #536966;
+  font-size: 12px;
+}
+
+.topic-mobile-feedback-topic-actions .adm-button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.topic-mobile-feedback-topic-body[hidden] {
+  display: none;
+}
+
+.topic-mobile-feedback-topic {
+  padding: 12px;
+  border: 1px solid #dce8e5;
+  border-radius: 8px;
+  background: #fbfdfd;
+}
+
+.topic-mobile-feedback-topic-head,
+.topic-mobile-reference-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.topic-mobile-feedback-topic-head {
+  margin-bottom: 10px;
+}
+
+.topic-mobile-feedback-topic-head span {
+  color: #70817e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.topic-mobile-feedback-topic-head h3 {
+  margin: 3px 0 0;
+  color: #172623;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.topic-mobile-reference {
+  margin-bottom: 12px;
+  padding: 10px;
+  border: 1px solid #e0ebe8;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.topic-mobile-reference-head strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #3d504d;
+  font-size: 12px;
+}
+
+.topic-mobile-reference-head .adm-button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.topic-mobile-reference-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 9px;
+}
+
+.topic-mobile-reference-list a {
+  color: #1f5fbe;
+  font-size: 12px;
+  line-height: 18px;
+  word-break: break-all;
+}
+
+.topic-mobile-feedback-topic .topic-mobile-feedback-list {
+  margin-bottom: 12px;
+}
+
 .topic-mobile-feedback.is-leader {
   align-self: flex-start;
 }
@@ -388,6 +493,12 @@ body,
   padding: 12px;
 }
 
+.topic-mobile-feedback-topic .topic-mobile-reply-card {
+  border: 1px solid #dfe9e7;
+  border-radius: 8px;
+  background: #fff;
+}
+
 .topic-mobile-reply-meta {
   display: flex;
   align-items: center;
@@ -408,13 +519,9 @@ body,
   --placeholder-color: #97a7a4;
 }
 
-.topic-mobile-voice-input {
-  display: none;
-}
-
 .topic-mobile-voice-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
   margin-top: 10px;
 }
@@ -433,86 +540,6 @@ body,
   justify-content: center;
   gap: 5px;
   min-width: 0;
-}
-
-.topic-mobile-voice-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.topic-mobile-voice-item {
-  position: relative;
-  padding: 10px 38px 10px 10px;
-  border: 1px solid #d7e7e3;
-  border-radius: 8px;
-  background: #f6fbfa;
-}
-
-.topic-mobile-voice-info {
-  display: grid;
-  grid-template-columns: 26px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.topic-mobile-voice-info > span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  color: #0d675f;
-  background: #e2f3ef;
-  font-size: 14px;
-}
-
-.topic-mobile-voice-info strong,
-.topic-mobile-voice-info span {
-  display: block;
-}
-
-.topic-mobile-voice-info strong {
-  color: #172623;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 18px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.topic-mobile-voice-info div span {
-  margin-top: 2px;
-  color: #788986;
-  font-size: 11px;
-  line-height: 16px;
-}
-
-.topic-mobile-voice-item audio {
-  display: block;
-  width: 100%;
-  height: 32px;
-}
-
-.topic-mobile-voice-remove {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: 7px;
-  color: #6b7c78;
-  background: #eaf2f0;
-  font-size: 12px;
 }
 
 .topic-mobile-saved-at {

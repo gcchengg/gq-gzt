@@ -242,6 +242,25 @@ body,
   font-weight: 500;
 }
 
+.topic-feedback-topic-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.topic-feedback-topic-actions .ant-tag {
+  margin-inline-end: 0;
+}
+
+.topic-feedback-topic-actions .ant-btn {
+  color: #52657a;
+}
+
+.topic-feedback-topic-body[hidden] {
+  display: none;
+}
+
 .topic-meeting-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -304,6 +323,74 @@ body,
   line-height: 20px;
 }
 
+.topic-feedback-topic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.topic-feedback-topic {
+  padding: 16px;
+  border: 1px solid #dce5ef;
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.topic-feedback-topic-head,
+.topic-reference-files-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.topic-feedback-topic-head {
+  margin-bottom: 14px;
+}
+
+.topic-feedback-topic-head span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.topic-feedback-topic-head h3 {
+  margin: 4px 0 0;
+  color: #172235;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.topic-reference-files {
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid #e1e8f0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.topic-reference-files-head strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #314056;
+}
+
+.topic-reference-file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 10px;
+}
+
+.topic-reference-file-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #245de4;
+  font-size: 13px;
+}
+
 .topic-feedback-list {
   display: flex;
   flex-direction: column;
@@ -314,6 +401,20 @@ body,
   background:
     linear-gradient(180deg, rgba(246, 249, 252, 0.9), rgba(255, 255, 255, 0.98)),
     #fff;
+}
+
+.topic-feedback-editor {
+  margin-top: 14px;
+}
+
+.topic-feedback-editor h4 {
+  margin: 0 0 8px;
+  color: #314056;
+  font-size: 14px;
+}
+
+.topic-feedback-editor .topic-rich-body {
+  min-height: 150px;
 }
 
 .topic-feedback-row {
