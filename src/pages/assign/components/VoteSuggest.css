@@ -70,17 +70,35 @@
 
 .vote-suggest-footer {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
   padding: 12px 20px;
   border-top: 1px solid #edf0f5;
   background: #fff;
 }
 
-.vote-suggest-download {
+.vote-suggest-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  padding: 8px 20px 0;
+  gap: 10px;
+}
+
+.vote-suggest-task-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vote-suggest-help-icon {
+  color: #8c8c8c;
+  cursor: help;
+  font-size: 15px;
+}
+
+.vote-suggest-help-icon:hover {
+  color: #6155e9;
 }
 
 @media (max-width: 1100px) {
@@ -95,5 +113,15 @@
 
   .vote-suggest-right {
     padding-left: 0;
+  }
+
+  .vote-suggest-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .vote-suggest-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }

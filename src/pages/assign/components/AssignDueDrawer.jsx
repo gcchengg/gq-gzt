@@ -34,7 +34,7 @@ const initialFeedbackGroups = {
         { key: "zhang", name: "张总", topics: [
             { id: "topic-001", name: "关于推进基金退出事项的议案", files: [{ name: "基金退出方案补充材料.pdf", url: referenceUrl }], records: [
                 { id: "feedback-001", role: "leader", sender: "张总", time: "2026-04-24 09:18", content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。" },
-                { id: "feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-24 10:06", content: "已收到，管护团队正在补充资信核查表和收益测算口径。" },
+                { id: "feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-24 10:06", content: "已收到，管户团队正在补充资信核查表和收益测算口径。" },
             ] },
             { id: "topic-002", name: "关于补充外部董事意见采纳情况的议案", files: [{ name: "外部董事意见采纳情况说明.pdf", url: referenceUrl }], records: [
                 { id: "feedback-003", role: "leader", sender: "张总", time: "2026-04-24 11:20", content: "请逐项标注外部董事意见是否采纳以及未采纳原因。" },
@@ -65,7 +65,7 @@ const initialFeedbackGroups = {
 function FeedbackChat({ topic, draft, onDraftChange }) {
     return (<section className="assign-feedback-topic">
       <div className="assign-feedback-chat-head">
-        <div><h3>{topic.name}</h3><p>按议题保留董事建议、参考文件和管护回复。</p></div>
+        <div><h3>{topic.name}</h3><p>按议题保留董事建议、参考文件和管户回复。</p></div>
         <Tag color="processing">沟通中</Tag>
       </div>
       <div className="assign-feedback-files">
@@ -74,12 +74,12 @@ function FeedbackChat({ topic, draft, onDraftChange }) {
       </div>
       <div className="assign-feedback-chat-body">
         {topic.records.map((item) => (<div className={`assign-feedback-row ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
-          <div className="assign-feedback-meta"><span>{item.role === "manager" ? "管护回复" : "反馈建议"}</span><strong>{item.sender}</strong><em>{item.time}</em></div>
+          <div className="assign-feedback-meta"><span>{item.role === "manager" ? "管户回复" : "反馈建议"}</span><strong>{item.sender}</strong><em>{item.time}</em></div>
           <div className="assign-feedback-bubble">{item.content}</div>
         </div>))}
       </div>
       <div className="assign-feedback-reply">
-        <Input.TextArea value={draft} onChange={(event) => onDraftChange(event.target.value)} placeholder="请输入对本议题的管护回复内容" autoSize={{ minRows: 3, maxRows: 5 }} maxLength={500} showCount/>
+        <Input.TextArea value={draft} onChange={(event) => onDraftChange(event.target.value)} placeholder="请输入对本议题的管户回复内容" autoSize={{ minRows: 3, maxRows: 5 }} maxLength={500} showCount/>
       </div>
     </section>);
 }
@@ -93,7 +93,7 @@ function DirectorFeedbackPanel({ type, directors, drafts, onDraftChange, onSend 
               return <FeedbackChat key={topic.id} topic={topic} draft={drafts[draftKey] || ""} onDraftChange={(value) => onDraftChange(draftKey, value)}/>;
           })}</div>
           <div className="assign-feedback-panel-actions">
-            <Button type="primary" onClick={() => onSend(type, director.key)}>发送管护回复</Button>
+            <Button type="primary" onClick={() => onSend(type, director.key)}>发送管户回复</Button>
           </div>
         </div>,
     }))}/>;
@@ -164,7 +164,7 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
         })
             .filter((item) => item.content) || [];
         if (!replies.length) {
-            message.warning("请输入管护回复内容");
+            message.warning("请输入管户回复内容");
             return;
         }
         const sentAt = dayjs().format("YYYY-MM-DD HH:mm");
@@ -179,7 +179,7 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
                         records: [...topic.records, {
                             id: `${reply.draftKey}-feedback-${Date.now()}`,
                             role: "manager",
-                            sender: "管护 王明",
+                            sender: "管户 王明",
                             time: sentAt,
                             content: reply.content,
                         }],
@@ -194,7 +194,7 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
             });
             return nextDrafts;
         });
-        message.success(`已发送 ${replies.length} 条管护回复`);
+        message.success(`已发送 ${replies.length} 条管户回复`);
     };
     const tabItems = [
         {

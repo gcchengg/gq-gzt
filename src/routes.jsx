@@ -8,6 +8,7 @@ const AdviceReview1Mobile = lazy(() => import("@/pages/adviceReview1Mobile"));
 const TopicAdvice = lazy(() => import("@/pages/topicAdvice"));
 const TopicAdviceMobile = lazy(() => import("@/pages/topicAdviceMobile"));
 const DdMsgMobile = lazy(() => import("@/pages/ddmsgMobile"));
+const FollowUp = lazy(() => import("@/pages/followUp"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
   {
@@ -87,6 +88,14 @@ export const routes = [
     element: (
       <Suspense>
         <DdMsgMobile />
+      </Suspense>
+    ),
+  },
+  {
+    path: "followUp",
+    element: (
+      <Suspense>
+        <FollowUp />
       </Suspense>
     ),
   },

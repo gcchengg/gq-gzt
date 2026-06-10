@@ -211,7 +211,7 @@ const voteSuggestByMgmtId = {
         bosAdvice:
             "建议监事会同意相关议题，并持续关注交易合规性及执行闭环情况。",
         shsAdvice:
-            "建议股东会同意相关议题，并要求管护团队按月反馈执行进展。",
+            "建议股东会同意相关议题，并要求管户团队按月反馈执行进展。",
         bodFlag: "1",
         bosFlag: "1",
         shsFlag: "1",

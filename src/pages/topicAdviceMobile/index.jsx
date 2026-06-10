@@ -179,7 +179,7 @@ const reviewerNotifyRows = [
 const topicFeedbackRecords = {
     "topic-001": [
         { id: "feedback-001", role: "leader", sender: "张总", time: "2026-04-24 09:18", content: "请补充基金退出方案中交易对手资信情况，以及本次退出对年度收益目标的影响测算。" },
-        { id: "feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-24 10:06", content: "已收到，管护团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。" },
+        { id: "feedback-002", role: "manager", sender: "股权运营部 王明", time: "2026-04-24 10:06", content: "已收到，管户团队正在补充资信核查表和收益测算口径，预计今日 16:00 前完成材料更新。" },
     ],
     "topic-002": [
         { id: "feedback-003", role: "leader", sender: "李董", time: "2026-04-24 14:32", content: "请同步说明是否涉及其他股东优先购买权，以及法律合规部是否已出具书面意见。" },
@@ -347,7 +347,7 @@ export default function TopicAdviceMobilePage() {
         }
         const confirmed = await Dialog.confirm({
             title: "确认提交回复？",
-            content: "提交后将给对应管护发钉钉消息。",
+            content: "提交后将给对应管户发钉钉消息。",
             confirmText: "确认提交",
             cancelText: "取消",
         });
@@ -523,7 +523,7 @@ export default function TopicAdviceMobilePage() {
                                     {(topicFeedbackRecords[topic.id] || []).map((item) => (
                                         <article className={`topic-mobile-feedback ${item.role === "manager" ? "is-manager" : "is-leader"}`} key={item.id}>
                                             <div className="topic-mobile-feedback-meta">
-                                                <span>{item.role === "manager" ? "管护回复" : "反馈建议"}</span>
+                                                <span>{item.role === "manager" ? "管户回复" : "反馈建议"}</span>
                                                 <strong>{item.sender}</strong>
                                             </div>
                                             <p>{item.content}</p>

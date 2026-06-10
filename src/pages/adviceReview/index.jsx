@@ -333,7 +333,7 @@ function AnnotationDrawer({ open, onClose, imageData, onSubmit }) {
           <Form.Item name="dutyUserType" label="指派执行人">
             <Select
               options={[
-                { label: "管护经理", value: "manager" },
+                { label: "管户经理", value: "manager" },
                 { label: "法律合规部", value: "legal" },
                 { label: "股权运营部", value: "operation" },
               ]}

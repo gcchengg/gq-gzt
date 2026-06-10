@@ -4,7 +4,7 @@ import "./index.css";
 const taskTabs = [
     "议题反馈建议",
     "表决建议单",
-    "基金股权转让",
+    "交办落实跟踪",
     "基金回购",
     "基金股票交易",
     "基金退出诉讼",
@@ -25,10 +25,10 @@ const taskCopyByCard = {
         description: "批注表决建议单",
         href: "/adviceReview1",
     },
-    基金股权转让: {
-        title: "基金股权转让",
-        description: "对应股权转让环节名称",
-        href: "3-非上市：股权转让.html",
+    交办落实跟踪: {
+        title: "交办落实跟踪",
+        description: "交办落实跟踪",
+        href: "/followUp",
     },
     基金回购: {
         title: "基金回购",

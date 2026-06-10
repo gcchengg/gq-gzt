@@ -1,4 +1,5 @@
-import { Button, Form, Input, Spin, Table, message } from "antd";
+import { Button, Form, Input, Popconfirm, Spin, Table, Tooltip, message } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { suggestGet, suggestSave } from "../mockApi";
@@ -159,6 +160,21 @@ export default function VoteSuggest({
     message.success("已生成表决建议单下载任务（本地假数据）");
   };
 
+  const handleSendTask = async () => {
+    const values = form.getFieldsValue();
+    const res = await suggestSave({
+      ...values,
+      sanhuiMgmtId: id,
+      status: "0",
+      adviceTaskSent: "1",
+    });
+    if (res.code !== 200) return;
+
+    form.setFieldValue("id", res.data.id);
+    await fetchData();
+    message.success("已发送建议单任务，董事将收到表决建议单任务或钉钉消息（本地假数据）");
+  };
+
   const hasAdviceTarget =
     detailData?.bodFlag === "1" ||
     detailData?.bosFlag === "1" ||
@@ -237,24 +253,39 @@ export default function VoteSuggest({
               />
             </div>
           </div>
-          {hasAdviceTarget && !isDetail ? (
-            <div className="vote-suggest-footer">
-              <Button disabled={actionDisabled} onClick={() => persist("0")}>
-                保存
-              </Button>
-              <Button
-                type="primary"
-                disabled={actionDisabled}
-                onClick={() => persist("1")}
-              >
-                提交
-              </Button>
-            </div>
-          ) : null}
-          <div className="vote-suggest-download">
+          <div className="vote-suggest-footer">
             <Button disabled={actionDisabled} onClick={handleDownload}>
               下载表决建议单
             </Button>
+            {hasAdviceTarget && !isDetail ? (
+              <div className="vote-suggest-actions">
+                <Button disabled={actionDisabled} onClick={() => persist("0")}>
+                  保存
+                </Button>
+                <Button
+                  type="primary"
+                  disabled={actionDisabled}
+                  onClick={() => persist("1")}
+                >
+                  提交
+                </Button>
+                <span className="vote-suggest-task-action">
+                  <Popconfirm
+                    title="确认发送建议单任务？"
+                    description="本操作将给董事发送表决建议单任务。"
+                    okText="确认发送"
+                    cancelText="取消"
+                    onConfirm={handleSendTask}
+                    disabled={actionDisabled}
+                  >
+                    <Button disabled={actionDisabled}>发送建议单任务</Button>
+                  </Popconfirm>
+                  <Tooltip title="第一次给董事发送任务，第二次不会发出任务只会发送钉钉消息">
+                    <QuestionCircleOutlined className="vote-suggest-help-icon" />
+                  </Tooltip>
+                </span>
+              </div>
+            ) : null}
           </div>
         </div>
       </Spin>

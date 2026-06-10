@@ -40,6 +40,9 @@ const fileKindText = {
   pdf: "PDF",
 };
 
+const isThreeMeetingFeedback = (item) =>
+  !item.followFromType || String(item.followFromType) === "200";
+
 function ColumnHelpTitle({ title, items }) {
   return (
     <span className="assign-follow-column-title">
@@ -62,9 +65,9 @@ function ColumnHelpTitle({ title, items }) {
 const voteSuggestionFeedbackFollow = {
   id: "follow-vote-feedback-001",
   followFromType: "200",
-  followName: "三会情况反馈跟进",
+  followName: "落实董事会决议事项",
   followDetail:
-    "董事反馈：表决建议中请明确本次基金退出的表决倾向，并补充收益测算依据、风险兜底安排及授权条件。",
+    "表决建议中请明确本次基金退出的表决倾向，并补充收益测算依据、风险兜底安排及授权条件。",
   itemType: "voteFeedback",
   toipcName: "关于推进基金退出事项的表决建议单",
   assignUserName: "张总",
@@ -72,7 +75,7 @@ const voteSuggestionFeedbackFollow = {
   planStartDate: "2026-04-25",
   planEndDate: "2026-04-30",
   execDetail:
-    "管护回复：已将表决倾向调整为建议同意，补充收益测算底稿、风险处置预案及授权条件，交易价格和协议文本将提交法务复核。",
+    "管户回复：已将表决倾向调整为建议同意，补充收益测算底稿、风险处置预案及授权条件，交易价格和协议文本将提交法务复核。",
   status: "1",
   feedbackKind: "voteSuggestion",
   referenceAttachments: [
@@ -89,7 +92,12 @@ const voteSuggestionFeedbackFollow = {
   ],
 };
 
-export default function AssignFollow({ id, editStatus }) {
+export default function AssignFollow({
+  id,
+  editStatus,
+  filterFollowFromType,
+  allowCreate = true,
+}) {
   const [loading, setLoading] = useState(false);
   const [aiParsing, setAiParsing] = useState(false);
   const [assignList, setAssignList] = useState([]);
@@ -126,6 +134,14 @@ export default function AssignFollow({ id, editStatus }) {
       : [voteSuggestionFeedbackFollow, ...assignList];
   }, [assignList]);
 
+  const visibleTableData = useMemo(
+    () =>
+      filterFollowFromType === "threeMeetingFeedback"
+        ? tableData.filter(isThreeMeetingFeedback)
+        : tableData,
+    [filterFollowFromType, tableData],
+  );
+
   const columns = useMemo(
     () => [
       {
@@ -140,7 +156,7 @@ export default function AssignFollow({ id, editStatus }) {
         title: (
           <ColumnHelpTitle
             title="交办来源"
-            items={["三会反馈", "专题汇报", "决策执行"]}
+            items={["1.反馈建议默认显示-三会反馈"]}
           />
         ),
         dataIndex: "followFromType",
@@ -165,8 +181,11 @@ export default function AssignFollow({ id, editStatus }) {
         render: (value, row) =>
           row.feedbackKind === "voteSuggestion" ? (
             <div className="assign-follow-cell-stack is-center">
-              <Tag color="purple">三会情况反馈</Tag>
-              <span>{value}</span>
+              <span>{value}</span>{" "}
+              <ColumnHelpTitle
+                title=""
+                items={["交办名称默认显示-落实董事会决议事项"]}
+              />
             </div>
           ) : (
             value
@@ -180,34 +199,13 @@ export default function AssignFollow({ id, editStatus }) {
         render: (value, row) =>
           row.feedbackKind === "voteSuggestion" ? (
             <div className="assign-follow-cell-stack">
-              <Tag color="blue">董事反馈</Tag>
               <span>{value}</span>
             </div>
           ) : (
             value
           ),
       },
-      {
-        title: (
-          <ColumnHelpTitle
-            title="相关分类"
-            items={["议题相关", "会议相关"]}
-          />
-        ),
-        dataIndex: "itemType",
-        key: "itemType",
-        align: "center",
-        width: 160,
-        render: (value, row) =>
-          row.feedbackKind === "voteSuggestion" ? (
-            <Space size={4} direction="vertical">
-              <Tag color="cyan">反馈闭环</Tag>
-              <Tag color="purple">表决建议</Tag>
-            </Space>
-          ) : (
-            itemTypeText[value] || ""
-          ),
-      },
+
       {
         title: "相关议题/会议名称",
         dataIndex: "toipcName",
@@ -273,7 +271,6 @@ export default function AssignFollow({ id, editStatus }) {
         render: (value, row) =>
           row.feedbackKind === "voteSuggestion" ? (
             <div className="assign-follow-cell-stack">
-              <Tag color="green">管护总结</Tag>
               <span>{value}</span>
             </div>
           ) : (
@@ -327,7 +324,7 @@ export default function AssignFollow({ id, editStatus }) {
               setDetailOpen(true);
             }}
           >
-           编辑
+            编辑
           </Button>
         ),
       },
@@ -404,13 +401,20 @@ export default function AssignFollow({ id, editStatus }) {
 
   return (
     <div className="assign-follow">
-
       <div className="assign-follow-toolbar">
         <div>
           <strong>交办事项</strong>
-          <span>共 {tableData.length} 条</span>
+          <span>共 {visibleTableData.length} 条</span>
+          <ColumnHelpTitle
+            title=""
+            items={[
+              "1.删除相关分类列",
+              "2.三会表决后额外给管护发送一个【交办落实跟踪】任务，目的是记录领导反馈内容的交办事项",
+              "2.当数据来源董事反馈，可以暂时不填写截止时间	计划执行时间	执行总结，不影响业务流程",
+            ]}
+          />
         </div>
-        {editStatus ? (
+        {editStatus && allowCreate ? (
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -428,7 +432,7 @@ export default function AssignFollow({ id, editStatus }) {
       <Table
         loading={loading || aiParsing}
         columns={columns}
-        dataSource={tableData}
+        dataSource={visibleTableData}
         rowKey="id"
         size="small"
         scroll={{ x: 2060 }}
