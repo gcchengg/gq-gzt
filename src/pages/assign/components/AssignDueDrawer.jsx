@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import AssignExecution from "./AssignExecution";
 import CompanyReview from "./CompanyReview";
 import SubmitDrawer from "./SubmitDrawer";
+import TopicEvaluation from "./TopicEvaluation";
 import VoteSuggest from "./VoteSuggest";
 import { getOtherInfo, getStatusText, getVoteList, sanhuiProgStatus, sanhuiStatusAvailable, } from "../mockApi";
 import "./AssignDueDrawer.css";
@@ -206,7 +207,7 @@ export default function AssignDueDrawer({ id, record, editStatus, progStatus, on
             key: "2",
             label: "议题评估",
             disabled: isTabDisabled("2"),
-            children: <StagePlaceholder title="议题评估" projectData={projectData} status={progStatus}/>,
+            children: <TopicEvaluation projectData={projectData}/>,
         },
         {
             key: "3",

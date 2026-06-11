@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 const Index = lazy(() => import("@/pages/index"));
 const GztHome = lazy(() => import("@/pages/gzthome"));
+const GztDemo = lazy(() => import("@/pages/gztDemo"));
 const Assign = lazy(() => import("@/pages/assign"));
 const AdviceReview = lazy(() => import("@/pages/adviceReview"));
 const AdviceReview1 = lazy(() => import("@/pages/adviceReview1"));
@@ -32,6 +33,14 @@ export const routes = [
     element: (
       <Suspense>
         <GztHome />
+      </Suspense>
+    ),
+  },
+  {
+    path: "gztDemo",
+    element: (
+      <Suspense>
+        <GztDemo />
       </Suspense>
     ),
   },
