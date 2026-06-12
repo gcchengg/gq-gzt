@@ -1,10 +1,20 @@
-import { useEffect, useRef } from "react";
+import { StarFilled, StarOutlined } from "@ant-design/icons";
+import { message } from "antd";
+import { useEffect, useRef, useState } from "react";
 import EvaluationExecution from "./components/EvaluationExecution";
 import EvaluationModelScore from "./components/EvaluationModelScore";
 import "./index.css";
 
 export default function GztDemo() {
   const didMountRef = useRef(false);
+  const [pdfFavorited, setPdfFavorited] = useState(false);
+
+  const togglePdfFavorite = () => {
+    setPdfFavorited((current) => {
+      message.success(current ? "已取消收藏" : "已收藏当前 PDF");
+      return !current;
+    });
+  };
 
   useEffect(() => {
     if (didMountRef.current) return undefined;
@@ -3358,7 +3368,18 @@ export default function GztDemo() {
                   <aside className="pdf-side">
                     <div className="pdf-side-head">
                       <div className="pdf-side-title" id="pdf-side-title">批注列表</div>
-                      <button className="foot-btn primary" id="pdf-task-add" type="button">新增</button>
+                      <div className="pdf-side-actions">
+                        <button
+                          className={`pdf-favorite-btn${pdfFavorited ? " active" : ""}`}
+                          type="button"
+                          title={pdfFavorited ? "取消收藏" : "收藏当前 PDF"}
+                          aria-label={pdfFavorited ? "取消收藏当前 PDF" : "收藏当前 PDF"}
+                          onClick={togglePdfFavorite}
+                        >
+                          {pdfFavorited ? <StarFilled /> : <StarOutlined />}
+                        </button>
+                        <button className="foot-btn primary" id="pdf-task-add" type="button">新增</button>
+                      </div>
                     </div>
                     <div className="pdf-task-scroll">
                       <div className="pdf-task-list" id="pdf-task-list">

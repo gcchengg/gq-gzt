@@ -6625,6 +6625,32 @@
       color: #2f3643;
     }
 
+    .pdf-side-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pdf-favorite-btn {
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(204, 214, 232, .96);
+      border-radius: 12px;
+      background: #fff;
+      color: #9aa5b7;
+      font-size: 21px;
+      cursor: pointer;
+      transition: color .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+
+    .pdf-favorite-btn:hover,
+    .pdf-favorite-btn.active {
+      border-color: #f2bd45;
+      background: #fff9e8;
+      color: #f2ad21;
+      box-shadow: 0 6px 14px rgba(226, 163, 34, .16);
+    }
+
     .pdf-task-scroll {
       flex: 1 1 auto;
       height: auto;
