@@ -4,6 +4,7 @@ import {
   Checkbox,
   Image,
   Modal,
+  Tabs,
   Table,
   Tag,
   message,
@@ -19,12 +20,51 @@ const attachmentData = [
     name: "20250428中联电子议题关键信息页(1).pdf",
     annotatable: true,
     notes: 0,
+    snapshots: [
+      {
+        key: "file-3-page-1",
+        page: 1,
+        notes: 2,
+        summary: "处置方案及资产净值表格，包含净值口径批注。",
+        mark: "批注：请补充附件来源",
+      },
+      {
+        key: "file-3-page-3",
+        page: 3,
+        notes: 1,
+        summary: "资产处置价格依据及附件来源说明。",
+        mark: "批注：需核对净值口径",
+      },
+    ],
   },
   {
     key: "file-4",
     name: "T3出行董事会及临时股东会议案.pdf",
     annotatable: true,
     notes: 3,
+    snapshots: [
+      {
+        key: "file-4-page-2",
+        page: 2,
+        notes: 1,
+        summary: "董事会会议案及表决建议，包含管理建议批注。",
+        mark: "批注：请说明表决依据",
+      },
+      {
+        key: "file-4-page-5",
+        page: 5,
+        notes: 2,
+        summary: "临时股东会议程及授权事项，包含程序合规批注。",
+        mark: "批注：需补充前置审议",
+      },
+      {
+        key: "file-4-page-8",
+        page: 8,
+        notes: 1,
+        summary: "经营数据及风险提示页，包含合理性说明批注。",
+        mark: "批注：风险提示需量化",
+      },
+    ],
   },
 ];
 
@@ -67,27 +107,6 @@ const evaluationData = [
   },
 ];
 
-const pageSnapshots = [
-  {
-    key: "page-1",
-    page: 1,
-    notes: 2,
-    summary: "处置方案及资产净值表格，包含净值口径批注。",
-  },
-  {
-    key: "page-2",
-    page: 2,
-    notes: 1,
-    summary: "董事会会议案及表决建议，包含管理建议批注。",
-  },
-  {
-    key: "page-3",
-    page: 3,
-    notes: 3,
-    summary: "资产处置价格依据及附件来源说明。",
-  },
-];
-
 export default function EvaluationExecution() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedRules, setSelectedRules] = useState([]);
@@ -95,10 +114,16 @@ export default function EvaluationExecution() {
   const [links, setLinks] = useState({});
   const [snapshotOpen, setSnapshotOpen] = useState(false);
   const [selectedSnapshots, setSelectedSnapshots] = useState([]);
+  const [activeSnapshotFileKey, setActiveSnapshotFileKey] = useState();
 
   const selectedAttachmentData = useMemo(
     () => attachmentData.filter((item) => selectedFiles.includes(item.key)),
     [selectedFiles],
+  );
+
+  const selectedAnnotatableFiles = useMemo(
+    () => selectedAttachmentData.filter((file) => file.annotatable),
+    [selectedAttachmentData],
   );
 
   const openAnnotation = (file) => {
@@ -107,15 +132,13 @@ export default function EvaluationExecution() {
   };
 
   const openSnapshotPicker = () => {
-    if (!activeFile) {
-      message.warning("请先点击已选 PDF 文件进入批注");
-      return;
-    }
     if (!selectedRules.length) {
       message.warning("请先选择需要关联的评价项");
       return;
     }
+    const initialFile = activeFile || selectedAnnotatableFiles[0];
     setSelectedSnapshots([]);
+    setActiveSnapshotFileKey(initialFile?.key);
     setSnapshotOpen(true);
   };
 
@@ -124,8 +147,12 @@ export default function EvaluationExecution() {
       message.warning("请至少选择一个需要关联的批注页截图");
       return;
     }
-    const snapshots = pageSnapshots.filter((item) =>
-      selectedSnapshots.includes(item.key),
+    const snapshots = selectedAnnotatableFiles.flatMap((file) =>
+      (file.snapshots || [])
+        .filter((snapshot) =>
+          selectedSnapshots.includes(`${file.key}:${snapshot.key}`),
+        )
+        .map((snapshot) => ({ ...snapshot, file })),
     );
     setLinks((current) => {
       const next = { ...current };
@@ -136,11 +163,11 @@ export default function EvaluationExecution() {
             (snapshot) =>
               !currentSnapshots.some(
                 (item) =>
-                  item.file.key === activeFile.key &&
+                  item.file.key === snapshot.file.key &&
                   item.page === snapshot.page,
               ),
           )
-          .map((snapshot) => ({ ...snapshot, file: activeFile }));
+          .map((snapshot) => ({ ...snapshot }));
         next[ruleKey] = [...currentSnapshots, ...newSnapshots];
       });
       return next;
@@ -300,7 +327,7 @@ export default function EvaluationExecution() {
               <Button
                 type="primary"
                 icon={<LinkOutlined />}
-                disabled={!activeFile || !selectedRules.length}
+                disabled={!selectedRules.length}
                 onClick={openSnapshotPicker}
               >
                 选择批注页截图
@@ -345,36 +372,49 @@ export default function EvaluationExecution() {
             <Alert
               showIcon
               type="info"
-              message={`当前文件：${activeFile?.name || ""}`}
-              description="请选择文件中的某一页。关联后将保存该页正文和批注内容的截图。"
+              message="请选择各 PDF 文件下的批注页截图"
+              description="可在多个 PDF 标签页中勾选页面。关联后将保存该页正文和批注内容的截图，并记录对应文件来源。"
             />
             <Checkbox.Group
-              className="gzt-eval-snapshot-grid"
+              className="gzt-eval-snapshot-checks"
               value={selectedSnapshots}
               onChange={setSelectedSnapshots}
             >
-              {pageSnapshots.map((snapshot) => (
-                <Checkbox
-                  key={snapshot.key}
-                  value={snapshot.key}
-                  className="gzt-eval-snapshot-card"
-                >
-                  <div className="gzt-eval-snapshot-image">
-                    <Image
-                      preview={false}
-                      src="/advice-review/6a2133fde4b0cb6abf664a41.pdf.png"
-                    />
-                    <span className="gzt-eval-annotation-mark">
-                      批注：请补充附件来源
-                    </span>
-                  </div>
-                  <div className="gzt-eval-snapshot-meta">
-                    <strong>第 {snapshot.page} 页</strong>
-                    <Tag color="blue">{snapshot.notes} 条批注</Tag>
-                  </div>
-                  <p>{snapshot.summary}</p>
-                </Checkbox>
-              ))}
+              <Tabs
+                className="gzt-eval-snapshot-tabs"
+                activeKey={activeSnapshotFileKey}
+                onChange={setActiveSnapshotFileKey}
+                items={selectedAnnotatableFiles.map((file) => ({
+                  key: file.key,
+                  label: file.name,
+                  children: (
+                    <div className="gzt-eval-snapshot-grid">
+                      {(file.snapshots || []).map((snapshot) => (
+                        <Checkbox
+                          key={snapshot.key}
+                          value={`${file.key}:${snapshot.key}`}
+                          className="gzt-eval-snapshot-card"
+                        >
+                          <div className="gzt-eval-snapshot-image">
+                            <Image
+                              preview={false}
+                              src="/advice-review/6a2133fde4b0cb6abf664a41.pdf.png"
+                            />
+                            <span className="gzt-eval-annotation-mark">
+                              {snapshot.mark}
+                            </span>
+                          </div>
+                          <div className="gzt-eval-snapshot-meta">
+                            <strong>第 {snapshot.page} 页</strong>
+                            <Tag color="blue">{snapshot.notes} 条批注</Tag>
+                          </div>
+                          <p>{snapshot.summary}</p>
+                        </Checkbox>
+                      ))}
+                    </div>
+                  ),
+                }))}
+              />
             </Checkbox.Group>
           </Modal>
         </>

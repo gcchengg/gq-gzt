@@ -227,6 +227,7 @@ export default function GztDemo() {
         window.innerWidth / 2048,
         window.innerHeight / 1159,
       );
+      viewport.style.width = `${window.innerWidth / scale}px`;
       viewport.style.height = `${window.innerHeight / scale}px`;
       viewport.style.transform = `scale(${scale})`;
     }

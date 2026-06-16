@@ -113,12 +113,30 @@
   font-size: 14px;
 }
 
+.gzt-eval-snapshot-checks {
+  display: block;
+  width: 100%;
+}
+
+.gzt-eval-snapshot-tabs {
+  margin-top: 16px;
+}
+
+.gzt-eval-snapshot-tabs .ant-tabs-tab {
+  max-width: 320px;
+}
+
+.gzt-eval-snapshot-tabs .ant-tabs-tab-btn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .gzt-eval-snapshot-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   width: 100%;
-  margin-top: 18px;
 }
 
 .gzt-eval-snapshot-card.ant-checkbox-wrapper {
