@@ -3,7 +3,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { suggestGet, suggestSave } from "../mock/voteSuggestApi";
-import voteSuggestPdfUrl from "../mock/data/companyReview/6a3a4395e4b0717a14fef280.pdf?url";
+import voteSuggestPdfUrl from "../mock/data/companyReview/6a3b7ad8e4b0329cf1b968eb.pdf?url";
 import "./VoteSuggest.css";
 
 const resultText = {

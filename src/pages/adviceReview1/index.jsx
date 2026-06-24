@@ -17,9 +17,10 @@ import {
 import { Button, Modal, Tag, Upload, message } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
+import voteSuggestPdfUrl from "../newSanhui/mock/data/companyReview/6a3b7ad8e4b0329cf1b968eb.pdf?url";
 import "./index.css";
 
-const pdfUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf";
+const pdfUrl = voteSuggestPdfUrl;
 const pdfPreviewUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf.png";
 const adviceTopics = [
     {
