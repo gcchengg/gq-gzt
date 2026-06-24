@@ -1,0 +1,28 @@
+前提：
+prd初始页面：http://www.prompt.ski/GztHome
+- 议题提报 下面 议题资料传达
+    - 需求更改：
+    点击提交后给对应的议题材料传达对象发送【议题反馈建议】任务，移动端发钉钉消息
+    任务页面显示路径为：http://www.prompt.ski/topicAdvice
+    钉钉消息页面：http://www.prompt.ski/ddmsgMobile
+    手机端议题反馈建议页面：http://www.prompt.ski/TopicAdviceMobile
+    管户收到董事回复后，会收到钉钉消息，管户去三会任务链接，点击【董事反馈记录】，查看【董事意见反馈】tab页面中进行查看和回复
+    展示图片如/Users/guocc/Documents/guquan/files/gq-gzt/src/三会需求更改0624/截屏2026-06-24 09.50.16.png 所示
+    - 任务结束时间 三会审核结束
+- 表决建议 
+   - 需求更改：
+   新增【发送建议单任务】，点击确认发送【表决建议单】任务，移动端发钉钉消息（对象：议题材料传达对象对应的人）
+    任务页面显示路径为：http://www.prompt.ski/topicAdvice
+    钉钉消息页面：http://www.prompt.ski/ddmsgMobile
+    手机端议题反馈建议页面：http://www.prompt.ski/adviceReview1Mobile
+    管户收到董事回复后，会收到钉钉消息，管户去三会任务链接，点击【董事反馈记录】，查看【三会情况反馈】tab页面中进行查看和回复
+    展示图片如/Users/guocc/Documents/guquan/files/gq-gzt/src/三会需求更改0624/截屏2026-06-24 09.58.34.png
+    - 任务结束时间 整个三会流程结束
+
+- 决策执行
+    - 交办事项tab修改：
+        - 需求更改：
+        1.删除相关分类列
+        2.提交后额外给管护发送一个督办任务，目的是记录领导反馈内容的交办事项
+        3.当数据来源董事反馈，可以暂时不填写截止时间 计划执行时间 执行总结，不影响业务流程
+        4.页面路径：http://www.prompt.ski/newSanhui?task=decisionExecution&autoOpen=1

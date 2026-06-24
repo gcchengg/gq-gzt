@@ -1,4 +1,34 @@
-/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/CompanyReview.jsx
-议题审核tab页面中，【审批材料准备】，要使用
-/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules/targetSet/pages/companyReview/index.jsx的【审批材料准备】tab的编辑模式
-包含向分管领导汇报预览和向总办会汇报预览的功能
+/newSanhui路径下的【决策执行】tab的名称右侧添加
+？图标，鼠标移入图标显示内容如下：
+1.删除 董事会会议决议/监事会会议决议/股东会会议决议 完整版文件上传功能
+2.删除 会议纪要上传功能
+
+
+/newSanhui路径下的【专题汇报】，提交后跳转到/gztHome，创建三会表决，点击去执行
+跳转到三会表决可编辑模式
+
+
+【一汽股权会议纪要】右侧在添加一个按钮【会议时间】，对应的管户可以修改会议时间
+点击【会议时间】弹出抽屉，抽屉内容如下：
+就是/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/SubmitDrawer.jsx页面中会议管理的内容，可编辑模式
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx页面中点击表决授权的内容要和
+/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules/targetSet/pages/EquityMeetings/meetingSubmmision/dueDrawer/index.jsx页面中表决授权的内容完全一致
+
+
+表决授权右侧添加
+？图标，鼠标移入图标显示内容如下：
+1.自动生成上传文件
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx
+页面中决策执行tab页面下，决策情况tab
+要显示上图格式
+
+三会决议名称右侧添加
+？图标，鼠标移入图标显示内容如下：
+1.选项统一 同意 反对 有条件同意 回避表决
+
+
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx
+页面中表决建议 表决建议单和表决建议 中间空白区域太多了
