@@ -1,13 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "./index.css";
+const taskKeyMap = {
+    topicApproval: "议题审批",
+    topicReport: "专题汇报",
+    meetingVote: "三会表决",
+};
 const taskTabs = [
     "议题反馈建议",
     "表决建议单",
-    "交办落实跟踪",
-    "基金回购",
-    "基金股票交易",
-    "基金退出诉讼",
+    "议题提报",
+    "议题评估",
+    "议题审批",
+    "议题初审_法务",
+    "议题初审_财务",
+    "议题初审_投资",
+    "议题初审_综合管理",
+    "议题初审_党群初审",
+    "表决建议",
+    "专题汇报",
+    "三会表决",
+    "决策执行",
+    "任务管理",
 ];
 const metrics = [
     { label: "总待办数", value: "4450" },
@@ -25,25 +39,70 @@ const taskCopyByCard = {
         description: "批注表决建议单",
         href: "/adviceReview1",
     },
-    交办落实跟踪: {
-        title: "交办落实跟踪",
-        description: "交办落实跟踪",
-        href: "/followUp",
+    议题提报: {
+        title: "议题提报",
+        description: "参股公司三会议题提报",
+        href: "/newSanhui?task=topicSubmit&autoOpen=1",
     },
-    基金回购: {
-        title: "基金回购",
-        description: "对应回购环节名称",
-        href: "4-非上市：回购.html",
+    议题评估: {
+        title: "议题评估",
+        description: "参股公司三会议题评估",
+        href: "/newSanhui?task=topicEvaluation&autoOpen=1",
     },
-    基金股票交易: {
-        title: "基金股票交易",
-        description: "股票交易指令",
-        href: "2-上市：股票交易.html",
+    议题审批: {
+        title: "议题审批",
+        description: "发起并执行议题审批",
+        href: "/newSanhui?task=topicApproval&autoOpen=1",
     },
-    基金退出诉讼: {
-        title: "基金退出诉讼",
-        description: "基金退出诉讼",
-        href: "#",
+    议题初审_法务: {
+        title: "议题初审_法务",
+        description: "法务部门议题初审",
+        href: "/newSanhuiPreReview?type=legal",
+    },
+    议题初审_财务: {
+        title: "议题初审_财务",
+        description: "财务部门议题初审",
+        href: "/newSanhuiPreReview?type=finance",
+    },
+    议题初审_投资: {
+        title: "议题初审_投资",
+        description: "投资部门议题初审",
+        href: "/newSanhuiPreReview?type=investment",
+    },
+    议题初审_综合管理: {
+        title: "议题初审_综合管理",
+        description: "综合管理部门议题初审",
+        href: "/newSanhuiPreReview?type=management",
+    },
+    议题初审_党群初审: {
+        title: "议题初审_党群初审",
+        description: "党群部门议题初审",
+        href: "/newSanhuiPreReview?type=party",
+    },
+    表决建议: {
+        title: "表决建议",
+        description: "参股公司三会表决建议",
+        href: "/newSanhui?task=voteSuggest&autoOpen=1",
+    },
+    专题汇报: {
+        title: "专题汇报",
+        description: "参股公司三会专题汇报",
+        href: "/newSanhui?task=topicReport&autoOpen=1",
+    },
+    三会表决: {
+        title: "三会表决",
+        description: "参股公司三会表决",
+        href: "/newSanhui?task=meetingVote&autoOpen=1",
+    },
+    决策执行: {
+        title: "决策执行",
+        description: "参股公司三会决策执行",
+        href: "/newSanhui?task=decisionExecution&autoOpen=1",
+    },
+    任务管理: {
+        title: "任务管理",
+        description: "三会决策执行交办事项任务完善",
+        href: "/assignFollowTask",
     },
 };
 const secondaryTaskCopyByCard = {
@@ -51,9 +110,9 @@ const secondaryTaskCopyByCard = {
         title: "表决建议单",
         description: "非上市退出决策",
     },
-    基金股票交易: {
-        title: "基金股票交易",
-        description: "维护交易结果",
+    表决建议: {
+        title: "表决建议",
+        description: "维护表决建议",
     },
 };
 function BrandMark() {
@@ -236,7 +295,9 @@ function TaskRow({ task, secondary, onDescriptionClick, }) {
     </article>);
 }
 function TaskPanel() {
-    const [activeTab, setActiveTab] = useState("议题反馈建议");
+    const [searchParams] = useSearchParams();
+    const taskFromUrl = taskKeyMap[searchParams.get("task")] || "议题反馈建议";
+    const [activeTab, setActiveTab] = useState(taskFromUrl);
     const [popover, setPopover] = useState({
         text: "",
         left: 24,
@@ -289,7 +350,7 @@ function TaskPanel() {
       <section className={panelClassName} aria-label="基金退出列表">
         <div className="list-title-row">
           <div className="list-title-left">
-            <div className="list-title">基金退出</div>
+            <div className="list-title">{activeTab}</div>
             <div className="summary">
               <span className="chip">
                 待办 <b>946</b>

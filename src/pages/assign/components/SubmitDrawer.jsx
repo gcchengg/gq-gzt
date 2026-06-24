@@ -286,7 +286,6 @@ function SmartSubmit({ disabled, onNext, }) {
           <InboxOutlined />
         </p>
         <p className="ant-upload-text">点击或将文件拖拽到这里上传</p>
-        <p className="ant-upload-hint">本项目不会调用真实上传接口，文件只会写入本地假数据列表。</p>
       </Upload.Dragger>
       <Table className="submit-table" bordered size="small" rowKey="id" columns={columns} dataSource={files} pagination={false}/>
       {!disabled ? (<div className="submit-footer">

@@ -1,0 +1,118 @@
+.new-sanhui-page {
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(29, 78, 216, 0.08), rgba(20, 184, 166, 0.05) 42%, rgba(245, 247, 251, 0) 70%),
+    #f5f7fb;
+  color: #1f2430;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.new-sanhui-search,
+.new-sanhui-table-card {
+  border: 1px solid #e1e8f4;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 30px rgba(31, 36, 48, 0.05);
+}
+
+.new-sanhui-search {
+  margin-bottom: 16px;
+  padding: 18px 20px 4px;
+}
+
+.new-sanhui-search-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) 172px;
+  gap: 12px;
+  align-items: end;
+}
+
+.new-sanhui-search-actions {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 24px;
+  justify-content: flex-end;
+}
+
+.new-sanhui-table-card {
+  padding: 16px;
+}
+
+.new-sanhui-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.new-sanhui-table-title {
+  color: #111827;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.new-sanhui-table-subtitle {
+  margin-top: 3px;
+  color: #7a8496;
+  font-size: 12px;
+}
+
+.new-sanhui-table-total {
+  color: #7a8496;
+  font-size: 13px;
+}
+
+.new-sanhui-drawer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.new-sanhui-drawer-title span {
+  color: #262629;
+  font-size: 18px;
+}
+
+.new-sanhui-drawer-title small {
+  padding-left: 10px;
+  border-left: 1px solid #e5e7eb;
+  color: #828290;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.new-sanhui-detail-drawer .ant-drawer-header {
+  min-height: 60px;
+  border-bottom: 1px solid #e8eef7;
+  background: #fbfdff;
+}
+
+.new-sanhui-detail-drawer .ant-drawer-body {
+  padding: 0;
+  background: #eef3fa;
+}
+
+.new-sanhui-detail {
+  padding: 20px;
+}
+
+@media (max-width: 1500px) {
+  .new-sanhui-search-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .new-sanhui-search-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 900px) {
+  .new-sanhui-page {
+    padding: 14px;
+  }
+
+  .new-sanhui-search-grid {
+    grid-template-columns: 1fr;
+  }
+}

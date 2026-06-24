@@ -1,0 +1,44 @@
+{
+  "code": 200,
+  "data": {
+    "id": "spec-report-001",
+    "sanhuiMgmtId": "assign-001",
+    "groupMsgFlag": 1,
+    "sanhuiVoteAdviceRespVoList": [
+      {
+        "id": "resp-001",
+        "attendFlag": "1",
+        "report_flag": "1",
+        "companySupervisor": {
+          "id": "supervisor-001",
+          "positionCategory": "100",
+          "positionCode": "1001",
+          "userName": "王明"
+        }
+      },
+      {
+        "id": "resp-002",
+        "attendFlag": "1",
+        "report_flag": "0",
+        "companySupervisor": {
+          "id": "supervisor-002",
+          "positionCategory": "200",
+          "positionCode": "2001",
+          "userName": "李娜"
+        }
+      },
+      {
+        "id": "resp-003",
+        "attendFlag": "0",
+        "report_flag": "",
+        "companySupervisor": {
+          "id": "supervisor-003",
+          "positionCategory": "300",
+          "positionCode": "3001",
+          "userName": "赵鹏"
+        }
+      }
+    ]
+  },
+  "message": "success"
+}

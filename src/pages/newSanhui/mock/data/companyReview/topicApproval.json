@@ -1,0 +1,27 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "id": "task-001",
+      "taskName": "法律合规审查",
+      "deptName": "法律合规部",
+      "executor": "赵鹏",
+      "status": "1"
+    },
+    {
+      "id": "task-002",
+      "taskName": "财务测算复核",
+      "deptName": "财务管理部",
+      "executor": "李娜",
+      "status": "1"
+    },
+    {
+      "id": "task-003",
+      "taskName": "风险评估确认",
+      "deptName": "审计风控部",
+      "executor": "周静",
+      "status": "0"
+    }
+  ],
+  "message": "success"
+}

@@ -3,6 +3,8 @@ const Index = lazy(() => import("@/pages/index"));
 const GztHome = lazy(() => import("@/pages/gzthome"));
 const GztDemo = lazy(() => import("@/pages/gztDemo"));
 const Assign = lazy(() => import("@/pages/assign"));
+const NewSanhui = lazy(() => import("@/pages/newSanhui"));
+const NewSanhuiPreReview = lazy(() => import("@/pages/newSanhuiPreReview"));
 const AdviceReview = lazy(() => import("@/pages/adviceReview"));
 const AdviceReview1 = lazy(() => import("@/pages/adviceReview1"));
 const AdviceReview1Mobile = lazy(() => import("@/pages/adviceReview1Mobile"));
@@ -10,6 +12,7 @@ const TopicAdvice = lazy(() => import("@/pages/topicAdvice"));
 const TopicAdviceMobile = lazy(() => import("@/pages/topicAdviceMobile"));
 const DdMsgMobile = lazy(() => import("@/pages/ddmsgMobile"));
 const FollowUp = lazy(() => import("@/pages/followUp"));
+const AssignFollowTask = lazy(() => import("@/pages/assignFollowTask"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
   {
@@ -49,6 +52,22 @@ export const routes = [
     element: (
       <Suspense>
         <Assign />
+      </Suspense>
+    ),
+  },
+  {
+    path: "newSanhui",
+    element: (
+      <Suspense>
+        <NewSanhui />
+      </Suspense>
+    ),
+  },
+  {
+    path: "newSanhuiPreReview",
+    element: (
+      <Suspense>
+        <NewSanhuiPreReview />
       </Suspense>
     ),
   },
@@ -105,6 +124,14 @@ export const routes = [
     element: (
       <Suspense>
         <FollowUp />
+      </Suspense>
+    ),
+  },
+  {
+    path: "assignFollowTask",
+    element: (
+      <Suspense>
+        <AssignFollowTask />
       </Suspense>
     ),
   },

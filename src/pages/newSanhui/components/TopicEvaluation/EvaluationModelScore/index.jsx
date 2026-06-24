@@ -66,6 +66,7 @@ const linkedMaterials = [
 export default function EvaluationModelScore({
   hideScore = false,
   hideModelAction = false,
+  hideMaterialAction = false,
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeElement, setActiveElement] = useState("");
@@ -210,17 +211,21 @@ export default function EvaluationModelScore({
                       <span className="green-dot"></span>
                     </td>
                     <td className="center">
-                      <div className="eval-op-actions">
-                        <Button
-                          className="eval-op-action"
-                          type="link"
-                          size="small"
-                          icon={<EyeOutlined />}
-                          onClick={() => openMaterialDrawer(row)}
-                        >
-                          查看关联材料
-                        </Button>
-                      </div>
+                      {hideMaterialAction ? (
+                        <span className="eval-readonly-mark">已关联</span>
+                      ) : (
+                        <div className="eval-op-actions">
+                          <Button
+                            className="eval-op-action"
+                            type="link"
+                            size="small"
+                            icon={<EyeOutlined />}
+                            onClick={() => openMaterialDrawer(row)}
+                          >
+                            查看关联材料
+                          </Button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

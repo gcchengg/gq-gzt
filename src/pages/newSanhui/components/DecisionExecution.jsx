@@ -4,36 +4,61 @@ import {
   Spin,
   Table,
   Tabs,
+  Tooltip,
   message,
 } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import {
   initDecisionExec,
   saveExec,
 } from "../mockApi";
 import AssignFollow from "./AssignFollow";
-import "./AssignExecution.css";
+import "./DecisionExecution.css";
 
-const passText = (value) =>
-  value === "0"
-    ? "不通过"
-    : value === "1"
-      ? "通过"
-      : value === "2"
-        ? "有条件通过"
-        : "-";
+const hasDecisionValue = (value) => value !== undefined && value !== null && value !== "";
 
-const pickTopDecision = (row) => {
-  if (row.shPassFlag !== undefined && row.shPassFlag !== null && row.shPassFlag !== "") {
-    return { from: "sh", value: row.shPassFlag };
-  }
-  if (row.bosPassFlag !== undefined && row.bosPassFlag !== null && row.bosPassFlag !== "") {
-    return { from: "bos", value: row.bosPassFlag };
-  }
-  if (row.bodPassFlag !== undefined && row.bodPassFlag !== null && row.bodPassFlag !== "") {
-    return { from: "bod", value: row.bodPassFlag };
-  }
-  return { from: null, value: null };
+const passText = (value) => {
+  if (value === "0") return "反对";
+  if (value === "1") return "同意";
+  if (value === "2") return "有条件同意";
+  if (value === "-1" || value === "3") return "回避表决";
+  return "-";
+};
+
+const getOfficeDecision = (row, meetingKey) => {
+  const fieldMap = {
+    bod: "gqBodPassFlag",
+    bos: "gqBosPassFlag",
+    sh: "gqShPassFlag",
+  };
+  const currentValue = row[fieldMap[meetingKey]];
+  if (hasDecisionValue(currentValue)) return currentValue;
+  if (hasDecisionValue(row.gqPassFlag) && hasDecisionValue(getThreeDecision(row, meetingKey))) return row.gqPassFlag;
+  return "";
+};
+
+const getThreeDecision = (row, meetingKey) => {
+  const fieldMap = {
+    bod: "bodPassFlag",
+    bos: "bosPassFlag",
+    sh: "shPassFlag",
+  };
+  return row[fieldMap[meetingKey]];
+};
+
+const getDecisionConsistency = (row) => {
+  const meetingKeys = ["bod", "bos", "sh"];
+  const compared = meetingKeys
+    .map((key) => ({
+      officeValue: getOfficeDecision(row, key),
+      threeValue: getThreeDecision(row, key),
+    }))
+    .filter(({ officeValue, threeValue }) => hasDecisionValue(officeValue) || hasDecisionValue(threeValue));
+
+  if (compared.length === 0) return null;
+
+  return compared.every(({ officeValue, threeValue }) => String(officeValue || "") === String(threeValue || ""));
 };
 
 export default function AssignExecution({
@@ -74,32 +99,58 @@ export default function AssignExecution({
         render: (_value, row) => row?.eoSanhuiTopic?.toipcName || row?.toipcName || "-",
       },
       {
-        title: "总办会",
-        dataIndex: "gqPassFlag",
+        title: "股东会议决策",
         align: "center",
-        width: 120,
-        render: passText,
+        children: [
+          {
+            title: "董事会",
+            dataIndex: "gqBodPassFlag",
+            align: "center",
+            width: 120,
+            render: (_value, row) => passText(getOfficeDecision(row, "bod")),
+          },
+          {
+            title: "监事会",
+            dataIndex: "gqBosPassFlag",
+            align: "center",
+            width: 120,
+            render: (_value, row) => passText(getOfficeDecision(row, "bos")),
+          },
+          {
+            title: "股东会 / 投委会",
+            dataIndex: "gqShPassFlag",
+            align: "center",
+            width: 150,
+            render: (_value, row) => passText(getOfficeDecision(row, "sh")),
+          },
+        ],
       },
       {
-        title: "董事会",
-        dataIndex: "bodPassFlag",
+        title: "三会决议",
         align: "center",
-        width: 120,
-        render: passText,
-      },
-      {
-        title: "监事会",
-        dataIndex: "bosPassFlag",
-        align: "center",
-        width: 120,
-        render: passText,
-      },
-      {
-        title: "股东会 / 投委会",
-        dataIndex: "shPassFlag",
-        align: "center",
-        width: 150,
-        render: passText,
+        children: [
+          {
+            title: "董事会",
+            dataIndex: "bodPassFlag",
+            align: "center",
+            width: 120,
+            render: passText,
+          },
+          {
+            title: "监事会",
+            dataIndex: "bosPassFlag",
+            align: "center",
+            width: 120,
+            render: passText,
+          },
+          {
+            title: "股东会 / 投委会",
+            dataIndex: "shPassFlag",
+            align: "center",
+            width: 150,
+            render: passText,
+          },
+        ],
       },
       {
         title: "一致性",
@@ -107,9 +158,8 @@ export default function AssignExecution({
         align: "center",
         width: 120,
         render: (_value, row) => {
-          const top = pickTopDecision(row);
-          if (!top.from) return <span>-</span>;
-          const matched = String(row.gqPassFlag) === String(top.value);
+          const matched = getDecisionConsistency(row);
+          if (matched === null) return <span>-</span>;
           return matched ? (
             <span className="assign-decision-ok">一致</span>
           ) : (
@@ -122,10 +172,9 @@ export default function AssignExecution({
         dataIndex: "diffRemark",
         width: 360,
         render: (_value, row, index) => {
-          const top = pickTopDecision(row);
-          const matched = top.from && String(row.gqPassFlag) === String(top.value);
+          const matched = getDecisionConsistency(row);
 
-          if (!top.from || matched) return "-";
+          if (matched === null || matched) return "-";
 
           return (
             <Input.TextArea
@@ -151,10 +200,8 @@ export default function AssignExecution({
 
   const handleDecisionSave = async (type) => {
     const invalid = decisionList.find((row) => {
-      const top = pickTopDecision(row);
-      if (!top.from) return false;
-      const matched = String(row.gqPassFlag) === String(top.value);
-      return !matched && !String(row.diffRemark || "").trim();
+      const matched = getDecisionConsistency(row);
+      return matched === false && !String(row.diffRemark || "").trim();
     });
 
     if (invalid) {
@@ -192,12 +239,13 @@ export default function AssignExecution({
         </span>
       </div>
       <Table
+        className="assign-decision-table"
         columns={decisionColumns}
         dataSource={decisionList}
         rowKey={(row) => row.id || row.topicId}
         size="small"
         bordered
-        scroll={{ x: 1400, y: 600 }}
+        scroll={{ x: 1700, y: 600 }}
         pagination={false}
       />
       {editStatus ? (
@@ -220,19 +268,30 @@ export default function AssignExecution({
   return (
     <Spin spinning={loading} tip="加载中...">
       <div className="assign-execution">
-        <div className="assign-execution-head">
+        {/* <div className="assign-execution-head">
           <div>
             <h3>{record.companyName}</h3>
             <p>
               {record.mgmtNo} / {record.submitUserName} 提报
             </p>
           </div>
-        </div>
+        </div> */}
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
           items={[
-            { key: "decision", label: "决策情况", children: decisionTab },
+            {
+              key: "decision",
+              label: (
+                <span className="assign-tab-label-with-help">
+                  决策情况
+                  <Tooltip title={<div><div>1.选项统一 同意 反对 有条件同意 回避表决</div><div>2. 股东会议决策 数据 取自审批材料准备</div></div>}>
+                    <QuestionCircleOutlined className="assign-tab-help-icon" onClick={(event) => event.stopPropagation()} />
+                  </Tooltip>
+                </span>
+              ),
+              children: decisionTab,
+            },
             { key: "follow", label: "交办事项", children: followTab },
           ]}
         />

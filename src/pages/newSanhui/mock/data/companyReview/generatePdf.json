@@ -1,0 +1,1220 @@
+{
+	"success": true,
+	"code": 200,
+	"message": "操作成功",
+	"data": {
+		"commentList": [
+			{
+				"reviewUserId": "liuhongyan",
+				"orgName": "财务部",
+				"coReviewId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"reviewComment": "同意",
+				"stepCode": "15300",
+				"reviewType": "2000",
+				"id": "c251978d78ea32cf9a36dce92fa5cb91",
+				"reviewOrgId": "10048032",
+				"stageCode": "15000"
+			},
+			{
+				"reviewUserId": "chenhao42",
+				"orgName": "综合管理部",
+				"coReviewId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"reviewComment": "同意",
+				"stepCode": "15300",
+				"reviewType": "2000",
+				"id": "509ff77f35794221cf2ecea88030e697",
+				"reviewOrgId": "10053781",
+				"stageCode": "15000"
+			}
+		],
+		"riskComment": "无",
+		"deptName": "股权运营部",
+		"reportFileList": [
+			{
+				"fileName": "01审议关于一汽富华高级管理人员任免建议方案.pptx",
+				"updatedBy": "yangbaijun",
+				"created": 1776766045000,
+				"delFlag": "0",
+				"version": 1,
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"createdBy": "yangbaijun",
+				"objectKey": "69e74c5ce4b07c0c20857c2a.pptx",
+				"fileCategory": "400",
+				"tenantId": "YQJT",
+				"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74c5ce4b07c0c20857c2a.pptx",
+				"id": "3c888e84f14cc8f2939929b9f5116954",
+				"updated": 1776766045000,
+				"fileId": "3c888e84f14cc8f2939929b9f5116954"
+			},
+			{
+				"fileName": "02审议关于一汽富华2025年度财务决算报告的议案.pptx",
+				"updatedBy": "yangbaijun",
+				"created": 1776766045000,
+				"delFlag": "0",
+				"version": 1,
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"createdBy": "yangbaijun",
+				"objectKey": "69e74c5ce4b07c0c20857c2b.pptx",
+				"fileCategory": "400",
+				"tenantId": "YQJT",
+				"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74c5ce4b07c0c20857c2b.pptx",
+				"id": "307667f7f4281c143a4c606ed5e55f43",
+				"updated": 1776766045000,
+				"fileId": "307667f7f4281c143a4c606ed5e55f43"
+			},
+			{
+				"fileName": "03审议关于一汽富华2025年度利润分配方案的议案.pptx",
+				"updatedBy": "yangbaijun",
+				"created": 1776766045000,
+				"delFlag": "0",
+				"version": 1,
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"createdBy": "yangbaijun",
+				"objectKey": "69e74c5ce4b07c0c20857c2c.pptx",
+				"fileCategory": "400",
+				"tenantId": "YQJT",
+				"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74c5ce4b07c0c20857c2c.pptx",
+				"id": "5fa4514f5ff08c4a4cb639152fc35a4f",
+				"updated": 1776766045000,
+				"fileId": "5fa4514f5ff08c4a4cb639152fc35a4f"
+			}
+		],
+		"lagelComment": "同意",
+		"auth": [],
+		"companyName": "一汽富华生态股份有限公司董事会2026年第五次会议、股东会2026年第二次会议的议案及表决建议",
+		"sanhuiVote": "",
+		"topicList": [
+			{
+				"categoryLv2Name": "5.1 董监高人员变更",
+				"eoSanhuiTopicScheduleFormList": [
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "1",
+						"createdBy": "yangbaijun",
+						"created": 1776655255000,
+						"sanhuiTopicId": "c5342b98abce10494129d372e6dc41af",
+						"tenantId": "YQJT",
+						"id": "e75d5749aa56c63130d051a67e35adbc",
+						"meetingType": "100",
+						"updated": 1776655255000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "0",
+						"createdBy": "yangbaijun",
+						"created": 1776655255000,
+						"sanhuiTopicId": "c5342b98abce10494129d372e6dc41af",
+						"tenantId": "YQJT",
+						"id": "59aec6d322aafade460b8c2f2343d691",
+						"meetingType": "200",
+						"updated": 1776655255000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "0",
+						"createdBy": "yangbaijun",
+						"created": 1776655255000,
+						"sanhuiTopicId": "c5342b98abce10494129d372e6dc41af",
+						"tenantId": "YQJT",
+						"id": "546070ca3cfc7ee3f81082817d3340e3",
+						"meetingType": "300",
+						"updated": 1776655255000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					}
+				],
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"answerNum": 0,
+				"id": "c5342b98abce10494129d372e6dc41af",
+				"categoryLv1Name": "5. 人事类",
+				"categoryLv3Id": "6dbe5349abee4989941e829b9debd311",
+				"categoryLv2Id": "e5f67811b377459995cdebe3e4a676ef",
+				"categoryLv1Id": "d3b84fbb3d9043c1b2d4bd083ee89f45",
+				"orderNo": 1,
+				"updatedBy": "yangbaijun",
+				"toipcName": "关于审议一汽富华高级管理人员任免建议方案的议案",
+				"created": 1776655255000,
+				"version": 17,
+				"reviewLevel": "3000",
+				"reviewLevel1": "3000",
+				"reviewLevel2": "3000",
+				"categoryLv3Name": "5.1.7 变更总经理",
+				"reviewLevel3": "3000",
+				"createdBy": "yangbaijun",
+				"tenantId": "YQJT",
+				"questionNum": 0,
+				"reviewLevel4": "3000",
+				"updated": 1776768248000,
+				"status": "2"
+			},
+			{
+				"categoryLv2Name": "3.6 分红",
+				"eoSanhuiTopicScheduleFormList": [
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "1",
+						"createdBy": "yangbaijun",
+						"created": 1776655269000,
+						"sanhuiTopicId": "16e3d57cd05fd0a8cf0442ec468a1624",
+						"tenantId": "YQJT",
+						"id": "be65f5c2613e3d6f6f569fef036bc218",
+						"meetingType": "100",
+						"updated": 1776655269000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "0",
+						"createdBy": "yangbaijun",
+						"created": 1776655269000,
+						"sanhuiTopicId": "16e3d57cd05fd0a8cf0442ec468a1624",
+						"tenantId": "YQJT",
+						"id": "60d75b854e33ace4a9469ed6644fc685",
+						"meetingType": "200",
+						"updated": 1776655269000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "1",
+						"createdBy": "yangbaijun",
+						"created": 1776655269000,
+						"sanhuiTopicId": "16e3d57cd05fd0a8cf0442ec468a1624",
+						"tenantId": "YQJT",
+						"id": "e744602113d17c63304e185a8e255d74",
+						"meetingType": "300",
+						"updated": 1776655269000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					}
+				],
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"answerNum": 0,
+				"id": "16e3d57cd05fd0a8cf0442ec468a1624",
+				"categoryLv1Name": "3. 财务类",
+				"categoryLv3Id": "da3de970bdcb409c85f52d833f598a04",
+				"categoryLv2Id": "e240de09dd544aa29edfe0eb9ba05503",
+				"categoryLv1Id": "a98fa980c97e454584bbff3a59aea4b0",
+				"orderNo": 2,
+				"updatedBy": "yangbaijun",
+				"toipcName": "关于审议一汽富华2025年度利润分配方案的议案",
+				"created": 1776655123000,
+				"version": 16,
+				"reviewLevel": "3000",
+				"reviewLevel1": "3000",
+				"reviewLevel2": "3000",
+				"categoryLv3Name": "3.6.2 年度利润分配方案",
+				"reviewLevel3": "3000",
+				"createdBy": "yangbaijun",
+				"tenantId": "YQJT",
+				"questionNum": 0,
+				"reviewLevel4": "3000",
+				"updated": 1776768248000,
+				"status": "2"
+			},
+			{
+				"categoryLv2Name": "3.2 年度决算",
+				"eoSanhuiTopicScheduleFormList": [
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "1",
+						"createdBy": "yangbaijun",
+						"created": 1776655183000,
+						"sanhuiTopicId": "3166ce24a28d6c16818ca197d233273d",
+						"tenantId": "YQJT",
+						"id": "86efa2167e5e01b9e8ec904587d8aa98",
+						"meetingType": "100",
+						"updated": 1776655183000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "0",
+						"createdBy": "yangbaijun",
+						"created": 1776655183000,
+						"sanhuiTopicId": "3166ce24a28d6c16818ca197d233273d",
+						"tenantId": "YQJT",
+						"id": "8201bf630d7c598fafbaa1baaf3fb115",
+						"meetingType": "200",
+						"updated": 1776655183000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "yangbaijun",
+						"launchFlag": "1",
+						"createdBy": "yangbaijun",
+						"created": 1776655183000,
+						"sanhuiTopicId": "3166ce24a28d6c16818ca197d233273d",
+						"tenantId": "YQJT",
+						"id": "234cebeacf7d141895f2ce0c54ac5e1c",
+						"meetingType": "300",
+						"updated": 1776655183000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					}
+				],
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"answerNum": 0,
+				"id": "3166ce24a28d6c16818ca197d233273d",
+				"categoryLv1Name": "3. 财务类",
+				"categoryLv3Id": "f5eb8617c4be4fd4b7f52b632b113a2b",
+				"categoryLv2Id": "bacb7076b96d4344a118c0d7e5bdb250",
+				"categoryLv1Id": "a98fa980c97e454584bbff3a59aea4b0",
+				"orderNo": 3,
+				"updatedBy": "yangbaijun",
+				"toipcName": "关于审议一汽富华2025年度财务决算报告的议案",
+				"created": 1776655183000,
+				"version": 16,
+				"reviewLevel": "2000",
+				"reviewLevel1": "2000",
+				"reviewLevel2": "2000",
+				"categoryLv3Name": "3.2.1 年度决算报告",
+				"reviewLevel3": "2000",
+				"createdBy": "yangbaijun",
+				"tenantId": "YQJT",
+				"questionNum": 0,
+				"reviewLevel4": "2000",
+				"updated": 1776768248000,
+				"status": "2"
+			}
+		],
+		"topicOpnList": [
+			{
+				"sanhuiTopicName": "关于审议一汽富华高级管理人员任免建议方案的议案",
+				"orderNo": 1,
+				"coReviewId": "b9416e00cee48b531d1b02501c6b7e67",
+				"voteAdvice": "1",
+				"voteAdvice100": "1",
+				"sanhuiTopicId": "c5342b98abce10494129d372e6dc41af",
+				"id": "e0ab5649e654a7b31e1ea41223bd3c93",
+				"meetingType": "100"
+			},
+			{
+				"sanhuiTopicName": "关于审议一汽富华2025年度利润分配方案的议案",
+				"orderNo": 2,
+				"coReviewId": "b9416e00cee48b531d1b02501c6b7e67",
+				"voteAdvice": "1",
+				"voteAdvice100": "1",
+				"sanhuiTopicId": "16e3d57cd05fd0a8cf0442ec468a1624",
+				"voteAdvice300": "1",
+				"id": "664a140fe467edd80787ead54c1899ef",
+				"meetingType": "100"
+			},
+			{
+				"sanhuiTopicName": "关于审议一汽富华2025年度财务决算报告的议案",
+				"orderNo": 3,
+				"coReviewId": "fbfb616f7b6d62799c75005ad6de649d",
+				"voteAdvice": "1",
+				"voteAdvice100": "1",
+				"sanhuiTopicId": "3166ce24a28d6c16818ca197d233273d",
+				"voteAdvice300": "1",
+				"id": "e781d404d2e52c9b78dc18bb8f5c6e6f",
+				"meetingType": "100"
+			}
+		],
+		"isReviewPage": false,
+		"assessmentList": [
+			{
+				"commentList": "同意",
+				"topicImageList": [
+					{
+						"fileName": "一汽富华董事会议题关键信息介绍202604_01.jpg",
+						"orderNo": 1,
+						"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+						"objectKey": "69e74acce4b07c0c5c9893c0.jpg",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74acce4b07c0c5c9893c0.jpg",
+						"id": "f67b2a5eb05464b9bf46a4457523403e",
+						"delFlag": "0",
+						"version": 3,
+						"fileType": "jpg",
+						"fileId": "f67b2a5eb05464b9bf46a4457523403e"
+					}
+				],
+				"topicName": "关于审议一汽富华高级管理人员任免建议方案的议案",
+				"assessmentList": [
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20219;&#32844;&#36164;&#26684;&#65288;&#31105;&#27490;&#26465;&#27454;&#65289;1.&#20844;&#21496;&#27861;&#23545;&#33891;&#30417;&#39640;&#20219;&#32844;&#36164;&#26684;&#30340;&#31105;&#27490;&#26465;&#27454;2.&#19978;&#24066;&#20844;&#21496;&#24212;&#21521;&#35777;&#30417;&#20250;&#25552;&#20132;&#20219;&#32844;&#36164;&#26684;&#30003;&#35831;&#65292;&#26680;&#20934;&#20219;&#32844;&#36164;&#26684;&zwnj;3.&#19987;&#19994;&#39046;&#22495;&#35268;&#23450;&#30340;&#20219;&#32844;&#36164;&#26684;&#65288;&#22914;&#22522;&#37329;&#12289;&#20445;&#38505;&#12289;&#36130;&#21153;&#31867;&#20225;&#19994;&#65289;",
+							"orderNo": 1,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "外部管理规定",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "bbea7ebe05464d64bb951e0e0a06ec5e",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 3,
+						"updatedBy": "yangbaijun",
+						"created": 1776664032000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "bbea7ebe05464d64bb951e0e0a06ec5e",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"rowspan": 4,
+						"tenantId": "YQJT",
+						"id": "36dbf0350e017e1a8bbd20e307c78311",
+						"assessmentId": "3c41a24a2b044cb0d59a7142bee2a759",
+						"updated": 1776768248000,
+						"execDetail": "符合"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20844;&#21496;&#31456;&#31243;&#25110;&#20869;&#37096;&#31649;&#29702;&#21046;&#24230;&#35201;&#27714;1.&#25353;&#29031;&#20844;&#21496;&#31456;&#31243;&#30001;&#32929;&#19996;&#26041;&#25512;&#33616;&#32856;&#20219;2.&#25353;&#29031;&#20844;&#21496;&#31456;&#31243;&#30001;&#33891;&#20107;&#20250;&#32856;&#20219;3.&#25353;&#29031;&#24066;&#22330;&#21270;&#26426;&#21046;&#23545;&#22806;&#25307;&#32856;4.&#25353;&#29031;&#20844;&#21496;&#20154;&#25165;&#20648;&#22791;&#35745;&#21010;&#26187;&#21319;",
+							"orderNo": 2,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "内部管理规定",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "3beefac14ca3437da6b9b7ee157ae6fc",
+							"updated": 1750503931000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776664032000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "3beefac14ca3437da6b9b7ee157ae6fc",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "d7d30cde1816d2c1e04d0260b616460a",
+						"assessmentId": "3c41a24a2b044cb0d59a7142bee2a759",
+						"updated": 1776768248000,
+						"execDetail": "符合公司章程规定"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#22269;&#36164;&#25511;&#32929;&#32929;&#19996;&#35813;&#31867;&#20107;&#39033;&#31649;&#29702;&#35201;&#27714;",
+							"orderNo": 3,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;(&#25511;&#32929;&#26041;&#20026;&#27665;&#20225;&#25110;&#22806;&#20225;&#31561;&#26102;&#23646;&#20110;&#19981;&#28041;&#21450;)&#65292;&#36890;&#36807;;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "国资控股股东要求",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "62df4fd0c708434e920730ed60d73403",
+							"updated": 1750503931000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776664032000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "62df4fd0c708434e920730ed60d73403",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "109418c89ac358675df42948ac468472",
+						"assessmentId": "3c41a24a2b044cb0d59a7142bee2a759",
+						"updated": 1776768248000,
+						"execDetail": "符合集团公司人事要求，集团公司已出具任命函"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#26159;&#21542;&#25353;&#21046;&#24230;&#35201;&#27714;&#36827;&#34892;&#21069;&#32622;&#23457;&#35758;",
+							"orderNo": 4,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "程序合规",
+							"version": 1,
+							"assessElement": "审议程序",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "5ac287ddd61244e49b713b13ea9eca77",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "yangbaijun",
+						"created": 1776664032000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "5ac287ddd61244e49b713b13ea9eca77",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "9f2f0377713c077d000555ca0e6dab17",
+						"assessmentId": "3c41a24a2b044cb0d59a7142bee2a759",
+						"updated": 1776768248000,
+						"execDetail": "经一汽富华党委会前置审议"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#21253;&#25324;&#22522;&#26412;&#20449;&#24687;&#12289;&#24037;&#20316;&#32463;&#21382;&#31561;&#20449;&#24687;",
+							"orderNo": 5,
+							"updatedBy": "zhangwei108",
+							"factorLv1Score": "100",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#26377;&#31616;&#21382;&#65292;&#21253;&#21547;&#22522;&#26412;&#20449;&#24687;&#21644;&#24037;&#20316;&#32463;&#21382;&#20449;&#24687;&#65292;&#24471;100&#20998;&#65307;&#26377;&#31616;&#21382;&#65292;&#21482;&#26377;&#22522;&#26412;&#20449;&#24687;&#25110;&#24037;&#20316;&#32463;&#21382;&#20449;&#24687;&#65292;&#24471;80&#20998;&#65307;&#26080;&#31616;&#21382;&#65292;&#24471;0&#20998;",
+							"weight": {
+								"source": "40.000000",
+								"parsedValue": 40
+							},
+							"factorLv2Name": "人员简历",
+							"version": 1,
+							"assessElement": "全面性",
+							"factorLv3Name": "合理性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "fdbcf35e03db44aea1d2da5ae8ad155e",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "yangbaijun",
+						"created": 1776664032000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "fdbcf35e03db44aea1d2da5ae8ad155e",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "40.00",
+							"parsedValue": 40
+						},
+						"createdBy": "yangbaijun",
+						"rowspan": 2,
+						"tenantId": "YQJT",
+						"id": "bab9a1f246c5eb220727e1caa805b55b",
+						"assessmentId": "3c41a24a2b044cb0d59a7142bee2a759",
+						"updated": 1776768248000,
+						"execDetail": "郑岩简介：1984年出生，曾任集团公司纪委监察部综合管理业务主任、办公室（党委办公室）秘书，资本控股公司党群工作部副部长、行政管理中心副总经理，集团公司审计与法务部总监、股权投资公司参股公司管理部总监，一汽富华副总经理。现经集团公司任命为一汽富华总经理"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#19982;&#21442;&#32929;&#20844;&#21496;&#19994;&#21153;&#30456;&#20851;&#30340;&#24037;&#20316;&#32463;&#21382;&#25110;&#19987;&#19994;&#32972;&#26223;",
+							"orderNo": 6,
+							"updatedBy": "zhangwei108",
+							"factorLv1Score": "100",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#24230;&#39640;&#65292;&#24471;100&#20998;&#65307;&#31526;&#21512;&#24230;&#19968;&#33324;&#65292;&#24471;60&#20998;&#65307;&#31526;&#21512;&#24230;&#20302;&#65292;&#24471;40&#20998;&#65307;&#23436;&#25104;&#19981;&#31526;&#21512;&#65292;&#24471;0&#20998;",
+							"weight": {
+								"source": "60.000000",
+								"parsedValue": 60
+							},
+							"factorLv2Name": "岗位匹配",
+							"version": 1,
+							"assessElement": "符合性",
+							"factorLv3Name": "合理性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "0fe8e213666d4c4d81778c5128a0613a",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "yangbaijun",
+						"created": 1776664032000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "0fe8e213666d4c4d81778c5128a0613a",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "60.00",
+							"parsedValue": 60
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "ae4de3ec7024dfef6f9938947d43e3cb",
+						"assessmentId": "3c41a24a2b044cb0d59a7142bee2a759",
+						"updated": 1776768248000,
+						"execDetail": "郑岩担任过多个分子公司或集团公司职能部门管理职务，此次任命前为一汽富华副总经理，工作经验与一汽富华主营业务匹配"
+					}
+				],
+				"title": "议题1:关于审议一汽富华高级管理人员任免建议方案的议案",
+				"assessmentTotalScore": {
+					"source": "100.00",
+					"parsedValue": 100
+				},
+				"todoComment": "同意一汽富华高级管理人员任免建议方案的议案内容",
+				"desc": ""
+			},
+			{
+				"commentList": "同意",
+				"topicImageList": [
+					{
+						"fileName": "一汽富华董事会议题关键信息介绍202604_02.jpg",
+						"orderNo": 2,
+						"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+						"objectKey": "69e74acce4b07c0c5c9893c1.jpg",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74acce4b07c0c5c9893c1.jpg",
+						"id": "77526ae06caf1797b468a6b933a36995",
+						"delFlag": "0",
+						"version": 3,
+						"fileType": "jpg",
+						"fileId": "77526ae06caf1797b468a6b933a36995"
+					}
+				],
+				"topicName": "关于审议一汽富华2025年度利润分配方案的议案",
+				"assessmentList": [
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20844;&#21496;&#27861;&#20851;&#20110;&#21033;&#28070;&#20998;&#37197;&#30340;&#26465;&#27454;",
+							"orderNo": 1,
+							"updatedBy": "wanglimin9",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#31526;&#21512;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "外部管理规定",
+							"factorLv3Name": "合规性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "6e229f0228254e03827e2cc26790e1ab",
+							"updated": 1756197504000
+						},
+						"lv2RowSpan": 5,
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "6e229f0228254e03827e2cc26790e1ab",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"rowspan": 6,
+						"tenantId": "YQJT",
+						"id": "4d4c88cfa30163a9d357457bb0c01dc1",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "符合公司法相关规定"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#19978;&#24066;&#20844;&#21496;&#21033;&#28070;&#20998;&#37197;&#30340;&#30456;&#20851;&#26465;&#27454;",
+							"orderNo": 2,
+							"updatedBy": "wanglimin9",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#31526;&#21512;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "外部管理规定",
+							"factorLv3Name": "合规性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "5b652d74dd3c48eab654d526079c0960",
+							"updated": 1756197504000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "5b652d74dd3c48eab654d526079c0960",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "c44403466aa45eec508a96641a0ba437",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "不涉及"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#35813;&#20844;&#21496;&#20869;&#37096;&#35813;&#31867;&#20107;&#39033;&#31649;&#29702;&#35201;&#27714;",
+							"orderNo": 3,
+							"updatedBy": "wanglimin9",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#31526;&#21512;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "内部管理规定",
+							"factorLv3Name": "合规性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "72abea70649b4ca6b6fc9f7cda051d65",
+							"updated": 1756197504000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "72abea70649b4ca6b6fc9f7cda051d65",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "512100a5740d3e8c396a8016e0987583",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "符合股东协议及公司章程相关规定：可供分配利润应由公司股东会按照届时各股东实缴出资额占公司总实缴出资额的比例进行分配；公司应于每自然年度6月30日前召开利润分配的股东会，并决议对前一年度实现的可供分配利润的40%进行分配。"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#22269;&#36164;&#25511;&#32929;&#32929;&#19996;&#35813;&#31867;&#20107;&#39033;&#35201;&#27714;",
+							"orderNo": 4,
+							"updatedBy": "wanglimin9",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#31526;&#21512;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "控股股东要求",
+							"factorLv3Name": "合规性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "d84217031c984ab498a362d73b367838",
+							"updated": 1756197504000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "d84217031c984ab498a362d73b367838",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "01ebf3dc05f0dde321042006851866fa",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "符合集团公司相关规定"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#32467;&#21512;&#35813;&#20844;&#21496;&#21382;&#21490;&#20998;&#32418;&#25215;&#35834;&#27604;&#20363;&#20817;&#29616;&#24773;&#20917;&#35780;&#20215;",
+							"orderNo": 5,
+							"updatedBy": "wanglimin9",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#31526;&#21512;&#25110;&#19981;&#28041;&#21450;&#25110;&#26377;&#21512;&#29702;&#29702;&#30001;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "承诺比例兑现情况",
+							"factorLv3Name": "合规性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "296ab6a6d3944cdcad4e0758e52dddaf",
+							"updated": 1756197504000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "296ab6a6d3944cdcad4e0758e52dddaf",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "ff7f9e8cffb58e3861a8b85ef1a78802",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "2025年9月30日完成投资，2026年第一次分红，按可供分配利润的40%进行分配。"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#26159;&#21542;&#25353;&#21046;&#24230;&#35201;&#27714;&#36827;&#34892;&#21069;&#32622;&#23457;&#35758;",
+							"orderNo": 6,
+							"updatedBy": "wanglimin9",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#31526;&#21512;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "程序合规",
+							"version": 1,
+							"assessElement": "审议程序",
+							"factorLv3Name": "合规性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "daef79eb85f14ef8a41b81db7674abbc",
+							"updated": 1756197504000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "daef79eb85f14ef8a41b81db7674abbc",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "75fd8da9dfdfd5d4d902c014793d34de",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "经一汽富华党委会前置审议"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#23545;&#27604;&#34892;&#19994;&#20998;&#32418;&#27604;&#20363;&#21512;&#29702;&#24615;",
+							"orderNo": 7,
+							"updatedBy": "wanglimin9",
+							"factorLv1Score": "100",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#24471;&#20998;=&#21442;&#32929;&#20844;&#21496;&#20998;&#32418;&#27604;&#20363;/&#21487;&#27604;&#20844;&#21496;&#24179;&#22343;&#20998;&#32418;&#27604;&#20363;*100&#65292;&#35745;&#31639;&#32467;&#26524;&#22823;&#20110;100&#24471;100&#20998;&#65292;&#23567;&#20110;100&#65292;&#25353;&#35745;&#31639;&#32467;&#26524;&#36171;&#20998;",
+							"weight": {
+								"source": "10.000000",
+								"parsedValue": 10
+							},
+							"factorLv2Name": "分红方案",
+							"version": 1,
+							"assessElement": "行业分红比例对比指标",
+							"factorLv3Name": "合理性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "e0e096b810d04f02aa5d99f499a8309f",
+							"updated": 1756197504000
+						},
+						"lv2RowSpan": 4,
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "e0e096b810d04f02aa5d99f499a8309f",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "10.00",
+							"parsedValue": 10
+						},
+						"createdBy": "yangbaijun",
+						"rowspan": 4,
+						"tenantId": "YQJT",
+						"id": "9c1990970c60d7b12193f840fa3032a9",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "分红比例满足公司章程规定"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20998;&#32418;&#27604;&#20363;&#65288;S&#65289;=&#23459;&#21578;&#20998;&#32418;&#37329;&#39069;(D)/&#21487;&#20998;&#37197;&#21033;&#28070;&#65288;C&#65289;",
+							"orderNo": 8,
+							"updatedBy": "wanglimin9",
+							"factorLv1Score": "100",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#9312;C&le;0&#65292;S=0&#65292;&#36890;&#36807;\r<br/>&#9313;C&gt;0&#65292;S=100%&#65292;&#36890;&#36807;\r<br/>&#9314;C&gt;0&#65292;0&lt;S&lt;100%&#65292;&#31526;&#21512;&#20844;&#21496;&#31456;&#31243;&#25110;&#20998;&#32418;&#25919;&#31574;&#65292;&#36890;&#36807;&#65307;&#31456;&#31243;&#26080;&#29305;&#27530;&#32422;&#23450;&#65292;&#20998;&#32418;&#24180;&#24230;&#39044;&#27979;&#24180;&#26411;&#36164;&#37329;&#20313;&#39069;&gt;C-D&#65292;&#19981;&#36890;&#36807;&#65292;&#20998;&#32418;&#24180;&#24230;&#39044;&#27979;&#24180;&#26411;&#36164;&#37329;&#20313;&#39069;&lt;C-D&#65292;&#36890;&#36807;\r<br/>&#36890;&#36807;&#65292;100&#20998;&#65307;&#19981;&#36890;&#36807;&#65292;0&#20998;",
+							"weight": {
+								"source": "50.000000",
+								"parsedValue": 50
+							},
+							"factorLv2Name": "分红方案",
+							"version": 1,
+							"assessElement": "分红比例",
+							"factorLv3Name": "合理性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "149604911f4b4d89b4d5e02a5cfca0c1",
+							"updated": 1756197504000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 16,
+						"factorId": "149604911f4b4d89b4d5e02a5cfca0c1",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "50.00",
+							"parsedValue": 50
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "54e46c4b5e65f20bbb20cbf4d97edd49",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "分红比例40%，满足公司章程规定"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20998;&#32418;&#26159;&#21542;&#24433;&#21709;&#20844;&#21496;&#26410;&#26469;&#32463;&#33829;&#21457;&#23637;&#25152;&#38656;&#36164;&#37329;",
+							"orderNo": 9,
+							"updatedBy": "wanglimin9",
+							"factorLv1Score": "100",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#26080;&#24433;&#21709;&#65292;100&#20998;&#65307;\r<br/>&#26377;&#24433;&#21709;&#65292;&#20294;&#21487;&#20197;&#25509;&#21463;&#25110;&#35299;&#20915;&#65292;80&#20998;\r<br/>&#65307;&#26377;&#36739;&#22823;&#24433;&#21709;&#65292;0&#20998;",
+							"weight": {
+								"source": "20.000000",
+								"parsedValue": 20
+							},
+							"factorLv2Name": "分红方案",
+							"version": 1,
+							"assessElement": "经营影响",
+							"factorLv3Name": "合理性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "a3ee11b38daf42cc9d1bb5984b4a6f54",
+							"updated": 1756197504000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 15,
+						"factorId": "a3ee11b38daf42cc9d1bb5984b4a6f54",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "20.00",
+							"parsedValue": 20
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "e6d94664551c8d57f756dc8dcd502b2d",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "分红不影响公司未来经营发展所需资金"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#29616;&#37329;&#32929;&#21033;/&#20998;&#32418;",
+							"orderNo": 10,
+							"updatedBy": "wanglimin9",
+							"factorLv1Score": "100",
+							"modelId": "8BAAF4744DD24A6A80FF8D771EC58E85",
+							"created": 1756197504000,
+							"assessRule": "&#29616;&#37329;&#32929;&#21033;/(&#29616;&#37329;&#32929;&#21033;+&#32929;&#31080;&#32929;&#21033;&#65289;*100",
+							"weight": {
+								"source": "20.000000",
+								"parsedValue": 20
+							},
+							"factorLv2Name": "分红方案",
+							"version": 1,
+							"assessElement": "分红结构",
+							"factorLv3Name": "合理性",
+							"createdBy": "wanglimin9",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "08664f170fec4865ba6ed0b26317f290",
+							"updated": 1756197504000
+						},
+						"updatedBy": "yangbaijun",
+						"created": 1776656994000,
+						"ligh": "green2",
+						"version": 15,
+						"factorId": "08664f170fec4865ba6ed0b26317f290",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "20.00",
+							"parsedValue": 20
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "9c6be8f93d9708237c4b68bbdf28439f",
+						"assessmentId": "afd6430b5b9016af886e30223f1fec3b",
+						"updated": 1776768248000,
+						"execDetail": "100%现金分红。2025年可分配利润718万元，应分配利润金额287万元。<br/>各股东分红金额：中国一汽股比68.9716%，198万元；一汽股权股比21.4812%，62万元；交银资产股比7.95%，23万元；成都锦江股比1.5912%，5万元"
+					}
+				],
+				"title": "议题2:关于审议一汽富华2025年度利润分配方案的议案",
+				"assessmentTotalScore": {
+					"source": "100.00",
+					"parsedValue": 100
+				},
+				"todoComment": "同意一汽富华2025年度利润分配方案的议案内容",
+				"desc": ""
+			},
+			{
+				"commentList": "同意",
+				"topicImageList": [
+					{
+						"fileName": "一汽富华董事会议题关键信息介绍202604_03.jpg",
+						"orderNo": 3,
+						"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+						"objectKey": "69e74acce4b07c0c5c9893c2.jpg",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74acce4b07c0c5c9893c2.jpg",
+						"id": "94d2342571a80cc0531b5af991dfd04d",
+						"delFlag": "0",
+						"version": 3,
+						"fileType": "jpg",
+						"fileId": "94d2342571a80cc0531b5af991dfd04d"
+					},
+					{
+						"fileName": "一汽富华董事会议题关键信息介绍202604_04.jpg",
+						"orderNo": 4,
+						"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+						"objectKey": "69e74acce4b07c0c5c9893c3.jpg",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74acce4b07c0c5c9893c3.jpg",
+						"id": "759db2d7e98d85aea1b5e8e7c2014d75",
+						"delFlag": "0",
+						"version": 3,
+						"fileType": "jpg",
+						"fileId": "759db2d7e98d85aea1b5e8e7c2014d75"
+					},
+					{
+						"fileName": "一汽富华董事会议题关键信息介绍202604_05.jpg",
+						"orderNo": 5,
+						"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+						"objectKey": "69e74acce4b07c0c5c9893c4.jpg",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/69e74acce4b07c0c5c9893c4.jpg",
+						"id": "f3b536249f12cc487acc0444b24310bb",
+						"delFlag": "0",
+						"version": 3,
+						"fileType": "jpg",
+						"fileId": "f3b536249f12cc487acc0444b24310bb"
+					}
+				],
+				"topicName": "关于审议一汽富华2025年度财务决算报告的议案",
+				"assessmentList": [
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#23457;&#35745;&#25253;&#21578;&#24847;&#35265;",
+							"orderNo": 1,
+							"updatedBy": "guozhengbo",
+							"modelId": "2209122a52d644fd931abda1ee951b46",
+							"created": 1750503931000,
+							"assessRule": "&#20986;&#20855;&#26080;&#20445;&#30041;&#24847;&#35265;&#23457;&#35745;&#25253;&#21578;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "审计报告",
+							"factorLv3Name": "合规性",
+							"createdBy": "guozhengbo",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "e4298a9b7b374606be71a7584884937a",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "yangbaijun",
+						"created": 1776672676000,
+						"ligh": "green2",
+						"version": 15,
+						"factorId": "e4298a9b7b374606be71a7584884937a",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"rowspan": 2,
+						"tenantId": "YQJT",
+						"id": "c4e33598e3e8278aa51c7a51a5b7678e",
+						"assessmentId": "b517b151fc892d4a8f8e34d4fc171ac5",
+						"updated": 1776768248000,
+						"execDetail": "已出具审计报告"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#21442;&#32929;&#20844;&#21496;&#26159;&#21542;&#25353;&#21046;&#24230;&#35201;&#27714;&#36827;&#34892;&#21069;&#32622;&#23457;&#35758;",
+							"orderNo": 2,
+							"updatedBy": "guozhengbo",
+							"modelId": "2209122a52d644fd931abda1ee951b46",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "程序合规",
+							"version": 1,
+							"assessElement": "审议程序",
+							"factorLv3Name": "合规性",
+							"createdBy": "guozhengbo",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "9c770d0b093b40519e90a90c03a768cb",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "yangbaijun",
+						"created": 1776672676000,
+						"ligh": "green2",
+						"version": 15,
+						"factorId": "9c770d0b093b40519e90a90c03a768cb",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "yangbaijun",
+						"tenantId": "YQJT",
+						"id": "50381e107e5cdf0645322b3fe09defa8",
+						"assessmentId": "b517b151fc892d4a8f8e34d4fc171ac5",
+						"updated": 1776768248000,
+						"execDetail": "经一汽富华党委会前置审议"
+					}
+				],
+				"title": "议题3:关于审议一汽富华2025年度财务决算报告的议案",
+				"assessmentTotalScore": "通过",
+				"todoComment": "同意一汽富华2025年度财务决算报告的议案内容",
+				"desc": ""
+			}
+		],
+		"meetingInfo": [
+			{
+				"convener": "",
+				"attendee": "",
+				"updatedBy": "yangbaijun",
+				"created": 1776656717000,
+				"meetingTypeName": "董事会",
+				"meetingType": "100",
+				"version": 1,
+				"launchTime": 1777352408000,
+				"launchTimeStr": "2026年04月28日",
+				"meetingName": "一汽富华生态股份有限公司董事会2026年第五次会议",
+				"launchFlag": true,
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"createdBy": "yangbaijun",
+				"tenantId": "YQJT",
+				"location": "一汽富华",
+				"id": "01f0d981da3a53aa5b9c69a660319d85",
+				"updated": 1776656717000,
+				"notifyDate": 1776614400000,
+				"launchType": "1",
+				"launchTypeName": "现场召开",
+				"status": "1"
+			},
+			{
+				"convener": "",
+				"attendee": "",
+				"updatedBy": "yangbaijun",
+				"created": 1776656717000,
+				"meetingTypeName": "股东会/投委会",
+				"meetingType": "300",
+				"version": 1,
+				"launchTime": 1777352408000,
+				"launchTimeStr": "2026年04月28日",
+				"meetingName": "一汽富华生态股份有限公司股东会2026年第二次会议",
+				"launchFlag": true,
+				"sanhuiMgmtId": "66fa7aa22c96f2530fb86e7c1187ea25",
+				"createdBy": "yangbaijun",
+				"tenantId": "YQJT",
+				"location": "一汽富华",
+				"id": "d718164cc8ea94cfe2cbffaacf3c5b88",
+				"updated": 1776656717000,
+				"notifyDate": 1776614400000,
+				"launchType": "1",
+				"launchTypeName": "现场召开",
+				"status": "1"
+			}
+		],
+		"desc": "如董事会对以下议案的决议内容无修改，则董事会表决意见在股东大会上进行表决"
+	},
+	"msgType": "I",
+	"errType": "N",
+	"errMsg": null,
+	"errCode": "YQJT0IGQ-0207_MSA_001N50200"
+}

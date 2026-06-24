@@ -1,0 +1,58 @@
+{
+  "code": 200,
+  "data": {
+    "id": "vote-suggest-001",
+    "sanhuiMgmtId": "assign-001",
+    "summary": "一汽股权投资（天津）有限公司拟于2026年4月28日召开2026年第4次董事会、监事会及股东会，审议基金退出及参股公司预算调整相关事项。",
+    "addlSummary": "经2026年4月22日总办会审议，原则同意相关议题提交三会审议。请将****年**月**日改为实际日期后形成正式表决建议。",
+    "bodAdvice": "建议董事会同意推进基金退出路径比选，并授权经营层根据测算结果组织交易谈判。",
+    "bosAdvice": "建议监事会同意相关议题，并持续关注交易合规性及执行闭环情况。",
+    "shsAdvice": "建议股东会同意相关议题，并要求管户团队按月反馈执行进展。",
+    "bodFlag": "1",
+    "bosFlag": "1",
+    "shsFlag": "1",
+    "pdfFileUrl": "/mock-files/vote-suggest-assign-001.pdf",
+    "sanhuiTopicAssessMiscVoList": [
+      {
+        "id": "misc-001",
+        "topicName": "关于推进基金退出事项的议案",
+        "bodFlag": "1",
+        "bodCompResult": "1",
+        "bodVoteElusionFlag": "0",
+        "bosFlag": "1",
+        "bosCompResult": "1",
+        "bosVoteElusionFlag": "0",
+        "shsFlag": "1",
+        "shsCompResult": "1",
+        "shsVoteElusionFlag": "0"
+      },
+      {
+        "id": "misc-002",
+        "topicName": "关于参股公司年度预算调整的议案",
+        "bodFlag": "1",
+        "bodCompResult": "2",
+        "bodVoteElusionFlag": "1",
+        "bosFlag": "0",
+        "bosCompResult": "",
+        "bosVoteElusionFlag": "0",
+        "shsFlag": "1",
+        "shsCompResult": "2",
+        "shsVoteElusionFlag": "0"
+      },
+      {
+        "id": "misc-003",
+        "topicName": "关于授权签署补充协议的议案",
+        "bodFlag": "1",
+        "bodCompResult": "0",
+        "bodVoteElusionFlag": "0",
+        "bosFlag": "0",
+        "bosCompResult": "",
+        "bosVoteElusionFlag": "0",
+        "shsFlag": "0",
+        "shsCompResult": "",
+        "shsVoteElusionFlag": "0"
+      }
+    ]
+  },
+  "message": "success"
+}

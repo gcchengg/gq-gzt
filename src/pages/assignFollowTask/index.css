@@ -1,0 +1,196 @@
+.assign-follow-task-page {
+  position: relative;
+  min-height: 100vh;
+  padding: 18px 18px 72px;
+  background: #f4f6fa;
+  color: #222631;
+}
+
+.assign-follow-task-steps {
+  margin-bottom: 14px;
+  padding: 24px 34px 18px;
+  border: 1px solid #e7ecf5;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.assign-follow-task-steps .ant-steps-item-title {
+  color: #1f2430;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.assign-follow-task-steps .ant-steps-item-description {
+  margin-top: 8px;
+  color: #8a8d94;
+  font-size: 13px;
+}
+
+.assign-follow-task-steps .ant-steps-item-process .ant-steps-item-icon {
+  background: #1f63ed;
+  border-color: #1f63ed;
+}
+
+.assign-follow-task-steps .ant-steps-item-finish .ant-steps-item-icon {
+  border-color: #1f63ed;
+  color: #1f63ed;
+}
+
+.assign-follow-task-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.assign-follow-task-card {
+  border: 1px solid #e7ecf5;
+  border-radius: 10px;
+  box-shadow: 0 8px 18px rgba(31, 36, 48, 0.06);
+}
+
+.assign-follow-task-card .ant-card-body {
+  padding: 20px 20px 24px;
+}
+
+.assign-follow-task-title {
+  position: relative;
+  margin-bottom: 24px;
+  padding-left: 12px;
+  color: #2b303b;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.assign-follow-task-title::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 0;
+  width: 4px;
+  height: 18px;
+  border-radius: 999px;
+  background: #1f63ed;
+}
+
+.assign-follow-task-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 235px));
+  gap: 18px 30px;
+  align-items: start;
+}
+
+.assign-follow-task-grid.compact {
+  grid-template-columns: 235px minmax(260px, 420px);
+  margin-top: 24px;
+}
+
+.assign-follow-task-create .ant-form-item {
+  margin-bottom: 0;
+}
+
+.assign-follow-task-page .ant-form-item-label > label {
+  color: #333947;
+}
+
+.assign-follow-task-page .ant-form-item-required::before {
+  color: #ff4d4f !important;
+}
+
+.assign-follow-task-desc {
+  margin-top: 16px;
+}
+
+.assign-follow-task-text {
+  min-height: 28px;
+  padding-top: 2px;
+  color: #333947;
+  line-height: 24px;
+}
+
+.assign-follow-task-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #1f63ed;
+  font-size: 13px;
+}
+
+.assign-follow-task-type {
+  width: 235px;
+}
+
+.assign-follow-task-improve {
+  max-width: 920px;
+}
+
+.assign-follow-task-improve-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 4px;
+}
+
+.assign-follow-task-type-note {
+  min-height: 32px;
+  margin-bottom: 24px;
+  padding: 6px 10px;
+  border: 1px solid #dce7ff;
+  border-radius: 6px;
+  background: #f4f8ff;
+  color: #4b6288;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.assign-follow-task-textarea {
+  max-width: 760px;
+  border-radius: 6px;
+}
+
+.assign-follow-task-footer {
+  position: fixed;
+  right: 24px;
+  bottom: 16px;
+  z-index: 10;
+}
+
+.assign-follow-task-footer .ant-btn {
+  min-width: 56px;
+  height: 36px;
+}
+
+@media (max-width: 1200px) {
+  .assign-follow-task-grid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
+  .assign-follow-task-grid.compact {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .assign-follow-task-page {
+    padding: 12px 12px 72px;
+  }
+
+  .assign-follow-task-steps {
+    padding: 18px 16px;
+  }
+
+  .assign-follow-task-body {
+    gap: 24px;
+  }
+
+  .assign-follow-task-improve-head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .assign-follow-task-grid,
+  .assign-follow-task-grid.compact {
+    grid-template-columns: 1fr;
+  }
+}

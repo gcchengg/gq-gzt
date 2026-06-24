@@ -1,0 +1,73 @@
+[
+  {
+    "id": "workbench",
+    "title": "工作台",
+    "key": "/GztHome",
+    "children": [
+      {
+        "id": "gzt-home",
+        "title": "任务首页",
+        "key": "/GztHome"
+      },
+      {
+        "id": "new-sanhui",
+        "title": "三会全流程管理",
+        "key": "/newSanhui"
+      }
+    ]
+  },
+  {
+    "id": "sanhui-work",
+    "title": "三会任务",
+    "key": "/assign",
+    "children": [
+      {
+        "id": "assign",
+        "title": "任务办理",
+        "key": "/assign"
+      },
+      {
+        "id": "topic-advice",
+        "title": "议题反馈建议",
+        "key": "/topicAdvice"
+      },
+      {
+        "id": "advice-review",
+        "title": "表决建议单批注",
+        "key": "/adviceReview1"
+      },
+      {
+        "id": "follow-up",
+        "title": "交办落实跟踪",
+        "key": "/followUp"
+      }
+    ]
+  },
+  {
+    "id": "demo",
+    "title": "演示与移动端",
+    "key": "/gztDemo",
+    "children": [
+      {
+        "id": "gzt-demo",
+        "title": "三会流程演示",
+        "key": "/gztDemo"
+      },
+      {
+        "id": "topic-advice-mobile",
+        "title": "议题反馈移动端",
+        "key": "/TopicAdviceMobile"
+      },
+      {
+        "id": "advice-review-mobile",
+        "title": "批注移动端",
+        "key": "/adviceReview1Mobile"
+      },
+      {
+        "id": "ddmsg-mobile",
+        "title": "钉钉消息",
+        "key": "/ddmsgMobile"
+      }
+    ]
+  }
+]

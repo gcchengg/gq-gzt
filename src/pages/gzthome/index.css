@@ -21,7 +21,7 @@ html,
 body,
 #root {
   width: 100%;
-  min-width: 1260px;
+  min-width: 0;
   height: 100%;
   margin: 0;
   overflow: hidden;
@@ -38,7 +38,7 @@ input {
 }
 
 .page {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   min-height: 858px;
   position: relative;
@@ -529,15 +529,32 @@ input {
 
 .tab-strip {
   height: 70px;
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  display: flex;
   gap: 9px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   position: relative;
   z-index: 1;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #b8c7f4 transparent;
+}
+
+.tab-strip::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tab-strip::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #b8c7f4;
+}
+
+.tab-strip::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .task-card {
+  flex: 0 0 190px;
   height: 70px;
   border: 1px solid #d8dce4;
   border-radius: 3px 3px 0 0;

@@ -1,0 +1,38 @@
+{
+  "code": 200,
+  "data": {
+    "sanhuiSpecReportId": "spec-report-001",
+    "sanhuiFollowVoList": [
+      {
+        "id": "follow-report-001",
+        "followName": "补充专题汇报纪要",
+        "followDetail": "根据集团领导反馈补充基金退出测算依据，并形成执行说明。",
+        "itemType": "1",
+        "itemId": "topic-001",
+        "toipcName": "关于推进基金退出事项的议案",
+        "topicName": "关于推进基金退出事项的议案",
+        "assignUserId": "user-001",
+        "assignUserName": "张华",
+        "assignDate": "2026-04-29",
+        "deadlineDate": "2026-05-10",
+        "planStartDate": "2026-04-30",
+        "planEndDate": "2026-05-10",
+        "startDate": "2026-05-01",
+        "endDate": "2026-05-08",
+        "execDetail": "已补充测算说明，待复核。",
+        "status": "0",
+        "actId": "act-report-001",
+        "actStatus": "2",
+        "fileList": [
+          {
+            "id": "follow-file-001",
+            "fileName": "专题汇报补充说明.pdf",
+            "fileUrl": "/mock-files/topic-report-follow.pdf",
+            "fileType": "application/pdf"
+          }
+        ]
+      }
+    ]
+  },
+  "message": "success"
+}
