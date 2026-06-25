@@ -611,6 +611,25 @@
   box-shadow: none;
 }
 
+.post-meeting-material-layout .after-meeting-application {
+  padding: 18px;
+  border-top: 1px solid #edf1f8;
+  background: #fff;
+}
+
+.after-meeting-application .ant-form {
+  max-width: 1120px;
+}
+
+.after-meeting-application .ant-form-item {
+  margin-bottom: 14px;
+}
+
+.after-meeting-application .ant-picker,
+.after-meeting-application .ant-input-number {
+  width: 100%;
+}
+
 .tabs1-scroll-content {
   flex: 1;
   min-height: 0;

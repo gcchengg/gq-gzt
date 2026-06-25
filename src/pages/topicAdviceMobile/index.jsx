@@ -450,7 +450,7 @@ export default function TopicAdviceMobilePage() {
                     </div>
                 </Section>
 
-                <Section title="议题资料传达" icon={<TeamOutlined />}>
+                {/* <Section title="议题资料传达" icon={<TeamOutlined />}>
                     <Collapse className="topic-mobile-collapse" defaultActiveKey={["attendees"]}>
                         <Collapse.Panel key="attendees" title={`参会及传达对象（${distributionRows.length}）`}>
                             <div className="topic-mobile-person-list">
@@ -485,7 +485,7 @@ export default function TopicAdviceMobilePage() {
                             </div>
                         </Collapse.Panel>
                     </Collapse>
-                </Section>
+                </Section> */}
 
                 <Section title="议题意见反馈与答复" icon={<MessageOutlined />}>
                     <input ref={fileInputRef} className="topic-mobile-file-input" type="file" onChange={handleReferenceFileChange} />

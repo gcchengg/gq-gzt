@@ -11,7 +11,7 @@ const MEETING_FILE_GROUPS = [
   { key: "shs", title: "股东会会议决议" },
 ];
 
-const MEETING_FILE_TYPES = ["我方发出版"];
+const MEETING_FILE_TYPES = ["我方发出版",'会议完整版'];
 const getFileCategory = (meetingTitle, fileType) => `${meetingTitle}-${fileType}`;
 
 const getEmptyVoteFileMap = () =>
@@ -278,12 +278,12 @@ export default function Vote(props) {
   return (
     <>
       <div className="vote-page">
-        <div className="vote-page-head">
+        {/* <div className="vote-page-head">
           <div>
             <div className="vote-page-eyebrow">三会表决</div>
             <div className="vote-page-title">三会决议及表决结果确认</div>
           </div>
-        </div>
+        </div> */}
         <Spin spinning={loading} tip="AI正在解析中，请稍等...">
           <div className="vote-section">
             <div className="vote-section-title">三会会议决议上传</div>

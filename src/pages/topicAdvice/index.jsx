@@ -495,7 +495,7 @@ export default function TopicAdvicePage() {
           </div>
         </ReadonlySection>
 
-        <ReadonlySection title="议题资料传达">
+        {/* <ReadonlySection title="议题资料传达">
           <Table rowKey="id" columns={distributionColumns} dataSource={distributionRows} pagination={false} size="small" scroll={{ x: 1180 }}/>
           <div className="topic-reviewer-list">
             {reviewerNotifyRows.map((row) => (<div className="topic-reviewer-item" key={row.id}>
@@ -505,7 +505,7 @@ export default function TopicAdvicePage() {
                   </Space>) : (<Tag>未参与</Tag>)}
               </div>))}
           </div>
-        </ReadonlySection>
+        </ReadonlySection> */}
 
         <section className="topic-advice-section topic-feedback-section">
           <div className="topic-advice-section-head">

@@ -1,26 +1,24 @@
 import {
   AuditOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined,
   FileOutlined,
   FileDoneOutlined,
   FileSearchOutlined,
   FormOutlined,
-  ProjectOutlined,
   QuestionCircleOutlined,
   SafetyCertificateOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { Button, DatePicker, Descriptions, Drawer, Empty, Form, Image, Input, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Upload, message } from "antd";
+import { Button, DatePicker, Descriptions, Drawer, Empty, Form, Image, Input, InputNumber, Popconfirm, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Upload, message } from "antd";
 import dayjs from "dayjs";
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { sanhuiProgStatus } from "../mockApi";
 import meetingGetListResponse from "../mock/data/submit/meetingGetList.json";
+import removedFileReplaceTabImage from "../mock/data/companyReview/截屏2026-06-25 11.08.51.png";
+import removedTopicReportTabImage from "../../截屏2026-06-25 13.34.13.png";
 import SubmitDrawer from "./SubmitDrawer";
 import TopicEvaluation from "./TopicEvaluation";
 import CompanyReview from "./CompanyReview";
 import VoteSuggest from "./VoteSuggest";
-import TopicReport from "./TopicReport";
 import Vote from "./Vote";
 import DecisionExecution from "./DecisionExecution";
 import "./DueDrawer.css";
@@ -32,7 +30,7 @@ const tabStatusMap = {
   14000: "2",
   15000: "3",
   16000: "4",
-  17000: "5",
+  17000: "6",
   18000: "6",
   19000: "7",
   20000: "7",
@@ -45,21 +43,17 @@ const stageMeta = {
   2: { title: "议题评估", desc: "材料批注、问答反馈、风险判断", icon: FileSearchOutlined },
   3: { title: "议题审核", desc: "联审意见、审批记录、附件校验", icon: AuditOutlined },
   4: { title: "表决建议", desc: "生成建议单、收集董事反馈", icon: FileDoneOutlined },
-  5: { title: "专题汇报", desc: "汇报材料、交办任务、反馈闭环", icon: ProjectOutlined },
   6: { title: "三会表决", desc: "表决结果、会议决议、用印材料", icon: SafetyCertificateOutlined },
   7: { title: "决策执行", desc: "落实跟踪、执行反馈、闭环确认", icon: CheckCircleOutlined },
 };
-const stepMeta = {
-  12000: { tabKey: "1", icon: ClockCircleOutlined },
-  13000: { tabKey: "1", icon: FormOutlined },
-  14000: { tabKey: "2", icon: FileSearchOutlined },
-  15000: { tabKey: "3", icon: AuditOutlined },
-  16000: { tabKey: "4", icon: FileDoneOutlined },
-  17000: { tabKey: "5", icon: ProjectOutlined },
-  18000: { tabKey: "6", icon: SafetyCertificateOutlined },
-  19000: { tabKey: "7", icon: CheckCircleOutlined },
-  20000: { tabKey: "7", icon: CheckCircleOutlined },
-};
+const phaseSteps = [
+  { value: "1", text: "议题提报" },
+  { value: "2", text: "议题评估" },
+  { value: "3", text: "议题审核" },
+  { value: "4", text: "表决建议" },
+  { value: "6", text: "三会表决" },
+  { value: "7", text: "决策执行" },
+];
 const voteRecords = [
   {
     id: "vote-001",
@@ -238,8 +232,17 @@ function TabLabel({ active, disabled, stageKey, children }) {
     <div className="new-sanhui-review-remove-tip">
       <div className="new-sanhui-review-remove-title">Demo说明：已删除子tab【议题初审问答】</div>
       <img src="/new-sanhui-review-removed-question-tab.png" alt="已删除的议题初审问答子tab截图" />
+      <div className="new-sanhui-review-remove-title">Demo说明：已删除文件替换tab页面</div>
+      <img src={removedFileReplaceTabImage} alt="已删除的文件替换tab页面截图" />
     </div>
   ) : null;
+  const voteRemovedTip = stageKey === "6" ? (
+    <div className="new-sanhui-review-remove-tip">
+      <div className="new-sanhui-review-remove-title">Demo说明：删除【专题汇报】</div>
+      <img src={removedTopicReportTabImage} alt="已删除专题汇报tab页面截图" />
+    </div>
+  ) : null;
+  const removedTip = reviewRemovedTip || voteRemovedTip;
   return (
     <div
       className={[
@@ -254,8 +257,8 @@ function TabLabel({ active, disabled, stageKey, children }) {
       <span className="new-sanhui-tab-text">
         <strong>
           {children}
-          {reviewRemovedTip ? (
-            <Tooltip placement="bottom" title={reviewRemovedTip} overlayClassName="new-sanhui-review-remove-tooltip">
+          {removedTip ? (
+            <Tooltip placement="bottom" title={removedTip} overlayClassName="new-sanhui-review-remove-tooltip">
               <QuestionCircleOutlined className="new-sanhui-tab-help-icon" onClick={(event) => event.stopPropagation()} />
             </Tooltip>
           ) : null}
@@ -272,20 +275,54 @@ const stepStateText = {
   wait: "未开始",
 };
 
-function StageStep({ item, state, active }) {
-  const meta = stepMeta[item.value] || {};
+function StageHelpTip({ stageKey }) {
+  const reviewRemovedTip = stageKey === "3" ? (
+    <div className="new-sanhui-review-remove-tip">
+      <div className="new-sanhui-review-remove-title">Demo说明：已删除子tab【议题初审问答】</div>
+      <img src="/new-sanhui-review-removed-question-tab.png" alt="已删除的议题初审问答子tab截图" />
+      <div className="new-sanhui-review-remove-title">Demo说明：已删除文件替换tab页面</div>
+      <img src={removedFileReplaceTabImage} alt="已删除的文件替换tab页面截图" />
+    </div>
+  ) : null;
+  const voteRemovedTip = stageKey === "6" ? (
+    <div className="new-sanhui-review-remove-tip">
+      <div className="new-sanhui-review-remove-title">Demo说明：删除【专题汇报】</div>
+      <img src={removedTopicReportTabImage} alt="已删除专题汇报tab页面截图" />
+    </div>
+  ) : null;
+  const title = reviewRemovedTip || voteRemovedTip;
+
+  if (!title) return null;
+
+  return (
+    <Tooltip placement="bottom" title={title} overlayClassName="new-sanhui-review-remove-tooltip">
+      <QuestionCircleOutlined className="new-sanhui-tab-help-icon" onClick={(event) => event.stopPropagation()} />
+    </Tooltip>
+  );
+}
+
+function StageStep({ item, state, active, disabled, onClick }) {
+  const meta = stageMeta[item.value] || {};
   const Icon = meta.icon || FormOutlined;
 
   return (
-    <div className={["new-sanhui-stage-step", state, active ? "active" : ""].join(" ")}>
+    <button
+      type="button"
+      className={["new-sanhui-stage-step", state, active ? "active" : "", disabled ? "disabled" : ""].join(" ")}
+      disabled={disabled}
+      onClick={onClick}
+    >
       <span className="new-sanhui-stage-icon">
         <Icon />
       </span>
       <span className="new-sanhui-stage-copy">
-        <span className="new-sanhui-stage-title">{item.text}</span>
+        <span className="new-sanhui-stage-title">
+          {item.text}
+          <StageHelpTip stageKey={item.value} />
+        </span>
         <span className="new-sanhui-stage-status">{stepStateText[state]}</span>
       </span>
-    </div>
+    </button>
   );
 }
 
@@ -644,11 +681,11 @@ const meetingTopicSeed = [
 ];
 
 const initialMeetingTimeList = meetingGetListResponse.data
-  .filter((item) => item.meetingTypeName === "董事会")
+  .filter((item) => ["董事会", "监事会", "股东会"].includes(item.meetingTypeName))
   .map((item, index) => ({
     ...item,
-    key: item.id || `${item.meetingType}-${index}`,
-    enabled: item.launchFlag !== false,
+    key: `${item.id || item.meetingType}-${item.meetingTypeName}-${index}`,
+    enabled: ["董事会", "监事会"].includes(item.meetingTypeName),
     notifyDate: item.notifyDate ? dayjs(item.notifyDate) : null,
     launchTime: item.launchTime ? dayjs(item.launchTime) : null,
     launchType: Number(item.launchType || 1),
@@ -706,8 +743,55 @@ function MeetingTimeCard({ meeting, onChange }) {
   );
 }
 
+function MeetingTimeApprovalSteps() {
+  const steps = [
+    { role: "申请人", name: "杨佰君", time: "2026-04-28 09:30:12", state: "start" },
+    { role: "总监", name: "黄国平", time: "待审批", state: "pending" },
+    { role: "分管领导", name: "李秀柱", time: "待审批", state: "pending", muted: true },
+  ];
+
+  return (
+    <div className="meeting-time-approval-panel">
+      <div className="meeting-time-approval-title">当前审批状态</div>
+      <div className="meeting-time-approval-list">
+        {steps.map((step, index, list) => (
+          <div
+            className={`meeting-time-approval-item ${step.state === "approved" ? "is-approved" : "is-start"} ${step.muted ? "is-muted" : ""}`}
+            key={`${step.role}-${step.name}`}
+          >
+            <div className="meeting-time-approval-rail">
+              <span className="meeting-time-approval-dot">{step.state === "approved" ? "✓" : ""}</span>
+              {index < list.length - 1 ? <span className="meeting-time-approval-line" /> : null}
+            </div>
+            <div className="meeting-time-approval-card">
+              <div className="meeting-time-approval-card-head">
+                <span className="meeting-time-approval-role">{step.role}</span>
+                <span className="meeting-time-approval-name">{step.name}</span>
+                {step.state === "approved" ? <span className="meeting-time-approval-status">审批通过</span> : null}
+                {step.state === "pending" ? <span className="meeting-time-approval-status is-pending">待审批</span> : null}
+              </div>
+              <div className="meeting-time-approval-time">{step.time}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function MeetingTimeManage({ onSave }) {
   const [meetings, setMeetings] = useState(initialMeetingTimeList);
+  const [fileList, setFileList] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = () => {
+    if (!fileList.length) {
+      message.error("请上传会议时间审批附件");
+      return;
+    }
+    setSubmitted(true);
+    onSave(meetings, fileList);
+  };
 
   return (
     <div className="submit-section meeting-time-manage">
@@ -733,17 +817,37 @@ function MeetingTimeManage({ onSave }) {
           </div>
         </div>
       </div>
+      <div className="submit-panel meeting-time-upload-panel">
+        <div className="submit-panel-head">
+          <div className="submit-panel-title">
+            会议时间审批附件<span className="meeting-time-required">*</span>
+          </div>
+        </div>
+        <div className="submit-panel-body">
+          <Upload
+            fileList={fileList}
+            beforeUpload={() => false}
+            onChange={({ fileList: nextFileList }) => setFileList(nextFileList)}
+          >
+            <Button icon={<UploadOutlined />}>上传文件</Button>
+          </Upload>
+        </div>
+      </div>
+      {submitted ? <MeetingTimeApprovalSteps /> : null}
       <div className="submit-footer meeting-time-footer">
-        <span className="submit-footer-hint">保存后将更新当前管户维护的会议时间</span>
-        <Button type="primary" onClick={() => onSave(meetings)}>
-          保存
-        </Button>
+        <span className="submit-footer-hint">提交后将发起会议时间审批流程</span>
+        <Popconfirm title="是否确认提交？" okText="确认提交" cancelText="取消" onConfirm={handleSubmit}>
+          <Button type="primary">
+            提交
+          </Button>
+        </Popconfirm>
       </div>
     </div>
   );
 }
 
 function GeneralOfficeMeeting({ canEdit = false }) {
+  const [form] = Form.useForm();
   const [fileList, setFileList] = useState([
     {
       uid: "general-minutes-001",
@@ -756,6 +860,24 @@ function GeneralOfficeMeeting({ canEdit = false }) {
   return (
     <div className="meeting-minutes-wrap">
       <div className="meeting-minutes-title">总办会会议纪要</div>
+      <Form
+        form={form}
+        layout="vertical"
+        disabled={!canEdit}
+        initialValues={{
+          zbhLaunchDate: dayjs("2026-04-28"),
+          zbhIssueNo: 4,
+        }}
+      >
+        <div className="meeting-minutes-form-grid">
+          <Form.Item label="总办会召开日" name="zbhLaunchDate" rules={[{ required: true, message: "请选择日期" }]}>
+            <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
+          </Form.Item>
+          <Form.Item label="期数" name="zbhIssueNo">
+            <InputNumber min={1} precision={0} placeholder="请输入期数" style={{ width: "100%" }} />
+          </Form.Item>
+        </div>
+      </Form>
       <Upload
         accept=".pdf"
         disabled={!canEdit}
@@ -954,18 +1076,6 @@ export default function DueDrawer({
     }
   }, [progStatus]);
 
-  const getStepStatus = (stepValue) => {
-    const progressStep = initStep === "12000" ? "13000" : initStep;
-
-    if (parseInt(stepValue) > parseInt(progressStep)) {
-      return "wait";
-    }
-    if (parseInt(stepValue) === parseInt(progressStep)) {
-      return "process";
-    }
-    return "finish";
-  };
-
   const isTabDisabled = (key) => {
     const statusNumber = parseInt(progStatus);
     const tabKey = parseInt(key);
@@ -974,22 +1084,28 @@ export default function DueDrawer({
       (statusNumber === 14000 && tabKey >= 3) ||
       (statusNumber === 15000 && tabKey >= 4) ||
       (statusNumber === 16000 && tabKey >= 5) ||
-      (statusNumber === 17000 && tabKey >= 6) ||
+      (statusNumber === 17000 && tabKey >= 7) ||
       (statusNumber === 18000 && tabKey >= 7)
     );
   };
 
   const isMeetingAvailable = showMeetingText.includes(String(progStatus));
-  const visibleSteps = useMemo(
-    () => sanhuiProgStatus.filter((item) => item.value !== "99999" && item.value !== "12000"),
-    []
-  );
   const visibleCurrentStep = currentStep === "12000" ? "13000" : currentStep;
-  const currentStepIndex = Math.max(0, visibleSteps.findIndex((item) => item.value === visibleCurrentStep));
+  const progressPhaseKey = tabStatusMap[visibleCurrentStep] || "1";
+  const currentStepIndex = Math.max(0, phaseSteps.findIndex((item) => item.value === progressPhaseKey));
   const progressPercent =
-    visibleSteps.length > 1 ? Math.round((currentStepIndex / (visibleSteps.length - 1)) * 100) : 0;
+    phaseSteps.length > 1 ? Math.round((currentStepIndex / (phaseSteps.length - 1)) * 100) : 0;
+  const getPhaseStatus = (tabKey) => {
+    if (isTabDisabled(tabKey)) {
+      return "wait";
+    }
+    if (tabKey === progressPhaseKey) {
+      return "process";
+    }
+    return "finish";
+  };
   const canEditMeetingMinutes = editStatus === "edit";
-  const showMeetingSave = canEditMeetingMinutes && (meetingActiveKey === "2" || meetingActiveKey === "3");
+  const showMeetingSave = canEditMeetingMinutes && (meetingActiveKey === "1" || meetingActiveKey === "2" || meetingActiveKey === "3");
   const meetingTabItems = [
     {
       key: "1",
@@ -1057,7 +1173,7 @@ export default function DueDrawer({
         ),
         key: "2",
         disabled: isTabDisabled("2"),
-        children: <TopicEvaluation projectData={projectData} />,
+        children: <TopicEvaluation projectData={projectData} onClose={onCloseDetail} />,
       },
       {
         label: (
@@ -1097,23 +1213,6 @@ export default function DueDrawer({
           <VoteSuggest
             id={id}
             editStatus={editStatus === "edit" && progStatus === "16000" ? "edit" : "detail"}
-          />
-        ),
-      },
-      {
-        label: (
-          <TabLabel active={firstActiveKey === "5"} disabled={isTabDisabled("5")} stageKey="5">
-            专题汇报
-          </TabLabel>
-        ),
-        key: "5",
-        disabled: isTabDisabled("5"),
-        children: (
-          <TopicReport
-            id={id}
-            onCloseDetail={onCloseDetail}
-            progStatus={progStatus}
-            editStatus={editStatus === "edit" && progStatus === "17000" ? "edit" : "detail"}
           />
         ),
       },
@@ -1162,6 +1261,10 @@ export default function DueDrawer({
   );
 
   const handleMeetingSave = () => {
+    if (meetingActiveKey === "1") {
+      message.success("总办会会议纪要信息已保存");
+      return;
+    }
     const ref = meetingActiveKey === "2" ? viceMeetingRef.current : meetingActiveKey === "3" ? directorMeetingRef.current : null;
     const payload = ref?.getSaveData?.();
     if (!payload) {
@@ -1181,8 +1284,7 @@ export default function DueDrawer({
   };
 
   const handleMeetingTimeSave = () => {
-    message.success("会议时间保存成功");
-    setMeetingTimeDrawerOpen(false);
+    message.success("会议时间提交成功，已发起审批");
   };
 
   const updateFeedbackDraft = (key, value) => {
@@ -1248,15 +1350,18 @@ export default function DueDrawer({
             aria-label="三会流程进度"
             style={{ "--stage-progress": `${progressPercent}%` }}
           >
-            {visibleSteps.map((item) => {
-              const state = getStepStatus(item.value);
+            {phaseSteps.map((item) => {
+              const state = getPhaseStatus(item.value);
+              const disabled = isTabDisabled(item.value);
 
               return (
                 <StageStep
                   key={item.value}
                   item={item}
                   state={state}
-                  active={item.value === visibleCurrentStep}
+                  active={item.value === firstActiveKey}
+                  disabled={disabled}
+                  onClick={() => setFirstActiveKey(item.value)}
                 />
               );
             })}
@@ -1280,7 +1385,7 @@ export default function DueDrawer({
                 >
                   <span className="new-sanhui-action-title-with-help">
                     一汽股权会议纪要
-                    <Tooltip title="1.从议题评估阶段开始，并且从任务进入和上总办会才能显示">
+                    <Tooltip title="1.从议题评估阶段开始，并且从任务进入和上总办会才能显示 2.可以修改召开时间和期数">
                       <QuestionCircleOutlined
                         className="new-sanhui-action-help-icon"
                         onClick={(event) => event.stopPropagation()}
@@ -1289,7 +1394,15 @@ export default function DueDrawer({
                   </span>
                 </Button>
                 <Button type="primary" onClick={() => setMeetingTimeDrawerOpen(true)}>
-                  会议时间
+                  <span className="new-sanhui-action-title-with-help">
+                    会议时间
+                    <Tooltip title={<div><div>1.审批层级到 科室经理</div><div>2.只有修改会议时间的时候才发起审批</div></div>}>
+                      <QuestionCircleOutlined
+                        className="new-sanhui-action-help-icon"
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                    </Tooltip>
+                  </span>
                 </Button>
           
               {Number(progStatus) > 14000 && (
@@ -1313,7 +1426,7 @@ export default function DueDrawer({
               </Button>
             </div>
           )}
-          <Tabs activeKey={firstActiveKey} onChange={(key) => setFirstActiveKey(key)} items={items} />
+          <Tabs className="new-sanhui-stage-content-tabs" activeKey={firstActiveKey} items={items} />
         </div>
       </div>
 

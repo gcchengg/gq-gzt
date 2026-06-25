@@ -1,7 +1,9 @@
-import { Button, Drawer, Form, Input, Radio, Select, Space, Switch, Table, Tag, message } from "antd";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Drawer, Form, Input, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, message } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import getBySanhuiMgmtIdResponse from "../../mock/data/evaluation/getBySanhuiMgmtId.json";
+import { MaterialPreparePanel } from "../CompanyReview";
 import EvaluationDetail from "./EvaluationDetail";
 import styles from "./index.module.css";
 
@@ -230,7 +232,7 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
   );
 }
 
-export default function TopicEvaluation({ projectData }) {
+export default function TopicEvaluation({ projectData, onClose }) {
   const navigate = useNavigate();
   const [topics, setTopics] = useState(() => createInitialTopics(projectData));
   const [completed, setCompleted] = useState(false);
@@ -268,8 +270,8 @@ export default function TopicEvaluation({ projectData }) {
 
   const finishEvaluation = () => {
     setCompleted(true);
-    message.success("议题评估已完成，已发起议题审批");
-    navigate("/GztHome?task=topicApproval");
+    message.success("议题评估已完成");
+    onClose?.("close");
   };
 
   const openAddTopic = () => {
@@ -376,7 +378,7 @@ export default function TopicEvaluation({ projectData }) {
 
   const orderedTopics = useMemo(() => sortTopics(topics), [topics]);
 
-  return (
+  const evaluationContent = (
     <div className={styles.page}>
       <div className={styles.tableCard}>
         <div className={styles.actionBar}>
@@ -418,5 +420,37 @@ export default function TopicEvaluation({ projectData }) {
         onSave={saveTopic}
       />
     </div>
+  );
+
+  return (
+    <Tabs
+      className={styles.tabs}
+      defaultActiveKey="annotation"
+      items={[
+        {
+          key: "annotation",
+          label: "评估批注",
+          children: evaluationContent,
+        },
+        {
+          key: "materialPrepare",
+          label: (
+            <span className={styles.tabHelpLabel}>
+              审批材料准备
+              <Tooltip title="1.【议题审核】-->【审批材料准备】移入到【议题评估中】">
+                <QuestionCircleOutlined className={styles.tabHelpIcon} />
+              </Tooltip>
+            </span>
+          ),
+          children: (
+            <MaterialPreparePanel
+              isEdit
+              submitButtonText="提交"
+              onSubmitSuccess={() => navigate("/GztHome")}
+            />
+          ),
+        },
+      ]}
+    />
   );
 }

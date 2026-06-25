@@ -14,6 +14,7 @@ const taskTabs = [
     "议题审批",
     "议题初审_法务",
     "议题初审_财务",
+    "议题初审_科室经理/总监",
     "议题初审_投资",
     "议题初审_综合管理",
     "议题初审_党群初审",
@@ -63,6 +64,11 @@ const taskCopyByCard = {
         title: "议题初审_财务",
         description: "财务部门议题初审",
         href: "/newSanhuiPreReview?type=finance",
+    },
+    "议题初审_科室经理/总监": {
+        title: "议题初审_科室经理/总监",
+        description: "科室经理/总监议题初审",
+        href: "/newSanhuiPreReview?type=managerDirector",
     },
     议题初审_投资: {
         title: "议题初审_投资",

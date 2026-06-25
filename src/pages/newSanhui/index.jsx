@@ -96,6 +96,24 @@ export default function NewSanhuiPage() {
     initPage();
   }, []);
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("gq:sanhui-detail-context", {
+      detail: {
+        open: detailOpen,
+        record: detailOpen ? activeRecord : null,
+      },
+    }));
+
+    return () => {
+      window.dispatchEvent(new CustomEvent("gq:sanhui-detail-context", {
+        detail: {
+          open: false,
+          record: null,
+        },
+      }));
+    };
+  }, [activeRecord, detailOpen]);
+
   const openDetail = async (record) => {
     const res = await threeListDetail(record.id);
     setActiveRecord(res.data);

@@ -117,6 +117,22 @@
   background: #fff;
 }
 
+.submit-table-column-help {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.submit-table-help-icon {
+  color: #8a94a6;
+  font-size: 14px;
+  cursor: help;
+}
+
+.submit-table-help-icon:hover {
+  color: #1d4ed8;
+}
+
 .submit-table-action .ant-btn-link {
   padding-inline: 4px;
 }

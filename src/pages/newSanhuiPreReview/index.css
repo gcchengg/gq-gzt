@@ -56,6 +56,67 @@
   font-weight: 400;
 }
 
+.pre-review-meeting-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pre-review-meeting-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #dfe6f2;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.pre-review-meeting-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #263248;
+  font-size: 15px;
+}
+
+.pre-review-meeting-head strong {
+  margin-right: auto;
+}
+
+.pre-review-meeting-mark {
+  width: 4px;
+  height: 16px;
+  border-radius: 999px;
+  background: #1d4ed8;
+}
+
+.pre-review-meeting-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pre-review-meeting-field {
+  min-width: 0;
+  margin-top: 10px;
+}
+
+.pre-review-meeting-field span {
+  display: block;
+  margin-bottom: 5px;
+  color: #7a8496;
+  font-size: 12px;
+}
+
+.pre-review-meeting-field p {
+  min-height: 22px;
+  margin: 0;
+  color: #303746;
+  font-size: 14px;
+  line-height: 22px;
+  word-break: break-word;
+}
+
 .pre-review-topic-name {
   color: #1f2a44;
   font-weight: 600;
@@ -130,6 +191,7 @@
 }
 
 @media (max-width: 900px) {
+  .pre-review-meeting-grid,
   .pre-review-legal-grid {
     grid-template-columns: 1fr;
   }

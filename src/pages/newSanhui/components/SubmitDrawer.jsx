@@ -10,7 +10,7 @@ import proposalGetResponse from "../mock/data/submit/proposalGet.json";
 import "./SubmitDrawer.css";
 const topicFileTypes = [
     { value: "100", label: "会议通知" },
-    { value: "200", label: "议题相关" },
+    { value: "200", label: "议题材料" },
     { value: "300", label: "议题目录" },
     { value: "400", label: "补充材料" },
 ];
@@ -360,7 +360,14 @@ function SmartSubmit({ disabled, onNext, }) {
             render: (value) => <a href="#">{value}</a>,
         },
         {
-            title: "文件分类",
+            title: (
+              <span className="submit-table-column-help">
+                文件分类
+                <Tooltip title="1.议题相关-->议题材料">
+                  <QuestionCircleOutlined className="submit-table-help-icon" />
+                </Tooltip>
+              </span>
+            ),
             dataIndex: "fileCategory",
             width: 180,
             render: (value, record) => (<Select disabled={disabled} value={value} style={{ width: "100%" }} options={topicFileTypes} onChange={(nextValue) => {

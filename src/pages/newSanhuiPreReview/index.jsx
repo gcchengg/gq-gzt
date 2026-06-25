@@ -1,7 +1,9 @@
 import { Button, Drawer, Input, Space, Table, Tag, message } from "antd";
 import { FilePdfOutlined, PaperClipOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import getBySanhuiMgmtIdResponse from "../newSanhui/mock/data/evaluation/getBySanhuiMgmtId.json";
+import meetingGetListResponse from "../newSanhui/mock/data/submit/meetingGetList.json";
 import PdfAnnotationEditor from "../newSanhui/components/TopicEvaluation/PdfAnnotationEditor";
 import EvaluationModelScore from "../newSanhui/components/TopicEvaluation/EvaluationModelScore";
 import "../newSanhui/components/TopicEvaluation/EvaluationModelScore/index.css";
@@ -10,6 +12,7 @@ import "./index.css";
 const reviewTypeMap = {
   legal: "议题初审_法务",
   finance: "议题初审_财务",
+  managerDirector: "议题初审_科室经理/总监",
   investment: "议题初审_投资",
   management: "议题初审_综合管理",
   party: "议题初审_党群初审",
@@ -39,6 +42,11 @@ const attachments = [
   },
 ];
 
+const meetingRows = meetingGetListResponse.data.map((item, index) => ({
+  ...item,
+  key: `${item.id || item.meetingType}-${item.meetingTypeName}-${index}`,
+}));
+
 function getReviewType() {
   const params = new URLSearchParams(window.location.search);
   return reviewTypeMap[params.get("type")] || reviewTypeMap.legal;
@@ -53,6 +61,61 @@ function createInitialTopics() {
 
 function sortTopics(topics) {
   return [...topics].sort((a, b) => a.level - b.level);
+}
+
+function formatDate(value, template = "YYYY-MM-DD") {
+  return value ? dayjs(value).format(template) : "-";
+}
+
+function MeetingManageInfo() {
+  return (
+    <section className="pre-review-card">
+      <div className="pre-review-card-head">
+        <span>会议管理</span>
+        <span className="pre-review-muted">来自议题提报 / 会议管理</span>
+      </div>
+      <div className="pre-review-meeting-grid">
+        {meetingRows.map((meeting) => {
+          const launchType = Number(meeting.launchType || 1);
+          return (
+            <article className="pre-review-meeting-card" key={meeting.key}>
+              <div className="pre-review-meeting-head">
+                <span className="pre-review-meeting-mark" />
+                <strong>{meeting.meetingTypeName}</strong>
+                <Tag color={meeting.launchFlag === false ? "default" : "processing"}>
+                  {meeting.launchFlag === false ? "不召开" : "召开"}
+                </Tag>
+              </div>
+              <div className="pre-review-meeting-field">
+                <span>会议名称</span>
+                <p>{meeting.meetingName || "-"}</p>
+              </div>
+              <div className="pre-review-meeting-row">
+                <div className="pre-review-meeting-field">
+                  <span>通知时间</span>
+                  <p>{formatDate(meeting.notifyDate)}</p>
+                </div>
+                <div className="pre-review-meeting-field">
+                  <span>召开方式</span>
+                  <p>{launchType === 2 ? "通讯表决" : "现场会议"}</p>
+                </div>
+              </div>
+              <div className="pre-review-meeting-row">
+                <div className="pre-review-meeting-field">
+                  <span>{launchType === 2 ? "表决日期" : "会议时间"}</span>
+                  <p>{formatDate(meeting.launchTime, launchType === 2 ? "YYYY-MM-DD" : "YYYY-MM-DD HH:mm")}</p>
+                </div>
+                <div className="pre-review-meeting-field">
+                  <span>会议地点</span>
+                  <p>{meeting.location || "-"}</p>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
 }
 
 function PreReviewDetail({ open, topic, reviewType, onClose }) {
@@ -109,7 +172,7 @@ function PreReviewDetail({ open, topic, reviewType, onClose }) {
             <Table rowKey="id" size="small" bordered pagination={false} columns={attachmentColumns} dataSource={attachments} />
           </section>
 
-          <EvaluationModelScore hideModelAction hideMaterialAction />
+          <EvaluationModelScore hideModelAction hideMaterialAction hideExecutionColumn hideExceptionColumn />
         </div>
       </Drawer>
 
@@ -175,6 +238,8 @@ export default function NewSanhuiPreReview() {
           scroll={{ x: 1220 }}
         />
       </section>
+
+      <MeetingManageInfo />
 
       <section className="pre-review-card">
         <div className="pre-review-card-head">

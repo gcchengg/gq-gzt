@@ -6,10 +6,11 @@ import {
   MenuUnfoldOutlined,
   ProjectOutlined,
 } from "@ant-design/icons";
-import { Button, Menu } from "antd";
+import { Button, Menu, Radio } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import webmenu from "@/pages/webmenu.json";
+import TaskIssueDrawer from "./TaskIssueDrawer";
 import "./AppShell.css";
 
 const iconById = {
@@ -77,6 +78,8 @@ function createMenuItems(menus = []) {
 export default function AppShell() {
   const { pathname, search } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const [role, setRole] = useState("manager");
+  const [sanhuiDetailContext, setSanhuiDetailContext] = useState({ open: false, record: null });
   const fullPath = pathname + search;
 
   const menuItems = useMemo(() => createMenuItems(webmenu), []);
@@ -94,6 +97,23 @@ export default function AppShell() {
       setOpenKeys(findParentKeys(webmenu, fullPath) || []);
     }
   }, [collapsed, fullPath]);
+
+  useEffect(() => {
+    const handleSanhuiDetailContext = (event) => {
+      setSanhuiDetailContext(event.detail || { open: false, record: null });
+    };
+
+    window.addEventListener("gq:sanhui-detail-context", handleSanhuiDetailContext);
+    return () => {
+      window.removeEventListener("gq:sanhui-detail-context", handleSanhuiDetailContext);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (pathname !== "/newSanhui" && sanhuiDetailContext.open) {
+      setSanhuiDetailContext({ open: false, record: null });
+    }
+  }, [pathname, sanhuiDetailContext.open]);
 
   return (
     <div className="gq-app-shell">
@@ -117,6 +137,21 @@ export default function AppShell() {
           items={menuItems}
         />
 
+        <div className="gq-app-role-switch">
+          {!collapsed ? <div className="gq-app-role-title">角色选择</div> : null}
+          <Radio.Group
+            className="gq-app-role-radio"
+            optionType="button"
+            buttonStyle="solid"
+            value={role}
+            onChange={(event) => setRole(event.target.value)}
+            options={[
+              { label: collapsed ? "管" : "管户", value: "manager" },
+              { label: collapsed ? "总" : "总监", value: "director" },
+            ]}
+          />
+        </div>
+
         <div className="gq-app-sidebar-footer">
           <Button
             type="text"
@@ -131,6 +166,17 @@ export default function AppShell() {
       <main className="gq-app-main">
         <Outlet />
       </main>
+      {role === "director" && sanhuiDetailContext.open ? (
+        <TaskIssueDrawer
+          key={sanhuiDetailContext.record?.id || "sanhui-task-drawer"}
+          sanhuiRecord={sanhuiDetailContext.record}
+          isSanhui={false}
+          ifFromTask={true}
+          onSubmit={(payload) => {
+            console.log(payload);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

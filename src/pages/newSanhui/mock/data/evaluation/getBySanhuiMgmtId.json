@@ -9,7 +9,7 @@
       "topicName": "测试议题1",
       "approvalLevel": "业务总监",
       "boardMeeting": true,
-      "supervisorMeeting": false,
+      "supervisorMeeting": true,
       "shareholderMeeting": false,
       "status": "评估中",
       "level": 1

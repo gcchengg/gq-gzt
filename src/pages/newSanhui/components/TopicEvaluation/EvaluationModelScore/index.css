@@ -84,6 +84,23 @@
   text-align: center;
 }
 
+.eval-table-title-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.eval-table-help-icon {
+  color: #8a94a6;
+  font-size: 14px;
+  cursor: help;
+}
+
+.eval-table-help-icon:hover {
+  color: #1d4ed8;
+}
+
 .eval-textbox {
   width: 100%;
   min-height: 52px;

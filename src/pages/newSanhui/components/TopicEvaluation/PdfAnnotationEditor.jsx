@@ -3,8 +3,10 @@ import {
     Button,
     Input,
     Modal,
+    Pagination,
     Radio,
     Space,
+    Switch,
     message,
 } from "antd";
 import { useMemo, useRef, useState } from "react";
@@ -40,6 +42,27 @@ const seedAnnotations = [
     ] },
 ];
 
+const screenshotStorageKey = "newSanhui.annotationScreenshotPages";
+const defaultScreenshotPages = {
+    [pdfFiles[0]]: [1, 2],
+    [pdfFiles[1]]: [2, 5],
+};
+
+function readScreenshotPages() {
+    if (typeof window === "undefined") return defaultScreenshotPages;
+    try {
+        return JSON.parse(window.localStorage.getItem(screenshotStorageKey)) || defaultScreenshotPages;
+    } catch {
+        return defaultScreenshotPages;
+    }
+}
+
+function writeScreenshotPages(value) {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(screenshotStorageKey, JSON.stringify(value));
+    window.dispatchEvent(new CustomEvent("newSanhui:annotationScreenshotPagesChange", { detail: value }));
+}
+
 export default function PdfAnnotationEditor({ open, fileName, mode = "annotation", onClose }) {
     const [activeFile, setActiveFile] = useState(fileName || pdfFiles[0]);
     const [compareFiles, setCompareFiles] = useState([fileName || pdfFiles[0], pdfFiles[1]]);
@@ -58,6 +81,8 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     const [creationArmed, setCreationArmed] = useState(false);
     const [draftTarget, setDraftTarget] = useState(null);
     const [drawingRect, setDrawingRect] = useState(null);
+    const [screenshotPages, setScreenshotPages] = useState(() => readScreenshotPages());
+    const [annotationPage, setAnnotationPage] = useState(1);
     const pageRef = useRef(null);
     const drawStartRef = useRef(null);
 
@@ -68,8 +93,13 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     }), [annotations, scope]);
     const activePage = visiblePages.find((page) => page.page === currentPage) || visiblePages[0] || pages[0];
     const activeAnnotations = annotations.filter((item) => item.page === activePage.page);
+    const pagedAnnotations = activeAnnotations.slice((annotationPage - 1) * 5, annotationPage * 5);
+    const isAnnotationScreenshotPage = screenshotPages[activeFile]?.includes(activePage.page);
 
-    const selectPage = (page) => setCurrentPage(page.page);
+    const selectPage = (page) => {
+        setCurrentPage(page.page);
+        setAnnotationPage(1);
+    };
     const shiftPage = (offset) => {
         const index = visiblePages.findIndex((page) => page.page === activePage.page);
         selectPage(visiblePages[Math.min(Math.max(index + offset, 0), visiblePages.length - 1)]);
@@ -157,6 +187,18 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
             : item));
         setReply("");
         setReplyingId(null);
+    };
+    const toggleAnnotationScreenshotPage = (checked) => {
+        setScreenshotPages((current) => {
+            const filePages = current[activeFile] || [];
+            const nextPages = checked
+                ? [...new Set([...filePages, activePage.page])]
+                : filePages.filter((page) => page !== activePage.page);
+            const next = { ...current, [activeFile]: nextPages };
+            writeScreenshotPages(next);
+            return next;
+        });
+        message.success(checked ? "已标记为批注页截图" : "已取消批注页截图标记");
     };
     const renderCompareTasks = (side) => {
         const list = side === "left"
@@ -323,6 +365,12 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                         </label>
                     ) : <span className="pdf-toolbar-hint">{creationArmed ? (markMode === "area" ? "拖动鼠标绘制矩形区域" : "点击正文高亮文本后填写说明") : "请选择标注模式开始批注"}</span>}
                     {creationArmed && mode !== "associate" ? <button className="pdf-toolbar-cancel" type="button" onClick={() => { setCreationArmed(false); setDrawingRect(null); }}>取消</button> : null}
+                    {mode !== "associate" ? (
+                        <label className="pdf-screenshot-switch">
+                            是否为批注页截图
+                            <Switch size="small" checked={isAnnotationScreenshotPage} onChange={toggleAnnotationScreenshotPage} />
+                        </label>
+                    ) : null}
                 </div>
 
                 <div className="pdf-editor-body">
@@ -413,7 +461,7 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                         </div>
                         <div className="pdf-task-scroll">
                           <div className="pdf-task-list">
-                            {activeAnnotations.map((item, index) => (
+                            {pagedAnnotations.map((item, index) => (
                                 <article className={`pdf-task-card ${index === 0 ? "active" : ""}`} key={item.id}>
                                     <div className="pdf-task-top">
                                         <div className="pdf-task-tags">
@@ -457,6 +505,16 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                             ))}
                             {!activeAnnotations.length ? <div className="pdf-empty-annotations">本页暂无批注</div> : null}
                           </div>
+                          {activeAnnotations.length > 5 ? (
+                            <Pagination
+                                className="pdf-task-pagination"
+                                size="small"
+                                current={annotationPage}
+                                pageSize={5}
+                                total={activeAnnotations.length}
+                                onChange={setAnnotationPage}
+                            />
+                          ) : null}
                         </div>
                     </aside>
                 </div>

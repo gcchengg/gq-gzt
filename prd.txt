@@ -4,31 +4,7 @@
 2.删除 会议纪要上传功能
 
 
-/newSanhui路径下的【专题汇报】，提交后跳转到/gztHome，创建三会表决，点击去执行
-跳转到三会表决可编辑模式
-
-
-【一汽股权会议纪要】右侧在添加一个按钮【会议时间】，对应的管户可以修改会议时间
-点击【会议时间】弹出抽屉，抽屉内容如下：
-就是/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/SubmitDrawer.jsx页面中会议管理的内容，可编辑模式
-
-/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx页面中点击表决授权的内容要和
-/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules/targetSet/pages/EquityMeetings/meetingSubmmision/dueDrawer/index.jsx页面中表决授权的内容完全一致
-
-
-表决授权右侧添加
-？图标，鼠标移入图标显示内容如下：
-1.自动生成上传文件
-
-/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx
-页面中决策执行tab页面下，决策情况tab
-要显示上图格式
-
-三会决议名称右侧添加
-？图标，鼠标移入图标显示内容如下：
-1.选项统一 同意 反对 有条件同意 回避表决
-
-
-
-/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx
-页面中表决建议 表决建议单和表决建议 中间空白区域太多了
+/newSanhui路径下的【智能提报】，AI 解析结果下方table
+文件分类列的下拉框，把议题相关改成议题材料
+文件分类列名后面添加？图标，鼠标移入图标显示内容如下：
+1.议题相关-->议题材料

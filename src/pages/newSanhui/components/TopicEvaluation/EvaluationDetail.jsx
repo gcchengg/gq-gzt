@@ -59,7 +59,17 @@ export default function EvaluationDetail({ open, topic, onClose }) {
             { title: "职务分类", dataIndex: "category", width: 220 },
             { title: "职务", dataIndex: "position", width: 220 },
             { title: "任职人", dataIndex: "person", width: 180 },
-            { title: "意见", dataIndex: "opinion" },
+            {
+              title: (
+                <span className={styles.tabHelpLabel}>
+                  意见
+                  <Tooltip title="1.董监高提交的议题反馈建议，要体现在这里面">
+                    <QuestionCircleOutlined className={styles.tabHelpIcon} />
+                  </Tooltip>
+                </span>
+              ),
+              dataIndex: "opinion",
+            },
           ]}
         />
       </section>

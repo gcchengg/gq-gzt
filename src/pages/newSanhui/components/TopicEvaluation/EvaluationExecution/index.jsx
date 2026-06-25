@@ -12,7 +12,7 @@ import {
   message,
 } from "antd";
 import { DeleteOutlined, EditOutlined, LinkOutlined } from "@ant-design/icons";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import EvaluationModelScore from "../EvaluationModelScore";
 import "./index.css";
 
@@ -113,6 +113,21 @@ const evaluationData = [
   },
 ];
 
+const screenshotStorageKey = "newSanhui.annotationScreenshotPages";
+
+function readScreenshotPages() {
+  const fallback = {
+    [attachmentData[0].name]: [1, 3],
+    [attachmentData[1].name]: [2, 5],
+  };
+  if (typeof window === "undefined") return fallback;
+  try {
+    return JSON.parse(window.localStorage.getItem(screenshotStorageKey)) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function EvaluationExecution({ onOpenPdf }) {
   const [attachments, setAttachments] = useState(attachmentData);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -122,6 +137,19 @@ export default function EvaluationExecution({ onOpenPdf }) {
   const [snapshotOpen, setSnapshotOpen] = useState(false);
   const [selectedSnapshots, setSelectedSnapshots] = useState([]);
   const [activeSnapshotFileKey, setActiveSnapshotFileKey] = useState();
+  const [screenshotPages, setScreenshotPages] = useState(() => readScreenshotPages());
+
+  useEffect(() => {
+    const handleChange = (event) => {
+      setScreenshotPages(event.detail || readScreenshotPages());
+    };
+    window.addEventListener("newSanhui:annotationScreenshotPagesChange", handleChange);
+    window.addEventListener("storage", handleChange);
+    return () => {
+      window.removeEventListener("newSanhui:annotationScreenshotPagesChange", handleChange);
+      window.removeEventListener("storage", handleChange);
+    };
+  }, []);
 
   const selectedAttachmentData = useMemo(
     () => attachments.filter((item) => selectedFiles.includes(item.key)),
@@ -131,6 +159,15 @@ export default function EvaluationExecution({ onOpenPdf }) {
   const selectedAnnotatableFiles = useMemo(
     () => selectedAttachmentData.filter((file) => file.annotatable),
     [selectedAttachmentData],
+  );
+  const markedSnapshotFiles = useMemo(
+    () => selectedAnnotatableFiles.map((file) => ({
+      ...file,
+      snapshots: (file.snapshots || []).filter((snapshot) =>
+        (screenshotPages[file.name] || []).includes(snapshot.page),
+      ),
+    })),
+    [screenshotPages, selectedAnnotatableFiles],
   );
 
   const openAnnotation = (file) => {
@@ -158,7 +195,7 @@ export default function EvaluationExecution({ onOpenPdf }) {
       message.warning("请至少选择一个需要关联的批注页截图");
       return;
     }
-    const snapshots = selectedAnnotatableFiles.flatMap((file) =>
+    const snapshots = markedSnapshotFiles.flatMap((file) =>
       (file.snapshots || [])
         .filter((snapshot) =>
           selectedSnapshots.includes(`${file.key}:${snapshot.key}`),
@@ -289,12 +326,12 @@ export default function EvaluationExecution({ onOpenPdf }) {
     { title: "评价要素", dataIndex: "element", width: 180 },
     { title: "权重", dataIndex: "weight", width: 80, align: "center" },
     { title: "评价规则", dataIndex: "rule", width: 300, ellipsis: true },
-    {
-      title: "异常提示",
-      width: 100,
-      align: "center",
-      render: () => <span className="green-dot"></span>,
-    },
+    // {
+    //   title: "异常提示",
+    //   width: 100,
+    //   align: "center",
+    //   render: () => <span className="green-dot"></span>,
+    // },
     {
       title: "关联页面截图",
       width: 340,
@@ -451,12 +488,12 @@ export default function EvaluationExecution({ onOpenPdf }) {
                 className="gzt-eval-snapshot-tabs"
                 activeKey={activeSnapshotFileKey}
                 onChange={setActiveSnapshotFileKey}
-                items={selectedAnnotatableFiles.map((file) => ({
+                items={markedSnapshotFiles.map((file) => ({
                   key: file.key,
                   label: file.name,
                   children: (
                     <div className="gzt-eval-snapshot-grid">
-                      {(file.snapshots || []).map((snapshot) => (
+                      {(file.snapshots || []).length ? (file.snapshots || []).map((snapshot) => (
                         <Checkbox
                           key={snapshot.key}
                           value={`${file.key}:${snapshot.key}`}
@@ -473,11 +510,16 @@ export default function EvaluationExecution({ onOpenPdf }) {
                           </div>
                           <div className="gzt-eval-snapshot-meta">
                             <strong>第 {snapshot.page} 页</strong>
-                            <Tag color="blue">{snapshot.notes} 条批注</Tag>
+                            <Tag color="blue">已标记批注页截图</Tag>
+                            <Tag color="purple">{snapshot.notes} 条批注</Tag>
                           </div>
                           <p>{snapshot.summary}</p>
                         </Checkbox>
-                      ))}
+                      )) : (
+                        <div className="gzt-eval-snapshot-empty">
+                          当前文件暂无已标记的批注页截图，请进入编辑 PDF 抽屉，将“是否为批注页截图”切换为“是”。
+                        </div>
+                      )}
                     </div>
                   ),
                 }))}

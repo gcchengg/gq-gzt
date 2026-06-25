@@ -115,6 +115,10 @@
   background: #fff;
 }
 
+.vote-file-upload-item + .vote-file-upload-item {
+  margin-top: 14px;
+}
+
 .vote-file-upload-title {
   display: flex;
   align-items: center;

@@ -123,6 +123,41 @@
   color: inherit;
 }
 
+.gq-app-role-switch {
+  padding: 10px;
+  border-top: 1px solid #eef0f4;
+}
+
+.gq-app-role-title {
+  margin-bottom: 8px;
+  padding: 0 6px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.gq-app-role-radio {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.gq-app-role-radio .ant-radio-button-wrapper {
+  height: 32px;
+  border-inline-start-width: 1px;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 30px;
+}
+
+.gq-app-role-radio .ant-radio-button-wrapper::before {
+  display: none;
+}
+
+.gq-app-sidebar.is-collapsed .gq-app-role-radio {
+  grid-template-columns: 1fr;
+}
+
 .gq-app-sidebar-footer {
   padding: 10px;
   border-top: 1px solid #e6e8ec;
@@ -156,6 +191,7 @@
   }
 
   .gq-app-brand-copy,
+  .gq-app-role-title,
   .gq-app-sidebar-footer .ant-btn span:not(.anticon) {
     display: none;
   }

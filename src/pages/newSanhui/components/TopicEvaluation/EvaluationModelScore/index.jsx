@@ -1,5 +1,5 @@
 import { Button, Image, Input, Modal, Radio, Tag, Tooltip } from "antd";
-import { EyeOutlined } from "@ant-design/icons";
+import { EyeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import "./index.css";
 
@@ -67,6 +67,8 @@ export default function EvaluationModelScore({
   hideScore = false,
   hideModelAction = false,
   hideMaterialAction = false,
+  hideExecutionColumn = false,
+  hideExceptionColumn = false,
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeElement, setActiveElement] = useState("");
@@ -140,10 +142,10 @@ export default function EvaluationModelScore({
                 <col style={{ width: "11%" }} />
                 <col style={{ width: "13%" }} />
                 <col style={{ width: "5%" }} />
-                <col style={{ width: "18%" }} />
+                {!hideExecutionColumn ? <col style={{ width: "18%" }} /> : null}
                 <col style={{ width: "14%" }} />
                 <col style={{ width: "10%" }} />
-                <col style={{ width: "7%" }} />
+                {!hideExceptionColumn ? <col style={{ width: "7%" }} /> : null}
                 <col style={{ width: "14%" }} />
               </colgroup>
               <thead>
@@ -152,10 +154,19 @@ export default function EvaluationModelScore({
                   <th>二级维度</th>
                   <th>评价要素</th>
                   <th>权重</th>
-                  <th>执行情况</th>
+                  {!hideExecutionColumn ? (
+                    <th>
+                      <span className="eval-table-title-help">
+                        执行情况
+                        <Tooltip title="1.根据选择的批注截图，自动生成执行情况">
+                          <QuestionCircleOutlined className="eval-table-help-icon" />
+                        </Tooltip>
+                      </span>
+                    </th>
+                  ) : null}
                   <th>评价规则</th>
                   <th>评价结果(分)</th>
-                  <th>异常提示</th>
+                  {!hideExceptionColumn ? <th>异常提示</th> : null}
                   <th>操作</th>
                 </tr>
               </thead>
@@ -173,11 +184,13 @@ export default function EvaluationModelScore({
                     <td>{row.subDimension}</td>
                     <td>{row.element}</td>
                     <td className="center">{row.weight || ""}</td>
-                    <td>
-                      <div className="eval-textbox">
-                        {row.result === "pass" ? "通过" : ""}
-                      </div>
-                    </td>
+                    {!hideExecutionColumn ? (
+                      <td>
+                        <div className="eval-textbox">
+                          {row.result === "pass" ? "通过" : ""}
+                        </div>
+                      </td>
+                    ) : null}
                     <td className="rule-cell">
                       <Tooltip
                         placement="topLeft"
@@ -207,9 +220,11 @@ export default function EvaluationModelScore({
                         </>
                       )}
                     </td>
-                    <td className="center">
-                      <span className="green-dot"></span>
-                    </td>
+                    {!hideExceptionColumn ? (
+                      <td className="center">
+                        <span className="green-dot"></span>
+                      </td>
+                    ) : null}
                     <td className="center">
                       {hideMaterialAction ? (
                         <span className="eval-readonly-mark">已关联</span>

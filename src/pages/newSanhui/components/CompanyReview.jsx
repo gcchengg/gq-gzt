@@ -16,9 +16,7 @@ import meetingDecisionResponse from "../mock/data/companyReview/meetingDecision.
 import approvalDemoPdfUrl from "../mock/data/companyReview/Document.pdf?url";
 import "./CompanyReview.css";
 const tabLabels = [
-    { key: "0", label: "文件替换" },
     { key: "2", label: "前置任务确认" },
-    { key: "3", label: "审批材料准备" },
     { key: "8", label: "提请部务会" },
     { key: "4", label: "议题审批" },
     { key: "5", label: "联审意见确认" },
@@ -432,13 +430,13 @@ function TopicApprovalPanel({ isEdit, setActiveKey, }) {
       </div>
       <Table rowKey="id" columns={columns} dataSource={rows} pagination={false} size="small"/>
       {isEdit ? (<div className="review-footer">
-          <Button type="primary" disabled={hasUnfinished} onClick={() => setActiveKey("3")}>
+          <Button type="primary" disabled={hasUnfinished} onClick={() => setActiveKey("4")}>
             下一步
           </Button>
         </div>) : null}
     </div>);
 }
-function MaterialPreparePanel({ isEdit, setActiveKey, }) {
+export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, submitButtonText = "下一步", afterContent }) {
     const [form] = Form.useForm();
     const materialData = initialMaterialPrepare;
     const [loading, setLoading] = useState(false);
@@ -511,6 +509,9 @@ function MaterialPreparePanel({ isEdit, setActiveKey, }) {
     const updateVoteAdvice = (record, value, setter) => {
         setter((current) => current.map((item) => (item.id === record.id ? { ...item, voteAdvice: value } : item)));
     };
+    const updateAvoidVote = (record, value, setter) => {
+        setter((current) => current.map((item) => (item.id === record.id ? { ...item, avoidVoteFlag: value } : item)));
+    };
     const updateMgmtComment = (record, value, setter) => {
         setter((current) => current.map((item) => (item.id === record.id ? { ...item, mgmtComment: value } : item)));
     };
@@ -577,7 +578,11 @@ function MaterialPreparePanel({ isEdit, setActiveKey, }) {
                 if (type === 1) {
                     message.success("提交成功");
                     setPdfModalOpen(false);
-                    setActiveKey("4");
+                    if (onSubmitSuccess) {
+                        onSubmitSuccess();
+                    } else {
+                        setActiveKey("4");
+                    }
                 }
             }, 260);
         }).catch(() => {
@@ -588,10 +593,26 @@ function MaterialPreparePanel({ isEdit, setActiveKey, }) {
         { title: "序号", width: 64, render: (_value, _row, index) => index + 1 },
         { title: "议案名称", dataIndex: "sanhuiTopicName", width: 260 },
         {
+            title: (
+              <span className="review-tab-label-with-help">
+                回避表决
+                <Tooltip title="1.添加回避表决列">
+                  <QuestionCircleOutlined className="review-tab-help-icon" />
+                </Tooltip>
+              </span>
+            ),
+            dataIndex: "avoidVoteFlag",
+            width: 120,
+            render: (value, record) => (<Select value={value || "0"} disabled={!isEdit} style={{ width: "100%" }} onChange={(nextValue) => updateAvoidVote(record, nextValue, setter)} options={[
+                    { label: "否", value: "0" },
+                    { label: "是", value: "1" },
+                ]}/>),
+        },
+        {
             title: "表决意见",
             dataIndex: "voteAdvice",
             width: 180,
-            render: (value, record) => (<Select value={value} disabled style={{ width: "100%" }} onChange={(nextValue) => updateVoteAdvice(record, nextValue, setter)} options={[
+            render: (value, record) => (<Select value={value} disabled={!isEdit} style={{ width: "100%" }} onChange={(nextValue) => updateVoteAdvice(record, nextValue, setter)} options={[
                     { label: "通过", value: "1" },
                     { label: "通过（附管理意见）", value: "2" },
                     { label: "不通过", value: "0" },
@@ -729,6 +750,7 @@ function MaterialPreparePanel({ isEdit, setActiveKey, }) {
                 </Form.Item>
               </div>
             </>) : null}
+            {afterContent}
           </Form>
         </Spin>
       </div>
@@ -737,7 +759,7 @@ function MaterialPreparePanel({ isEdit, setActiveKey, }) {
         {pdfCurrentList.includes("2000") ? <Button loading={loading} type="primary" onClick={() => (isEdit ? onSave(0, "2000") : onPreview("2000"))}>向分管领导汇报预览</Button> : null}
         {pdfCurrentList.includes("3000") ? <Button loading={loading} type="primary" onClick={() => (isEdit ? onSave(0, "3000") : onPreview("3000"))}>向总办会汇报预览</Button> : null}
         {isEdit ? <Button loading={loading} onClick={() => onSave(0)}>保存</Button> : null}
-        {isEdit ? <Button loading={loading} type="primary" onClick={() => setSubmitMeetingModalOpen(true)}>下一步</Button> : null}
+        {isEdit ? <Button loading={loading} type="primary" onClick={() => (onSubmitSuccess ? onSave(1) : setSubmitMeetingModalOpen(true))}>{submitButtonText}</Button> : null}
       </div>
       <Modal title="是否提请部务会" open={submitMeetingModalOpen} onCancel={() => setSubmitMeetingModalOpen(false)} footer={<Space>
           <Button onClick={() => {
@@ -1100,7 +1122,7 @@ function TopicApprovalFlowPanel({ projectId, isEdit, onClosed, setActiveKey, inv
       </Modal>
     </div>);
 }
-function JointOpinionPanel({ isEdit, setActiveKey, }) {
+function JointOpinionTable({ isEdit }) {
     const [rows, setRows] = useState([
         { id: "dept-opinion-001", deptName: "财务部", opinion: "同意", reply: "" },
         { id: "dept-opinion-002", deptName: "综合管理部", opinion: "同意", reply: "" },
@@ -1115,6 +1137,9 @@ function JointOpinionPanel({ isEdit, setActiveKey, }) {
             render: (value, record) => (<Input value={value} disabled={!isEdit} onChange={(event) => setRows((current) => current.map((item) => item.id === record.id ? { ...item, reply: event.target.value } : item))}/>),
         },
     ];
+    return <Table rowKey="id" columns={columns} dataSource={rows} pagination={false} className="table-tabs1 joint-opinion-table" bordered/>;
+}
+function JointOpinionPanel({ isEdit, setActiveKey, }) {
     return (<div className="joint-review-layout tabs2-container tabs-container-sanhui">
       <div className="joint-review-left">
         <div className="joint-review-workspace">
@@ -1123,10 +1148,119 @@ function JointOpinionPanel({ isEdit, setActiveKey, }) {
               <span className="title-dot"/>
               <span className="title-text">相关部门意见</span>
             </div>
-            <Table rowKey="id" columns={columns} dataSource={rows} pagination={false} className="table-tabs1 joint-opinion-table" bordered/>
+            <JointOpinionTable isEdit={isEdit}/>
           </div>
           <div className="joint-material-section">
             <MaterialPreparePanel isEdit={isEdit} setActiveKey={setActiveKey}/>
+          </div>
+        </div>
+      </div>
+      <ReviewApprovalSteps />
+    </div>);
+}
+function AfterMeetingReplacementApplication({ isEdit }) {
+    const [form] = Form.useForm();
+    const [fileList, setFileList] = useState([
+        {
+            uid: "after-meeting-file-001",
+            name: "会后材料替换申请附件.pdf",
+            fileName: "会后材料替换申请附件.pdf",
+        },
+    ]);
+    const userOptions = (votePersonSelectResponse.data || []).map((item) => ({
+        label: item.optionName,
+        value: item.optionValue,
+    }));
+    const normalizeUploadList = (list = []) => list.map((file) => ({
+        uid: file.uid || file.fileUrl || file.url || file.name || file.fileName,
+        name: file.name || file.fileName,
+        url: file.url || file.fileUrl,
+    }));
+    const initialValues = {
+        topic: "关于推进基金退出事项的议案",
+        applUserName: "张明",
+        lsryName: "李娜、王强",
+        applOrgName: "投资管理部",
+        projectAlias: ["u001", "u002"],
+        "planStartDate-planEndDate": [dayjs("2026-05-08 09:00", "YYYY-MM-DD HH:mm"), dayjs("2026-05-08 11:00", "YYYY-MM-DD HH:mm")],
+        planMinute: 20,
+    };
+    return (<div className="after-meeting-application">
+      <div className="questions-title table-title">
+        <span className="title-dot"/>
+        <span className="title-text">会后材料替换申请</span>
+      </div>
+      <Form form={form} layout="vertical" initialValues={initialValues} disabled={!isEdit}>
+        <div className="item-flex-wrap">
+          <Form.Item label="议题名称" name="topic">
+            <Input disabled/>
+          </Form.Item>
+          <Form.Item label="提报人" name="applUserName">
+            <Input disabled/>
+          </Form.Item>
+        </div>
+        <div className="item-flex-wrap">
+          <Form.Item label="联审人员" name="lsryName">
+            <Input disabled/>
+          </Form.Item>
+          <Form.Item label="提报部门" name="applOrgName">
+            <Input disabled/>
+          </Form.Item>
+        </div>
+        <div className="item-flex-wrap">
+          <Form.Item label="列席人" name="projectAlias">
+            <Select mode="multiple" disabled options={userOptions}/>
+          </Form.Item>
+          <Form.Item label="拟上会时间段" name="planStartDate-planEndDate">
+            <DatePicker.RangePicker showTime disabled/>
+          </Form.Item>
+        </div>
+        <div className="item-flex-wrap">
+          <Form.Item label="相关材料" name="relatedFile">
+            <div className="file-upload-container">
+              <span>相关材料要求：</span>
+              <span>1、所有材料均需解密后上传会议系统</span>
+              <span>2、会议材料中如涉及插入附件，需将附件单独上传</span>
+            </div>
+            <Upload disabled={!isEdit} fileList={normalizeUploadList(fileList)} beforeUpload={(file) => {
+            const objectUrl = URL.createObjectURL(file);
+            setFileList((current) => [
+                ...current,
+                {
+                    uid: file.uid,
+                    name: file.name,
+                    fileName: file.name,
+                    url: objectUrl,
+                    fileUrl: objectUrl,
+                },
+            ]);
+            return false;
+        }} onRemove={(file) => {
+            setFileList((current) => current.filter((item) => (item.uid || item.fileUrl || item.url || item.name || item.fileName) !== file.uid));
+        }}>
+              <Button icon={<UploadOutlined />}>上传文件</Button>
+            </Upload>
+          </Form.Item>
+          <Form.Item label="预计汇报时长（分钟）" name="planMinute">
+            <InputNumber min={0} precision={0} disabled/>
+          </Form.Item>
+        </div>
+      </Form>
+    </div>);
+}
+function PostMeetingMaterialPanel({ isEdit, setActiveKey }) {
+    return (<div className="joint-review-layout tabs2-container tabs-container-sanhui post-meeting-material-layout">
+      <div className="joint-review-left">
+        <div className="joint-review-workspace">
+          <div className="joint-opinion-section">
+            <div className="questions-title">
+              <span className="title-dot"/>
+              <span className="title-text">相关部门意见</span>
+            </div>
+            <JointOpinionTable isEdit={isEdit}/>
+          </div>
+          <div className="joint-material-section">
+            <MaterialPreparePanel isEdit={isEdit} setActiveKey={setActiveKey} afterContent={<AfterMeetingReplacementApplication isEdit={isEdit}/>}/>
           </div>
         </div>
       </div>
@@ -1188,6 +1322,7 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
             if (data.zbhLaunchDate) {
                 form.setFieldsValue({
                     zbhLaunchDate: dayjs(data.zbhLaunchDate, "YYYY-MM-DD"),
+                    zbhIssueNo: data.zbhIssueNo,
                 });
             }
             setTableLoading(false);
@@ -1205,6 +1340,7 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
         const str = ["保存成功", "提交成功"];
         form.validateFields().then((values) => {
             params.zbhLaunchDate = values.zbhLaunchDate ? values.zbhLaunchDate.format("YYYY-MM-DD") : undefined;
+            params.zbhIssueNo = values.zbhIssueNo;
             setTimeout(() => {
                 message.success(str[type]);
                 getList();
@@ -1236,6 +1372,9 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
             <div className="meeting-basic-grid">
               <Form.Item label="总办会召开日" name="zbhLaunchDate" rules={[{ required: true, message: "请选择日期" }]}>
                 <DatePicker format="YYYY-MM-DD" style={{ width: 300 }}/>
+              </Form.Item>
+              <Form.Item label="期数" name="zbhIssueNo">
+                <InputNumber min={1} precision={0} placeholder="请输入期数" style={{ width: 300 }}/>
               </Form.Item>
               <Form.Item label="会议纪要" name="dutyUserName" className="formItem-upload">
                 <Upload fileList={fileList.map((file) => ({
@@ -1346,23 +1485,13 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
       </div>
     </div>);
 }
-export default function CompanyReview({ projectId, isEdit, projectData = companyReviewDetailResponse.data, initialActiveKey = "0", onClosed }) {
+export default function CompanyReview({ projectId, isEdit, projectData = companyReviewDetailResponse.data, initialActiveKey = "2", onClosed }) {
     const [activeKey, setActiveKey] = useState(initialActiveKey);
     const items = useMemo(() => [
-        {
-            key: "0",
-            label: "文件替换",
-            children: <FilesReplacePanel isEdit={isEdit}/>,
-        },
         {
             key: "2",
             label: "前置任务确认",
             children: <TopicApprovalPanel isEdit={isEdit} setActiveKey={setActiveKey}/>,
-        },
-        {
-            key: "3",
-            label: "审批材料准备",
-            children: <MaterialPreparePanel isEdit={isEdit} setActiveKey={setActiveKey}/>,
         },
         {
             key: "8",
@@ -1381,15 +1510,22 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
         },
         {
             key: "6",
-            label: "会后材料替换",
-            children: <JointOpinionPanel isEdit={isEdit} setActiveKey={setActiveKey}/>,
+            label: (
+                <span className="review-tab-label-with-help">
+                  会后材料替换
+                  <Tooltip title="1.现在要显示所有的议题">
+                    <QuestionCircleOutlined className="review-tab-help-icon" onClick={(event) => event.stopPropagation()}/>
+                  </Tooltip>
+                </span>
+            ),
+            children: <PostMeetingMaterialPanel isEdit={isEdit} setActiveKey={setActiveKey}/>,
         },
         {
             key: "7",
             label: (
                 <span className="review-tab-label-with-help">
-                  总办会会议纪要
-                  <Tooltip title="1.董事会 监事会 股东会/投委会 都要填写各自的表决建议">
+                  投资决策结果
+                  <Tooltip title="1.董事会 监事会 股东会/投委会 都要填写各自的表决建议 2.增加期数 3.总办会会议纪要-->投资决策结果">
                     <QuestionCircleOutlined className="review-tab-help-icon" onClick={(event) => event.stopPropagation()}/>
                   </Tooltip>
                 </span>

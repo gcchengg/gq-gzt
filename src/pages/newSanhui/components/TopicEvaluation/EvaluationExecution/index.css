@@ -149,6 +149,16 @@
   width: 100%;
 }
 
+.gzt-eval-snapshot-empty {
+  grid-column: 1 / -1;
+  padding: 28px 16px;
+  border: 1px dashed #cfd9ea;
+  border-radius: 8px;
+  background: #f8fbff;
+  color: #7b879b;
+  text-align: center;
+}
+
 .gzt-eval-snapshot-card.ant-checkbox-wrapper {
   position: relative;
   display: block;
