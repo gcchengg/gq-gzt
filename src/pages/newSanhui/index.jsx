@@ -336,7 +336,7 @@ export default function NewSanhuiPage() {
               editStatus="edit"
               progStatus={activeRecord.progStatus}
               dutyUserName={activeRecord.submitUserName}
-              reviewInitialTab={searchParams.get("task") === "topicApproval" ? "0" : undefined}
+              reviewInitialTab={searchParams.get("task") === "topicApproval" ? "2" : undefined}
               onCloseDetail={(type) => {
                 if (type === "submit" || type === "save") {
                   getTableData();
