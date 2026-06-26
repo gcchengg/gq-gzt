@@ -63,7 +63,7 @@ function writeScreenshotPages(value) {
     window.dispatchEvent(new CustomEvent("newSanhui:annotationScreenshotPagesChange", { detail: value }));
 }
 
-export default function PdfAnnotationEditor({ open, fileName, mode = "annotation", onClose }) {
+export default function PdfAnnotationEditor({ open, fileName, mode = "annotation", showNeedReply = true, onClose }) {
     const [activeFile, setActiveFile] = useState(fileName || pdfFiles[0]);
     const [compareFiles, setCompareFiles] = useState([fileName || pdfFiles[0], pdfFiles[1]]);
     const [scope, setScope] = useState(mode === "associate" ? "existing" : "all");
@@ -76,6 +76,7 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     const [note, setNote] = useState("");
     const [needReply, setNeedReply] = useState(false);
     const [compareOpen, setCompareOpen] = useState(false);
+    const [contextOpen, setContextOpen] = useState(false);
     const [replyingId, setReplyingId] = useState(null);
     const [reply, setReply] = useState("");
     const [creationArmed, setCreationArmed] = useState(false);
@@ -198,7 +199,7 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
             writeScreenshotPages(next);
             return next;
         });
-        message.success(checked ? "已标记为批注页截图" : "已取消批注页截图标记");
+        message.success(checked ? "已标记为汇报材料页收藏" : "已取消汇报材料页收藏标记");
     };
     const renderCompareTasks = (side) => {
         const list = side === "left"
@@ -365,12 +366,6 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                         </label>
                     ) : <span className="pdf-toolbar-hint">{creationArmed ? (markMode === "area" ? "拖动鼠标绘制矩形区域" : "点击正文高亮文本后填写说明") : "请选择标注模式开始批注"}</span>}
                     {creationArmed && mode !== "associate" ? <button className="pdf-toolbar-cancel" type="button" onClick={() => { setCreationArmed(false); setDrawingRect(null); }}>取消</button> : null}
-                    {mode !== "associate" ? (
-                        <label className="pdf-screenshot-switch">
-                            是否为批注页截图
-                            <Switch size="small" checked={isAnnotationScreenshotPage} onChange={toggleAnnotationScreenshotPage} />
-                        </label>
-                    ) : null}
                 </div>
 
                 <div className="pdf-editor-body">
@@ -403,6 +398,7 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                         </div>
 
                         <div className="pdf-page-jump">
+                            <button className="pdf-page-context-btn" type="button" onClick={() => setContextOpen(true)}>参考信息</button>
                             <button className="pdf-page-nav-btn" type="button" disabled={activePage.page === visiblePages[0]?.page} onClick={() => shiftPage(-1)}>上一页</button>
                             <div className="pdf-page-stepper">
                                 <button className="pdf-page-step-btn" type="button" disabled={activePage.page === visiblePages[0]?.page} onClick={() => shiftPage(-1)}>-</button>
@@ -415,42 +411,14 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                                 <button className="pdf-page-step-btn" type="button" disabled={activePage.page === visiblePages.at(-1)?.page} onClick={() => shiftPage(1)}>+</button>
                             </div>
                             <button className="pdf-page-nav-btn" type="button" disabled={activePage.page === visiblePages.at(-1)?.page} onClick={() => shiftPage(1)}>下一页</button>
+                            {mode !== "associate" ? (
+                                <label className="pdf-page-screenshot-switch">
+                                    汇报材料页收藏
+                                    <Switch size="small" checked={isAnnotationScreenshotPage} onChange={toggleAnnotationScreenshotPage} />
+                                </label>
+                            ) : null}
                         </div>
 
-                        <div className="pdf-bottom-hover-zone" aria-hidden="true" />
-                        <div className={`pdf-bottom-dock ${mode === "associate" ? "annotation-mode" : ""}`}>
-                            {mode === "associate" ? (
-                                <div className="pdf-bottom-info-row">
-                                    <div className="pdf-bottom-info"><div className="pdf-bottom-info-label">评价要素</div><div className="pdf-bottom-info-value">外部管理规定</div></div>
-                                    <div className="pdf-bottom-info"><div className="pdf-bottom-info-label">参股公司信息</div><div className="pdf-bottom-info-value">长春富维集团汽车零部件股份有限公司</div></div>
-                                    <div className="pdf-bottom-info"><div className="pdf-bottom-info-label">议案名称</div><div className="pdf-bottom-info-value">2026年第三次临时股东会议案及表决建议</div></div>
-                                </div>
-                            ) : null}
-                            <div className="pdf-bottom-select-row">
-                                <div className="pdf-bottom-field"><label>议题大类</label><select><option>1. 经营类</option><option>2. 投资类</option></select></div>
-                                <div className="pdf-bottom-field"><label>议题中类</label><select><option>1.3 定期监管报告</option><option>1.4 经营分析</option></select></div>
-                                <div className="pdf-bottom-field"><label>议题小类</label><select><option>1.3.1 按国家部委等上级机构监管要求定期报告事项</option><option>1.3.2 风险事项报告</option></select></div>
-                                <div className="pdf-bottom-field"><label>参股公司</label><select><option>长春富维集团汽车零部件股份有限公司</option><option>T3出行科技有限公司</option></select></div>
-                                <div className="pdf-bottom-field"><label>议案</label><select><option>请选择议案</option><option>设备购入及处置方案</option><option>董事会会议案及表决建议</option></select></div>
-                            </div>
-                            <div className="pdf-bottom-attach-panel">
-                                <div className="pdf-bottom-attach-list">
-                                    {pdfFiles.map((item) => (
-                                        <div className="pdf-bottom-attach-row" key={item}>
-                                            <div className="pdf-bottom-attach-type">{item.endsWith(".pdf") ? "PDF" : "DOCX"}</div>
-                                            <button className="pdf-bottom-attach-file" type="button" onClick={() => item.endsWith(".pdf") && setActiveFile(item)}>{item}</button>
-                                            <button className="pdf-bottom-row-compare" type="button" onClick={() => setCompareOpen(true)}>对比</button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="pdf-bottom-actions-row">
-                                <button className="pdf-bottom-action" type="button">参股公司信息</button>
-                                <button className="pdf-bottom-action" type="button">一企一策</button>
-                                <button className="pdf-bottom-action" type="button">战略规划</button>
-                                <button className="pdf-bottom-action" type="button">财务报表</button>
-                            </div>
-                        </div>
                     </main>
                     <aside className="pdf-side">
                         <div className="pdf-side-head">
@@ -586,9 +554,56 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                 onOk={saveNote}
             >
                 <Input.TextArea value={note} onChange={(event) => setNote(event.target.value)} placeholder="请输入批注说明" autoSize={{ minRows: 4, maxRows: 8 }} />
-                <Radio.Group className="pdf-note-type-inline" value={needReply} onChange={(event) => setNeedReply(event.target.value)}>
-                    <Radio value={true}>需要提报人回复</Radio><Radio value={false}>无需回复</Radio>
-                </Radio.Group>
+                {showNeedReply && !editing ? (<div className="pdf-note-reply-field">
+                    <span>是否需要提报人回复：</span>
+                    <Radio.Group value={needReply} onChange={(event) => setNeedReply(event.target.value)}>
+                        <Radio value={true}>是</Radio>
+                        <Radio value={false}>否</Radio>
+                    </Radio.Group>
+                </div>) : null}
+            </Modal>
+            <Modal
+                title="参考信息"
+                open={contextOpen}
+                width={980}
+                zIndex={10060}
+                footer={null}
+                onCancel={() => setContextOpen(false)}
+                className="pdf-context-modal"
+            >
+                <div className={`pdf-context-modal-content ${mode === "associate" ? "annotation-mode" : ""}`}>
+                    {mode === "associate" ? (
+                        <div className="pdf-bottom-info-row">
+                            <div className="pdf-bottom-info"><div className="pdf-bottom-info-label">评价要素</div><div className="pdf-bottom-info-value">外部管理规定</div></div>
+                            <div className="pdf-bottom-info"><div className="pdf-bottom-info-label">参股公司信息</div><div className="pdf-bottom-info-value">长春富维集团汽车零部件股份有限公司</div></div>
+                            <div className="pdf-bottom-info"><div className="pdf-bottom-info-label">议案名称</div><div className="pdf-bottom-info-value">2026年第三次临时股东会议案及表决建议</div></div>
+                        </div>
+                    ) : null}
+                    <div className="pdf-bottom-select-row">
+                        <div className="pdf-bottom-field"><label>议题大类</label><select><option>1. 经营类</option><option>2. 投资类</option></select></div>
+                        <div className="pdf-bottom-field"><label>议题中类</label><select><option>1.3 定期监管报告</option><option>1.4 经营分析</option></select></div>
+                        <div className="pdf-bottom-field"><label>议题小类</label><select><option>1.3.1 按国家部委等上级机构监管要求定期报告事项</option><option>1.3.2 风险事项报告</option></select></div>
+                        <div className="pdf-bottom-field"><label>参股公司</label><select><option>长春富维集团汽车零部件股份有限公司</option><option>T3出行科技有限公司</option></select></div>
+                        <div className="pdf-bottom-field"><label>议案</label><select><option>请选择议案</option><option>设备购入及处置方案</option><option>董事会会议案及表决建议</option></select></div>
+                    </div>
+                    <div className="pdf-bottom-attach-panel">
+                        <div className="pdf-bottom-attach-list">
+                            {pdfFiles.map((item) => (
+                                <div className="pdf-bottom-attach-row" key={item}>
+                                    <div className="pdf-bottom-attach-type">{item.endsWith(".pdf") ? "PDF" : "DOCX"}</div>
+                                    <button className="pdf-bottom-attach-file" type="button" onClick={() => item.endsWith(".pdf") && setActiveFile(item)}>{item}</button>
+                                    <button className="pdf-bottom-row-compare" type="button" onClick={() => setCompareOpen(true)}>对比</button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="pdf-bottom-actions-row">
+                        <button className="pdf-bottom-action" type="button">参股公司信息</button>
+                        <button className="pdf-bottom-action" type="button">一企一策</button>
+                        <button className="pdf-bottom-action" type="button">战略规划</button>
+                        <button className="pdf-bottom-action" type="button">财务报表</button>
+                    </div>
+                </div>
             </Modal>
         </>
     );

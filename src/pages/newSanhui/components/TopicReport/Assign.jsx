@@ -44,7 +44,7 @@ export default function Assign(props) {
       width: 220,
       render: (_value, row) => (row.planStartDate && row.planEndDate ? `${dayjs(row.planStartDate).format("YYYY-MM-DD")} ~ ${dayjs(row.planEndDate).format("YYYY-MM-DD")}` : "-"),
     },
-    { title: "执行总结", dataIndex: "execDetail", align: "center", width: 180 },
+    { title: "执行计划", dataIndex: "execDetail", align: "center", width: 180 },
     {
       title: "状态",
       dataIndex: "status",

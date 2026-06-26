@@ -264,7 +264,7 @@ export default function AssignFollow({
             : "-",
       },
       {
-        title: "执行总结",
+        title: "执行计划",
         dataIndex: "execDetail",
         key: "execDetail",
         width: 340,
@@ -410,7 +410,7 @@ export default function AssignFollow({
             items={[
               "1.删除相关分类列",
               "2.三会表决后额外给管护发送一个【交办落实跟踪】任务，目的是记录领导反馈内容的交办事项",
-              "2.当数据来源董事反馈，可以暂时不填写截止时间	计划执行时间	执行总结，不影响业务流程",
+              "2.当数据来源董事反馈，可以暂时不填写截止时间	计划执行时间	执行计划，不影响业务流程",
             ]}
           />
         </div>
@@ -504,7 +504,7 @@ export default function AssignFollow({
           <Form.Item name="planDate" label="计划执行时间">
             <DatePicker.RangePicker style={{ width: "100%" }} />
           </Form.Item>
-          <Form.Item name="execDetail" label="执行总结">
+          <Form.Item name="execDetail" label="执行计划">
             <Input.TextArea rows={4} />
           </Form.Item>
         </Form>

@@ -280,7 +280,7 @@ export async function parseAssignFile(params = {}) {
       deadlineDate: dayjs().add(isAudio ? 7 : 10, "day").format("YYYY-MM-DD"),
       planStartDate: dayjs().format("YYYY-MM-DD"),
       planEndDate: dayjs().add(isAudio ? 7 : 10, "day").format("YYYY-MM-DD"),
-      execDetail: "AI已生成初步交办描述，请责任人复核后更新执行总结。",
+      execDetail: "AI已生成初步交办描述，请责任人复核后更新执行计划。",
       status: "0",
       aiSourceFileName: params.fileName,
       aiSourceFileType: params.fileType,

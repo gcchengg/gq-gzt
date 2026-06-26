@@ -404,6 +404,10 @@
 
 .tabs2-container .file-upload-item {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 8px;
   color: #25324a;
   font-size: 14px;
@@ -566,6 +570,33 @@
   background: #fff;
 }
 
+.risk-compliance-opinions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 14px;
+}
+
+.risk-compliance-card {
+  padding: 12px 14px;
+  border: 1px solid #e6edf7;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.risk-compliance-title {
+  margin-bottom: 8px;
+  color: #25324a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.risk-compliance-content {
+  color: #536078;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
 .joint-opinion-table .ant-table {
   border-radius: 10px;
 }
@@ -628,6 +659,37 @@
 .after-meeting-application .ant-picker,
 .after-meeting-application .ant-input-number {
   width: 100%;
+}
+
+.after-meeting-archive-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.after-meeting-archive-card {
+  padding: 12px;
+  border: 1px solid #e6edf7;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.after-meeting-file-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: #25324a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.after-meeting-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .tabs1-scroll-content {
@@ -723,6 +785,21 @@
 .table-title .title-text {
   flex: 0 0 auto;
   color: #33415c;
+}
+
+.proposal-index-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: #2454d6;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .proposal-name {

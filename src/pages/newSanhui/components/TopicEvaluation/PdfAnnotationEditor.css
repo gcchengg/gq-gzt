@@ -197,6 +197,36 @@
     z-index: 8;
 }
 
+.pdf-page-context-btn {
+    height: 34px;
+    padding: 0 14px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: #2057d9;
+    cursor: pointer;
+    background: #eef4ff;
+    border: 1px solid #c8d9ff;
+    border-radius: 999px;
+}
+
+.pdf-page-context-btn:hover {
+    background: #e2ecff;
+}
+
+.pdf-page-screenshot-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    color: #334155;
+    white-space: nowrap;
+    background: #fff;
+    border: 1px solid #d8e1ed;
+    border-radius: 999px;
+}
+
 .pdf-page-nav-btn,
 .pdf-page-step-btn {
     height: 34px;
@@ -408,6 +438,16 @@
 
 .pdf-bottom-dock.annotation-mode .pdf-bottom-info-row {
     display: grid;
+}
+
+.pdf-context-modal-content.annotation-mode .pdf-bottom-info-row {
+    display: grid;
+}
+
+.pdf-context-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
 .pdf-bottom-info {
@@ -798,8 +838,17 @@
     border-radius: 10px;
 }
 
-.pdf-note-type-inline {
+.pdf-note-reply-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     margin-top: 16px;
+    color: #334155;
+}
+
+.pdf-note-reply-field > span {
+    flex: 0 0 auto;
+    font-weight: 600;
 }
 
 .pdf-compare-overlay {
@@ -1027,7 +1076,7 @@
     padding: 0 8px 0 16px;
 }
 
-.ant-modal-root:has(.pdf-note-type-inline) {
+.ant-modal-root:has(.pdf-note-reply-field) {
     z-index: 10060;
 }
 

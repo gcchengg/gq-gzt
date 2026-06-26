@@ -24,5 +24,5 @@ prd初始页面：http://www.prompt.ski/GztHome
         - 需求更改：
         1.删除相关分类列
         2.提交后额外给管护发送一个督办任务，目的是记录领导反馈内容的交办事项
-        3.当数据来源董事反馈，可以暂时不填写截止时间 计划执行时间 执行总结，不影响业务流程
+        3.当数据来源董事反馈，可以暂时不填写截止时间 计划执行时间 执行计划，不影响业务流程
         4.页面路径：http://www.prompt.ski/newSanhui?task=decisionExecution&autoOpen=1

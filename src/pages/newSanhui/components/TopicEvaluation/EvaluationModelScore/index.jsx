@@ -1,5 +1,5 @@
-import { Button, Image, Input, Modal, Radio, Tag, Tooltip } from "antd";
-import { EyeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { Button, Image, Input, Modal, Radio, Tag, Tooltip, message } from "antd";
+import { EyeOutlined, QuestionCircleOutlined, ThunderboltOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import "./index.css";
 
@@ -69,6 +69,7 @@ export default function EvaluationModelScore({
   hideMaterialAction = false,
   hideExecutionColumn = false,
   hideExceptionColumn = false,
+  showAiEvaluation = false,
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeElement, setActiveElement] = useState("");
@@ -135,6 +136,20 @@ export default function EvaluationModelScore({
           <>
             <div className="eval-score-head">
               <div className="eval-score-title">评估评分</div>
+              {showAiEvaluation ? (
+                <div className="eval-ai-action">
+                  <Button
+                    type="primary"
+                    icon={<ThunderboltOutlined />}
+                    onClick={() => message.success("AI评估已生成")}
+                  >
+                    AI评估
+                  </Button>
+                  <Tooltip title="1.根据评注内容和模型评价规则智能评估执行情况及评价结果">
+                    <QuestionCircleOutlined className="eval-ai-help-icon" />
+                  </Tooltip>
+                </div>
+              ) : null}
             </div>
             <table className="data-table eval-grade-table">
               <colgroup>

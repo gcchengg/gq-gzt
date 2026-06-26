@@ -34,15 +34,7 @@
     "planEndDate": "2026-05-18 09:20:00",
     "topicSummary": "本议题拟提请审议基金退出路径、交易对手沟通安排及资金回收计划。",
     "reviewMapFileList": {
-      "1000": [
-        {
-          "uid": "review-1000",
-          "name": "业务总监审批议题材料.pdf",
-          "fileName": "业务总监审批议题材料.pdf",
-          "url": "/mock-pdf/review-director.pdf",
-          "fileUrl": "/mock-pdf/review-director.pdf"
-        }
-      ],
+      "1000": [],
       "2000": [
         {
           "uid": "review-2000",

@@ -180,6 +180,7 @@ function PreReviewDetail({ open, topic, reviewType, onClose }) {
         open={Boolean(pdfEditor)}
         fileName={pdfEditor?.fileName}
         mode={pdfEditor?.mode}
+        showNeedReply
         onClose={() => setPdfEditor(null)}
       />
     </>
@@ -224,6 +225,8 @@ export default function NewSanhuiPreReview() {
         <Tag color="blue">待办任务</Tag>
       </div>
 
+      <MeetingManageInfo />
+
       <section className="pre-review-card">
         <div className="pre-review-card-head">
           <span>议题列表</span>
@@ -238,8 +241,6 @@ export default function NewSanhuiPreReview() {
           scroll={{ x: 1220 }}
         />
       </section>
-
-      <MeetingManageInfo />
 
       <section className="pre-review-card">
         <div className="pre-review-card-head">
@@ -285,7 +286,7 @@ export default function NewSanhuiPreReview() {
       <div className="pre-review-footer">
         <Button onClick={() => history.back()}>返回</Button>
         <Button type="primary" onClick={() => message.success(`${reviewType}已提交`)}>
-          提交初审
+          完成初审
         </Button>
       </div>
 

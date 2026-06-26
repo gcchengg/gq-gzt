@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, DatePicker, Drawer, Form, Input, Popconfirm, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Upload, message, } from "antd";
+import { Button, Card, Checkbox, DatePicker, Drawer, Form, Input, Modal, Popconfirm, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Upload, message, } from "antd";
 import { InboxOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
@@ -126,10 +126,15 @@ const promptText = {
 };
 const initialSmartFiles = smartGetListResponse.data;
 const initialTopics = topicGetListResponse.data.list;
-const initialMeetings = meetingGetListResponse.data.map((item) => ({
+const meetingTypeList = ["董事会", "监事会", "股东会"];
+const initialMeetings = meetingGetListResponse.data.map((item, index) => ({
     ...item,
+    key: `${item.id || item.meetingType || "meeting"}-${index}`,
+    meetingTypeName: meetingTypeList[index] || item.meetingTypeName,
+    enabled: Boolean(item.launchFlag),
     notifyDate: item.notifyDate ? dayjs(item.notifyDate) : null,
     launchTime: item.launchTime ? dayjs(item.launchTime) : null,
+    launchType: Number(item.launchType || 1),
 }));
 const initialDistribution = proposalGetResponse.data.supervisorNotifyList;
 const reviewerUserOptions = [
@@ -159,7 +164,6 @@ function Panel({ title, extra, children }) {
 function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
     const [form] = Form.useForm();
     const planTopicFlag = Form.useWatch("planTopicFlag", form);
-    const [selectedFileKeys, setSelectedFileKeys] = useState([]);
     const [level2Options, setLevel2Options] = useState([]);
     const [level3Options, setLevel3Options] = useState([]);
     useEffect(() => {
@@ -185,7 +189,6 @@ function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
         form.setFieldsValue(initialValues);
         setLevel2Options(getLevel2Options(initialValues.categoryLv1Name));
         setLevel3Options(getLevel3Options(initialValues.categoryLv2Name));
-        setSelectedFileKeys(record?.fileIds || []);
     }, [form, open, record]);
     const handleLevel1Change = (value) => {
         setLevel2Options(getLevel2Options(value));
@@ -216,20 +219,15 @@ function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
             ...record,
             ...values,
             id: record?.id || `topic-${Date.now()}`,
-            fileIds: selectedFileKeys,
         });
     };
-    const attachmentColumns = [
-        { title: "序号", width: 64, render: (_value, _row, index) => index + 1 },
-        { title: "文件名", dataIndex: "fileName" },
-        {
-            title: "文件分类",
-            dataIndex: "fileCategory",
-            width: 140,
-            render: (value) => topicFileTypes.find((item) => item.value === value)?.label || "-",
-        },
-    ];
-    return (<Drawer title={mode === "edit" ? "编辑议题" : "新增议题"} width={960} open={open} onClose={onClose} destroyOnClose>
+    const drawerTitle = mode === "edit" ? "编辑议题" : "新增议题";
+    return (<Drawer title={<span className="topic-edit-drawer-title">{drawerTitle}<Tooltip title="1.删除回避表决"><QuestionCircleOutlined className="topic-edit-title-help"/></Tooltip></span>} width={960} open={open} onClose={onClose} destroyOnClose className="topic-edit-drawer-shell" footer={<div className="topic-edit-drawer-footer">
+        <Button onClick={onClose}>取消</Button>
+        <Button type="primary" onClick={handleSave} disabled={disabled}>
+          保存
+        </Button>
+      </div>}>
       <div className="topic-edit-drawer">
         <Form form={form} layout="vertical" disabled={disabled} initialValues={{
             needPreAudit: "0",
@@ -241,8 +239,17 @@ function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
             shareholderBack: false,
             planTopicFlag: "0",
         }}>
-          <div className="topic-edit-section-title">基本信息</div>
-          <div className="topic-edit-grid">
+          <div className="topic-edit-hero">
+            <div>
+              <div className="topic-edit-hero-title">{mode === "edit" ? "维护议题信息" : "创建一条新议题"}</div>
+              <div className="topic-edit-hero-desc">补全议题基础信息、参会范围和审批分类后，可继续生成会议安排。</div>
+            </div>
+            <Tag color={mode === "edit" ? "processing" : "success"}>{mode === "edit" ? "编辑" : "新增"}</Tag>
+          </div>
+
+          <div className="topic-edit-block">
+            <div className="topic-edit-section-title">基础信息</div>
+            <div className="topic-edit-grid topic-edit-grid-primary">
             <Form.Item label="前序审核（由集团/股权公司总办会/党委会等已审批通过）" name="needPreAudit" rules={[{ required: true, message: "请选择" }]}>
               <Select placeholder="请选择" options={[
             { label: "有", value: "1" },
@@ -252,6 +259,25 @@ function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
             <Form.Item label="议题名称" name="toipcName" rules={[{ required: true, message: "请输入" }]}>
               <Input placeholder="请输入"/>
             </Form.Item>
+            <Form.Item label="计划议题" name="planTopicFlag" rules={[{ required: true, message: "请选择是否计划议题" }]}>
+              <Radio.Group options={[
+            { label: "是", value: "1" },
+            { label: "否", value: "0" },
+        ]} onChange={(event) => {
+            if (event.target.value !== "1") {
+                form.setFieldsValue({ planItemName: "" });
+            }
+        }}/>
+            </Form.Item>
+            <Form.Item label="关联计划议题（以备证计划议题被提报）" name="planItemName">
+              <Input.Search placeholder="请选择关联的计划议题" enterButton disabled={planTopicFlag !== "1"}/>
+            </Form.Item>
+            </div>
+          </div>
+
+          <div className="topic-edit-block">
+            <div className="topic-edit-section-title">会议属性</div>
+            <div className="topic-edit-switch-card">
             <Form.Item className="topic-edit-switch-item" label="参会审议">
               <div className="topic-edit-switch-group">
                 <span>董事会</span>
@@ -268,35 +294,12 @@ function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
                 </Form.Item>
               </div>
             </Form.Item>
-            <Form.Item className="topic-edit-switch-item" label="回避表决">
-              <div className="topic-edit-switch-group">
-                <span>董事会</span>
-                <Form.Item name="boardBack" valuePropName="checked" noStyle>
-                  <Switch/>
-                </Form.Item>
-                <span>监事会</span>
-                <Form.Item name="supervisorBack" valuePropName="checked" noStyle>
-                  <Switch/>
-                </Form.Item>
-                <span>股东会</span>
-                <Form.Item name="shareholderBack" valuePropName="checked" noStyle>
-                  <Switch/>
-                </Form.Item>
-              </div>
-            </Form.Item>
-            <Form.Item label="计划议题" name="planTopicFlag" rules={[{ required: true, message: "请选择是否计划议题" }]}>
-              <Radio.Group options={[
-            { label: "是", value: "1" },
-            { label: "否", value: "0" },
-        ]} onChange={(event) => {
-            if (event.target.value !== "1") {
-                form.setFieldsValue({ planItemName: "" });
-            }
-        }}/>
-            </Form.Item>
-            <Form.Item label="关联计划议题（以备证计划议题被提报）" name="planItemName">
-              <Input.Search placeholder="请选择关联的计划议题" enterButton disabled={planTopicFlag !== "1"}/>
-            </Form.Item>
+            </div>
+          </div>
+
+          <div className="topic-edit-block">
+            <div className="topic-edit-section-title">分类与审批</div>
+            <div className="topic-edit-grid">
             <Form.Item label="议题分类（大）" name="categoryLv1Name" rules={[{ required: true, message: "请选择" }]}>
               <Select placeholder="请选择" allowClear options={categoryOptions.lv1} onChange={handleLevel1Change}/>
             </Form.Item>
@@ -309,25 +312,7 @@ function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
             <Form.Item label="审批层级" name="reviewLevel2" rules={[{ required: true, message: "请选择" }]}>
               <Select placeholder="请选择" allowClear options={reviewLevelOptions}/>
             </Form.Item>
-          </div>
-          <div className="topic-edit-section-title">相关附件</div>
-          <div className="topic-edit-attachment-tip">
-            AI已经帮您选择了认为相关的文档，如有遗漏请补充选择！
-          </div>
-          <Table className="submit-table" rowKey="id" columns={attachmentColumns} dataSource={initialSmartFiles} pagination={false} size="small" rowSelection={{
-            selectedRowKeys: selectedFileKeys,
-            onChange: (keys) => setSelectedFileKeys(keys),
-          }}/>
-          <div className="topic-edit-footer">
-            <Button onClick={() => message.info("当前为本地假数据演示，未接入材料补充页面")} disabled={disabled}>
-              补充汇报材料
-            </Button>
-            <Button onClick={() => message.info("当前为本地假数据预览")} disabled={disabled}>
-              预览
-            </Button>
-            <Button type="primary" onClick={handleSave} disabled={disabled}>
-              保存
-            </Button>
+            </div>
           </div>
         </Form>
       </div>
@@ -456,46 +441,82 @@ function TopicManage({ disabled, onPrev, onNext, }) {
     const [filterLevel3Options, setFilterLevel3Options] = useState([]);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [editingTopic, setEditingTopic] = useState(null);
+    const moveTopic = (index, offset) => {
+        setTopics((current) => {
+            const nextIndex = index + offset;
+            if (nextIndex < 0 || nextIndex >= current.length) {
+                return current;
+            }
+            const next = [...current];
+            const [target] = next.splice(index, 1);
+            next.splice(nextIndex, 0, target);
+            const neighbor = current[nextIndex];
+            setAllTopics((allCurrent) => {
+                const targetIndex = allCurrent.findIndex((item) => item.id === target.id);
+                const neighborIndex = allCurrent.findIndex((item) => item.id === neighbor.id);
+                if (targetIndex < 0 || neighborIndex < 0) {
+                    return allCurrent;
+                }
+                const allNext = [...allCurrent];
+                [allNext[targetIndex], allNext[neighborIndex]] = [allNext[neighborIndex], allNext[targetIndex]];
+                return allNext;
+            });
+            return next;
+        });
+    };
     const columns = [
-        { title: "序号", width: 64, render: (_value, _row, index) => index + 1 },
-        { title: "议题分类（大）", dataIndex: "categoryLv1Name" },
-        { title: "议题分类（中）", dataIndex: "categoryLv2Name" },
-        { title: "议题分类（小）", dataIndex: "categoryLv3Name" },
-        { title: "议题名称", dataIndex: "toipcName", width: 280 },
+        { title: "序号", width: 64, align: "center", render: (_value, _row, index) => index + 1 },
+        { title: "议题分类（大）", dataIndex: "categoryLv1Name", width: 130, ellipsis: true },
+        { title: "议题分类（中）", dataIndex: "categoryLv2Name", width: 160, ellipsis: true },
+        { title: "议题分类（小）", dataIndex: "categoryLv3Name", width: 260, ellipsis: true },
+        { title: "议题名称", dataIndex: "toipcName", width: 280, ellipsis: true },
         {
             title: "董事会",
             dataIndex: "board",
+            width: 80,
+            align: "center",
             render: (value) => (value ? "√" : "-"),
         },
         {
             title: "监事会",
             dataIndex: "supervisor",
+            width: 80,
+            align: "center",
             render: (value) => (value ? "√" : "-"),
         },
         {
             title: "股东会",
             dataIndex: "shareholder",
+            width: 80,
+            align: "center",
             render: (value) => (value ? "√" : "-"),
         },
-        { title: "审批层级", dataIndex: "reviewLevel2" },
+        { title: "审批层级", dataIndex: "reviewLevel2", width: 110 },
         {
             title: "操作",
-            width: 150,
-            render: (_value, record) => (<Space size={4}>
-          <Button type="link" onClick={() => {
+            width: 220,
+            fixed: "right",
+            render: (_value, record, index) => (<Space className="submit-topic-actions" size={4}>
+          <Button type="link" size="small" onClick={() => {
                 setEditingTopic(record);
                 setDrawerOpen(true);
             }}>
             编辑
           </Button>
-          {!disabled ? (<Popconfirm title="是否确定删除这条数据?" okText="确定" cancelText="取消" onConfirm={() => {
+          <Button type="link" size="small" disabled={index === 0} onClick={() => moveTopic(index, -1)}>
+            上移
+          </Button>
+          <Button type="link" size="small" disabled={index === topics.length - 1} onClick={() => moveTopic(index, 1)}>
+            下移
+          </Button>
+          <Popconfirm title="是否确定删除这条数据?" okText="确定" cancelText="取消" onConfirm={() => {
                 setTopics((current) => current.filter((item) => item.id !== record.id));
                 setAllTopics((current) => current.filter((item) => item.id !== record.id));
             }}>
-              <Button type="link" danger>
+              <Button type="link" size="small" danger>
                 删除
               </Button>
-            </Popconfirm>) : null}
+            </Popconfirm>
         </Space>),
         },
     ];
@@ -580,15 +601,12 @@ function TopicManage({ disabled, onPrev, onNext, }) {
               <Button type="primary" onClick={handleSearch}>
                 搜索
               </Button>
-              {!disabled ? (<Button type="primary" onClick={openAddDrawer}>
-                  新增
-                </Button>) : null}
             </div>
           </div>
         </Form>
       </Panel>
-      <Panel title="议题清单">
-        <Table className="submit-table" rowKey="id" columns={columns} dataSource={topics} pagination={false} size="small"/>
+      <Panel title="议题清单" extra={<Button type="primary" onClick={openAddDrawer}>新增议题</Button>}>
+        <Table className="submit-table" rowKey="id" columns={columns} dataSource={topics} pagination={false} size="small" scroll={{ x: 1464 }}/>
       </Panel>
       {!disabled ? (<div className="submit-footer">
           <span className="submit-footer-hint">确认议题后生成会议安排</span>
@@ -597,14 +615,25 @@ function TopicManage({ disabled, onPrev, onNext, }) {
             下一步
           </Button>
         </div>) : null}
-      <TopicEditDrawer open={drawerOpen} mode={editingTopic ? "edit" : "add"} record={editingTopic} disabled={disabled} onClose={() => {
+      <TopicEditDrawer open={drawerOpen} mode={editingTopic ? "edit" : "add"} record={editingTopic} disabled={false} onClose={() => {
             setDrawerOpen(false);
             setEditingTopic(null);
         }} onSave={handleSaveTopic}/>
     </div>);
 }
-function MeetingCard({ meeting, disabled, onChange, }) {
+const meetingEnabledChangeTip = (
+  <div>
+    <div>如关闭/开启该会议：</div>
+    <div>1.请确认每个议题的参会审议情况</div>
+    <div>2.会影响议题材料传达对象参会人员是否可选</div>
+  </div>
+);
+
+function MeetingCard({ meeting, disabled, onChange, onEnabledChange, }) {
     const [form] = Form.useForm();
+    const handleEnabledChange = (checked) => {
+        onEnabledChange(meeting, checked);
+    };
     return (<div className="meeting-card">
       <div className="meeting-card-head">
         <div>
@@ -612,7 +641,7 @@ function MeetingCard({ meeting, disabled, onChange, }) {
           <strong>{meeting.meetingTypeName}</strong>
         </div>
         <Space>
-          <Switch disabled={disabled} checked={meeting.enabled} onChange={(checked) => onChange({ ...meeting, enabled: checked })}/>
+          <Switch disabled={disabled} checked={meeting.enabled} onChange={handleEnabledChange}/>
           <span>召开</span>
         </Space>
       </div>
@@ -638,16 +667,44 @@ function MeetingCard({ meeting, disabled, onChange, }) {
       </Form>
     </div>);
 }
-function MeetingManage({ disabled, onPrev, onNext, }) {
+function MeetingManage({ disabled, onPrev, onNext, showFooter = true, confirmEnabledChange = false, }) {
     const [meetings, setMeetings] = useState(initialMeetings);
+    const [pendingEnabledChange, setPendingEnabledChange] = useState(null);
+    const updateMeeting = (nextMeeting) => {
+        setMeetings((current) => current.map((item) => (item.key === nextMeeting.key ? nextMeeting : item)));
+    };
+    const handleEnabledChange = (meeting, checked) => {
+        if (!confirmEnabledChange) {
+            updateMeeting({ ...meeting, enabled: checked });
+            return;
+        }
+        setPendingEnabledChange({ meeting, checked });
+    };
+    const confirmPendingEnabledChange = () => {
+        if (pendingEnabledChange) {
+            updateMeeting({ ...pendingEnabledChange.meeting, enabled: pendingEnabledChange.checked });
+        }
+        setPendingEnabledChange(null);
+    };
     return (<div className="submit-section">
       <Prompt type="meeting"/>
       <Panel title="会议安排">
         <div className="meeting-grid">
-          {meetings.map((meeting) => (<MeetingCard key={meeting.key} meeting={meeting} disabled={disabled} onChange={(nextMeeting) => setMeetings((current) => current.map((item) => (item.key === nextMeeting.key ? nextMeeting : item)))}/>))}
+          {meetings.map((meeting) => (<MeetingCard key={meeting.key} meeting={meeting} disabled={disabled} onEnabledChange={handleEnabledChange} onChange={updateMeeting}/>))}
         </div>
       </Panel>
-      {!disabled ? (<div className="submit-footer">
+      <Modal
+        title={pendingEnabledChange?.checked ? "确认开启该会议？" : "确认关闭该会议？"}
+        open={Boolean(pendingEnabledChange)}
+        onOk={confirmPendingEnabledChange}
+        onCancel={() => setPendingEnabledChange(null)}
+        okText="确认"
+        cancelText="取消"
+        zIndex={2200}
+      >
+        {meetingEnabledChangeTip}
+      </Modal>
+      {!disabled && showFooter ? (<div className="submit-footer">
           <span className="submit-footer-hint">确认会议后进入资料传达配置</span>
           <Button onClick={onPrev}>上一步</Button>
           <Button type="primary" onClick={onNext}>
@@ -735,6 +792,10 @@ function DistributionManage({ disabled, onPrev, onSubmit, }) {
       <Prompt type="distribution"/>
       <div className="distribution-layout">
         <Panel title="议题材料传达对象" extra={<span className="distribution-notice danger"><span className="distribution-notice-icon">!</span><span>集团总经理助理及以上不传达</span></span>}>
+          <div className="distribution-task-tip">
+            <span className="distribution-task-tip-icon">i</span>
+            <span>勾选传达对象后，后续阶段会触发董事意见反馈、表决建议单任务。</span>
+          </div>
           <Table className="submit-table" rowKey="id" columns={columns} dataSource={data} pagination={false} size="small" scroll={{ x: 1260 }}/>
         </Panel>
         <Panel title="职能联审议题材料传达对象" extra={<span className="distribution-notice warning"><span className="distribution-notice-icon">!</span><span>指定参与职能联审初审的职能部门</span></span>}>
@@ -748,7 +809,7 @@ function DistributionManage({ disabled, onPrev, onSubmit, }) {
         </Panel>
       </div>
       {!disabled ? (<div className="submit-footer">
-          <span className="submit-footer-hint">提交后将同时发起议题初审与议题评估任务</span>
+          <span className="submit-footer-hint">提交后将同时发起议题初审、议题评估、董事意见反馈与表决建议单任务</span>
           <Button onClick={onPrev}>上一步</Button>
           <Button type="primary" onClick={submitDistribution}>
             提交
@@ -756,9 +817,11 @@ function DistributionManage({ disabled, onPrev, onSubmit, }) {
         </div>) : null}
     </div>);
 }
-export default function SubmitDrawer({ editStatus, projectData }) {
+export default function SubmitDrawer({ editStatus, projectData, progStatus }) {
     const navigate = useNavigate();
     const disabled = editStatus === "detail";
+    const canEditMeetingInEvaluation = String(progStatus) === "14000";
+    const meetingDisabled = disabled && !canEditMeetingInEvaluation;
     const [activeKey, setActiveKey] = useState("1");
     const [allowedTabs, setAllowedTabs] = useState(["1", "2", "3", "4"]);
     const goNext = () => {
@@ -799,7 +862,7 @@ export default function SubmitDrawer({ editStatus, projectData }) {
             key: "3",
             label: "会议管理",
             disabled: !allowedTabs.includes("3"),
-            children: <MeetingManage disabled={disabled} onPrev={goPrev} onNext={goNext}/>,
+            children: <MeetingManage disabled={meetingDisabled} confirmEnabledChange={canEditMeetingInEvaluation} showFooter={!disabled} onPrev={goPrev} onNext={goNext}/>,
         },
         {
             key: "4",
@@ -814,7 +877,7 @@ export default function SubmitDrawer({ editStatus, projectData }) {
             disabled: !allowedTabs.includes("4"),
             children: <DistributionManage disabled={disabled} onPrev={goPrev} onSubmit={goGztHome}/>,
         },
-    ], [allowedTabs, activeKey, disabled]);
+    ], [allowedTabs, activeKey, canEditMeetingInEvaluation, disabled, meetingDisabled]);
     return (<div className="submit-drawer">
       {/* <div className="submit-company">
         <span className="submit-company-title">参股公司</span>

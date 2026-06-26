@@ -5,6 +5,7 @@ import {
   Image,
   Input,
   Modal,
+  Popconfirm,
   Tabs,
   Table,
   Tag,
@@ -236,6 +237,13 @@ export default function EvaluationExecution({ onOpenPdf }) {
       return next;
     });
   };
+  const removeRuleLinks = (ruleKey) => {
+    setLinks((current) => {
+      const next = { ...current };
+      delete next[ruleKey];
+      return next;
+    });
+  };
 
   const addSupplementAttachment = (file) => {
     const isPdf = file.name.toLowerCase().endsWith(".pdf");
@@ -376,6 +384,34 @@ export default function EvaluationExecution({ onOpenPdf }) {
         );
       },
     },
+    {
+      title: "操作",
+      width: 110,
+      fixed: "right",
+      render: (_, record) => {
+        const linkedSnapshots = links[record.key] || [];
+        return (
+          <span className="gzt-eval-table-actions">
+            {linkedSnapshots.length ? (
+              <Popconfirm
+                title="是否确定删除关联的批注页截图?"
+                okText="确定"
+                cancelText="取消"
+                onConfirm={() => removeRuleLinks(record.key)}
+              >
+                <Button type="link" size="small" danger>
+                  删除
+                </Button>
+              </Popconfirm>
+            ) : (
+              <Button type="link" size="small" danger disabled>
+                删除
+              </Button>
+            )}
+          </span>
+        );
+      },
+    },
   ];
 
   return (
@@ -436,12 +472,12 @@ export default function EvaluationExecution({ onOpenPdf }) {
             <div className="gzt-eval-section-head">
               <div>
                 <h3>评价要素关联材料</h3>
-                <p>
+                {/* <p>
                   当前批注文件：
                   <strong>
                     {activeFile?.name || "尚未选择，请点击上方已选 PDF 文件"}
                   </strong>
-                </p>
+                </p> */}
               </div>
               <Button
                 type="primary"
@@ -457,6 +493,7 @@ export default function EvaluationExecution({ onOpenPdf }) {
               pagination={false}
               dataSource={evaluationData}
               columns={relationColumns}
+              scroll={{ x: 1360 }}
               rowSelection={{
                 selectedRowKeys: selectedRules,
                 onChange: setSelectedRules,
@@ -476,8 +513,8 @@ export default function EvaluationExecution({ onOpenPdf }) {
             <Alert
               showIcon
               type="info"
-              message="请选择各 PDF 文件下的批注页截图"
-              description="可在多个 PDF 标签页中勾选页面。关联后将保存该页正文和批注内容的截图，并记录对应文件来源。"
+              message="请选择各 PDF 文件下收藏过的批注页截图"
+              description="当前仅显示已在编辑 PDF 中收藏过的页面。可在多个 PDF 标签页中勾选页面，关联后将保存该页正文和批注内容的截图，并记录对应文件来源。"
             />
             <Checkbox.Group
               className="gzt-eval-snapshot-checks"
@@ -517,7 +554,7 @@ export default function EvaluationExecution({ onOpenPdf }) {
                         </Checkbox>
                       )) : (
                         <div className="gzt-eval-snapshot-empty">
-                          当前文件暂无已标记的批注页截图，请进入编辑 PDF 抽屉，将“是否为批注页截图”切换为“是”。
+                          当前文件暂无收藏过的批注页截图，请进入编辑 PDF 抽屉，将需要关联的页面加入汇报材料页收藏。
                         </div>
                       )}
                     </div>

@@ -8,3 +8,90 @@
 文件分类列的下拉框，把议题相关改成议题材料
 文件分类列名后面添加？图标，鼠标移入图标显示内容如下：
 1.议题相关-->议题材料
+
+会议时间中：
+1.保存按钮，变为提交按钮，点击提交,有是否确认提交提示
+2.下方增加上传文件功能，必填
+3.因为点击提交后有审批，所以这个页面还要添加
+类似/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/CompanyReview.jsx页面中的当前审批状态
+
+
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/TopicEvaluation/EvaluationModelScore/index.jsx页面中会议管理的内容，可编辑模式table
+执行情况列右侧添加？图标，鼠标移入图标显示内容如下：
+1.根据选择的批注截图，自动生成执行情况
+
+
+
+
+
+议题评估详情中，分为 评估执行和综合意见 两个tab页面
+
+评估执行tab需求更改：
+1.进入编辑PDF抽屉页面的时候，应该有个是否为批注页截图的功能，如果为是的话，在评价要素关联材料区域，点击选择批注页截图才能选择截图
+2.批注列表增加分页功能，5个批注一页
+有个问题因为综合意见tab中要显示批注的截图，如果一个页面批注列表内容过多时，怎么显示效果比较好呢，咱们先讨论然后在生成
+综合意见tab中：
+点击预览，预览内容中要根据议题显示对应批注的截图
+
+
+
+
+回避表决右侧添加
+？图标，鼠标移入图标显示内容如下：
+1.添加回避表决列
+
+
+
+议题评估详情 下面【综合意见】tab页下面董监高意见下方table中意见列右侧添加
+？图标，鼠标移入图标显示内容如下：
+1.董事提交的议题反馈建议，要体现在这里面
+
+
+/newSanhuiPreReview 页面下还希望看到
+/newSanhui 路径下【议题提报】tab下面【会议管理】的信息
+
+
+/newSanhui 路径下【议题评估】下面【审批材料准备】tab需求更改：
+1./Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/CompanyReview.jsx页面下的table
+表决意见前增加一列，叫回避表决，下面是下拉 有是和否
+
+
+
+
+
+/newSanhui 路径下【会后材料替换】tab页面下方要增加
+/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules/targetSet/pages/companyReview/newSanhui/tabs5.jsx
+页面中会后材料替换申请下面内容
+
+
+
+
+会后材料替换右侧添加
+？图标，鼠标移入图标显示内容如下：
+1.现在要显示所有的议题
+
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/SubmitDrawer.jsx
+议题管理tab中，议题资料传达tab中，希望告知用户传达对象勾选后，后续阶段会触发董事意见反馈、表决建议单任务
+
+
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx
+1.页面中【议题提报】tab下面【议题管理】要跟 【议题评估】tab下面【评估批注】一样有【新增议题】功能
+2.并且【新增议题】抽屉页面都删除 【补充汇报材料】和 【预览】按钮，并删除相关附件区域内容
+
+
+
+【议题评估】中【议题评估详情】的【编辑PDF】的时候
+1.鼠标移入底部显示浮窗的功能，改为分页左侧显示一个按钮弹出modal的形式
+2.页面顶部【是否为批注页截图】要放在分页右侧
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/TopicEvaluation/EvaluationDetail.jsx
+页面中
+      <div className={styles.requiredLabel}>综合意见</div> 
+      右侧添加
+？图标，鼠标移入图标显示内容如下：
+1.增加回避表决
+
+

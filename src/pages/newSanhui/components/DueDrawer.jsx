@@ -6,10 +6,11 @@ import {
   FileSearchOutlined,
   FormOutlined,
   QuestionCircleOutlined,
+  PoweroffOutlined,
   SafetyCertificateOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { Button, DatePicker, Descriptions, Drawer, Empty, Form, Image, Input, InputNumber, Popconfirm, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Upload, message } from "antd";
+import { Button, DatePicker, Descriptions, Drawer, Empty, Form, Image, Input, InputNumber, Modal, Popconfirm, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, Upload, message } from "antd";
 import dayjs from "dayjs";
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import meetingGetListResponse from "../mock/data/submit/meetingGetList.json";
@@ -34,7 +35,7 @@ const tabStatusMap = {
   18000: "6",
   19000: "7",
   20000: "7",
-  99999: "3",
+  99999: "8",
 };
 
 const showMeetingText = ["15000", "16000", "17000", "18000", "19000"];
@@ -45,6 +46,7 @@ const stageMeta = {
   4: { title: "表决建议", desc: "生成建议单、收集董事反馈", icon: FileDoneOutlined },
   6: { title: "三会表决", desc: "表决结果、会议决议、用印材料", icon: SafetyCertificateOutlined },
   7: { title: "决策执行", desc: "落实跟踪、执行反馈、闭环确认", icon: CheckCircleOutlined },
+  8: { title: "结束", desc: "流程已结束", icon: PoweroffOutlined },
 };
 const phaseSteps = [
   { value: "1", text: "议题提报" },
@@ -53,6 +55,7 @@ const phaseSteps = [
   { value: "4", text: "表决建议" },
   { value: "6", text: "三会表决" },
   { value: "7", text: "决策执行" },
+  { value: "8", text: "结束" },
 ];
 const voteRecords = [
   {
@@ -339,9 +342,8 @@ function PlaceholderPanel({ title }) {
 
 const meetingReviewOptions = [
   { label: "同意", value: "1" },
+  { label: "反对", value: "0" },
   { label: "有条件同意", value: "2" },
-  { label: "不同意", value: "0" },
-  { label: "回避表决", value: "3" },
 ];
 
 const meetingUserOptions = [
@@ -691,12 +693,24 @@ const initialMeetingTimeList = meetingGetListResponse.data
     launchType: Number(item.launchType || 1),
   }));
 
-function MeetingTimeCard({ meeting, onChange }) {
+const meetingEnabledChangeTip = (
+  <div>
+    <div>如关闭/开启该会议：</div>
+    <div>1.请确认每个议题的参会审议情况</div>
+    <div>2.会影响议题材料传达对象参会人员是否可选</div>
+  </div>
+);
+
+function MeetingTimeCard({ meeting, onChange, onEnabledChange }) {
   const [form] = Form.useForm();
 
   useEffect(() => {
     form.setFieldsValue(meeting);
   }, [form, meeting]);
+
+  const handleEnabledChange = (checked) => {
+    onEnabledChange(meeting, checked);
+  };
 
   return (
     <div className="meeting-card">
@@ -706,7 +720,10 @@ function MeetingTimeCard({ meeting, onChange }) {
           <strong>{meeting.meetingTypeName}</strong>
         </div>
         <Space>
-          <Switch checked={meeting.enabled} onChange={(checked) => onChange({ ...meeting, enabled: checked })} />
+          <Switch
+            checked={meeting.enabled}
+            onChange={handleEnabledChange}
+          />
           <span>召开</span>
         </Space>
       </div>
@@ -783,6 +800,18 @@ function MeetingTimeManage({ onSave }) {
   const [meetings, setMeetings] = useState(initialMeetingTimeList);
   const [fileList, setFileList] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [pendingEnabledChange, setPendingEnabledChange] = useState(null);
+
+  const updateMeeting = (nextMeeting) => {
+    setMeetings((current) => current.map((item) => (item.key === nextMeeting.key ? nextMeeting : item)));
+  };
+
+  const confirmPendingEnabledChange = () => {
+    if (pendingEnabledChange) {
+      updateMeeting({ ...pendingEnabledChange.meeting, enabled: pendingEnabledChange.checked });
+    }
+    setPendingEnabledChange(null);
+  };
 
   const handleSubmit = () => {
     if (!fileList.length) {
@@ -795,10 +824,10 @@ function MeetingTimeManage({ onSave }) {
 
   return (
     <div className="submit-section meeting-time-manage">
-      <div className="submit-prompt">
+      {/* <div className="submit-prompt">
         <span className="submit-prompt-icon">AI</span>
         <span>请确认并维护会议时间、召开方式和会议地点。</span>
-      </div>
+      </div> */}
       <div className="submit-panel">
         <div className="submit-panel-head">
           <div className="submit-panel-title">会议安排</div>
@@ -809,14 +838,24 @@ function MeetingTimeManage({ onSave }) {
               <MeetingTimeCard
                 key={meeting.key}
                 meeting={meeting}
-                onChange={(nextMeeting) =>
-                  setMeetings((current) => current.map((item) => (item.key === nextMeeting.key ? nextMeeting : item)))
-                }
+                onEnabledChange={(nextMeeting, checked) => setPendingEnabledChange({ meeting: nextMeeting, checked })}
+                onChange={updateMeeting}
               />
             ))}
           </div>
         </div>
       </div>
+      <Modal
+        title={pendingEnabledChange?.checked ? "确认开启该会议？" : "确认关闭该会议？"}
+        open={Boolean(pendingEnabledChange)}
+        onOk={confirmPendingEnabledChange}
+        onCancel={() => setPendingEnabledChange(null)}
+        okText="确认"
+        cancelText="取消"
+        zIndex={2200}
+      >
+        {meetingEnabledChangeTip}
+      </Modal>
       <div className="submit-panel meeting-time-upload-panel">
         <div className="submit-panel-head">
           <div className="submit-panel-title">
@@ -1069,7 +1108,7 @@ export default function DueDrawer({
 
   useEffect(() => {
     if (progStatus) {
-      const stepStatus = String(progStatus) === "99999" ? "15000" : String(progStatus);
+      const stepStatus = String(progStatus);
       setCurrentStep(stepStatus);
       setInitStep(stepStatus);
       setFirstActiveKey(tabStatusMap[String(progStatus)] || "1");
@@ -1080,6 +1119,7 @@ export default function DueDrawer({
     const statusNumber = parseInt(progStatus);
     const tabKey = parseInt(key);
     return (
+      tabKey === 8 ||
       ((statusNumber === 12000 || statusNumber === 13000) && tabKey >= 2) ||
       (statusNumber === 14000 && tabKey >= 3) ||
       (statusNumber === 15000 && tabKey >= 4) ||
@@ -1256,6 +1296,15 @@ export default function DueDrawer({
           />
         ),
       },
+      {
+        label: (
+          <TabLabel active={firstActiveKey === "8"} disabled={false} stageKey="8">
+            结束
+          </TabLabel>
+        ),
+        key: "8",
+        children: <PlaceholderPanel title="流程已结束" />,
+      },
     ],
     [firstActiveKey, projectData, id, editStatus, progStatus, dutyUserName]
   );
@@ -1368,7 +1417,7 @@ export default function DueDrawer({
           </div>
         </div>
         <div className="new-sanhui-project-tabs">
-          {firstActiveKey !== "1" && (
+          {firstActiveKey !== "1" && firstActiveKey !== "8" && (
             <div className="new-sanhui-button-group">
               <Button type="primary" onClick={() => setFeedbackOpen(true)}>
                 董事反馈记录
@@ -1395,7 +1444,7 @@ export default function DueDrawer({
                 </Button>
                 <Button type="primary" onClick={() => setMeetingTimeDrawerOpen(true)}>
                   <span className="new-sanhui-action-title-with-help">
-                    会议时间
+                    修改会议信息
                     <Tooltip title={<div><div>1.审批层级到 科室经理</div><div>2.只有修改会议时间的时候才发起审批</div></div>}>
                       <QuestionCircleOutlined
                         className="new-sanhui-action-help-icon"

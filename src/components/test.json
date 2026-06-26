@@ -1,0 +1,1097 @@
+{
+	"success": true,
+	"code": 200,
+	"message": "操作成功",
+	"data": {
+		"commentList": [
+			{
+				"reviewUserId": "chenhao42",
+				"orgName": "综合管理部",
+				"coReviewId": "50035284b8d692558e216ce6ccafe49a",
+				"reviewComment": "同意",
+				"stepCode": "15300",
+				"reviewType": "2000",
+				"id": "d22795f6e623367465e8924ddc9df578",
+				"reviewOrgId": "10053781",
+				"stageCode": "15000"
+			},
+			{
+				"reviewUserId": "liuhongyan",
+				"orgName": "财务部",
+				"coReviewId": "50035284b8d692558e216ce6ccafe49a",
+				"reviewComment": "同意",
+				"stepCode": "15300",
+				"reviewType": "2000",
+				"id": "b196441615f1ea4cb8d918a610328e57",
+				"reviewOrgId": "10048032",
+				"stageCode": "15000"
+			}
+		],
+		"riskComment": "无",
+		"deptName": "股权运营部",
+		"reportFileList": [
+			{
+				"fileName": "富奥智能转向系统（长春）有限公司2026年第一次股东会决议.docx",
+				"updatedBy": "luzhengming",
+				"created": 1779322076000,
+				"aiAnalysisStatus": "1",
+				"delFlag": "0",
+				"version": 3,
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"createdBy": "hezhen",
+				"objectKey": "6a0e4ccde4b0d15acc361d4d.docx",
+				"fileCategory": "200",
+				"tenantId": "YQJT",
+				"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/6a0e4ccde4b0d15acc361d4d.docx",
+				"aiAnalysisResult": "已提取到关键信息并创建了1个议题",
+				"id": "3a7d2071dfe34ec56716a9db20ea4ec0",
+				"updated": 1779322287000,
+				"fileId": "3a7d2071dfe34ec56716a9db20ea4ec0"
+			},
+			{
+				"fileName": "第一届董事会第六次会议决议-会议日期2026.6.2.docx",
+				"updatedBy": "luzhengming",
+				"created": 1779322076000,
+				"aiAnalysisStatus": "1",
+				"delFlag": "0",
+				"version": 3,
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"createdBy": "hezhen",
+				"objectKey": "6a0e4cb2e4b0d15acc361d4c.docx",
+				"fileCategory": "200",
+				"tenantId": "YQJT",
+				"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/6a0e4cb2e4b0d15acc361d4c.docx",
+				"aiAnalysisResult": "已提取到关键信息并创建了1个议题",
+				"id": "6489e50047e13cbc07249a3a47643be1",
+				"updated": 1779322287000,
+				"fileId": "6489e50047e13cbc07249a3a47643be1"
+			},
+			{
+				"fileName": "第一届董事会第六次会议董事会材料-智能转向公司.pptx",
+				"updatedBy": "luzhengming",
+				"created": 1779322076000,
+				"aiAnalysisStatus": "1",
+				"delFlag": "0",
+				"version": 3,
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"createdBy": "hezhen",
+				"objectKey": "6a0e4cb9e4b06259cd204c1a.pptx",
+				"fileCategory": "200",
+				"tenantId": "YQJT",
+				"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/6a0e4cb9e4b06259cd204c1a.pptx",
+				"aiAnalysisResult": "已提取到关键信息并创建了1个议题",
+				"id": "c50a56feca2ad465b3c2f17e795c93f9",
+				"updated": 1779322288000,
+				"fileId": "c50a56feca2ad465b3c2f17e795c93f9"
+			},
+			{
+				"fileName": "2026年第一次股东会材料-智能转向公司.pptx",
+				"updatedBy": "luzhengming",
+				"created": 1779322076000,
+				"aiAnalysisStatus": "1",
+				"delFlag": "0",
+				"version": 3,
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"createdBy": "hezhen",
+				"objectKey": "6a0e4cd5e4b06259cd204c1b.pptx",
+				"fileCategory": "200",
+				"tenantId": "YQJT",
+				"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/6a0e4cd5e4b06259cd204c1b.pptx",
+				"aiAnalysisResult": "已提取到关键信息并创建了1个议题",
+				"id": "256ef8083babc4c8c8e2524e5f226156",
+				"updated": 1779322288000,
+				"fileId": "256ef8083babc4c8c8e2524e5f226156"
+			}
+		],
+		"lagelComment": "同意",
+		"auth": [],
+		"companyName": "富奥智能转向系统（长春）有限公司第一届董事会第六次会议、2026年第一次股东会的议案及表决建议",
+		"sanhuiVote": "",
+		"topicList": [
+			{
+				"categoryLv2Name": "5.1 董监高人员变更",
+				"eoSanhuiTopicScheduleFormList": [
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "1",
+						"createdBy": "hezhen",
+						"created": 1779322150000,
+						"sanhuiTopicId": "e075476d1b0eeb7999b2d266c84b6a73",
+						"tenantId": "YQJT",
+						"id": "4a53914525f605dd5955857ea89fb02a",
+						"meetingType": "100",
+						"updated": 1779322150000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "0",
+						"createdBy": "hezhen",
+						"created": 1779322150000,
+						"sanhuiTopicId": "e075476d1b0eeb7999b2d266c84b6a73",
+						"tenantId": "YQJT",
+						"id": "09e4734e4d78ede97c8f0c63fec29d0b",
+						"meetingType": "200",
+						"updated": 1779322150000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "0",
+						"createdBy": "hezhen",
+						"created": 1779322150000,
+						"sanhuiTopicId": "e075476d1b0eeb7999b2d266c84b6a73",
+						"tenantId": "YQJT",
+						"id": "d1581dd047c05712c5553aabd4600b24",
+						"meetingType": "300",
+						"updated": 1779322150000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					}
+				],
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"answerNum": 0,
+				"id": "e075476d1b0eeb7999b2d266c84b6a73",
+				"categoryLv1Name": "5. 人事类",
+				"categoryLv3Id": "6dbe5349abee4989941e829b9debd311",
+				"categoryLv2Id": "e5f67811b377459995cdebe3e4a676ef",
+				"categoryLv1Id": "d3b84fbb3d9043c1b2d4bd083ee89f45",
+				"orderNo": 1,
+				"updatedBy": "hezhen",
+				"toipcName": "公司总经理聘任的议案",
+				"created": 1779322150000,
+				"version": 24,
+				"reviewLevel": "3000",
+				"reviewLevel1": "3000",
+				"reviewLevel2": "3000",
+				"categoryLv3Name": "5.1.7 变更总经理",
+				"reviewLevel3": "3000",
+				"createdBy": "hezhen",
+				"tenantId": "YQJT",
+				"questionNum": 0,
+				"reviewLevel4": "3000",
+				"updated": 1779924855000,
+				"status": "2"
+			},
+			{
+				"categoryLv2Name": "3.2 年度决算",
+				"eoSanhuiTopicScheduleFormList": [
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "1",
+						"createdBy": "hezhen",
+						"created": 1779322178000,
+						"sanhuiTopicId": "24fa018511898c8906af3c14ececc265",
+						"tenantId": "YQJT",
+						"id": "d4a8cb55df8a85d878a92ca95b2e90a0",
+						"meetingType": "100",
+						"updated": 1779322178000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "0",
+						"createdBy": "hezhen",
+						"created": 1779322178000,
+						"sanhuiTopicId": "24fa018511898c8906af3c14ececc265",
+						"tenantId": "YQJT",
+						"id": "cd4513fd0ffb03a4521ae16dddbac837",
+						"meetingType": "200",
+						"updated": 1779322178000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "1",
+						"createdBy": "hezhen",
+						"created": 1779322178000,
+						"sanhuiTopicId": "24fa018511898c8906af3c14ececc265",
+						"tenantId": "YQJT",
+						"id": "e97b9945c78e8a95e72fc674d35b478b",
+						"meetingType": "300",
+						"updated": 1779322178000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					}
+				],
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"answerNum": 0,
+				"id": "24fa018511898c8906af3c14ececc265",
+				"categoryLv1Name": "3. 财务类",
+				"categoryLv3Id": "f5eb8617c4be4fd4b7f52b632b113a2b",
+				"categoryLv2Id": "bacb7076b96d4344a118c0d7e5bdb250",
+				"categoryLv1Id": "a98fa980c97e454584bbff3a59aea4b0",
+				"orderNo": 2,
+				"updatedBy": "hezhen",
+				"toipcName": "公司2025年财务决算的议案",
+				"created": 1779322178000,
+				"version": 24,
+				"reviewLevel": "2000",
+				"reviewLevel1": "2000",
+				"reviewLevel2": "2000",
+				"categoryLv3Name": "3.2.1 年度决算报告",
+				"reviewLevel3": "2000",
+				"createdBy": "hezhen",
+				"tenantId": "YQJT",
+				"questionNum": 0,
+				"reviewLevel4": "2000",
+				"updated": 1779924855000,
+				"status": "2"
+			},
+			{
+				"categoryLv2Name": "3.5 关联交易",
+				"eoSanhuiTopicScheduleFormList": [
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "1",
+						"createdBy": "hezhen",
+						"created": 1779322207000,
+						"sanhuiTopicId": "d32d2889b3b559d1afcb49717a32c45e",
+						"tenantId": "YQJT",
+						"id": "f00b585d39714d9192755321536aac0d",
+						"meetingType": "100",
+						"updated": 1779322207000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "0",
+						"createdBy": "hezhen",
+						"created": 1779322207000,
+						"sanhuiTopicId": "d32d2889b3b559d1afcb49717a32c45e",
+						"tenantId": "YQJT",
+						"id": "c16e7ce41aa97b045b084bd44bde2f4e",
+						"meetingType": "200",
+						"updated": 1779322207000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					},
+					{
+						"updatedBy": "hezhen",
+						"launchFlag": "1",
+						"createdBy": "hezhen",
+						"created": 1779322207000,
+						"sanhuiTopicId": "d32d2889b3b559d1afcb49717a32c45e",
+						"tenantId": "YQJT",
+						"id": "436a7e0608643b809bb21b88b817b271",
+						"meetingType": "300",
+						"updated": 1779322207000,
+						"version": 1,
+						"voteElusionFlag": "0"
+					}
+				],
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"answerNum": 0,
+				"id": "d32d2889b3b559d1afcb49717a32c45e",
+				"categoryLv1Name": "3. 财务类",
+				"categoryLv3Id": "a6e1c0b567864d988fff902ec67be0e2",
+				"categoryLv2Id": "5f26f4e8e3434d66a5a93698337218ec",
+				"categoryLv1Id": "a98fa980c97e454584bbff3a59aea4b0",
+				"orderNo": 3,
+				"updatedBy": "hezhen",
+				"toipcName": "公司2025年关联交易决算的议案",
+				"created": 1779322207000,
+				"version": 24,
+				"reviewLevel": "2000",
+				"reviewLevel1": "2000",
+				"reviewLevel2": "2000",
+				"categoryLv3Name": "3.5.2 日常关联交易及相关",
+				"reviewLevel3": "2000",
+				"createdBy": "hezhen",
+				"tenantId": "YQJT",
+				"questionNum": 0,
+				"reviewLevel4": "2000",
+				"updated": 1779924855000,
+				"status": "2"
+			}
+		],
+		"topicOpnList": [
+			{
+				"sanhuiTopicName": "公司总经理聘任的议案",
+				"orderNo": 1,
+				"coReviewId": "ef9ec4fa913ac7423af4b787b49f8317",
+				"voteAdvice": "1",
+				"voteAdvice100": "1",
+				"sanhuiTopicId": "e075476d1b0eeb7999b2d266c84b6a73",
+				"id": "74d1b41c67ab91e13ded166697efd0d2",
+				"meetingType": "100"
+			},
+			{
+				"sanhuiTopicName": "公司2025年财务决算的议案",
+				"orderNo": 2,
+				"coReviewId": "7f38f256b161dff7280fa15d22fdbaeb",
+				"voteAdvice": "1",
+				"voteAdvice100": "1",
+				"sanhuiTopicId": "24fa018511898c8906af3c14ececc265",
+				"voteAdvice300": "1",
+				"id": "0ade612e802c2d1fa18977542e2d83f1",
+				"meetingType": "100"
+			},
+			{
+				"sanhuiTopicName": "公司2025年关联交易决算的议案",
+				"orderNo": 3,
+				"coReviewId": "7f38f256b161dff7280fa15d22fdbaeb",
+				"voteAdvice": "1",
+				"voteAdvice100": "1",
+				"sanhuiTopicId": "d32d2889b3b559d1afcb49717a32c45e",
+				"voteAdvice300": "1",
+				"id": "7e65cc5cfafbfb25079f9a088f2926c8",
+				"meetingType": "100"
+			}
+		],
+		"isReviewPage": false,
+		"assessmentList": [
+			{
+				"commentList": "同意",
+				"topicImageList": [
+					{
+						"fileName": "介绍页-富奥转向_P1.png",
+						"orderNo": 4,
+						"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+						"objectKey": "6a177ef5e4b06259cd204cc2.png",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/6a177ef5e4b06259cd204cc2.png",
+						"id": "35734b3b096875510a2ef776e256de78",
+						"delFlag": "0",
+						"version": 1,
+						"fileType": "png",
+						"fileId": "35734b3b096875510a2ef776e256de78"
+					}
+				],
+				"topicName": "公司总经理聘任的议案",
+				"assessmentList": [
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20219;&#32844;&#36164;&#26684;&#65288;&#31105;&#27490;&#26465;&#27454;&#65289;1.&#20844;&#21496;&#27861;&#23545;&#33891;&#30417;&#39640;&#20219;&#32844;&#36164;&#26684;&#30340;&#31105;&#27490;&#26465;&#27454;2.&#19978;&#24066;&#20844;&#21496;&#24212;&#21521;&#35777;&#30417;&#20250;&#25552;&#20132;&#20219;&#32844;&#36164;&#26684;&#30003;&#35831;&#65292;&#26680;&#20934;&#20219;&#32844;&#36164;&#26684;&zwnj;3.&#19987;&#19994;&#39046;&#22495;&#35268;&#23450;&#30340;&#20219;&#32844;&#36164;&#26684;&#65288;&#22914;&#22522;&#37329;&#12289;&#20445;&#38505;&#12289;&#36130;&#21153;&#31867;&#20225;&#19994;&#65289;",
+							"orderNo": 1,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "外部管理规定",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "bbea7ebe05464d64bb951e0e0a06ec5e",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 3,
+						"updatedBy": "hezhen",
+						"created": 1779322544000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "bbea7ebe05464d64bb951e0e0a06ec5e",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"rowspan": 4,
+						"tenantId": "YQJT",
+						"id": "f5fe69862f50b38d58858fe37eb06c7c",
+						"assessmentId": "37a2872b4814568f21a7e6ca433f39b8",
+						"updated": 1779924855000,
+						"execDetail": "不涉及《公司法》第一百七十八条中的五种情形"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20844;&#21496;&#31456;&#31243;&#25110;&#20869;&#37096;&#31649;&#29702;&#21046;&#24230;&#35201;&#27714;1.&#25353;&#29031;&#20844;&#21496;&#31456;&#31243;&#30001;&#32929;&#19996;&#26041;&#25512;&#33616;&#32856;&#20219;2.&#25353;&#29031;&#20844;&#21496;&#31456;&#31243;&#30001;&#33891;&#20107;&#20250;&#32856;&#20219;3.&#25353;&#29031;&#24066;&#22330;&#21270;&#26426;&#21046;&#23545;&#22806;&#25307;&#32856;4.&#25353;&#29031;&#20844;&#21496;&#20154;&#25165;&#20648;&#22791;&#35745;&#21010;&#26187;&#21319;",
+							"orderNo": 2,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "内部管理规定",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "3beefac14ca3437da6b9b7ee157ae6fc",
+							"updated": 1750503931000
+						},
+						"updatedBy": "hezhen",
+						"created": 1779322544000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "3beefac14ca3437da6b9b7ee157ae6fc",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "043249f1e000651503d1274d0bd93edc",
+						"assessmentId": "37a2872b4814568f21a7e6ca433f39b8",
+						"updated": 1779924855000,
+						"execDetail": "符合《公司章程》第二十七条，总经理由富奥股份推荐，副总经理由一汽股权推荐，均由公司董事会聘任或解聘相关要求"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#22269;&#36164;&#25511;&#32929;&#32929;&#19996;&#35813;&#31867;&#20107;&#39033;&#31649;&#29702;&#35201;&#27714;",
+							"orderNo": 3,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;(&#25511;&#32929;&#26041;&#20026;&#27665;&#20225;&#25110;&#22806;&#20225;&#31561;&#26102;&#23646;&#20110;&#19981;&#28041;&#21450;)&#65292;&#36890;&#36807;;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "国资控股股东要求",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "62df4fd0c708434e920730ed60d73403",
+							"updated": 1750503931000
+						},
+						"updatedBy": "hezhen",
+						"created": 1779322544000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "62df4fd0c708434e920730ed60d73403",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "988ce45420dfd9209c4e1c6807593705",
+						"assessmentId": "37a2872b4814568f21a7e6ca433f39b8",
+						"updated": 1779924855000,
+						"execDetail": "5月15日，富奥公司向富奥转向发出〔2026〕函字3号《关于推荐撤回郝昕等任职的函》，推荐郝昕为公司总经理"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#26159;&#21542;&#25353;&#21046;&#24230;&#35201;&#27714;&#36827;&#34892;&#21069;&#32622;&#23457;&#35758;",
+							"orderNo": 4,
+							"updatedBy": "zhangwei108",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "程序合规",
+							"version": 1,
+							"assessElement": "审议程序",
+							"factorLv3Name": "合规性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "5ac287ddd61244e49b713b13ea9eca77",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322544000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "5ac287ddd61244e49b713b13ea9eca77",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "df1e1fb547186a2f5dd5b1a939c757c5",
+						"assessmentId": "37a2872b4814568f21a7e6ca433f39b8",
+						"updated": 1779924855000,
+						"execDetail": "不涉及"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#21253;&#25324;&#22522;&#26412;&#20449;&#24687;&#12289;&#24037;&#20316;&#32463;&#21382;&#31561;&#20449;&#24687;",
+							"orderNo": 5,
+							"updatedBy": "zhangwei108",
+							"factorLv1Score": "100",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#26377;&#31616;&#21382;&#65292;&#21253;&#21547;&#22522;&#26412;&#20449;&#24687;&#21644;&#24037;&#20316;&#32463;&#21382;&#20449;&#24687;&#65292;&#24471;100&#20998;&#65307;&#26377;&#31616;&#21382;&#65292;&#21482;&#26377;&#22522;&#26412;&#20449;&#24687;&#25110;&#24037;&#20316;&#32463;&#21382;&#20449;&#24687;&#65292;&#24471;80&#20998;&#65307;&#26080;&#31616;&#21382;&#65292;&#24471;0&#20998;",
+							"weight": {
+								"source": "40.000000",
+								"parsedValue": 40
+							},
+							"factorLv2Name": "人员简历",
+							"version": 1,
+							"assessElement": "全面性",
+							"factorLv3Name": "合理性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "fdbcf35e03db44aea1d2da5ae8ad155e",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322544000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "fdbcf35e03db44aea1d2da5ae8ad155e",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "40.00",
+							"parsedValue": 40
+						},
+						"createdBy": "hezhen",
+						"rowspan": 2,
+						"tenantId": "YQJT",
+						"id": "335eb7e40975522cb0de6dc095109911",
+						"assessmentId": "37a2872b4814568f21a7e6ca433f39b8",
+						"updated": 1779924855000,
+						"execDetail": "1.郝昕先生简历内容全面，满足要求<br/>2.郝昕先生，1986年11月出生，长春理工大学机械设计制造及其自动化，硕士研究生毕业。历任采埃孚富奥底盘技术（长春）有限公司工艺工程师、产品工程师、项目经理，富奥威泰克汽车底盘系统有限公司工程部业务主任、项目部部长、工程部部长、总经理助理，一汽光洋转向装置有限公司总经理助理，富奥捷太格特转向系统（长春）有限公司总经理助理"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#19982;&#21442;&#32929;&#20844;&#21496;&#19994;&#21153;&#30456;&#20851;&#30340;&#24037;&#20316;&#32463;&#21382;&#25110;&#19987;&#19994;&#32972;&#26223;",
+							"orderNo": 6,
+							"updatedBy": "zhangwei108",
+							"factorLv1Score": "100",
+							"modelId": "8ac82974b1d3417ba1dd4a8f25256f18",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#24230;&#39640;&#65292;&#24471;100&#20998;&#65307;&#31526;&#21512;&#24230;&#19968;&#33324;&#65292;&#24471;60&#20998;&#65307;&#31526;&#21512;&#24230;&#20302;&#65292;&#24471;40&#20998;&#65307;&#23436;&#25104;&#19981;&#31526;&#21512;&#65292;&#24471;0&#20998;",
+							"weight": {
+								"source": "60.000000",
+								"parsedValue": 60
+							},
+							"factorLv2Name": "岗位匹配",
+							"version": 1,
+							"assessElement": "符合性",
+							"factorLv3Name": "合理性",
+							"createdBy": "zhangwei108",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "0fe8e213666d4c4d81778c5128a0613a",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322544000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "0fe8e213666d4c4d81778c5128a0613a",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "60.00",
+							"parsedValue": 60
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "6f86cd3edb22c16584308017618b3f59",
+						"assessmentId": "37a2872b4814568f21a7e6ca433f39b8",
+						"updated": 1779924855000,
+						"execDetail": "郝昕先生先生具备丰富的底盘相关工艺开发、产品管理、项目管理、公司运营方面的工作经历，任职资格满足要求"
+					}
+				],
+				"title": "议题1:公司总经理聘任的议案",
+				"assessmentTotalScore": {
+					"source": "100.00",
+					"parsedValue": 100
+				},
+				"todoComment": "同意公司总经理聘任的议案",
+				"desc": ""
+			},
+			{
+				"commentList": "同意",
+				"topicImageList": [
+					{
+						"fileName": "介绍页-富奥转向_P2.png",
+						"orderNo": 1,
+						"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+						"objectKey": "6a154f72e4b0d15acc361dcc.png",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/6a154f72e4b0d15acc361dcc.png",
+						"id": "42c6d923bbd2da78ce825eded3841f2f",
+						"delFlag": "0",
+						"version": 6,
+						"fileType": "png",
+						"fileId": "42c6d923bbd2da78ce825eded3841f2f"
+					}
+				],
+				"topicName": "公司2025年财务决算的议案",
+				"assessmentList": [
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#23457;&#35745;&#25253;&#21578;&#24847;&#35265;",
+							"orderNo": 1,
+							"updatedBy": "guozhengbo",
+							"modelId": "2209122a52d644fd931abda1ee951b46",
+							"created": 1750503931000,
+							"assessRule": "&#20986;&#20855;&#26080;&#20445;&#30041;&#24847;&#35265;&#23457;&#35745;&#25253;&#21578;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "审计报告",
+							"factorLv3Name": "合规性",
+							"createdBy": "guozhengbo",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "e4298a9b7b374606be71a7584884937a",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322810000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "e4298a9b7b374606be71a7584884937a",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"rowspan": 2,
+						"tenantId": "YQJT",
+						"id": "ec5b8878623f37299be8523d2218c57c",
+						"assessmentId": "5232807d07b4e79435d854b28bc48733",
+						"updated": 1779924855000,
+						"execDetail": "信永中和出具无保留意见审计报告<br/>1.信永中和审计了富奥智能转向公司财务报表，包括2025年12月31日的合并及母公司资产负债表，2025年度的合并及母公司利润表、合并及母公司现金流量表、合并及母公司所有者权益变动表以及相关财务报表附注<br/>2.信用中和认为，后附的财务报表在所有重大方面按照企业会计准则的规定编制，公允反映了富奥智能转向公司2025年12月31日的财务状况以及2025年度的经营成果和现金流量"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#21442;&#32929;&#20844;&#21496;&#26159;&#21542;&#25353;&#21046;&#24230;&#35201;&#27714;&#36827;&#34892;&#21069;&#32622;&#23457;&#35758;",
+							"orderNo": 2,
+							"updatedBy": "guozhengbo",
+							"modelId": "2209122a52d644fd931abda1ee951b46",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "程序合规",
+							"version": 1,
+							"assessElement": "审议程序",
+							"factorLv3Name": "合规性",
+							"createdBy": "guozhengbo",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "9c770d0b093b40519e90a90c03a768cb",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322810000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "9c770d0b093b40519e90a90c03a768cb",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "9f839b0cf97895c6efb1409e0bcc0e3f",
+						"assessmentId": "5232807d07b4e79435d854b28bc48733",
+						"updated": 1779924855000,
+						"execDetail": "富奥智能转向公司已前置审议本议案"
+					}
+				],
+				"title": "议题2:公司2025年财务决算的议案",
+				"assessmentTotalScore": "通过",
+				"todoComment": "同意公司2025年财务决算的议案",
+				"desc": ""
+			},
+			{
+				"commentList": "同意",
+				"topicImageList": [
+					{
+						"fileName": "介绍页-富奥转向_P3.png",
+						"orderNo": 2,
+						"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+						"objectKey": "6a154f72e4b0d15acc361dcd.png",
+						"fileCategory": "上传补充说明材料",
+						"tenantId": "YQJT",
+						"fileUrl": "https://qxztpt-sc.obs.cn-northeast-204.faw.com.cn:443/6a154f72e4b0d15acc361dcd.png",
+						"id": "7c0d02f9dacfd8272e1c0b64cb0b44f4",
+						"delFlag": "0",
+						"version": 6,
+						"fileType": "png",
+						"fileId": "7c0d02f9dacfd8272e1c0b64cb0b44f4"
+					}
+				],
+				"topicName": "公司2025年关联交易决算的议案",
+				"assessmentList": [
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#26159;&#21542;&#31526;&#21512;&#21046;&#24230;&#35201;&#27714;&#65288;&#28041;&#21450;&#22269;&#26377;&#36164;&#20135;&#25110;&#19978;&#24066;&#20844;&#21496;&#30340;&#65292;&#38656;&#39069;&#22806;&#23653;&#34892;&#22269;&#36164;&#30417;&#31649;&#23457;&#25209;&#25110;&#35777;&#21048;&#20132;&#26131;&#25152;&#20107;&#21069;&#25259;&#38706;&#20041;&#21153;&#65289;",
+							"orderNo": 1,
+							"updatedBy": "taining",
+							"modelId": "a038ca2683594aef9aad4cdd36be9a35",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "上级文件要求",
+							"factorLv3Name": "合规性",
+							"createdBy": "taining",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "3676392267de446da83fcceae23c9902",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 3,
+						"updatedBy": "hezhen",
+						"created": 1779322875000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "3676392267de446da83fcceae23c9902",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"rowspan": 4,
+						"tenantId": "YQJT",
+						"id": "f7c980cd7bb5f4876259ea9525fe1292",
+						"assessmentId": "f96f21d54bf3968d371645bac6e66f66",
+						"updated": 1779924855000,
+						"execDetail": "符合要求"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20851;&#32852;&#20132;&#26131;&#20107;&#39033;&#26159;&#21542;&#36981;&#24490;&#20225;&#19994;&#20869;&#37096;&#21046;&#24230;&#35201;&#27714;",
+							"orderNo": 2,
+							"updatedBy": "taining",
+							"modelId": "a038ca2683594aef9aad4cdd36be9a35",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "内部控制要求",
+							"factorLv3Name": "合规性",
+							"createdBy": "taining",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "b6f39081270e4a71916077703983892f",
+							"updated": 1750503931000
+						},
+						"updatedBy": "hezhen",
+						"created": 1779322875000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "b6f39081270e4a71916077703983892f",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "8b32edf83444ec7383101fbf7a5f340e",
+						"assessmentId": "f96f21d54bf3968d371645bac6e66f66",
+						"updated": 1779924855000,
+						"execDetail": "满足《公司章程》第十九条股东会的审议事项：（八）审议年度管理交易预算方案、年度关联交易议案决算方案"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#22269;&#36164;&#25511;&#32929;&#32929;&#19996;&#35813;&#31867;&#20107;&#39033;&#31649;&#29702;&#35201;&#27714;",
+							"orderNo": 3,
+							"updatedBy": "taining",
+							"modelId": "a038ca2683594aef9aad4cdd36be9a35",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#25110;&#19981;&#28041;&#21450;(&#25511;&#32929;&#26041;&#20026;&#27665;&#20225;&#25110;&#22806;&#20225;&#31561;&#26102;&#23646;&#20110;&#19981;&#28041;&#21450;)&#65292;&#36890;&#36807;;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "实质合规",
+							"version": 1,
+							"assessElement": "国资控股股东要求",
+							"factorLv3Name": "合规性",
+							"createdBy": "taining",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "5b29546d3298482993c672ab7d326a26",
+							"updated": 1750503931000
+						},
+						"updatedBy": "hezhen",
+						"created": 1779322875000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "5b29546d3298482993c672ab7d326a26",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "eb31eca3695b33113895a886595e64d3",
+						"assessmentId": "f96f21d54bf3968d371645bac6e66f66",
+						"updated": 1779924855000,
+						"execDetail": "不涉及"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#26159;&#21542;&#25353;&#21046;&#24230;&#35201;&#27714;&#36827;&#34892;&#21069;&#32622;&#23457;&#35758;",
+							"orderNo": 4,
+							"updatedBy": "taining",
+							"modelId": "a038ca2683594aef9aad4cdd36be9a35",
+							"created": 1750503931000,
+							"assessRule": "&#31526;&#21512;&#35201;&#27714;&#65292;&#36890;&#36807;&#65307;&#19981;&#31526;&#21512;&#35201;&#27714;&#65292;&#21542;&#20915;&#35813;&#35758;&#26696;",
+							"factorLv2Name": "程序合规",
+							"version": 1,
+							"assessElement": "审议程序",
+							"factorLv3Name": "合规性",
+							"createdBy": "taining",
+							"tenantId": "YQJT",
+							"factorType": "2",
+							"id": "e6db80f866c2483bac0fd3f94ad4f443",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322875000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "e6db80f866c2483bac0fd3f94ad4f443",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "e70b8bb7442a8d5c8bc831384082d898",
+						"assessmentId": "f96f21d54bf3968d371645bac6e66f66",
+						"updated": 1779924855000,
+						"execDetail": "本议案已通过富奥智能转向公司审议"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#26159;&#21542;&#20026;&#29983;&#20135;&#32463;&#33829;&#21457;&#23637;&#38656;&#35201;&#30340;&#27491;&#24120;&#19994;&#21153;&#24448;&#26469;&#65288;&#21363;&#20132;&#26131;&#36923;&#36753;&#26159;&#21542;&#21512;&#29702;&#65289;",
+							"orderNo": 5,
+							"updatedBy": "taining",
+							"factorLv1Score": "100",
+							"modelId": "a038ca2683594aef9aad4cdd36be9a35",
+							"created": 1750503931000,
+							"assessRule": "&#26159;&#65292;&#24471;100&#20998;&#65307;&#21542;&#65292;0&#20998;",
+							"weight": {
+								"source": "30.000000",
+								"parsedValue": 30
+							},
+							"factorLv2Name": "必要性",
+							"version": 1,
+							"assessElement": "经营发展需要",
+							"factorLv3Name": "合理性",
+							"createdBy": "taining",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "1003dad1d21640dba589ef13d4a451b7",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322875000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "1003dad1d21640dba589ef13d4a451b7",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "30.00",
+							"parsedValue": 30
+						},
+						"createdBy": "hezhen",
+						"rowspan": 3,
+						"tenantId": "YQJT",
+						"id": "10c78563d1c4fe82446ff821d89f2491",
+						"assessmentId": "f96f21d54bf3968d371645bac6e66f66",
+						"updated": 1779924855000,
+						"execDetail": "1.向关联人采购商品/接受劳务，为向富奥公司支付管理服务费、IT服务费、SAP软件，购买原材料，与中国一汽关联方主要为支付产品相关索赔费用、支付管理费等<br/>2.向关联人销售商品/提供劳务，主要为向红旗、奔腾、一汽大众主机厂提供转向器总成，向富奥威泰克、大众平台件公司提供转向器总成，用于转向器与副车架间装配<br/>3.向关联人出租资产，为原属富奥捷太格特土地，目前用一汽大众、东机工员工停车，收取相应的租金<br/>4.向关联人承租资产，为上海子公司租用富奥智研（上海）汽车科技有限公司相关办公楼产生的费用<br/>5.上述业务，均为公司正常经营行为"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#26159;&#21542;&#26080;&#22833;&#20449;&#35760;&#24405;&#65292;&#26159;&#21542;&#27491;&#24120;&#22238;&#27454;",
+							"orderNo": 6,
+							"updatedBy": "taining",
+							"factorLv1Score": "100",
+							"modelId": "a038ca2683594aef9aad4cdd36be9a35",
+							"created": 1750503931000,
+							"assessRule": "&#26159;&#65292;&#24471;100&#20998;&#65307;&#21542;&#65292;0&#20998;",
+							"weight": {
+								"source": "30.000000",
+								"parsedValue": 30
+							},
+							"factorLv2Name": "履约能力",
+							"version": 1,
+							"assessElement": "信用情况",
+							"factorLv3Name": "合理性",
+							"createdBy": "taining",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "25711cae6086426b8c7a11bc1f5657ef",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322875000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "25711cae6086426b8c7a11bc1f5657ef",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "30.00",
+							"parsedValue": 30
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "356d12e88680a4bfe99d5e827c450103",
+						"assessmentId": "f96f21d54bf3968d371645bac6e66f66",
+						"updated": 1779924855000,
+						"execDetail": "富奥智能转向公司主要关联方富奥汽车零部件股份有限公司及控制的公司、中国一汽集团及控制的公司，目前均为正常存续公司，具备正常履约能力"
+					},
+					{
+						"sanhuiTopicModelFactorVo": {
+							"criterion": "&#20132;&#26131;&#23450;&#20215;&#21407;&#21017;&#26159;&#21542;&#36981;&#24490;&#33258;&#24895;&#12289;&#20844;&#24179;&#21512;&#29702;&#12289;&#21327;&#21830;&#19968;&#33268;",
+							"orderNo": 7,
+							"updatedBy": "taining",
+							"factorLv1Score": "100",
+							"modelId": "a038ca2683594aef9aad4cdd36be9a35",
+							"created": 1750503931000,
+							"assessRule": "&#26159;&#65292;&#24471;100&#20998;&#65307;&#21542;&#65292;0&#20998;",
+							"weight": {
+								"source": "40.000000",
+								"parsedValue": 40
+							},
+							"factorLv2Name": "公允性",
+							"version": 1,
+							"assessElement": "交易价格",
+							"factorLv3Name": "合理性",
+							"createdBy": "taining",
+							"tenantId": "YQJT",
+							"factorType": "1",
+							"id": "56a41259423c4f0cac41fba122990e78",
+							"updated": 1750503931000
+						},
+						"lv2RowSpan": 1,
+						"updatedBy": "hezhen",
+						"created": 1779322875000,
+						"ligh": "green2",
+						"version": 23,
+						"factorId": "56a41259423c4f0cac41fba122990e78",
+						"result": {
+							"source": "100.000000",
+							"parsedValue": 100
+						},
+						"assessResult": {
+							"source": "40.00",
+							"parsedValue": 40
+						},
+						"createdBy": "hezhen",
+						"tenantId": "YQJT",
+						"id": "d4a678047a8e87c415391fa2e039e713",
+						"assessmentId": "f96f21d54bf3968d371645bac6e66f66",
+						"updated": 1779924855000,
+						"execDetail": "上述业务，均遵循市场定价原则"
+					}
+				],
+				"title": "议题3:公司2025年关联交易决算的议案",
+				"assessmentTotalScore": {
+					"source": "100.00",
+					"parsedValue": 100
+				},
+				"todoComment": "同意公司2025年关联交易决算的议案",
+				"desc": ""
+			}
+		],
+		"meetingInfo": [
+			{
+				"convener": "",
+				"attendee": "",
+				"updatedBy": "hezhen",
+				"created": 1779322424000,
+				"meetingTypeName": "董事会",
+				"meetingType": "100",
+				"version": 1,
+				"launchTime": 1780360234000,
+				"launchTimeStr": "2026年06月02日",
+				"meetingName": "富奥智能转向系统（长春）有限公司第一届董事会第六次会议",
+				"launchFlag": true,
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"createdBy": "hezhen",
+				"tenantId": "YQJT",
+				"location": "",
+				"id": "5c359ea6f43f7e5191588dc926e679fc",
+				"updated": 1779322424000,
+				"notifyDate": 1779120000000,
+				"launchType": "1",
+				"launchTypeName": "现场召开",
+				"status": "1"
+			},
+			{
+				"convener": "",
+				"attendee": "",
+				"updatedBy": "hezhen",
+				"created": 1779322424000,
+				"meetingTypeName": "股东会/投委会",
+				"meetingType": "300",
+				"version": 1,
+				"launchTimeStr": "",
+				"meetingName": "富奥智能转向系统（长春）有限公司2026年第一次股东会",
+				"launchFlag": true,
+				"sanhuiMgmtId": "50035284b8d692558e216ce6ccafe49a",
+				"createdBy": "hezhen",
+				"tenantId": "YQJT",
+				"id": "b1b9a885430fa67e1d243b412a082282",
+				"updated": 1779322424000,
+				"notifyDate": 1780329600000,
+				"launchType": "2",
+				"launchTypeName": "通讯表决",
+				"status": "1"
+			}
+		],
+		"desc": "如董事会对以下议案的决议内容无修改，则董事会表决意见在股东大会上进行表决"
+	},
+	"msgType": "I",
+	"errType": "N",
+	"errMsg": null,
+	"errCode": "YQJT0IGQ-0207_MSA_001N50200"
+}

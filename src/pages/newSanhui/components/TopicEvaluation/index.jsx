@@ -1,8 +1,9 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Button, Drawer, Form, Input, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, message } from "antd";
+import { Button, Drawer, Form, Input, Modal, Popconfirm, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, message } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import getBySanhuiMgmtIdResponse from "../../mock/data/evaluation/getBySanhuiMgmtId.json";
+import JointReviewFeedback from "../JointReviewFeedback";
 import { MaterialPreparePanel } from "../CompanyReview";
 import EvaluationDetail from "./EvaluationDetail";
 import styles from "./index.module.css";
@@ -151,8 +152,29 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
     });
   };
 
+  const drawerTitle = mode === "edit" ? "编辑议题" : "新增议题";
   return (
-    <Drawer title={mode === "edit" ? "编辑议题" : "新增议题"} width={960} open={open} onClose={onClose} destroyOnClose>
+    <Drawer
+      title={(
+        <span className={styles.topicEditDrawerTitle}>
+          {drawerTitle}
+          <Tooltip title="1.删除回避表决">
+            <QuestionCircleOutlined className={styles.topicEditTitleHelp} />
+          </Tooltip>
+        </span>
+      )}
+      width={960}
+      open={open}
+      onClose={onClose}
+      destroyOnClose
+      className={styles.topicEditDrawerShell}
+      footer={(
+        <div className={styles.topicEditDrawerFooter}>
+          <Button onClick={onClose}>取消</Button>
+          <Button type="primary" onClick={handleSave}>保存</Button>
+        </div>
+      )}
+    >
       <div className={styles.topicEditDrawer}>
         <Form
           form={form}
@@ -168,33 +190,22 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
             planTopicFlag: "0",
           }}
         >
-          <div className={styles.topicEditSectionTitle}>基本信息</div>
-          <div className={styles.topicEditGrid}>
+          <div className={styles.topicEditHero}>
+            <div>
+              <div className={styles.topicEditHeroTitle}>{mode === "edit" ? "维护议题信息" : "创建一条新议题"}</div>
+              <div className={styles.topicEditHeroDesc}>补全议题基础信息、参会范围和审批分类后，可继续进入评估批注。</div>
+            </div>
+            <Tag color={mode === "edit" ? "processing" : "success"}>{mode === "edit" ? "编辑" : "新增"}</Tag>
+          </div>
+
+          <div className={styles.topicEditBlock}>
+            <div className={styles.topicEditSectionTitle}>基础信息</div>
+            <div className={`${styles.topicEditGrid} ${styles.topicEditGridPrimary}`}>
             <Form.Item label="前序审核（由集团/股权公司总办会/党委会等已审批通过）" name="needPreAudit" rules={[{ required: true, message: "请选择" }]}>
               <Select placeholder="请选择" options={[{ label: "有", value: "1" }, { label: "无", value: "0" }]} />
             </Form.Item>
             <Form.Item label="议题名称" name="topicName" rules={[{ required: true, message: "请输入" }]}>
               <Input placeholder="请输入" />
-            </Form.Item>
-            <Form.Item className={styles.topicEditSwitchItem} label="参会审议">
-              <div className={styles.topicEditSwitchGroup}>
-                <span>董事会</span>
-                <Form.Item name="boardMeeting" valuePropName="checked" noStyle><Switch /></Form.Item>
-                <span>监事会</span>
-                <Form.Item name="supervisorMeeting" valuePropName="checked" noStyle><Switch /></Form.Item>
-                <span>股东会</span>
-                <Form.Item name="shareholderMeeting" valuePropName="checked" noStyle><Switch /></Form.Item>
-              </div>
-            </Form.Item>
-            <Form.Item className={styles.topicEditSwitchItem} label="回避表决">
-              <div className={styles.topicEditSwitchGroup}>
-                <span>董事会</span>
-                <Form.Item name="boardBack" valuePropName="checked" noStyle><Switch /></Form.Item>
-                <span>监事会</span>
-                <Form.Item name="supervisorBack" valuePropName="checked" noStyle><Switch /></Form.Item>
-                <span>股东会</span>
-                <Form.Item name="shareholderBack" valuePropName="checked" noStyle><Switch /></Form.Item>
-              </div>
             </Form.Item>
             <Form.Item label="计划议题" name="planTopicFlag" rules={[{ required: true, message: "请选择是否计划议题" }]}>
               <Radio.Group options={[{ label: "是", value: "1" }, { label: "否", value: "0" }]} onChange={(event) => {
@@ -206,6 +217,28 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
             <Form.Item label="关联计划议题（以备证计划议题被提报）" name="planItemName">
               <Input.Search placeholder="请选择关联的计划议题" enterButton disabled={planTopicFlag !== "1"} />
             </Form.Item>
+            </div>
+          </div>
+
+          <div className={styles.topicEditBlock}>
+            <div className={styles.topicEditSectionTitle}>会议属性</div>
+            <div className={styles.topicEditSwitchCard}>
+            <Form.Item className={styles.topicEditSwitchItem} label="参会审议">
+              <div className={styles.topicEditSwitchGroup}>
+                <span>董事会</span>
+                <Form.Item name="boardMeeting" valuePropName="checked" noStyle><Switch /></Form.Item>
+                <span>监事会</span>
+                <Form.Item name="supervisorMeeting" valuePropName="checked" noStyle><Switch /></Form.Item>
+                <span>股东会</span>
+                <Form.Item name="shareholderMeeting" valuePropName="checked" noStyle><Switch /></Form.Item>
+              </div>
+            </Form.Item>
+            </div>
+          </div>
+
+          <div className={styles.topicEditBlock}>
+            <div className={styles.topicEditSectionTitle}>分类与审批</div>
+            <div className={styles.topicEditGrid}>
             <Form.Item label="议题分类（大）" name="categoryMain" rules={[{ required: true, message: "请选择" }]}>
               <Select placeholder="请选择" allowClear options={categoryOptions.lv1} onChange={handleLevel1Change} />
             </Form.Item>
@@ -218,13 +251,7 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
             <Form.Item label="审批层级" name="approvalLevel" rules={[{ required: true, message: "请选择" }]}>
               <Select placeholder="请选择" allowClear options={reviewLevelOptions} />
             </Form.Item>
-          </div>
-          <div className={styles.topicEditSectionTitle}>相关附件</div>
-          <div className={styles.topicEditAttachmentTip}>AI已经帮您选择了认为相关的文档，如有遗漏请补充选择！</div>
-          <div className={styles.topicEditFooter}>
-            <Button onClick={() => message.info("当前为本地假数据演示，未接入材料补充页面")}>补充汇报材料</Button>
-            <Button onClick={() => message.info("当前为本地假数据预览")}>预览</Button>
-            <Button type="primary" onClick={handleSave}>保存</Button>
+            </div>
           </div>
         </Form>
       </div>
@@ -234,6 +261,7 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
 
 export default function TopicEvaluation({ projectData, onClose }) {
   const navigate = useNavigate();
+  const [jointFeedbackOpen, setJointFeedbackOpen] = useState(false);
   const [topics, setTopics] = useState(() => createInitialTopics(projectData));
   const [completed, setCompleted] = useState(false);
   const [activeTopic, setActiveTopic] = useState(null);
@@ -267,6 +295,10 @@ export default function TopicEvaluation({ projectData, onClose }) {
       }));
     });
   };
+  const removeTopic = (record) => {
+    setTopics((current) => current.filter((item) => item.id !== record.id));
+    message.success("删除成功");
+  };
 
   const finishEvaluation = () => {
     setCompleted(true);
@@ -297,6 +329,8 @@ export default function TopicEvaluation({ projectData, onClose }) {
     setEditingTopic(null);
     message.success("保存成功");
   };
+
+  const orderedTopics = useMemo(() => sortTopics(topics), [topics]);
 
   const columns = useMemo(() => [
     {
@@ -363,20 +397,21 @@ export default function TopicEvaluation({ projectData, onClose }) {
     },
     {
       title: "操作",
-      width: 210,
+      width: 260,
       fixed: "right",
-      render: (_, record) => (
-        <Space>
+      render: (_, record, index) => (
+        <Space className={styles.tableActions} size={4}>
           <Button type="link" onClick={() => setActiveTopic(record)}>评估</Button>
           <Button type="link" onClick={() => openEditTopic(record)}>编辑</Button>
-          <Button type="link" onClick={() => moveTopic(record, "up")}>上移</Button>
-          <Button type="link" onClick={() => moveTopic(record, "down")}>下移</Button>
+          <Button type="link" disabled={index === 0} onClick={() => moveTopic(record, "up")}>上移</Button>
+          <Button type="link" disabled={index === orderedTopics.length - 1} onClick={() => moveTopic(record, "down")}>下移</Button>
+          <Popconfirm title="是否确定删除这条数据?" okText="确定" cancelText="取消" onConfirm={() => removeTopic(record)}>
+            <Button type="link" danger>删除</Button>
+          </Popconfirm>
         </Space>
       ),
     },
-  ], [completed]);
-
-  const orderedTopics = useMemo(() => sortTopics(topics), [topics]);
+  ], [completed, orderedTopics.length]);
 
   const evaluationContent = (
     <div className={styles.page}>
@@ -397,7 +432,7 @@ export default function TopicEvaluation({ projectData, onClose }) {
             pagination={false}
             columns={columns}
             dataSource={orderedTopics}
-            scroll={{ x: 1220 }}
+            scroll={{ x: 1270 }}
           />
         </div>
         <div className={styles.footer}>
@@ -423,34 +458,52 @@ export default function TopicEvaluation({ projectData, onClose }) {
   );
 
   return (
-    <Tabs
-      className={styles.tabs}
-      defaultActiveKey="annotation"
-      items={[
-        {
-          key: "annotation",
-          label: "评估批注",
-          children: evaluationContent,
-        },
-        {
-          key: "materialPrepare",
-          label: (
-            <span className={styles.tabHelpLabel}>
-              审批材料准备
-              <Tooltip title="1.【议题审核】-->【审批材料准备】移入到【议题评估中】">
-                <QuestionCircleOutlined className={styles.tabHelpIcon} />
-              </Tooltip>
-            </span>
+    <>
+      <Tabs
+        className={styles.tabs}
+        defaultActiveKey="annotation"
+        tabBarExtraContent={{
+          right: (
+            <Button type="primary" onClick={() => setJointFeedbackOpen(true)}>
+              联审部门反馈
+            </Button>
           ),
-          children: (
-            <MaterialPreparePanel
-              isEdit
-              submitButtonText="提交"
-              onSubmitSuccess={() => navigate("/GztHome")}
-            />
-          ),
-        },
-      ]}
-    />
+        }}
+        items={[
+          {
+            key: "annotation",
+            label: "评估批注",
+            children: evaluationContent,
+          },
+          {
+            key: "materialPrepare",
+            label: (
+              <span className={styles.tabHelpLabel}>
+                审批材料准备
+                <Tooltip title="1.【议题审核】-->【审批材料准备】移入到【议题评估中】">
+                  <QuestionCircleOutlined className={styles.tabHelpIcon} />
+                </Tooltip>
+              </span>
+            ),
+            children: (
+              <MaterialPreparePanel
+                isEdit
+                submitButtonText="提交"
+                onSubmitSuccess={() => navigate("/GztHome")}
+              />
+            ),
+          },
+        ]}
+      />
+      <Modal
+        title="联审部门反馈"
+        open={jointFeedbackOpen}
+        width={1120}
+        footer={null}
+        onCancel={() => setJointFeedbackOpen(false)}
+      >
+        <JointReviewFeedback isEdit />
+      </Modal>
+    </>
   );
 }

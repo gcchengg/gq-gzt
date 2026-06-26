@@ -137,6 +137,41 @@
   padding-inline: 4px;
 }
 
+.submit-topic-actions {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  min-width: 196px;
+  padding: 2px 4px;
+  border: 1px solid #e6eaf2;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.submit-topic-actions .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  min-width: 44px;
+  padding: 0 6px;
+  border-radius: 5px;
+  color: #445066;
+}
+
+.submit-topic-actions .ant-btn:not(:disabled):hover {
+  background: #eaf1ff;
+  color: #1d4ed8;
+}
+
+.submit-topic-actions .ant-btn-dangerous:not(:disabled):hover {
+  background: #fff1f0;
+  color: #d4380d;
+}
+
+.submit-topic-actions .ant-btn:disabled {
+  color: #b8c0cc;
+}
+
 .submit-panel {
   overflow: hidden;
   border: 1px solid #e7ebf3;
@@ -216,13 +251,68 @@
   justify-content: flex-end;
 }
 
+.topic-edit-drawer-shell .ant-drawer-body {
+  background: #f6f8fb;
+}
+
+.topic-edit-drawer-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topic-edit-title-help {
+  color: #8a94a6;
+  font-size: 14px;
+  cursor: help;
+}
+
+.topic-edit-title-help:hover {
+  color: #1d4ed8;
+}
+
 .topic-edit-drawer {
-  padding-bottom: 24px;
+  display: grid;
+  gap: 14px;
+  padding-bottom: 8px;
+}
+
+.topic-edit-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid #dbe5f4;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.topic-edit-hero-title {
+  color: #1f2533;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 26px;
+}
+
+.topic-edit-hero-desc {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.topic-edit-block {
+  padding: 16px 16px 2px;
+  border: 1px solid #e3e8f1;
+  border-radius: 8px;
+  background: #fff;
 }
 
 .topic-edit-section-title {
   position: relative;
-  margin: 2px 0 14px;
+  margin: 0 0 14px;
   padding-left: 10px;
   color: #262629;
   font-size: 16px;
@@ -244,35 +334,60 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 18px;
-  margin-bottom: 18px;
+}
+
+.topic-edit-grid-primary {
+  grid-template-columns: minmax(240px, 0.8fr) minmax(320px, 1.2fr);
+}
+
+.topic-edit-grid .ant-form-item {
+  margin-bottom: 16px;
 }
 
 .topic-edit-switch-item .ant-form-item-control-input-content {
   min-height: 32px;
 }
 
-.topic-edit-switch-group {
+.topic-edit-switch-card {
   display: grid;
-  grid-template-columns: auto 44px auto 44px auto 44px;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  padding-bottom: 14px;
+}
+
+.topic-edit-switch-card .ant-form-item {
+  margin-bottom: 0;
+  padding: 12px;
+  border: 1px solid #edf1f7;
+  border-radius: 8px;
+  background: #fbfcff;
+}
+
+.topic-edit-switch-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
   align-items: center;
   min-height: 32px;
 }
 
-.topic-edit-attachment-tip {
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border: 1px solid #ffe3c2;
-  border-radius: 8px;
-  background: #fff8f0;
-  color: #ff7d00;
+.topic-edit-switch-group > span {
+  color: #303848;
+  font-weight: 500;
 }
 
-.topic-edit-footer {
+.topic-edit-switch-group .ant-switch {
+  margin-right: 18px;
+}
+
+.topic-edit-switch-group .ant-switch:last-child {
+  margin-right: 0;
+}
+
+.topic-edit-drawer-footer {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 18px;
 }
 
 .meeting-grid {
@@ -382,6 +497,34 @@
   margin-right: 5px;
   border-radius: 50%;
   background: currentColor;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.distribution-task-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 9px 12px;
+  border: 1px solid #cfe0ff;
+  border-radius: 8px;
+  background: #f5f8ff;
+  color: #355075;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.distribution-task-tip-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1d4ed8;
   color: #fff;
   font-size: 12px;
   font-weight: 700;

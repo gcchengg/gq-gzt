@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import companyReviewDetailResponse from "../mock/data/companyReview/threeListDetail.json";
 import filesReplaceResponse from "../mock/data/companyReview/filesReplace.json";
 import questionListResponse from "../mock/data/companyReview/questionList.json";
-import topicApprovalResponse from "../mock/data/companyReview/topicApproval.json";
 import reviewMaterialDataResponse from "../mock/data/companyReview/reviewMaterialData.json";
 import votePersonSelectResponse from "../mock/data/companyReview/votePersonSelect.json";
 import generatePdfResponse from "../mock/data/companyReview/generatePdf.json";
@@ -14,6 +13,8 @@ import getCompanyIdResponse from "../mock/data/companyReview/getCompanyId.json";
 import topicOADetailResponse from "../mock/data/companyReview/topicOADetail.json";
 import meetingDecisionResponse from "../mock/data/companyReview/meetingDecision.json";
 import approvalDemoPdfUrl from "../mock/data/companyReview/Document.pdf?url";
+import JointReviewFeedback from "./JointReviewFeedback";
+import { EvaluationPreview, SupplementMaterials } from "./TopicEvaluation/EvaluationMaterials";
 import "./CompanyReview.css";
 const tabLabels = [
     { key: "2", label: "前置任务确认" },
@@ -25,14 +26,16 @@ const tabLabels = [
 ];
 const initialFiles = filesReplaceResponse.data;
 const initialQuestions = questionListResponse.data.list;
-const initialPreTasks = topicApprovalResponse.data;
 const initialMaterialPrepare = reviewMaterialDataResponse.data;
 const meetingDecisionVoteOptions = [
     { label: "同意", value: "1" },
     { label: "反对", value: "0" },
     { label: "有条件同意", value: "2" },
-    { label: "回避表决", value: "-1" },
 ];
+const normalizeDecisionRows = (rows = []) => rows.map((item) => ({
+    ...item,
+    voteAdvice: item.avoidVoteFlag === "1" ? "" : item.voteAdvice,
+}));
 function ReviewHeader({ projectData }) {
     return (<Card className="review-summary" size="small">
       <Descriptions size="small" column={3}>
@@ -404,45 +407,16 @@ function QuestionsPanel({ isEdit, onCountChange, }) {
       </Modal>
     </div>);
 }
-function TopicApprovalPanel({ isEdit, setActiveKey, }) {
-    const [rows, setRows] = useState(initialPreTasks);
-    const columns = [
-        { title: "序号", width: 64, render: (_value, _row, index) => index + 1 },
-        { title: "任务名称", dataIndex: "taskName" },
-        { title: "相关部门", dataIndex: "deptName" },
-        { title: "执行人", dataIndex: "executor" },
-        {
-            title: "状态",
-            dataIndex: "status",
-            render: (value, row) => (<Tag color={value === "1" ? "success" : "warning"} onClick={() => {
-                    if (!isEdit || value === "1")
-                        return;
-                    setRows((current) => current.map((item) => (item.id === row.id ? { ...item, status: "1" } : item)));
-                }}>
-          {value === "1" ? "完成" : "未完成"}
-        </Tag>),
-        },
-    ];
-    const hasUnfinished = rows.some((item) => item.status === "0");
-    return (<div className="review-panel">
-      <div className="review-warning">
-        以下列表中所有的前置任务都完成后才能进行议题审核，请联系各个任务的执行人尽快完成前置任务！
-      </div>
-      <Table rowKey="id" columns={columns} dataSource={rows} pagination={false} size="small"/>
-      {isEdit ? (<div className="review-footer">
-          <Button type="primary" disabled={hasUnfinished} onClick={() => setActiveKey("4")}>
-            下一步
-          </Button>
-        </div>) : null}
-    </div>);
+function TopicApprovalPanel({ isEdit }) {
+    return <JointReviewFeedback isEdit={isEdit}/>;
 }
 export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, submitButtonText = "下一步", afterContent }) {
     const [form] = Form.useForm();
     const materialData = initialMaterialPrepare;
     const [loading, setLoading] = useState(false);
-    const [tableData, setTableData] = useState(materialData.opnFormMap?.["100"] || []);
-    const [tableData1, setTableData1] = useState(materialData.opnFormMap?.["200"] || []);
-    const [tableData2, setTableData2] = useState(materialData.opnFormMap?.["300"] || []);
+    const [tableData, setTableData] = useState(() => normalizeDecisionRows(materialData.opnFormMap?.["100"] || []));
+    const [tableData1, setTableData1] = useState(() => normalizeDecisionRows(materialData.opnFormMap?.["200"] || []));
+    const [tableData2, setTableData2] = useState(() => normalizeDecisionRows(materialData.opnFormMap?.["300"] || []));
     const [proposalList, setProposalList] = useState(materialData.proposalList || []);
     const [pdfUrl, setPdfUrl] = useState(() => ({
         1000: approvalDemoPdfUrl,
@@ -510,7 +484,7 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
         setter((current) => current.map((item) => (item.id === record.id ? { ...item, voteAdvice: value } : item)));
     };
     const updateAvoidVote = (record, value, setter) => {
-        setter((current) => current.map((item) => (item.id === record.id ? { ...item, avoidVoteFlag: value } : item)));
+        setter((current) => current.map((item) => (item.id === record.id ? { ...item, avoidVoteFlag: value, voteAdvice: value === "1" ? "" : item.voteAdvice } : item)));
     };
     const updateMgmtComment = (record, value, setter) => {
         setter((current) => current.map((item) => (item.id === record.id ? { ...item, mgmtComment: value } : item)));
@@ -518,7 +492,7 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
     const changeTotalValue = (score, proposalName) => {
         const nextVote = score >= 80 ? "1" : score >= 60 ? "2" : "0";
         [setTableData, setTableData1, setTableData2].forEach((setter) => {
-            setter((current) => current.map((item) => item.sanhuiTopicName === proposalName ? { ...item, voteAdvice: nextVote } : item));
+            setter((current) => current.map((item) => item.sanhuiTopicName === proposalName && item.avoidVoteFlag !== "1" ? { ...item, voteAdvice: nextVote } : item));
         });
     };
     const updateProposal = (proposalId, updater) => {
@@ -612,12 +586,14 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
             title: "表决意见",
             dataIndex: "voteAdvice",
             width: 180,
-            render: (value, record) => (<Select value={value} disabled={!isEdit} style={{ width: "100%" }} onChange={(nextValue) => updateVoteAdvice(record, nextValue, setter)} options={[
+            render: (value, record) => {
+                const isAvoidVote = record.avoidVoteFlag === "1";
+                return (<Select value={isAvoidVote ? undefined : value || undefined} disabled={!isEdit || isAvoidVote} style={{ width: "100%" }} onChange={(nextValue) => updateVoteAdvice(record, nextValue, setter)} options={[
                     { label: "通过", value: "1" },
                     { label: "通过（附管理意见）", value: "2" },
                     { label: "不通过", value: "0" },
-                    { label: "回避表决", value: "-1" },
-                ]}/>),
+                ]}/>);
+            },
         },
         {
             title: "管理建议",
@@ -695,12 +671,18 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
         const total = hasDisqualified || !hasValidFactors ? (hasDisqualified ? 0 : 100) : Number(tableList.filter((item) => item.sanhuiTopicModelFactorVo?.factorType !== "2").reduce((sum, item) => sum + (Number(item.sanhuiTopicModelFactorVo?.weight) * Number(item.excludeFlag === "1" ? 0 : item.assessResult || 0)) / 100, 0).toFixed(2));
         return (<div className="scoreTable" key={scoreData.id || scoreIndex}>
           <div className="questions-title table-title">
-            <span className="title-text">议题名称:</span>
+            <span className="proposal-index-badge">{scoreIndex + 1}</span>
+            <span className="title-text review-tab-label-with-help">
+              议题名称:
+              <Tooltip title="1.这里不让删除议题了">
+                <QuestionCircleOutlined className="review-tab-help-icon" />
+              </Tooltip>
+            </span>
             <Input className="proposal-name" disabled={!isEdit} value={scoreData.proposalName} onChange={(event) => updateProposal(scoreData.id, (draft) => ({ ...draft, proposalName: event.target.value }))}/>
-            <Button danger disabled={!isEdit} onClick={() => {
+            {/* <Button danger disabled={!isEdit} onClick={() => {
                 setProposalList((current) => current.filter((item) => item.id !== scoreData.id));
                 message.success("删除成功");
-            }}>删除议题</Button>
+            }}>删除议题</Button> */}
           </div>
           <div className="img-wraper">
             <span className="img-title-text">补充汇报材料</span>
@@ -794,26 +776,8 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
         </>}>
         {pdfUrl[currentPreviewType] ? (<iframe title={previewTitleMap[currentPreviewType]} src={pdfUrl[currentPreviewType]} width="100%" height="100%"/>) : (<div>正在生成...</div>)}
       </Modal>
-      <Modal title="材料预览" open={!!previewTopic} onCancel={() => setPreviewTopic(null)} footer={null} width="80%">
-        <Table rowKey="id" bordered pagination={false} columns={[
-            { title: "序号", render: (_value, _record, index) => index + 1, width: 64 },
-            { title: "评价要素", render: (_value, record) => record.sanhuiTopicModelFactorVo?.assessElement },
-            { title: "执行情况", dataIndex: "execDetail" },
-            { title: "评价结果", dataIndex: "assessResult", width: 120 },
-        ]} dataSource={previewTopic?.topicAssesList || []}/>
-      </Modal>
-      <Modal title="补充汇报材料" open={!!materialOpen} onCancel={() => setMaterialOpen(null)} footer={null} width="70%">
-        <Upload.Dragger disabled={!isEdit} showUploadList beforeUpload={(file) => {
-            updateProposal(materialOpen.id, (draft) => ({
-                ...draft,
-                materialFileList: [...(draft.materialFileList || []), { fileName: file.name, fileUrl: URL.createObjectURL(file) }],
-            }));
-            message.success("补充汇报材料成功");
-            return false;
-        }}>
-          <p className="ant-upload-text">点击或拖拽文件到此处上传</p>
-        </Upload.Dragger>
-      </Modal>
+      <EvaluationPreview open={Boolean(previewTopic)} topic={previewTopic} onClose={() => setPreviewTopic(null)} />
+      <SupplementMaterials open={Boolean(materialOpen)} onClose={() => setMaterialOpen(null)} />
     </div>);
 }
 function MinistryMeetingPanel({ isEdit }) {
@@ -898,11 +862,33 @@ function TopicApprovalFlowPanel({ projectId, isEdit, onClosed, setActiveKey, inv
         2000: "分管领导审批",
         3000: "总办会审批",
     };
+    const fileNameMap = {
+        1000: "业务总监审批议题材料.pdf",
+        2000: "分管领导审批议题材料.pdf",
+        3000: "总办会审批议题材料.pdf",
+    };
+    const reviewFileKeys = ["1000", "2000", "3000"].filter((key) => pdfCurrentList.includes(key));
     const normalizeUploadList = (list = []) => list.map((file) => ({
         uid: file.uid || file.fileUrl || file.url || file.name || file.fileName,
         name: file.name || file.fileName,
         url: file.url || file.fileUrl,
     }));
+    const generateReviewFile = (key) => {
+        const fileName = fileNameMap[key];
+        setFileList((current) => ({
+            ...current,
+            [key]: [
+                {
+                    uid: `generated-${key}-${Date.now()}`,
+                    name: fileName,
+                    fileName,
+                    url: `/mock-pdf/generated-${key}.pdf`,
+                    fileUrl: `/mock-pdf/generated-${key}.pdf`,
+                },
+            ],
+        }));
+        message.success(`${fileTypeMap[key]}材料已${(fileList[key] || []).length ? "重新" : ""}生成`);
+    };
     const addUploadFile = (setter, file) => {
         const objectUrl = URL.createObjectURL(file);
         setter((current) => [
@@ -972,7 +958,11 @@ function TopicApprovalFlowPanel({ projectId, isEdit, onClosed, setActiveKey, inv
         setLargeFlag(data.thImptLargeFlag || "1");
         setInfoData(data);
         setSaveId(data.id);
-        setFileList(data.reviewMapFileList || {});
+        setFileList({
+            1000: [],
+            2000: data.reviewMapFileList?.["2000"] || [],
+            3000: data.reviewMapFileList?.["3000"] || [],
+        });
         setFileImgList(data.decisionRequestScreenshotFile || []);
     }, []);
     return (<div className="tabs2-container tabs-container-sanhui">
@@ -1058,8 +1048,16 @@ function TopicApprovalFlowPanel({ projectId, isEdit, onClosed, setActiveKey, inv
                   <span>2、会议材料中如涉及插入附件，需将附件单独上传</span>
                 </div>
                 <div className="file-listWrap">
-                  {Object.keys(fileList || {}).map((key) => (<div key={key}>
-                      <div className="file-upload-item">{fileTypeMap[key]}</div>
+                  {reviewFileKeys.map((key) => {
+                    const currentFiles = fileList[key] || [];
+                    const hasFile = currentFiles.length > 0;
+                    return (<div key={key}>
+                      <div className="file-upload-item">
+                        <span>{fileTypeMap[key]}</span>
+                        <Button size="small" type="primary" ghost loading={loading} onClick={() => generateReviewFile(key)}>
+                          {hasFile ? "重新生成" : "生成"}
+                        </Button>
+                      </div>
                       <Upload disabled={!isShow} fileList={normalizeUploadList(fileList[key])} beforeUpload={(file) => {
                 addReviewFile(key, file);
                 return false;
@@ -1071,7 +1069,8 @@ function TopicApprovalFlowPanel({ projectId, isEdit, onClosed, setActiveKey, inv
             }}>
                         <Button icon={<UploadOutlined />}>上传文件</Button>
                       </Upload>
-                    </div>))}
+                    </div>);
+                  })}
                 </div>
               </Form.Item>
               <Form.Item label="提请决策事项" name="applDecisionItem">
@@ -1139,6 +1138,24 @@ function JointOpinionTable({ isEdit }) {
     ];
     return <Table rowKey="id" columns={columns} dataSource={rows} pagination={false} className="table-tabs1 joint-opinion-table" bordered/>;
 }
+function RiskComplianceOpinions() {
+    const rows = [
+        {
+            title: "风控合规审核意见",
+            content: "经审核，本议题决策依据、审批路径及材料完整性基本符合公司治理要求；建议在提交正式审批前补充交易对手资信复核记录，并同步完善资金回收节点责任分工。",
+        },
+        {
+            title: "风控合规风险提示应对建议",
+            content: "请重点关注退出协议履约、资金到账进度及信息披露一致性风险；建议设置阶段性跟踪台账，明确异常情况升级汇报机制，并在会后形成风险闭环记录。",
+        },
+    ];
+    return (<div className="risk-compliance-opinions">
+      {rows.map((item) => (<div className="risk-compliance-card" key={item.title}>
+          <div className="risk-compliance-title">{item.title}</div>
+          <div className="risk-compliance-content">{item.content}</div>
+        </div>))}
+    </div>);
+}
 function JointOpinionPanel({ isEdit, setActiveKey, }) {
     return (<div className="joint-review-layout tabs2-container tabs-container-sanhui">
       <div className="joint-review-left">
@@ -1148,6 +1165,7 @@ function JointOpinionPanel({ isEdit, setActiveKey, }) {
               <span className="title-dot"/>
               <span className="title-text">相关部门意见</span>
             </div>
+            <RiskComplianceOpinions />
             <JointOpinionTable isEdit={isEdit}/>
           </div>
           <div className="joint-material-section">
@@ -1160,11 +1178,29 @@ function JointOpinionPanel({ isEdit, setActiveKey, }) {
 }
 function AfterMeetingReplacementApplication({ isEdit }) {
     const [form] = Form.useForm();
+    const [directorFinalFiles, setDirectorFinalFiles] = useState([
+        {
+            uid: "director-final-001",
+            name: "总监审批文件终板.pdf",
+            fileName: "总监审批文件终板.pdf",
+            url: "/mock-pdf/director-final.pdf",
+            fileUrl: "/mock-pdf/director-final.pdf",
+        },
+    ]);
+    const [leaderFinalFiles, setLeaderFinalFiles] = useState([
+        {
+            uid: "leader-final-001",
+            name: "分管领导审批文件终板.pdf",
+            fileName: "分管领导审批文件终板.pdf",
+            url: "/mock-pdf/leader-final.pdf",
+            fileUrl: "/mock-pdf/leader-final.pdf",
+        },
+    ]);
     const [fileList, setFileList] = useState([
         {
             uid: "after-meeting-file-001",
-            name: "会后材料替换申请附件.pdf",
-            fileName: "会后材料替换申请附件.pdf",
+            name: "总办会决策文件.pdf",
+            fileName: "总办会决策文件.pdf",
         },
     ]);
     const userOptions = (votePersonSelectResponse.data || []).map((item) => ({
@@ -1176,6 +1212,62 @@ function AfterMeetingReplacementApplication({ isEdit }) {
         name: file.name || file.fileName,
         url: file.url || file.fileUrl,
     }));
+    const addArchiveFile = (setter, file) => {
+        const objectUrl = URL.createObjectURL(file);
+        setter((current) => [
+            ...current,
+            {
+                uid: file.uid,
+                name: file.name,
+                fileName: file.name,
+                url: objectUrl,
+                fileUrl: objectUrl,
+            },
+        ]);
+    };
+    const removeArchiveFile = (setter, file) => {
+        setter((current) => current.filter((item) => (item.uid || item.fileUrl || item.url || item.name || item.fileName) !== file.uid));
+    };
+    const regenerateArchiveFile = (setter, label, fileName, fileUrl) => {
+        setter([
+            {
+                uid: `${label}-${Date.now()}`,
+                name: fileName,
+                fileName,
+                url: fileUrl,
+                fileUrl,
+            },
+        ]);
+        message.success(`${label}已重新生成`);
+    };
+    const renderArchiveUpload = ({ label, files, setter, fileName, fileUrl }) => {
+        return (
+            <div className="after-meeting-archive-card">
+              <div className="after-meeting-file-action">
+                <span className="after-meeting-file-label">
+                  {label}
+                  <Tooltip title="如果页面信息发生变化需重新生成">
+                    <QuestionCircleOutlined className="review-tab-help-icon" />
+                  </Tooltip>
+                </span>
+                <Button size="small" type="primary" ghost disabled={!isEdit} onClick={() => regenerateArchiveFile(setter, label, fileName, fileUrl)}>
+                  重新生成
+                </Button>
+              </div>
+              <Upload
+                disabled={!isEdit}
+                fileList={normalizeUploadList(files)}
+                beforeUpload={(file) => {
+                    addArchiveFile(setter, file);
+                    return false;
+                }}
+                onRemove={(file) => removeArchiveFile(setter, file)}
+              >
+                <Button icon={<UploadOutlined />}>上传文件</Button>
+              </Upload>
+            </div>
+        );
+    };
     const initialValues = {
         topic: "关于推进基金退出事项的议案",
         applUserName: "张明",
@@ -1186,6 +1278,22 @@ function AfterMeetingReplacementApplication({ isEdit }) {
         planMinute: 20,
     };
     return (<div className="after-meeting-application">
+      <div className="after-meeting-archive-section">
+        {renderArchiveUpload({
+            label: "总监审批文件终板归档",
+            files: directorFinalFiles,
+            setter: setDirectorFinalFiles,
+            fileName: "总监审批文件终板.pdf",
+            fileUrl: "/mock-pdf/director-final.pdf",
+        })}
+        {renderArchiveUpload({
+            label: "分管领导审批文件终板归档",
+            files: leaderFinalFiles,
+            setter: setLeaderFinalFiles,
+            fileName: "分管领导审批文件终板.pdf",
+            fileUrl: "/mock-pdf/leader-final.pdf",
+        })}
+      </div>
       <div className="questions-title table-title">
         <span className="title-dot"/>
         <span className="title-text">会后材料替换申请</span>
@@ -1222,21 +1330,22 @@ function AfterMeetingReplacementApplication({ isEdit }) {
               <span>1、所有材料均需解密后上传会议系统</span>
               <span>2、会议材料中如涉及插入附件，需将附件单独上传</span>
             </div>
+            <div className="after-meeting-file-action">
+              <span className="after-meeting-file-label">
+                总办会决策文件
+                <Tooltip title="如果页面信息发生变化需重新生成">
+                  <QuestionCircleOutlined className="review-tab-help-icon" />
+                </Tooltip>
+              </span>
+              <Button size="small" type="primary" ghost disabled={!isEdit} onClick={() => regenerateArchiveFile(setFileList, "总办会决策文件", "总办会决策文件.pdf", "/mock-pdf/after-meeting-replacement.pdf")}>
+                重新生成
+              </Button>
+            </div>
             <Upload disabled={!isEdit} fileList={normalizeUploadList(fileList)} beforeUpload={(file) => {
-            const objectUrl = URL.createObjectURL(file);
-            setFileList((current) => [
-                ...current,
-                {
-                    uid: file.uid,
-                    name: file.name,
-                    fileName: file.name,
-                    url: objectUrl,
-                    fileUrl: objectUrl,
-                },
-            ]);
+            addArchiveFile(setFileList, file);
             return false;
         }} onRemove={(file) => {
-            setFileList((current) => current.filter((item) => (item.uid || item.fileUrl || item.url || item.name || item.fileName) !== file.uid));
+            removeArchiveFile(setFileList, file);
         }}>
               <Button icon={<UploadOutlined />}>上传文件</Button>
             </Upload>
@@ -1524,8 +1633,8 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
             key: "7",
             label: (
                 <span className="review-tab-label-with-help">
-                  投资决策结果
-                  <Tooltip title="1.董事会 监事会 股东会/投委会 都要填写各自的表决建议 2.增加期数 3.总办会会议纪要-->投资决策结果">
+                  股权公司决策结果
+                  <Tooltip title="1.董事会 监事会 股东会/投委会 都要填写各自的表决建议 2.增加期数 3.总办会会议纪要-->股权公司决策结果">
                     <QuestionCircleOutlined className="review-tab-help-icon" onClick={(event) => event.stopPropagation()}/>
                   </Tooltip>
                 </span>

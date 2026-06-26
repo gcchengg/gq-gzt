@@ -45,7 +45,7 @@ export default function EvaluationDetail({ open, topic, onClose }) {
 
   const opinionPane = (
     <div className={styles.gztOpinionLayout}>
-      <EvaluationModelScore hideModelAction />
+      <EvaluationModelScore hideModelAction showAiEvaluation />
 
       <section className={styles.gztOpinionTableWrap}>
         <div className={styles.gztOpinionSectionTitle}>董监高意见</div>
@@ -77,12 +77,18 @@ export default function EvaluationDetail({ open, topic, onClose }) {
       <section className={styles.gztOpinionFormCard}>
         <div className={`${styles.gztOpinionSectionTitle} ${styles.gztOpinionSummaryTitle}`}>综合意见</div>
         <div className={styles.gztOpinionForm}>
-          <div className={styles.requiredLabel}>综合意见</div>
+          <div className={`${styles.requiredLabel} ${styles.requiredHelpLabel}`}>
+            综合意见
+            <Tooltip title="1.增加回避表决">
+              <QuestionCircleOutlined className={styles.tabHelpIcon} />
+            </Tooltip>
+          </div>
           <Radio.Group value={overallOpinion} onChange={(event) => setOverallOpinion(event.target.value)}>
             <Space direction="vertical">
               <Radio value="agree">同意</Radio>
-              <Radio value="conditional">有条件同意（附管理建议）</Radio>
-              <Radio value="disagree">不同意</Radio>
+              <Radio value="conditional">有条件同意</Radio>
+              <Radio value="disagree">反对</Radio>
+              <Radio value="disagree1">回避表决</Radio>
             </Space>
           </Radio.Group>
           <div className={styles.gztOpinionTextareaLabel}>管理建议</div>
@@ -145,6 +151,7 @@ export default function EvaluationDetail({ open, topic, onClose }) {
         open={Boolean(pdfEditor)}
         fileName={pdfEditor?.fileName}
         mode={pdfEditor?.mode}
+        showNeedReply={false}
         onClose={() => setPdfEditor(null)}
       />
       <SupplementMaterials open={supplementOpen} onClose={() => setSupplementOpen(false)} />
