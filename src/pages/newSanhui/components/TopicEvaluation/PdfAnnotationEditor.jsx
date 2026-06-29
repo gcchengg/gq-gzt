@@ -1,4 +1,4 @@
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, QuestionCircleOutlined, StarFilled, StarOutlined } from "@ant-design/icons";
 import {
     Button,
     Input,
@@ -6,10 +6,10 @@ import {
     Pagination,
     Radio,
     Space,
-    Switch,
+    Tooltip,
     message,
 } from "antd";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import "./PdfAnnotationEditor.css";
 
@@ -33,7 +33,7 @@ const pdfFiles = [
 ];
 
 const seedAnnotations = [
-    { id: "area-1", page: 1, type: "框选批注", rect: { left: 49, top: 51, width: 43, height: 20 }, content: "关键净值与拆除费用表格区域，需要在评估前补充附件来源说明。", author: "郑华峰 2025-06-21 19:05" },
+    { id: "area-1", page: 1, type: "框选批注", rect: { left: 49, top: 51, width: 43, height: 20 }, content: "关键净值与拆除费用表格区域，需要在评估前补充附件来源说明。", author: "郑华峰 2025-06-21 19:05", favorite: true },
     { id: "text-1", page: 1, type: "文字选择", textKey: "asset-status", content: "确认“无法再使用”的判断依据是否需要补充现场照片或附表说明。", author: "吴文君 2025-06-21 19:08" },
     { id: "discussion-1", page: 2, type: "文字选择", textKey: "asset-status", content: "建议在董事会审议前完成净值口径、处置价格依据及资产完备性说明的补充标注，并同步形成任务清单。", author: "系统预置 2026-05-15 18:06", discussion: [
         "吴文君：建议补充现场照片作为支撑，避免判断只停留在文字描述。",
@@ -84,6 +84,7 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     const [drawingRect, setDrawingRect] = useState(null);
     const [screenshotPages, setScreenshotPages] = useState(() => readScreenshotPages());
     const [annotationPage, setAnnotationPage] = useState(1);
+    const [annotationFavoriteOnly, setAnnotationFavoriteOnly] = useState(false);
     const pageRef = useRef(null);
     const drawStartRef = useRef(null);
 
@@ -94,8 +95,16 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     }), [annotations, scope]);
     const activePage = visiblePages.find((page) => page.page === currentPage) || visiblePages[0] || pages[0];
     const activeAnnotations = annotations.filter((item) => item.page === activePage.page);
-    const pagedAnnotations = activeAnnotations.slice((annotationPage - 1) * 5, annotationPage * 5);
+    const filteredAnnotations = annotationFavoriteOnly ? activeAnnotations.filter((item) => item.favorite) : activeAnnotations;
+    const pagedAnnotations = filteredAnnotations.slice((annotationPage - 1) * 5, annotationPage * 5);
     const isAnnotationScreenshotPage = screenshotPages[activeFile]?.includes(activePage.page);
+
+    useEffect(() => {
+        const maxPage = Math.max(Math.ceil(filteredAnnotations.length / 5), 1);
+        if (annotationPage > maxPage) {
+            setAnnotationPage(maxPage);
+        }
+    }, [annotationPage, filteredAnnotations.length]);
 
     const selectPage = (page) => {
         setCurrentPage(page.page);
@@ -188,6 +197,9 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
             : item));
         setReply("");
         setReplyingId(null);
+    };
+    const toggleAnnotationFavorite = (id) => {
+        setAnnotations((current) => current.map((item) => item.id === id ? { ...item, favorite: !item.favorite } : item));
     };
     const toggleAnnotationScreenshotPage = (checked) => {
         setScreenshotPages((current) => {
@@ -412,10 +424,27 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                             </div>
                             <button className="pdf-page-nav-btn" type="button" disabled={activePage.page === visiblePages.at(-1)?.page} onClick={() => shiftPage(1)}>下一页</button>
                             {mode !== "associate" ? (
-                                <label className="pdf-page-screenshot-switch">
-                                    汇报材料页收藏
-                                    <Switch size="small" checked={isAnnotationScreenshotPage} onChange={toggleAnnotationScreenshotPage} />
-                                </label>
+                                <div className="pdf-page-screenshot-action">
+                                    <button
+                                      className={`pdf-page-screenshot-btn ${isAnnotationScreenshotPage ? "active" : ""}`}
+                                      type="button"
+                                      aria-pressed={isAnnotationScreenshotPage}
+                                      onClick={() => toggleAnnotationScreenshotPage(!isAnnotationScreenshotPage)}
+                                    >
+                                      {isAnnotationScreenshotPage ? <StarFilled /> : <StarOutlined />}
+                                      {isAnnotationScreenshotPage ? "已收藏为汇报材料页" : "收藏为汇报材料页"}
+                                    </button>
+                                    <Tooltip
+                                      title="如果批注列表发生变化，需要重新收藏截图，确保汇报材料页同步最新批注。"
+                                      placement="top"
+                                      zIndex={10090}
+                                      getPopupContainer={() => document.body}
+                                    >
+                                      <span className="pdf-page-screenshot-tip" tabIndex={0} aria-label="汇报材料页收藏提示">
+                                        <QuestionCircleOutlined />
+                                      </span>
+                                    </Tooltip>
+                                </div>
                             ) : null}
                         </div>
 
@@ -424,6 +453,31 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                         <div className="pdf-side-head">
                             <div className="pdf-side-title">{mode === "associate" ? "关联项列表" : "批注列表"}</div>
                             <div className="pdf-side-actions">
+                                {mode !== "associate" ? (
+                                    <div className="pdf-annotation-filter" aria-label="批注收藏过滤">
+                                        <button
+                                            className={!annotationFavoriteOnly ? "active" : ""}
+                                            type="button"
+                                            onClick={() => {
+                                                setAnnotationFavoriteOnly(false);
+                                                setAnnotationPage(1);
+                                            }}
+                                        >
+                                            全部
+                                        </button>
+                                        <button
+                                            className={annotationFavoriteOnly ? "active" : ""}
+                                            type="button"
+                                            onClick={() => {
+                                                setAnnotationFavoriteOnly(true);
+                                                setAnnotationPage(1);
+                                            }}
+                                        >
+                                            <StarFilled />
+                                            已收藏
+                                        </button>
+                                    </div>
+                                ) : null}
                                 {mode !== "associate" ? <Button type="primary" icon={<PlusOutlined />} onClick={() => armCreation(markMode)}>新增</Button> : null}
                             </div>
                         </div>
@@ -437,6 +491,15 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                                             <span className="pdf-tag pdf-tag-type">{item.type}</span>
                                             {item.needReply ? <span className="pdf-tag pdf-tag-thread">需协同回复</span> : null}
                                         </div>
+                                        <button
+                                            className={`pdf-task-favorite ${item.favorite ? "active" : ""}`}
+                                            type="button"
+                                            aria-label={item.favorite ? "取消收藏批注" : "收藏批注"}
+                                            aria-pressed={Boolean(item.favorite)}
+                                            onClick={() => toggleAnnotationFavorite(item.id)}
+                                        >
+                                            {item.favorite ? <StarFilled /> : <StarOutlined />}
+                                        </button>
                                     </div>
                                     <div className="pdf-task-main">{item.content}</div>
                                     {(item.discussion || []).length ? (
@@ -471,15 +534,15 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                                     </div>
                                 </article>
                             ))}
-                            {!activeAnnotations.length ? <div className="pdf-empty-annotations">本页暂无批注</div> : null}
+                            {!filteredAnnotations.length ? <div className="pdf-empty-annotations">{annotationFavoriteOnly ? "本页暂无收藏批注" : "本页暂无批注"}</div> : null}
                           </div>
-                          {activeAnnotations.length > 5 ? (
+                          {filteredAnnotations.length > 5 ? (
                             <Pagination
                                 className="pdf-task-pagination"
                                 size="small"
                                 current={annotationPage}
                                 pageSize={5}
-                                total={activeAnnotations.length}
+                                total={filteredAnnotations.length}
                                 onChange={setAnnotationPage}
                             />
                           ) : null}

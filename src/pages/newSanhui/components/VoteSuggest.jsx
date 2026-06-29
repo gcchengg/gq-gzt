@@ -22,7 +22,6 @@ function VoteResult({ enabled, result, elusion }) {
       <span className={isOpposed ? "vote-suggest-result-no" : "vote-suggest-result-yes"}>
         {resultText[result] || "-"}
       </span>
-      {elusion === "1" ? <span>（回避表决）</span> : null}
     </>
   );
 }

@@ -344,6 +344,7 @@ const meetingReviewOptions = [
   { label: "同意", value: "1" },
   { label: "反对", value: "0" },
   { label: "有条件同意", value: "2" },
+  { label: "回避表决", value: "-1" },
 ];
 
 const meetingUserOptions = [
