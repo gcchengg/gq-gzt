@@ -26,13 +26,15 @@ const normalizePath = (path = "") => {
 };
 
 const getPathOnly = (path = "") => path.split("?")[0];
+const isShelllessPath = (path = "") => path === "/ai-pricing";
 
-const flattenMenus = (menus = []) => menus.flatMap((item) => {
-  if (Array.isArray(item.children) && item.children.length) {
-    return flattenMenus(item.children);
-  }
-  return [{ ...item, key: normalizePath(item.key) }];
-});
+const flattenMenus = (menus = []) =>
+  menus.flatMap((item) => {
+    if (Array.isArray(item.children) && item.children.length) {
+      return flattenMenus(item.children);
+    }
+    return [{ ...item, key: normalizePath(item.key) }];
+  });
 
 const findParentKeys = (menus = [], activePath = "", parents = []) => {
   for (const item of menus) {
@@ -57,7 +59,8 @@ function createMenuItems(menus = []) {
     .filter((item) => !item.hideInMenu)
     .map((item) => {
       const path = normalizePath(item.key);
-      const hasChildren = Array.isArray(item.children) && item.children.length > 0;
+      const hasChildren =
+        Array.isArray(item.children) && item.children.length > 0;
 
       if (hasChildren) {
         return {
@@ -79,18 +82,26 @@ export default function AppShell() {
   const { pathname, search } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [role, setRole] = useState("manager");
-  const [sanhuiDetailContext, setSanhuiDetailContext] = useState({ open: false, record: null });
+  const [sanhuiDetailContext, setSanhuiDetailContext] = useState({
+    open: false,
+    record: null,
+  });
   const fullPath = pathname + search;
+  const isShelllessPage = isShelllessPath(pathname);
 
   const menuItems = useMemo(() => createMenuItems(webmenu), []);
   const leafMenus = useMemo(() => flattenMenus(webmenu), []);
 
   const selectedKey = useMemo(() => {
-    const matched = leafMenus.find((item) => getPathOnly(item.key) === pathname);
+    const matched = leafMenus.find(
+      (item) => getPathOnly(item.key) === pathname,
+    );
     return matched?.key || pathname;
   }, [leafMenus, pathname]);
 
-  const [openKeys, setOpenKeys] = useState(() => findParentKeys(webmenu, fullPath) || []);
+  const [openKeys, setOpenKeys] = useState(
+    () => findParentKeys(webmenu, fullPath) || [],
+  );
 
   useEffect(() => {
     if (!collapsed) {
@@ -103,9 +114,15 @@ export default function AppShell() {
       setSanhuiDetailContext(event.detail || { open: false, record: null });
     };
 
-    window.addEventListener("gq:sanhui-detail-context", handleSanhuiDetailContext);
+    window.addEventListener(
+      "gq:sanhui-detail-context",
+      handleSanhuiDetailContext,
+    );
     return () => {
-      window.removeEventListener("gq:sanhui-detail-context", handleSanhuiDetailContext);
+      window.removeEventListener(
+        "gq:sanhui-detail-context",
+        handleSanhuiDetailContext,
+      );
     };
   }, []);
 
@@ -115,9 +132,17 @@ export default function AppShell() {
     }
   }, [pathname, sanhuiDetailContext.open]);
 
+  if (isShelllessPage) {
+    return <Outlet />;
+  }
+
   return (
     <div className="gq-app-shell">
-      <aside className={["gq-app-sidebar", collapsed ? "is-collapsed" : ""].join(" ")}>
+      <aside
+        className={["gq-app-sidebar", collapsed ? "is-collapsed" : ""].join(
+          " ",
+        )}
+      >
         <div className="gq-app-brand">
           <div className="gq-app-brand-mark">GQ</div>
           {!collapsed ? (
@@ -138,7 +163,9 @@ export default function AppShell() {
         />
 
         <div className="gq-app-role-switch">
-          {!collapsed ? <div className="gq-app-role-title">角色选择</div> : null}
+          {!collapsed ? (
+            <div className="gq-app-role-title">角色选择</div>
+          ) : null}
           <Radio.Group
             className="gq-app-role-radio"
             optionType="button"

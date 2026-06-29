@@ -13,6 +13,7 @@ const TopicAdviceMobile = lazy(() => import("@/pages/topicAdviceMobile"));
 const DdMsgMobile = lazy(() => import("@/pages/ddmsgMobile"));
 const FollowUp = lazy(() => import("@/pages/followUp"));
 const AssignFollowTask = lazy(() => import("@/pages/assignFollowTask"));
+const AiPricing = lazy(() => import("@/pages/aiPricing"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
   {
@@ -132,6 +133,14 @@ export const routes = [
     element: (
       <Suspense>
         <AssignFollowTask />
+      </Suspense>
+    ),
+  },
+  {
+    path: "ai-pricing",
+    element: (
+      <Suspense>
+        <AiPricing />
       </Suspense>
     ),
   },
