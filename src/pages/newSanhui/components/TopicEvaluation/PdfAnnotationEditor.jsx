@@ -603,7 +603,7 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                         aria-expanded={factorTableOpen}
                         onPointerDown={startFactorButtonDrag}
                     >
-                        评价要素
+                        评估模型
                     </button>
                     {factorTableOpen ? (
                         <div className="pdf-factor-panel">
