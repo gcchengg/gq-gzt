@@ -173,8 +173,8 @@ export default function AppShell() {
             value={role}
             onChange={(event) => setRole(event.target.value)}
             options={[
+              { label: collapsed ? "股" : "股权管理者", value: "director" },
               { label: collapsed ? "管" : "管户", value: "manager" },
-              { label: collapsed ? "总" : "总监", value: "director" },
             ]}
           />
         </div>

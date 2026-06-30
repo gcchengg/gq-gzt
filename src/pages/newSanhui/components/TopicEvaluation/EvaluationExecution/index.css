@@ -99,6 +99,13 @@
   color: #a0a9b8;
 }
 
+.gzt-eval-rule-ellipsis {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .gzt-eval-table-actions {
   display: inline-flex;
   flex-wrap: nowrap;

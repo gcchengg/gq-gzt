@@ -6,11 +6,13 @@ import {
     Pagination,
     Radio,
     Space,
+    Table,
     Tooltip,
     message,
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { evaluationData, evaluationRelationColumns } from "./EvaluationExecution";
 import "./PdfAnnotationEditor.css";
 
 const pages = [
@@ -85,8 +87,11 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     const [screenshotPages, setScreenshotPages] = useState(() => readScreenshotPages());
     const [annotationPage, setAnnotationPage] = useState(1);
     const [annotationFavoriteOnly, setAnnotationFavoriteOnly] = useState(false);
+    const [factorTableOpen, setFactorTableOpen] = useState(false);
+    const [factorButtonPosition, setFactorButtonPosition] = useState({ x: 32, y: 116 });
     const pageRef = useRef(null);
     const drawStartRef = useRef(null);
+    const factorDragRef = useRef(null);
 
     const visiblePages = useMemo(() => pages.filter((page) => {
         if (scope === "existing") return page.annotated || annotations.some((item) => item.page === page.page);
@@ -105,6 +110,45 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
             setAnnotationPage(maxPage);
         }
     }, [annotationPage, filteredAnnotations.length]);
+
+    useEffect(() => {
+        if (!open) return undefined;
+        const handlePointerMove = (event) => {
+            const drag = factorDragRef.current;
+            if (!drag) return;
+            const nextX = Math.min(Math.max(event.clientX - drag.offsetX, 16), window.innerWidth - 148);
+            const nextY = Math.min(Math.max(event.clientY - drag.offsetY, 84), window.innerHeight - 76);
+            if (Math.abs(nextX - drag.startX) > 3 || Math.abs(nextY - drag.startY) > 3) {
+                drag.moved = true;
+            }
+            setFactorButtonPosition({ x: nextX, y: nextY });
+        };
+        const handlePointerUp = () => {
+            const drag = factorDragRef.current;
+            if (!drag) return;
+            factorDragRef.current = null;
+            if (!drag.moved) {
+                setFactorTableOpen((value) => !value);
+            }
+        };
+        window.addEventListener("pointermove", handlePointerMove);
+        window.addEventListener("pointerup", handlePointerUp);
+        return () => {
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+        };
+    }, [open]);
+
+    const startFactorButtonDrag = (event) => {
+        event.preventDefault();
+        factorDragRef.current = {
+            offsetX: event.clientX - factorButtonPosition.x,
+            offsetY: event.clientY - factorButtonPosition.y,
+            startX: factorButtonPosition.x,
+            startY: factorButtonPosition.y,
+            moved: false,
+        };
+    };
 
     const selectPage = (page) => {
         setCurrentPage(page.page);
@@ -548,6 +592,32 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                           ) : null}
                         </div>
                     </aside>
+                </div>
+                <div
+                    className="pdf-factor-floating"
+                    style={{ left: factorButtonPosition.x, top: factorButtonPosition.y }}
+                >
+                    <button
+                        className={`pdf-factor-toggle ${factorTableOpen ? "active" : ""}`}
+                        type="button"
+                        aria-expanded={factorTableOpen}
+                        onPointerDown={startFactorButtonDrag}
+                    >
+                        评价要素
+                    </button>
+                    {factorTableOpen ? (
+                        <div className="pdf-factor-panel">
+                            <Table
+                                rowKey="key"
+                                size="small"
+                                bordered
+                                pagination={false}
+                                dataSource={evaluationData}
+                                columns={evaluationRelationColumns}
+                                scroll={{ x: 810, y: 280 }}
+                            />
+                        </div>
+                    ) : null}
                 </div>
                 <div className={`pdf-compare-overlay ${compareOpen ? "open" : ""}`} aria-hidden={!compareOpen}>
                     <button className="pdf-compare-mask" type="button" aria-label="关闭文件对比" onClick={() => setCompareOpen(false)} />

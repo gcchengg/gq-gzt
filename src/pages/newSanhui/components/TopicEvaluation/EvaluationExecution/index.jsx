@@ -9,6 +9,7 @@ import {
   Tabs,
   Table,
   Tag,
+  Tooltip,
   Upload,
   message,
 } from "antd";
@@ -75,7 +76,7 @@ const attachmentData = [
   },
 ];
 
-const evaluationData = [
+export const evaluationData = [
   {
     key: "rule-1",
     dimension: "合规性",
@@ -111,6 +112,29 @@ const evaluationData = [
     element: "成效、问题及相应举措",
     weight: "100",
     rule: "工作有效开展并达到预期目标，得100分。",
+  },
+];
+
+export const evaluationRelationColumns = [
+  { title: "一级维度", dataIndex: "dimension", width: 110 },
+  { title: "二级维度", dataIndex: "subDimension", width: 140 },
+  { title: "评价要素", dataIndex: "element", width: 180 },
+  { title: "权重", dataIndex: "weight", width: 80, align: "center" },
+  {
+    title: "评价规则",
+    dataIndex: "rule",
+    width: 300,
+    ellipsis: true,
+    render: (text) => (
+      <Tooltip
+        title={text}
+        placement="topLeft"
+        zIndex={10090}
+        getPopupContainer={() => document.body}
+      >
+        <span className="gzt-eval-rule-ellipsis">{text}</span>
+      </Tooltip>
+    ),
   },
 ];
 
@@ -329,11 +353,7 @@ export default function EvaluationExecution({ onOpenPdf }) {
   ];
 
   const relationColumns = [
-    { title: "一级维度", dataIndex: "dimension", width: 110 },
-    { title: "二级维度", dataIndex: "subDimension", width: 140 },
-    { title: "评价要素", dataIndex: "element", width: 180 },
-    { title: "权重", dataIndex: "weight", width: 80, align: "center" },
-    { title: "评价规则", dataIndex: "rule", width: 300, ellipsis: true },
+    ...evaluationRelationColumns,
     // {
     //   title: "异常提示",
     //   width: 100,
