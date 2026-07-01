@@ -65,10 +65,15 @@ export default function AssignExecution({
   id,
   record,
   editStatus,
+  onActiveTabChange,
 }) {
   const [loading, setLoading] = useState(false);
   const [decisionList, setDecisionList] = useState([]);
   const [activeTab, setActiveTab] = useState("decision");
+  const handleActiveTabChange = (key) => {
+    setActiveTab(key);
+    onActiveTabChange?.(key);
+  };
   const fetchData = async () => {
     if (!id) return;
     setLoading(true);
@@ -278,7 +283,7 @@ export default function AssignExecution({
         </div> */}
         <Tabs
           activeKey={activeTab}
-          onChange={setActiveTab}
+          onChange={handleActiveTabChange}
           items={[
             {
               key: "decision",

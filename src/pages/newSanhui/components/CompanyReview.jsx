@@ -1595,13 +1595,17 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
       </div>
     </div>);
 }
-export default function CompanyReview({ projectId, isEdit, projectData = companyReviewDetailResponse.data, initialActiveKey = "2", onClosed }) {
+export default function CompanyReview({ projectId, isEdit, projectData = companyReviewDetailResponse.data, initialActiveKey = "2", onClosed, onActiveKeyChange }) {
     const [activeKey, setActiveKey] = useState(initialActiveKey);
+    const handleActiveKeyChange = (key) => {
+        setActiveKey(key);
+        onActiveKeyChange?.(key);
+    };
     const items = useMemo(() => [
         {
             key: "2",
             label: "前置任务确认",
-            children: <TopicApprovalPanel isEdit={isEdit} setActiveKey={setActiveKey}/>,
+            children: <TopicApprovalPanel isEdit={isEdit} setActiveKey={handleActiveKeyChange}/>,
         },
         {
             key: "8",
@@ -1611,12 +1615,12 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
         {
             key: "4",
             label: "议题审批",
-            children: <TopicApprovalFlowPanel projectId={projectId} isEdit={isEdit} onClosed={onClosed} setActiveKey={setActiveKey}/>,
+            children: <TopicApprovalFlowPanel projectId={projectId} isEdit={isEdit} onClosed={onClosed} setActiveKey={handleActiveKeyChange}/>,
         },
         {
             key: "5",
             label: "联审意见确认",
-            children: <JointOpinionPanel isEdit={isEdit} setActiveKey={setActiveKey}/>,
+            children: <JointOpinionPanel isEdit={isEdit} setActiveKey={handleActiveKeyChange}/>,
         },
         {
             key: "6",
@@ -1628,7 +1632,7 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
                   </Tooltip>
                 </span>
             ),
-            children: <PostMeetingMaterialPanel isEdit={isEdit} setActiveKey={setActiveKey}/>,
+            children: <PostMeetingMaterialPanel isEdit={isEdit} setActiveKey={handleActiveKeyChange}/>,
         },
         {
             key: "7",
@@ -1650,7 +1654,7 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
     return (<div className="company-review">
       {/* <ReviewHeader projectData={projectData}/> */}
       <div className="review-tab-shell">
-        <Radio.Group options={radioOptions} onChange={(event) => setActiveKey(event.target.value)} value={activeKey} optionType="button" buttonStyle="solid" className="review-radio-tabs"/>
+        <Radio.Group options={radioOptions} onChange={(event) => handleActiveKeyChange(event.target.value)} value={activeKey} optionType="button" buttonStyle="solid" className="review-radio-tabs"/>
         <Tabs activeKey={activeKey} items={items} className="review-hidden-tabs"/>
       </div>
       <div className="review-close-row">

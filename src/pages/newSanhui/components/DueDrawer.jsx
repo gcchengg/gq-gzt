@@ -1094,6 +1094,8 @@ export default function DueDrawer({
   const [meetingDrawerOpen, setMeetingDrawerOpen] = useState(false);
   const [meetingTimeDrawerOpen, setMeetingTimeDrawerOpen] = useState(false);
   const [meetingActiveKey, setMeetingActiveKey] = useState("1");
+  const [reviewActiveKey, setReviewActiveKey] = useState(reviewInitialTab || "2");
+  const [decisionActiveKey, setDecisionActiveKey] = useState("decision");
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackGroups, setFeedbackGroups] = useState(initialFeedbackGroups);
   const [feedbackDrafts, setFeedbackDrafts] = useState({});
@@ -1182,6 +1184,53 @@ export default function DueDrawer({
       ),
     },
   ];
+  const getActionVisibility = () => {
+    const base = {
+      feedback: false,
+      meetingMinutes: false,
+      meetingTime: false,
+      voteResult: false,
+      voteAuthorize: false,
+      seal: false,
+    };
+
+    if (firstActiveKey === "2") {
+      return { ...base, feedback: true, meetingTime: true, voteAuthorize: true };
+    }
+
+    if (firstActiveKey === "3") {
+      const isPostMeeting = reviewActiveKey === "6" || reviewActiveKey === "7";
+      return {
+        ...base,
+        feedback: true,
+        meetingMinutes: true,
+        meetingTime: true,
+        voteAuthorize: !isPostMeeting,
+        seal: true,
+      };
+    }
+
+    if (firstActiveKey === "4") {
+      return { ...base, feedback: true, meetingMinutes: true, meetingTime: true, seal: true };
+    }
+
+    if (firstActiveKey === "6") {
+      return { ...base, feedback: true, meetingMinutes: true, voteResult: true, seal: true };
+    }
+
+    if (firstActiveKey === "7") {
+      return {
+        ...base,
+        feedback: true,
+        meetingMinutes: decisionActiveKey === "decision",
+        seal: true,
+      };
+    }
+
+    return base;
+  };
+  const actionVisibility = getActionVisibility();
+  const hasVisibleActions = Object.values(actionVisibility).some(Boolean);
 
   const items = useMemo(
     () => [
@@ -1231,6 +1280,7 @@ export default function DueDrawer({
             isEdit={editStatus !== "detail"}
             initialActiveKey={reviewInitialTab}
             onClosed={onCloseDetail}
+            onActiveKeyChange={setReviewActiveKey}
           />
         ),
       },
@@ -1294,6 +1344,7 @@ export default function DueDrawer({
             id={id}
             record={projectData}
             editStatus={editStatus === "edit" && (progStatus === "19000" || progStatus === "20000")}
+            onActiveTabChange={setDecisionActiveKey}
           />
         ),
       },
@@ -1418,12 +1469,14 @@ export default function DueDrawer({
           </div>
         </div>
         <div className="new-sanhui-project-tabs">
-          {firstActiveKey !== "1" && firstActiveKey !== "8" && (
+          {hasVisibleActions && (
             <div className="new-sanhui-button-group">
-              <Button type="primary" onClick={() => setFeedbackOpen(true)}>
-                董事反馈记录
-              </Button>
-       
+              {actionVisibility.feedback && (
+                <Button type="primary" onClick={() => setFeedbackOpen(true)}>
+                  董事反馈记录
+                </Button>
+              )}
+              {actionVisibility.meetingMinutes && (
                 <Button
                   type="primary"
                   onClick={() => {
@@ -1443,6 +1496,8 @@ export default function DueDrawer({
                     </Tooltip>
                   </span>
                 </Button>
+              )}
+              {actionVisibility.meetingTime && (
                 <Button type="primary" onClick={() => setMeetingTimeDrawerOpen(true)}>
                   <span className="new-sanhui-action-title-with-help">
                     修改会议信息
@@ -1454,26 +1509,30 @@ export default function DueDrawer({
                     </Tooltip>
                   </span>
                 </Button>
-          
-              {Number(progStatus) > 14000 && (
+              )}
+              {actionVisibility.voteResult && (
                 <Button type="primary" onClick={() => setDrawerOpen(true)}>
                   投票结果
                 </Button>
               )}
-              <Button type="primary" onClick={() => setVoteVisible(true)}>
-                <span className="new-sanhui-action-title-with-help">
-                  表决授权
-                  <Tooltip title="1.自动生成上传文件">
-                    <QuestionCircleOutlined
-                      className="new-sanhui-action-help-icon"
-                      onClick={(event) => event.stopPropagation()}
-                    />
-                  </Tooltip>
-                </span>
-              </Button>
-              <Button type="primary" onClick={() => setSealVisible(true)}>
-                用印申请
-              </Button>
+              {actionVisibility.voteAuthorize && (
+                <Button type="primary" onClick={() => setVoteVisible(true)}>
+                  <span className="new-sanhui-action-title-with-help">
+                    表决授权
+                    <Tooltip title="1.自动生成上传文件">
+                      <QuestionCircleOutlined
+                        className="new-sanhui-action-help-icon"
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                    </Tooltip>
+                  </span>
+                </Button>
+              )}
+              {actionVisibility.seal && (
+                <Button type="primary" onClick={() => setSealVisible(true)}>
+                  用印申请
+                </Button>
+              )}
             </div>
           )}
           <Tabs className="new-sanhui-stage-content-tabs" activeKey={firstActiveKey} items={items} />
