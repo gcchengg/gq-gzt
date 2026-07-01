@@ -1634,8 +1634,8 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
             key: "7",
             label: (
                 <span className="review-tab-label-with-help">
-                  股权公司决策结果
-                  <Tooltip title="1.董事会 监事会 股东会/投委会 都要填写各自的表决建议 2.增加期数 3.总办会会议纪要-->股权公司决策结果">
+                  一汽股权决策结果
+                  <Tooltip title="1.董事会 监事会 股东会/投委会 都要填写各自的表决建议 2.增加期数 3.总办会会议纪要-->一汽股权决策结果">
                     <QuestionCircleOutlined className="review-tab-help-icon" onClick={(event) => event.stopPropagation()}/>
                   </Tooltip>
                 </span>

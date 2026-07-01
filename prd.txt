@@ -113,3 +113,87 @@ table中应该有五个部门信息，记录着
 
 /Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx
 1.页面中【议题审核】tab下面【股权公司决策结果】，下面会议决策区域中，radio选项中 应该有 同意 反对 有条件同意 回避表决
+
+
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/DueDrawer.jsx
+页面中：
+        <div className="new-sanhui-project-tabs">
+          {firstActiveKey !== "1" && firstActiveKey !== "8" && (
+            <div className="new-sanhui-button-group">
+              <Button type="primary" onClick={() => setFeedbackOpen(true)}>
+                董事反馈记录
+              </Button>
+       
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setMeetingDrawerOpen(true);
+                    if (meetingTabItems.length > 0) {
+                      setMeetingActiveKey(meetingTabItems[0].key);
+                    }
+                  }}
+                >
+                  <span className="new-sanhui-action-title-with-help">
+                    一汽股权会议纪要
+                    <Tooltip title="1.从议题评估阶段开始，并且从任务进入和上总办会才能显示 2.可以修改召开时间和期数">
+                      <QuestionCircleOutlined
+                        className="new-sanhui-action-help-icon"
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                    </Tooltip>
+                  </span>
+                </Button>
+                <Button type="primary" onClick={() => setMeetingTimeDrawerOpen(true)}>
+                  <span className="new-sanhui-action-title-with-help">
+                    修改会议信息
+                    <Tooltip title={<div><div>1.审批层级到 科室经理</div><div>2.只有修改会议时间的时候才发起审批</div></div>}>
+                      <QuestionCircleOutlined
+                        className="new-sanhui-action-help-icon"
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                    </Tooltip>
+                  </span>
+                </Button>
+          
+              {Number(progStatus) > 14000 && (
+                <Button type="primary" onClick={() => setDrawerOpen(true)}>
+                  投票结果
+                </Button>
+              )}
+              <Button type="primary" onClick={() => setVoteVisible(true)}>
+                <span className="new-sanhui-action-title-with-help">
+                  表决授权
+                  <Tooltip title="1.自动生成上传文件">
+                    <QuestionCircleOutlined
+                      className="new-sanhui-action-help-icon"
+                      onClick={(event) => event.stopPropagation()}
+                    />
+                  </Tooltip>
+                </span>
+              </Button>
+              <Button type="primary" onClick={() => setSealVisible(true)}>
+                用印申请
+              </Button>
+            </div>
+          )}
+          <Tabs className="new-sanhui-stage-content-tabs" activeKey={firstActiveKey} items={items} />
+        </div>
+        这部分代码要做出显示逻辑修改
+议题提报：不显示任何标签
+议题评估：董事反馈记录 修改会议信息 表决授权
+议题审核：
+1.会后材料替换前：董事反馈记录 修改会议信息 表决授权 用印申请 一汽股权会议纪要
+2.会后材料替换：董事反馈记录 修改会议信息 用印申请 一汽股权会议纪要
+3.一汽股权决策结果：董事反馈记录 修改会议信息 用印申请 一汽股权会议纪要
+表决建议：董事反馈记录 修改会议信息 用印申请 一汽股权会议纪要
+三会表决：董事反馈记录 用印申请 一汽股权会议纪要 投票结果
+决策执行：
+1.决策情况：董事反馈记录 用印申请 一汽股权会议纪要 
+2.交办事项：董事反馈记录 用印申请
+
+
+
+参考/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules/targetSet/routes/index.route.js
+我想把该页面所以功能都复制到当前项目中，当前项目侧边栏也添加一个三会计划
+包括点击月列内容弹出的抽屉页面和编辑时弹出的抽屉页面内容，然后把该页面需要接口的部分，形成json假数据，然后告诉我是哪个接口，我把接口数据填到json假数据中
+并优化UI效果

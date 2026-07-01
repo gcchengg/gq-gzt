@@ -294,6 +294,22 @@ function TopicEditDrawer({ open, mode, record, disabled, onClose, onSave, }) {
                 </Form.Item>
               </div>
             </Form.Item>
+            <Form.Item className="topic-edit-switch-item" label="回避表决">
+              <div className="topic-edit-switch-group">
+                <span>董事会</span>
+                <Form.Item name="boardBack" valuePropName="checked" noStyle>
+                  <Switch/>
+                </Form.Item>
+                <span>监事会</span>
+                <Form.Item name="supervisorBack" valuePropName="checked" noStyle>
+                  <Switch/>
+                </Form.Item>
+                <span>股东会</span>
+                <Form.Item name="shareholderBack" valuePropName="checked" noStyle>
+                  <Switch/>
+                </Form.Item>
+              </div>
+            </Form.Item>
             </div>
           </div>
 
@@ -789,7 +805,7 @@ function DistributionManage({ disabled, onPrev, onSubmit, }) {
         onSubmit();
     };
     return (<div className="submit-section">
-      <Prompt type="distribution"/>
+      {/* <Prompt type="distribution"/> */}
       <div className="distribution-layout">
         <Panel title="议题材料传达对象" extra={<span className="distribution-notice danger"><span className="distribution-notice-icon">!</span><span>集团总经理助理及以上不传达</span></span>}>
           <div className="distribution-task-tip">

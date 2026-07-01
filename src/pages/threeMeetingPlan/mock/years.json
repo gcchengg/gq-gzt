@@ -1,0 +1,12 @@
+{
+	"success": true,
+	"code": 200,
+	"message": "操作成功",
+	"data": [
+		2026
+	],
+	"msgType": "I",
+	"errType": "N",
+	"errMsg": null,
+	"errCode": "YQJT0IGQ-0207_MSA_001N50200"
+}

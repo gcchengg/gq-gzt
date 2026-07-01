@@ -27,6 +27,11 @@
         "key": "/assign"
       },
       {
+        "id": "three-meeting-plan",
+        "title": "三会计划",
+        "key": "/threeMeetingPlan"
+      },
+      {
         "id": "topic-advice",
         "title": "议题反馈建议",
         "key": "/topicAdvice"

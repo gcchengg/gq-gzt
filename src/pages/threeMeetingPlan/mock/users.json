@@ -1,0 +1,10 @@
+{
+  "code": 200,
+  "data": [
+    { "loginId": "guohu001", "fullName": "张明", "email": "zhangming@example.com" },
+    { "loginId": "guohu002", "fullName": "李娜", "email": "lina@example.com" },
+    { "loginId": "guohu003", "fullName": "赵鹏", "email": "zhaopeng@example.com" },
+    { "loginId": "guohu004", "fullName": "周静", "email": "zhoujing@example.com" }
+  ],
+  "msg": "success"
+}

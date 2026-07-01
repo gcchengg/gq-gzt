@@ -1,0 +1,120 @@
+.detailShell {
+  display: grid;
+  gap: 12px;
+}
+
+.filterPanel {
+  overflow: hidden;
+  padding: 14px;
+  border: 1px solid #e3e9f3;
+  border-radius: 8px;
+  background: #fbfcff;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+  width: 100%;
+}
+
+.filterGrid :global(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+.filterItem {
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-bottom: 0;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.table {
+  background: #fff;
+}
+
+.tableScroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table :global(.ant-table-thead > tr > th) {
+  background: #f6f8fc;
+  color: #334155;
+  font-weight: 700;
+}
+
+.table :global(.ant-table-cell) {
+  padding: 8px 10px;
+  vertical-align: middle;
+}
+
+.table :global(.ant-table-tbody > tr > td) {
+  background: #fff;
+}
+
+.topicName {
+  display: block;
+  overflow: hidden;
+  color: #172033;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mutedText {
+  color: #a0a8b8;
+}
+
+.dateNormal,
+.dateLate {
+  display: inline-flex;
+  min-width: 92px;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dateNormal {
+  background: #e8f8ef;
+  color: #1f8f4d;
+}
+
+.dateLate {
+  background: #fff0f0;
+  color: #d4380d;
+}
+
+.dotActive {
+  color: #245bdb;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dotMuted {
+  color: #c7cfdd;
+}
+
+@media (max-width: 1200px) {
+  .filterGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .filterGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

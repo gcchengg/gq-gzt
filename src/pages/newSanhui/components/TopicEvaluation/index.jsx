@@ -233,6 +233,16 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
                 <Form.Item name="shareholderMeeting" valuePropName="checked" noStyle><Switch /></Form.Item>
               </div>
             </Form.Item>
+            <Form.Item className={styles.topicEditSwitchItem} label="回避表决">
+              <div className={styles.topicEditSwitchGroup}>
+                <span>董事会</span>
+                <Form.Item name="boardBack" valuePropName="checked" noStyle><Switch /></Form.Item>
+                <span>监事会</span>
+                <Form.Item name="supervisorBack" valuePropName="checked" noStyle><Switch /></Form.Item>
+                <span>股东会</span>
+                <Form.Item name="shareholderBack" valuePropName="checked" noStyle><Switch /></Form.Item>
+              </div>
+            </Form.Item>
             </div>
           </div>
 

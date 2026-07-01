@@ -1,0 +1,32 @@
+.formShell {
+  display: grid;
+  gap: 16px;
+}
+
+.formHero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid #dde6f2;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 68%);
+}
+
+.heroEyebrow {
+  color: #60708a;
+  font-size: 12px;
+}
+
+.heroTitle {
+  margin-top: 2px;
+  color: #172033;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+}

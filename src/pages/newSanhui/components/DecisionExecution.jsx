@@ -99,7 +99,7 @@ export default function AssignExecution({
         render: (_value, row) => row?.eoSanhuiTopic?.toipcName || row?.toipcName || "-",
       },
       {
-        title: "股权公司决策",
+        title: "一汽股权决策结果",
         align: "center",
         children: [
           {
