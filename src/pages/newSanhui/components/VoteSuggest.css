@@ -98,45 +98,16 @@
   line-height: 18px;
 }
 
-.vote-suggest-result-yes,
-.vote-suggest-result-no,
-.vote-suggest-result-conditional,
-.vote-suggest-result-avoid,
-.vote-suggest-result-empty {
+.vote-suggest-result-text {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 24px;
   min-width: 48px;
   padding: 0 9px;
-  border-radius: 999px;
-  font-weight: 600;
+  color: #262629;
+  font-weight: 400;
   white-space: nowrap;
-}
-
-.vote-suggest-result-yes {
-  color: #16803d;
-  background: #eaf8ef;
-}
-
-.vote-suggest-result-no {
-  color: #c2410c;
-  background: #fff1e8;
-}
-
-.vote-suggest-result-conditional {
-  color: #1d4ed8;
-  background: #eaf2ff;
-}
-
-.vote-suggest-result-avoid {
-  color: #6d28d9;
-  background: #f3e8ff;
-}
-
-.vote-suggest-result-empty {
-  color: #8b95a7;
-  background: #f1f5f9;
 }
 
 .vote-suggest-footer {
@@ -258,8 +229,8 @@
 }
 
 .vote-suggest-table-section .ant-table-thead > tr:first-child > th {
-  background: #eef4ff;
-  color: #1d4ed8;
+  background: #f6f8fb;
+  color: #364153;
 }
 
 .vote-suggest-table-section .ant-table-tbody > tr > td {

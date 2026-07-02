@@ -1,4 +1,13 @@
-import { Button, Form, Input, Popconfirm, Spin, Table, Tooltip, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Popconfirm,
+  Spin,
+  Table,
+  Tooltip,
+  message,
+} from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,31 +22,44 @@ const resultText = {
   "-1": "回避表决",
 };
 
-const resultClassName = {
-  0: "vote-suggest-result-no",
-  1: "vote-suggest-result-yes",
-  2: "vote-suggest-result-conditional",
-  "-1": "vote-suggest-result-avoid",
-};
-
 function VoteResult({ enabled, result, elusion }) {
   if (enabled !== "1") return "-";
 
   const value = elusion === "1" ? "-1" : result;
 
   return (
-    <>
-      <span className={resultClassName[value] || "vote-suggest-result-empty"}>
-        {resultText[value] || "-"}
-      </span>
-    </>
+    <span className="vote-suggest-result-text">{resultText[value] || "-"}</span>
   );
 }
 
 const meetingFields = [
-  { key: "bod", flag: "bodFlag", result: "bodCompResult", elusion: "bodVoteElusionFlag", advice: "bodAdvice", title: "董事会", label: "向董事会发起的建议" },
-  { key: "bos", flag: "bosFlag", result: "bosCompResult", elusion: "bosVoteElusionFlag", advice: "bosAdvice", title: "监事会", label: "向监事会发起的建议" },
-  { key: "shs", flag: "shsFlag", result: "shsCompResult", elusion: "shsVoteElusionFlag", advice: "shsAdvice", title: "股东会", label: "向股东会发起的建议" },
+  {
+    key: "bod",
+    flag: "bodFlag",
+    result: "bodCompResult",
+    elusion: "bodVoteElusionFlag",
+    advice: "bodAdvice",
+    title: "董事会",
+    label: "向董事会发起的建议",
+  },
+  {
+    key: "bos",
+    flag: "bosFlag",
+    result: "bosCompResult",
+    elusion: "bosVoteElusionFlag",
+    advice: "bosAdvice",
+    title: "监事会",
+    label: "向监事会发起的建议",
+  },
+  {
+    key: "shs",
+    flag: "shsFlag",
+    result: "shsCompResult",
+    elusion: "shsVoteElusionFlag",
+    advice: "shsAdvice",
+    title: "股东会",
+    label: "向股东会发起的建议",
+  },
 ];
 
 const sendTaskTip = (
@@ -52,7 +74,11 @@ const sendTaskTip = (
 );
 
 function openVoteSuggestPdf() {
-  const opened = window.open(voteSuggestPdfUrl, "_blank", "noopener,noreferrer");
+  const opened = window.open(
+    voteSuggestPdfUrl,
+    "_blank",
+    "noopener,noreferrer",
+  );
   if (opened) {
     opened.opener = null;
   }
@@ -70,11 +96,7 @@ function createTopicAdviceValues(data = {}, topics = []) {
   }, {});
 }
 
-export default function VoteSuggest({
-  id,
-  editStatus,
-  disabled,
-}) {
+export default function VoteSuggest({ id, editStatus, disabled }) {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [dataSource, setDataSource] = useState([]);
@@ -103,7 +125,7 @@ export default function VoteSuggest({
         ),
       },
       {
-        title: "表决结果",
+        title: "表决建议",
         className: "vote-suggest-result-group",
         children: meetingFields.map((meeting) => ({
           title: meeting.title,
@@ -130,14 +152,25 @@ export default function VoteSuggest({
             const enabled = record[meeting.flag] === "1";
 
             if (!enabled) {
-              return <span className="vote-suggest-table-disabled">无需填写</span>;
+              return (
+                <span className="vote-suggest-table-disabled">无需填写</span>
+              );
             }
 
             return (
               <Form.Item
                 className="vote-suggest-table-form-item"
                 name={["topicAdvices", record.key, meeting.advice]}
-                rules={isDetail ? [] : [{ required: true, message: `请输入${meeting.title}建议` }]}
+                rules={
+                  isDetail
+                    ? []
+                    : [
+                        {
+                          required: true,
+                          message: `请输入${meeting.title}建议`,
+                        },
+                      ]
+                }
               >
                 <Input.TextArea
                   placeholder={`请输入${meeting.title}建议`}
@@ -168,10 +201,12 @@ export default function VoteSuggest({
         addlSummary: data.addlSummary,
       });
       setDetailData(data);
-      const topics = (data.sanhuiTopicAssessMiscVoList || []).map((item, index) => ({
-        ...item,
-        key: item.id || index,
-      }));
+      const topics = (data.sanhuiTopicAssessMiscVoList || []).map(
+        (item, index) => ({
+          ...item,
+          key: item.id || index,
+        }),
+      );
       setDataSource(topics);
       form.setFieldValue("topicAdvices", createTopicAdviceValues(data, topics));
     } finally {
@@ -248,7 +283,9 @@ export default function VoteSuggest({
 
     form.setFieldValue("id", res.data.id);
     await fetchData();
-    message.success("已发送建议单任务，董事将收到表决建议单任务或钉钉消息（本地假数据）");
+    message.success(
+      "已发送建议单任务，董事将收到表决建议单任务或钉钉消息（本地假数据）",
+    );
   };
 
   const hasAdviceTarget =
@@ -260,7 +297,12 @@ export default function VoteSuggest({
     <div className="vote-suggest">
       <Spin spinning={loading}>
         <div className="vote-suggest-content">
-          <Form form={form} layout="vertical" className="vote-suggest-form-shell" autoComplete="off">
+          <Form
+            form={form}
+            layout="vertical"
+            className="vote-suggest-form-shell"
+            autoComplete="off"
+          >
             <div className="vote-suggest-main">
               <div className="vote-suggest-left">
                 <div className="vote-suggest-title">表决建议单</div>
@@ -293,7 +335,9 @@ export default function VoteSuggest({
             <div className="vote-suggest-table-section">
               <div className="vote-suggest-title">
                 <span>表决建议</span>
-                <small>{dataSource.length} 个议题，按召开会议填写对应建议</small>
+                <small>
+                  {dataSource.length} 个议题，按召开会议填写对应建议
+                </small>
               </div>
               <Table
                 rowKey="key"
