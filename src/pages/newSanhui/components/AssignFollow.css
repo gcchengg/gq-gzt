@@ -86,7 +86,7 @@
   font-size: 16px;
 }
 
-.assign-follow-toolbar span {
+.assign-follow-toolbar > div > span {
   color: #7a8496;
   font-size: 13px;
 }

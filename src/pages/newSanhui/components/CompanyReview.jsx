@@ -781,9 +781,13 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
       <SupplementMaterials open={Boolean(materialOpen)} onClose={() => setMaterialOpen(null)} />
     </div>);
 }
-function MinistryMeetingPanel({ isEdit }) {
+function MinistryMeetingPanel({ isEdit, setActiveKey }) {
     const [form] = Form.useForm();
-    return (<div className="review-panel">
+    const handleSubmit = () => {
+        message.success("部务会提请信息已提交");
+        setActiveKey("4");
+    };
+    return (<div className="review-panel ministry-meeting-panel">
       <Card title="提请部务会" size="small">
         <Form form={form} layout="vertical" disabled={!isEdit} initialValues={{
             meetingSubject: "关于推进基金退出事项提请部务会审议",
@@ -800,10 +804,20 @@ function MinistryMeetingPanel({ isEdit }) {
             <Input />
           </Form.Item>
         </Form>
-        {isEdit ? (<Button type="primary" onClick={() => message.success("部务会提请信息已保存")}>
-            保存
-          </Button>) : null}
       </Card>
+      {isEdit ? (
+        <div className="projectBtn">
+          <Button onClick={() => setActiveKey("1")}>
+            上一步
+          </Button>
+          <Button type="primary" onClick={() => message.success("部务会提请信息已保存")}>
+            保存
+          </Button>
+          <Button type="primary" onClick={handleSubmit}>
+            提交
+          </Button>
+        </div>
+      ) : null}
     </div>);
 }
 function ReviewApprovalSteps() {
@@ -1529,11 +1543,11 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
                           <span className="meeting-decision-index">{index + 1}</span>
                           <div className="meeting-decision-topic">
                             <div className="meeting-decision-topic-name">{topic.toipcName || "未命名议题"}</div>
-                            <div className="meeting-decision-tags">
+                            {/* <div className="meeting-decision-tags">
                               <Tag>{topic.categoryLv1Name || "-"}</Tag>
                               <Tag>{topic.categoryLv2Name || "-"}</Tag>
                               <Tag>{topic.categoryLv3Name || "-"}</Tag>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                         <div className="meeting-vote-grid">
@@ -1610,7 +1624,7 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
         {
             key: "8",
             label: "提请部务会",
-            children: <MinistryMeetingPanel isEdit={isEdit}/>,
+            children: <MinistryMeetingPanel isEdit={isEdit} setActiveKey={handleActiveKeyChange}/>,
         },
         {
             key: "4",
@@ -1647,19 +1661,10 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
             children: <MeetingMinutesPanel projectId={projectId} isEdit={isEdit} onClosed={onClosed}/>,
         },
     ], [isEdit, onClosed, projectId]);
-    const radioOptions = items.map((item) => ({
-        label: item.label,
-        value: item.key,
-    }));
     return (<div className="company-review">
       {/* <ReviewHeader projectData={projectData}/> */}
       <div className="review-tab-shell">
-        <Radio.Group options={radioOptions} onChange={(event) => handleActiveKeyChange(event.target.value)} value={activeKey} optionType="button" buttonStyle="solid" className="review-radio-tabs"/>
-        <Tabs activeKey={activeKey} items={items} className="review-hidden-tabs"/>
-      </div>
-      <div className="review-close-row">
-        <span></span>
-        <Button onClick={() => onClosed("close")}>关闭审核页</Button>
+        <Tabs activeKey={activeKey} onChange={handleActiveKeyChange} items={items} className="review-stage-tabs"/>
       </div>
     </div>);
 }

@@ -48,14 +48,33 @@
 }
 
 .assign-warning {
+  position: relative;
   display: flex;
-  gap: 12px;
   align-items: center;
-  padding: 10px 12px;
-  border: 1px solid #ffe1a6;
-  border-radius: 6px;
-  background: #fff8e6;
-  color: #7a4f00;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 14px 10px 28px;
+  border: 1px solid #e4ebf6;
+  border-radius: 8px;
+  background: #fbfcff;
+  color: #536078;
+}
+
+.assign-warning::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 15px;
+  width: 3px;
+  height: 14px;
+  border-radius: 999px;
+  background: #1d4ed8;
+}
+
+.assign-warning strong {
+  color: #262629;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .assign-decision-ok {
