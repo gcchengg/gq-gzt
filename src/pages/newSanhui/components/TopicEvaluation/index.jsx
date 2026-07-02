@@ -1,10 +1,8 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Button, Drawer, Form, Input, Modal, Popconfirm, Radio, Select, Space, Switch, Table, Tabs, Tag, Tooltip, message } from "antd";
+import { Button, Drawer, Form, Input, Modal, Popconfirm, Radio, Select, Space, Switch, Table, Tag, Tooltip, message } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import getBySanhuiMgmtIdResponse from "../../mock/data/evaluation/getBySanhuiMgmtId.json";
 import JointReviewFeedback from "../JointReviewFeedback";
-import { MaterialPreparePanel } from "../CompanyReview";
 import EvaluationDetail from "./EvaluationDetail";
 import styles from "./index.module.css";
 
@@ -270,7 +268,6 @@ function TopicEditDrawer({ open, mode, record, onClose, onSave }) {
 }
 
 export default function TopicEvaluation({ projectData, onClose }) {
-  const navigate = useNavigate();
   const [jointFeedbackOpen, setJointFeedbackOpen] = useState(false);
   const [topics, setTopics] = useState(() => createInitialTopics(projectData));
   const [completed, setCompleted] = useState(false);
@@ -432,7 +429,7 @@ export default function TopicEvaluation({ projectData, onClose }) {
           </span>
           <Space>
             <Button type="primary" onClick={openAddTopic}>新增议题</Button>
-            <Button onClick={() => setTopics((current) => sortTopics(current))}>自动分级排序</Button>
+            {/* <Button onClick={() => setTopics((current) => sortTopics(current))}>自动分级排序</Button> */}
           </Space>
         </div>
         <div className={styles.tableWrap}>
@@ -469,42 +466,12 @@ export default function TopicEvaluation({ projectData, onClose }) {
 
   return (
     <>
-      <Tabs
-        className={styles.tabs}
-        defaultActiveKey="annotation"
-        tabBarExtraContent={{
-          right: (
-            <Button type="primary" onClick={() => setJointFeedbackOpen(true)}>
-              联审部门反馈
-            </Button>
-          ),
-        }}
-        items={[
-          {
-            key: "annotation",
-            label: "评估批注",
-            children: evaluationContent,
-          },
-          {
-            key: "materialPrepare",
-            label: (
-              <span className={styles.tabHelpLabel}>
-                审批材料准备
-                <Tooltip title="1.【议题审核】-->【审批材料准备】移入到【议题评估中】">
-                  <QuestionCircleOutlined className={styles.tabHelpIcon} />
-                </Tooltip>
-              </span>
-            ),
-            children: (
-              <MaterialPreparePanel
-                isEdit
-                submitButtonText="提交"
-                onSubmitSuccess={() => navigate("/GztHome")}
-              />
-            ),
-          },
-        ]}
-      />
+      <div className={styles.evaluationHeaderActions}>
+        <Button type="primary" onClick={() => setJointFeedbackOpen(true)}>
+          联审部门反馈
+        </Button>
+      </div>
+      {evaluationContent}
       <Modal
         title="联审部门反馈"
         open={jointFeedbackOpen}

@@ -12,6 +12,10 @@ import {
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import companyInfoImageUrl from "../../../../components/imgages/参股公司信息管理.png?url";
+import financeReportImageUrl from "../../../../components/imgages/财务报表.png?url";
+import strategyProgressImageUrl from "../../../../components/imgages/规划进展点检.png?url";
+import oneCompanyPolicyImageUrl from "../../../../components/imgages/一企一策.png?url";
 import { evaluationData, evaluationRelationColumns } from "./EvaluationExecution";
 import "./PdfAnnotationEditor.css";
 
@@ -31,7 +35,7 @@ const pages = [
 const pdfFiles = [
     "20250428中联电子议题关键信息页(1).pdf",
     "20260403(股权运营部)T3出行第二届董事会2026年第一次会议、2026年第三次临时股东会议案及表决建议.pdf",
-    "1.招标文件-备注版-明阳智能AI在多业务域应用试点项目-20250606.docx",
+    "1.招标文件-备注版-明阳智能AI在多业务域应用试点项目-20250606.pdf",
 ];
 
 const seedAnnotations = [
@@ -49,6 +53,20 @@ const defaultScreenshotPages = {
     [pdfFiles[0]]: [1, 2],
     [pdfFiles[1]]: [2, 5],
 };
+
+const referenceActions = [
+    { label: "参股公司信息", url: companyInfoImageUrl },
+    { label: "一企一策", url: oneCompanyPolicyImageUrl },
+    { label: "战略规划", url: strategyProgressImageUrl },
+    { label: "财务报表", url: financeReportImageUrl },
+];
+
+function openReferenceImage(url) {
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (opened) {
+        opened.opener = null;
+    }
+}
 
 function readScreenshotPages() {
     if (typeof window === "undefined") return defaultScreenshotPages;
@@ -731,10 +749,11 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                         </div>
                     </div>
                     <div className="pdf-bottom-actions-row">
-                        <button className="pdf-bottom-action" type="button">参股公司信息</button>
-                        <button className="pdf-bottom-action" type="button">一企一策</button>
-                        <button className="pdf-bottom-action" type="button">战略规划</button>
-                        <button className="pdf-bottom-action" type="button">财务报表</button>
+                        {referenceActions.map((item) => (
+                            <button className="pdf-bottom-action" type="button" key={item.label} onClick={() => openReferenceImage(item.url)}>
+                                {item.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </Modal>

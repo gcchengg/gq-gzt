@@ -1,8 +1,9 @@
 import "antd/dist/reset.css";
-import { BoldOutlined, CalendarOutlined, DownOutlined, FileDoneOutlined, ItalicOutlined, LinkOutlined, MessageOutlined, OrderedListOutlined, PaperClipOutlined, RightOutlined, SaveOutlined, SendOutlined, TeamOutlined, UnorderedListOutlined, UploadOutlined, } from "@ant-design/icons";
+import { BoldOutlined, CalendarOutlined, DownOutlined, FileDoneOutlined, FilePdfOutlined, ItalicOutlined, LinkOutlined, MessageOutlined, OrderedListOutlined, PaperClipOutlined, RightOutlined, SaveOutlined, SendOutlined, TeamOutlined, UnorderedListOutlined, UploadOutlined, } from "@ant-design/icons";
 import { Button, Descriptions, Divider, Modal, Space, Table, Tag, Upload, message, } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useRef, useState } from "react";
+import PdfAnnotationEditor from "../newSanhui/components/TopicEvaluation/PdfAnnotationEditor";
 import "./index.css";
 const topicFileTypes = {
     "100": "会议通知",
@@ -18,13 +19,13 @@ const smartFiles = [
         aiAnalysisStatus: "1",
         aiAnalysisResult: "已提取到 1 个会议信息",
     },
-    {
-        id: "smart-002",
-        fileName: "基金退出决策议题目录.xlsx",
-        fileCategory: "300",
-        aiAnalysisStatus: "1",
-        aiAnalysisResult: "已提取到关键信息并创建了 2 个议题",
-    },
+    // {
+    //     id: "smart-002",
+    //     fileName: "基金退出决策议题目录.xlsx",
+    //     fileCategory: "300",
+    //     aiAnalysisStatus: "1",
+    //     aiAnalysisResult: "已提取到关键信息并创建了 2 个议题",
+    // },
     {
         id: "smart-003",
         fileName: "基金退出方案补充材料.pdf",
@@ -226,6 +227,7 @@ export default function TopicAdvicePage() {
     const [savedAtByTopic, setSavedAtByTopic] = useState({});
     const [collapsedTopicIds, setCollapsedTopicIds] = useState(() => new Set());
     const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
+    const [pdfEditor, setPdfEditor] = useState(null);
     const enabledMeetings = meetings.filter((item) => item.enabled);
     const summaryStats = [
         {
@@ -263,7 +265,16 @@ export default function TopicAdvicePage() {
             title: "文件名",
             dataIndex: "fileName",
             width: 300,
-            render: (value) => <a href="#">{value}</a>,
+            render: (value) => value?.toLowerCase().endsWith(".pdf") ? (
+                <Button type="link" icon={<FilePdfOutlined />} onClick={() => setPdfEditor({ fileName: value, mode: "annotation" })}>
+                  {value}
+                </Button>
+            ) : (
+                <Space>
+                  <PaperClipOutlined />
+                  {value}
+                </Space>
+            ),
         },
         {
             title: "文件分类",
@@ -577,5 +588,12 @@ export default function TopicAdvicePage() {
       <Modal title="确认提交回复？" open={submitConfirmOpen} okText="确认提交" cancelText="取消" onOk={handleConfirmSubmit} onCancel={() => setSubmitConfirmOpen(false)}>
         <p>提交后将给对应管户发钉钉消息。</p>
       </Modal>
+      <PdfAnnotationEditor
+        open={Boolean(pdfEditor)}
+        fileName={pdfEditor?.fileName}
+        mode={pdfEditor?.mode}
+        showNeedReply
+        onClose={() => setPdfEditor(null)}
+      />
     </div>);
 }

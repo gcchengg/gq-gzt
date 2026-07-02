@@ -480,12 +480,9 @@
   line-height: 24px;
 }
 
-.distribution-notice.danger {
-  color: #e12535;
-}
-
+.distribution-notice.danger,
 .distribution-notice.warning {
-  color: #ff7d00;
+  color: #e12535;
 }
 
 .distribution-notice-icon {

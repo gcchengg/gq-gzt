@@ -13,7 +13,6 @@ const statusColorMap = {
   14000: "purple",
   15000: "gold",
   16000: "cyan",
-  17000: "blue",
   18000: "geekblue",
   19000: "processing",
   20000: "success",
@@ -31,7 +30,6 @@ const taskStatusMap = {
   topicEvaluation: ["14000"],
   topicApproval: ["15000"],
   voteSuggest: ["16000"],
-  topicReport: ["17000"],
   meetingVote: ["18000"],
   decisionExecution: ["19000", "20000"],
 };
@@ -336,7 +334,7 @@ export default function NewSanhuiPage() {
               editStatus="edit"
               progStatus={activeRecord.progStatus}
               dutyUserName={activeRecord.submitUserName}
-              reviewInitialTab={searchParams.get("task") === "topicApproval" ? "2" : undefined}
+              reviewInitialTab={searchParams.get("task") === "topicApproval" ? "1" : undefined}
               onCloseDetail={(type) => {
                 if (type === "submit" || type === "save") {
                   getTableData();

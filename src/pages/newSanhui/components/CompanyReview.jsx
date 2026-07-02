@@ -17,7 +17,7 @@ import JointReviewFeedback from "./JointReviewFeedback";
 import { EvaluationPreview, SupplementMaterials } from "./TopicEvaluation/EvaluationMaterials";
 import "./CompanyReview.css";
 const tabLabels = [
-    { key: "2", label: "前置任务确认" },
+    { key: "1", label: "审批材料准备" },
     { key: "8", label: "提请部务会" },
     { key: "4", label: "议题审批" },
     { key: "5", label: "联审意见确认" },
@@ -590,9 +590,9 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
             render: (value, record) => {
                 const isAvoidVote = record.avoidVoteFlag === "1";
                 return (<Select value={isAvoidVote ? undefined : value || undefined} disabled={!isEdit || isAvoidVote} style={{ width: "100%" }} onChange={(nextValue) => updateVoteAdvice(record, nextValue, setter)} options={[
-                    { label: "通过", value: "1" },
-                    { label: "通过（附管理意见）", value: "2" },
-                    { label: "不通过", value: "0" },
+                    { label: "同意", value: "1" },
+                    { label: "反对", value: "2" },
+                    { label: "有条件同意", value: "0" },
                 ]}/>);
             },
         },
@@ -1595,7 +1595,7 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
       </div>
     </div>);
 }
-export default function CompanyReview({ projectId, isEdit, projectData = companyReviewDetailResponse.data, initialActiveKey = "2", onClosed, onActiveKeyChange }) {
+export default function CompanyReview({ projectId, isEdit, projectData = companyReviewDetailResponse.data, initialActiveKey = "1", onClosed, onActiveKeyChange }) {
     const [activeKey, setActiveKey] = useState(initialActiveKey);
     const handleActiveKeyChange = (key) => {
         setActiveKey(key);
@@ -1603,9 +1603,9 @@ export default function CompanyReview({ projectId, isEdit, projectData = company
     };
     const items = useMemo(() => [
         {
-            key: "2",
-            label: "前置任务确认",
-            children: <TopicApprovalPanel isEdit={isEdit} setActiveKey={handleActiveKeyChange}/>,
+            key: "1",
+            label: "审批材料准备",
+            children: <MaterialPreparePanel isEdit={isEdit} setActiveKey={handleActiveKeyChange}/>,
         },
         {
             key: "8",

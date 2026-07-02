@@ -134,23 +134,6 @@ if (!records.some((record) => String(record.progStatus) === "15000")) {
   });
 }
 
-if (!records.some((record) => String(record.progStatus) === "17000")) {
-  records.unshift({
-    ...records[0],
-    id: "topic-report-task-001",
-    mgmtNo: "202600179",
-    created: "2026-06-11T11:12:00",
-    updated: "2026-06-11T11:12:00",
-    submitTime: "2026-06-11T11:10:00",
-    stageCode: "17000",
-    stepCode: "17100",
-    progStatus: "17000",
-    outerProgStatus: "11000",
-    topicCfmState: "2",
-    overdueRemark: null,
-  });
-}
-
 if (!records.some((record) => String(record.progStatus) === "18000")) {
   records.unshift({
     ...records[0],

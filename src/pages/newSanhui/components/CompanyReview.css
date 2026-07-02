@@ -104,23 +104,24 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: 46px;
-  padding-left: 16px;
+  min-height: 44px;
+  padding: 10px 14px 10px 28px;
   overflow: hidden;
-  color: #273449;
-  font-size: 16px;
+  color: #262629;
+  font-size: 15px;
   font-weight: 600;
   border: 1px solid #e4ebf6;
   border-radius: 8px;
-  background: linear-gradient(90deg, #edf5ff 0%, #fff 72%);
+  background: #fbfcff;
 }
 
 .filesReplace-title::before {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 5px;
-  height: 100%;
+  left: 14px;
+  top: 15px;
+  width: 3px;
+  height: 14px;
+  border-radius: 999px;
   content: "";
   background: #1d4ed8;
 }

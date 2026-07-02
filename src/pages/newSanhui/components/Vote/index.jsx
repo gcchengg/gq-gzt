@@ -213,6 +213,7 @@ export default function Vote(props) {
   const renderVoteDecision = (text, record, index, flagKey, topicFlagKey) =>
     record.itemData?.eoSanhuiTopic?.[topicFlagKey] === "0" ? "-" : (
       <Radio.Group
+        className="vote-decision-radio"
         disabled={props.editStatus === "detail"}
         options={voteDecisionOptions}
         value={text}
@@ -230,21 +231,21 @@ export default function Vote(props) {
     {
       title: "董事会决议",
       dataIndex: "bodPassFlag",
-      width: 320,
+      width: 400,
       align: "center",
       render: (text, record, index) => renderVoteDecision(text, record, index, "bodPassFlag", "bodFlag"),
     },
     {
       title: "监事会决议",
       dataIndex: "bosPassFlag",
-      width: 320,
+      width: 400,
       align: "center",
       render: (text, record, index) => renderVoteDecision(text, record, index, "bosPassFlag", "bosFlag"),
     },
     {
       title: "股东会决议/投委会决议",
       dataIndex: "shPassFlag",
-      width: 320,
+      width: 400,
       align: "center",
       render: (text, record, index) => renderVoteDecision(text, record, index, "shPassFlag", "shsFlag"),
     },

@@ -15,7 +15,6 @@ import dayjs from "dayjs";
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import meetingGetListResponse from "../mock/data/submit/meetingGetList.json";
 import removedFileReplaceTabImage from "../mock/data/companyReview/截屏2026-06-25 11.08.51.png";
-import removedTopicReportTabImage from "../../截屏2026-06-25 13.34.13.png";
 import SubmitDrawer from "./SubmitDrawer";
 import TopicEvaluation from "./TopicEvaluation";
 import CompanyReview from "./CompanyReview";
@@ -31,14 +30,13 @@ const tabStatusMap = {
   14000: "2",
   15000: "3",
   16000: "4",
-  17000: "6",
   18000: "6",
   19000: "7",
   20000: "7",
   99999: "8",
 };
 
-const showMeetingText = ["15000", "16000", "17000", "18000", "19000"];
+const showMeetingText = ["15000", "16000", "18000", "19000"];
 const stageMeta = {
   1: { title: "议题提报", desc: "资料上传、AI提取、议题与会议确认", icon: FormOutlined },
   2: { title: "议题评估", desc: "材料批注、问答反馈、风险判断", icon: FileSearchOutlined },
@@ -239,13 +237,7 @@ function TabLabel({ active, disabled, stageKey, children }) {
       <img src={removedFileReplaceTabImage} alt="已删除的文件替换tab页面截图" />
     </div>
   ) : null;
-  const voteRemovedTip = stageKey === "6" ? (
-    <div className="new-sanhui-review-remove-tip">
-      <div className="new-sanhui-review-remove-title">Demo说明：删除【专题汇报】</div>
-      <img src={removedTopicReportTabImage} alt="已删除专题汇报tab页面截图" />
-    </div>
-  ) : null;
-  const removedTip = reviewRemovedTip || voteRemovedTip;
+  const removedTip = reviewRemovedTip;
   return (
     <div
       className={[
@@ -287,13 +279,7 @@ function StageHelpTip({ stageKey }) {
       <img src={removedFileReplaceTabImage} alt="已删除的文件替换tab页面截图" />
     </div>
   ) : null;
-  const voteRemovedTip = stageKey === "6" ? (
-    <div className="new-sanhui-review-remove-tip">
-      <div className="new-sanhui-review-remove-title">Demo说明：删除【专题汇报】</div>
-      <img src={removedTopicReportTabImage} alt="已删除专题汇报tab页面截图" />
-    </div>
-  ) : null;
-  const title = reviewRemovedTip || voteRemovedTip;
+  const title = reviewRemovedTip;
 
   if (!title) return null;
 
@@ -738,7 +724,7 @@ function MeetingTimeCard({ meeting, onChange, onEnabledChange }) {
           <Input />
         </Form.Item>
         <Form.Item name="notifyDate" label="通知时间" rules={[{ required: true }]}>
-          <DatePicker style={{ width: "100%" }} />
+          <DatePicker style={{ width: "100%" }} disabled />
         </Form.Item>
         <Form.Item name="launchType" label="召开方式" rules={[{ required: true }]}>
           <Radio.Group>
@@ -1094,7 +1080,7 @@ export default function DueDrawer({
   const [meetingDrawerOpen, setMeetingDrawerOpen] = useState(false);
   const [meetingTimeDrawerOpen, setMeetingTimeDrawerOpen] = useState(false);
   const [meetingActiveKey, setMeetingActiveKey] = useState("1");
-  const [reviewActiveKey, setReviewActiveKey] = useState(reviewInitialTab || "2");
+  const [reviewActiveKey, setReviewActiveKey] = useState(reviewInitialTab || "1");
   const [decisionActiveKey, setDecisionActiveKey] = useState("decision");
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedbackGroups, setFeedbackGroups] = useState(initialFeedbackGroups);
@@ -1127,7 +1113,6 @@ export default function DueDrawer({
       (statusNumber === 14000 && tabKey >= 3) ||
       (statusNumber === 15000 && tabKey >= 4) ||
       (statusNumber === 16000 && tabKey >= 5) ||
-      (statusNumber === 17000 && tabKey >= 7) ||
       (statusNumber === 18000 && tabKey >= 7)
     );
   };

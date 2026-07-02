@@ -20,10 +20,10 @@
         "bodCompResult": "1",
         "bodVoteElusionFlag": "0",
         "bosFlag": "1",
-        "bosCompResult": "1",
+        "bosCompResult": "0",
         "bosVoteElusionFlag": "0",
         "shsFlag": "1",
-        "shsCompResult": "1",
+        "shsCompResult": "2",
         "shsVoteElusionFlag": "0"
       },
       {
@@ -31,12 +31,12 @@
         "topicName": "关于参股公司年度预算调整的议案",
         "bodFlag": "1",
         "bodCompResult": "2",
-        "bodVoteElusionFlag": "1",
-        "bosFlag": "0",
-        "bosCompResult": "",
+        "bodVoteElusionFlag": "0",
+        "bosFlag": "1",
+        "bosCompResult": "-1",
         "bosVoteElusionFlag": "0",
         "shsFlag": "1",
-        "shsCompResult": "2",
+        "shsCompResult": "1",
         "shsVoteElusionFlag": "0"
       },
       {
@@ -45,11 +45,24 @@
         "bodFlag": "1",
         "bodCompResult": "0",
         "bodVoteElusionFlag": "0",
-        "bosFlag": "0",
-        "bosCompResult": "",
+        "bosFlag": "1",
+        "bosCompResult": "2",
         "bosVoteElusionFlag": "0",
-        "shsFlag": "0",
-        "shsCompResult": "",
+        "shsFlag": "1",
+        "shsCompResult": "-1",
+        "shsVoteElusionFlag": "0"
+      },
+      {
+        "id": "misc-004",
+        "topicName": "关于外部董事意见采纳情况说明的议案",
+        "bodFlag": "1",
+        "bodCompResult": "-1",
+        "bodVoteElusionFlag": "0",
+        "bosFlag": "1",
+        "bosCompResult": "1",
+        "bosVoteElusionFlag": "0",
+        "shsFlag": "1",
+        "shsCompResult": "0",
         "shsVoteElusionFlag": "0"
       }
     ]

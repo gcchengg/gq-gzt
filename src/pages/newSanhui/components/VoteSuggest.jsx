@@ -10,17 +10,25 @@ const resultText = {
   0: "反对",
   1: "同意",
   2: "有条件同意",
+  "-1": "回避表决",
+};
+
+const resultClassName = {
+  0: "vote-suggest-result-no",
+  1: "vote-suggest-result-yes",
+  2: "vote-suggest-result-conditional",
+  "-1": "vote-suggest-result-avoid",
 };
 
 function VoteResult({ enabled, result, elusion }) {
   if (enabled !== "1") return "-";
 
-  const isOpposed = result === "0";
+  const value = elusion === "1" ? "-1" : result;
 
   return (
     <>
-      <span className={isOpposed ? "vote-suggest-result-no" : "vote-suggest-result-yes"}>
-        {resultText[result] || "-"}
+      <span className={resultClassName[value] || "vote-suggest-result-empty"}>
+        {resultText[value] || "-"}
       </span>
     </>
   );
@@ -39,16 +47,15 @@ const sendTaskTip = (
     <p>2. 点击【发送建议单任务】后，发送【表决建议单】任务</p>
     <p>3. 整个三会结束后关闭【表决建议单】任务</p>
     <p>4. 第一次给董事发送任务，第二次不会发出任务只会发送钉钉消息</p>
+    <p>4. 根据会议时间，提前三天给管户发送提醒让他点击发送建议单任务</p>
   </div>
 );
 
-function downloadVoteSuggestPdf() {
-  const link = document.createElement("a");
-  link.href = voteSuggestPdfUrl;
-  link.download = "表决建议单.pdf";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+function openVoteSuggestPdf() {
+  const opened = window.open(voteSuggestPdfUrl, "_blank", "noopener,noreferrer");
+  if (opened) {
+    opened.opener = null;
+  }
 }
 
 function createTopicAdviceValues(data = {}, topics = []) {
@@ -197,7 +204,7 @@ export default function VoteSuggest({
     message.success(res.message || "保存成功");
 
     if (status === "1") {
-      navigate("/GztHome?task=topicReport");
+      navigate("/GztHome?task=meetingVote");
       return;
     }
 
@@ -220,8 +227,8 @@ export default function VoteSuggest({
 
     form.setFieldValue("id", res.data.id);
     await fetchData();
-    downloadVoteSuggestPdf();
-    message.success("表决建议单下载已开始");
+    openVoteSuggestPdf();
+    message.success("表决建议单已在新标签页打开");
   };
 
   const handleSendTask = async () => {

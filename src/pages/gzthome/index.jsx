@@ -3,7 +3,6 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import "./index.css";
 const taskKeyMap = {
     topicApproval: "议题审批",
-    topicReport: "专题汇报",
     meetingVote: "三会表决",
 };
 const taskTabs = [
@@ -19,7 +18,6 @@ const taskTabs = [
     "议题初审_综合管理",
     "议题初审_党群初审",
     "表决建议",
-    "专题汇报",
     "三会表决",
     "决策执行",
     "任务管理",
@@ -89,11 +87,6 @@ const taskCopyByCard = {
         title: "表决建议",
         description: "参股公司三会表决建议",
         href: "/newSanhui?task=voteSuggest&autoOpen=1",
-    },
-    专题汇报: {
-        title: "专题汇报",
-        description: "参股公司三会专题汇报",
-        href: "/newSanhui?task=topicReport&autoOpen=1",
     },
     三会表决: {
         title: "三会表决",

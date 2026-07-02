@@ -1,4 +1,4 @@
-import { Table, Tag } from "antd";
+import { Button, Space, Table, Tag, message } from "antd";
 import { useMemo, useState } from "react";
 
 const initialJointReviewRows = [
@@ -84,13 +84,30 @@ function FeedbackCell({ value }) {
   return <span>{value || "-"}</span>;
 }
 
-export default function JointReviewFeedback() {
+export default function JointReviewFeedback({ isEdit = false }) {
   const [rows, setRows] = useState(initialJointReviewRows);
 
   const completedCount = useMemo(
     () => rows.filter((item) => item.reviewerStatus === "done" && (!item.needManagerConfirm || item.managerStatus === "done")).length,
     [rows],
   );
+
+  const handleRemind = (record, target) => {
+    const targetName = target === "manager" ? record.manager : record.reviewer;
+    const targetLabel = target === "manager" ? "科室经理" : "联审人";
+
+    setRows((current) =>
+      current.map((item) =>
+        item.id === record.id
+          ? {
+              ...item,
+              [`${target}Reminded`]: true,
+            }
+          : item,
+      ),
+    );
+    message.success(`已提醒${record.deptName}${targetLabel}${targetName ? `（${targetName}）` : ""}`);
+  };
 
   const columns = [
     { title: "序号", width: 64, render: (_value, _row, index) => index + 1 },
@@ -137,6 +154,42 @@ export default function JointReviewFeedback() {
         record.needManagerConfirm ? <FeedbackCell value={value} /> : <span>不涉及</span>
       ),
     },
+    ...(isEdit
+      ? [
+          {
+            title: "操作",
+            key: "action",
+            width: 180,
+            fixed: "right",
+            render: (_value, record) => {
+              const reviewerDone = record.reviewerStatus === "done";
+              const managerDone = !record.needManagerConfirm || record.managerStatus === "done";
+              return (
+                <Space size={4}>
+                  <Button
+                    type="link"
+                    size="small"
+                    disabled={reviewerDone}
+                    onClick={() => handleRemind(record, "reviewer")}
+                  >
+                    {record.reviewerReminded ? "已提醒联审人" : "提醒联审人"}
+                  </Button>
+                  {record.needManagerConfirm ? (
+                    <Button
+                      type="link"
+                      size="small"
+                      disabled={managerDone}
+                      onClick={() => handleRemind(record, "manager")}
+                    >
+                      {record.managerReminded ? "已提醒经理" : "提醒经理"}
+                    </Button>
+                  ) : null}
+                </Space>
+              );
+            },
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -144,7 +197,7 @@ export default function JointReviewFeedback() {
       <div className="review-warning">
         联审部门反馈共 {rows.length} 个部门，已完成 {completedCount} 个。联审人任务和科室经理任务分别记录完成状态与反馈建议；财务部、审计风控与法务部需同时完成联审人及科室经理任务。
       </div>
-      <Table rowKey="id" columns={columns} dataSource={rows} pagination={false} size="small" scroll={{ x: 1800 }} />
+      <Table rowKey="id" columns={columns} dataSource={rows} pagination={false} size="small" scroll={{ x: isEdit ? 1980 : 1800 }} />
     </div>
   );
 }

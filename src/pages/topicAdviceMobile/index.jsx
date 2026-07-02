@@ -33,13 +33,13 @@ const smartFiles = [
         aiAnalysisStatus: "1",
         aiAnalysisResult: "已提取到 1 个会议信息",
     },
-    {
-        id: "smart-002",
-        fileName: "基金退出决策议题目录.xlsx",
-        fileCategory: "300",
-        aiAnalysisStatus: "1",
-        aiAnalysisResult: "已提取到关键信息并创建了 2 个议题",
-    },
+    // {
+    //     id: "smart-002",
+    //     fileName: "基金退出决策议题目录.xlsx",
+    //     fileCategory: "300",
+    //     aiAnalysisStatus: "1",
+    //     aiAnalysisResult: "已提取到关键信息并创建了 2 个议题",
+    // },
     {
         id: "smart-003",
         fileName: "基金退出方案补充材料.pdf",

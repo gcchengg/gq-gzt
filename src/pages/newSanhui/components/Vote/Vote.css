@@ -184,6 +184,22 @@
   margin-right: 14px;
 }
 
+.vote-decision-radio {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.vote-decision-radio .ant-radio-wrapper {
+  flex: 0 0 auto;
+  margin-right: 10px;
+}
+
+.vote-decision-radio .ant-radio-wrapper:last-child {
+  margin-right: 0;
+}
+
 .vote-button-group {
   position: absolute;
   right: 22px;
