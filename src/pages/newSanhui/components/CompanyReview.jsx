@@ -12,7 +12,10 @@ import generatePdfResponse from "../mock/data/companyReview/generatePdf.json";
 import getCompanyIdResponse from "../mock/data/companyReview/getCompanyId.json";
 import topicOADetailResponse from "../mock/data/companyReview/topicOADetail.json";
 import meetingDecisionResponse from "../mock/data/companyReview/meetingDecision.json";
+import approvalPreviewResponse from "../yulan.json";
 import approvalDemoPdfUrl from "../mock/data/companyReview/Document.pdf?url";
+import approvalPreviewImage1 from "../../../components/1.png";
+import approvalPreviewImage2 from "../../../components/2.png";
 import JointReviewFeedback from "./JointReviewFeedback";
 import { EvaluationPreview, SupplementMaterials } from "./TopicEvaluation/EvaluationMaterials";
 import "./CompanyReview.css";
@@ -411,7 +414,202 @@ function QuestionsPanel({ isEdit, onCountChange, }) {
 function TopicApprovalPanel({ isEdit }) {
     return <JointReviewFeedback isEdit={isEdit}/>;
 }
-export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, submitButtonText = "下一步", afterContent }) {
+const reviewTitleMap = {
+    1000: "总监PDF预览",
+    2000: "分管副总PDF预览",
+    3000: "总办会PDF预览",
+};
+const voteAdviceTextMap = {
+    0: "不同意",
+    1: "同意",
+    2: "同意",
+    "-1": "回避表决",
+};
+const approvalPreviewImages = [
+    { id: "approval-preview-image-1", fileName: "1.png", fileUrl: approvalPreviewImage1 },
+    { id: "approval-preview-image-2", fileName: "2.png", fileUrl: approvalPreviewImage2 },
+];
+function HtmlText({ value }) {
+    return <span dangerouslySetInnerHTML={{ __html: value || "--" }}/>;
+}
+function ApprovalPreviewModal({ open, onClose, reviewType }) {
+    const infoData = approvalPreviewResponse.data || {};
+    const calculateRowSpan = (data, field, index) => {
+        if (index === 0 || data[index]?.sanhuiTopicModelFactorVo?.[field] !== data[index - 1]?.sanhuiTopicModelFactorVo?.[field]) {
+            let count = 1;
+            for (let i = index + 1; i < data.length; i += 1) {
+                if (data[i]?.sanhuiTopicModelFactorVo?.[field] === data[index]?.sanhuiTopicModelFactorVo?.[field]) {
+                    count += 1;
+                }
+                else {
+                    break;
+                }
+            }
+            return count;
+        }
+        return 0;
+    };
+    const meetingInfoColumns = [
+        { title: "会议分类", dataIndex: "meetingTypeName", width: "12%", align: "center" },
+        { title: "会议名称", dataIndex: "meetingName", width: "60%" },
+        { title: "会议日期", dataIndex: "launchTimeStr", width: "14%", align: "center" },
+        { title: "会议形式", dataIndex: "launchTypeName", width: "14%", align: "center" },
+    ];
+    const topicInfoColumns = [
+        { title: "序号", width: "6%", align: "center", render: (_text, _record, index) => index + 1 },
+        { title: "议案名称", dataIndex: "toipcName", width: "52%" },
+        {
+            title: "董事会",
+            width: "14%",
+            align: "center",
+            render: (_text, record) => {
+                const schedule = record.eoSanhuiTopicScheduleFormList?.find((item) => item.meetingType === "100");
+                return schedule?.launchFlag === "1" ? <div className="approval-preview-stack"><div>√</div>{schedule.voteElusionFlag === "1" ? <div>（回避表决）</div> : null}</div> : "-";
+            },
+        },
+        {
+            title: "监事会",
+            width: "14%",
+            align: "center",
+            render: (_text, record) => {
+                const schedule = record.eoSanhuiTopicScheduleFormList?.find((item) => item.meetingType === "200");
+                return schedule?.launchFlag === "1" ? <div className="approval-preview-stack"><div>√</div>{schedule.voteElusionFlag === "1" ? <div>（回避表决）</div> : null}</div> : "-";
+            },
+        },
+        {
+            title: "股东会",
+            width: "14%",
+            align: "center",
+            render: (_text, record) => {
+                const schedule = record.eoSanhuiTopicScheduleFormList?.find((item) => item.meetingType === "300");
+                return schedule?.launchFlag === "1" ? <div className="approval-preview-stack"><div>√</div>{schedule.voteElusionFlag === "1" ? <div>（回避表决）</div> : null}</div> : "-";
+            },
+        },
+    ];
+    const assessmentColumns = (data) => [
+        { title: "序号", width: "4%", align: "center", render: (_text, _record, index) => index + 1 },
+        {
+            title: "一级维度",
+            width: "6%",
+            align: "center",
+            render: (_text, record, index) => ({ children: record.sanhuiTopicModelFactorVo?.factorLv3Name, props: { rowSpan: calculateRowSpan(data, "factorLv3Name", index) } }),
+        },
+        {
+            title: "二级维度",
+            width: "6%",
+            align: "center",
+            render: (_text, record, index) => ({ children: record.sanhuiTopicModelFactorVo?.factorLv2Name, props: { rowSpan: calculateRowSpan(data, "factorLv2Name", index) } }),
+        },
+        {
+            title: "评价要素",
+            width: "8%",
+            align: "center",
+            render: (_text, record, index) => ({ children: record.sanhuiTopicModelFactorVo?.assessElement, props: { rowSpan: calculateRowSpan(data, "assessElement", index) } }),
+        },
+        { title: "权重", width: "5%", align: "center", render: (_text, record) => record.sanhuiTopicModelFactorVo?.factorType === "2" ? "/" : `${record.sanhuiTopicModelFactorVo?.weight || ""}%` },
+        { title: "评价标准", render: (_text, record) => <HtmlText value={record.sanhuiTopicModelFactorVo?.criterion}/> },
+        { title: "执行情况", render: (_text, record) => <HtmlText value={record.execDetail}/> },
+        { title: "评价规则", render: (_text, record) => <HtmlText value={record.sanhuiTopicModelFactorVo?.assessRule}/> },
+        {
+            title: "评价结果(分)",
+            width: "8%",
+            align: "center",
+            render: (_text, record) => {
+                if (record.sanhuiTopicModelFactorVo?.factorType === "2") {
+                    return record.result === 100 ? "通过" : "不通过";
+                }
+                return record.sanhuiTopicModelFactorVo?.excludeAble === "1" && record.excludeFlag === "1" ? "/" : record.assessResult;
+            },
+        },
+        {
+            title: "异常提示",
+            width: "6%",
+            align: "center",
+            render: (_text, record) => <span className={`approval-preview-circle ${record.excludeFlag === "1" ? "green2" : record.ligh || ""}`}/>,
+        },
+    ];
+    const opinionColumns = [
+        { title: "序号", width: "6%", align: "center", render: (_text, _record, index) => index + 1 },
+        { title: "相关部门", width: "15%", dataIndex: "orgName", align: "center" },
+        { title: "反馈意见", dataIndex: "reviewComment", align: "center", render: (text) => text || "-" },
+        { title: "补充意见", dataIndex: "addlComment", align: "center", render: (text) => text || "-" },
+    ];
+    const decisionColumns = [
+        { title: "序号", width: "6%", align: "center", render: (_text, _record, index) => index + 1 },
+        { title: "议案名称", dataIndex: "sanhuiTopicName", width: "46%" },
+        {
+            title: "董事会审议",
+            width: "16%",
+            align: "center",
+            render: (_text, record) => record.voteAdvice100 ? <div className="approval-preview-stack"><div>{voteAdviceTextMap[record.voteAdvice100]}</div>{record.mgmtComment100 ? <div>（{record.mgmtComment100}）</div> : null}</div> : "-",
+        },
+        {
+            title: "监事会审议",
+            width: "16%",
+            align: "center",
+            render: (_text, record) => record.voteAdvice200 ? <div className="approval-preview-stack"><div>{voteAdviceTextMap[record.voteAdvice200]}</div>{record.mgmtComment200 ? <div>（{record.mgmtComment200}）</div> : null}</div> : "-",
+        },
+        {
+            title: "股东会审议",
+            width: "16%",
+            align: "center",
+            render: (_text, record) => record.voteAdvice300 ? <div className="approval-preview-stack"><div>{voteAdviceTextMap[record.voteAdvice300]}</div>{record.mgmtComment300 ? <div>（{record.mgmtComment300}）</div> : null}</div> : "-",
+        },
+    ];
+    return (<Modal title={reviewTitleMap[reviewType]} open={open} width="100%" style={{ top: 0 }} className="search-modal approval-preview-modal" onCancel={onClose} footer={null}>
+      <div className="approval-preview-doc">
+        <h1 className="approval-preview-doc-title">
+          <div className="approval-preview-main-title"><HtmlText value={infoData.companyName}/></div>
+          <span className="approval-preview-dept-title">{infoData.deptName}</span>
+        </h1>
+        <h2>提报材料</h2>
+        <Table rowKey="id" className="approval-preview-table" columns={[
+            { title: "序号", width: "10%", align: "center", render: (_text, _record, index) => index + 1 },
+            { title: "文件", dataIndex: "fileName", render: (text, record) => <a href={record.fileUrl} target="_blank" rel="noreferrer">{text}</a> },
+        ]} dataSource={infoData.reportFileList || []} pagination={false} bordered/>
+        <h2>风控合规审核意见</h2>
+        <p><HtmlText value={infoData.lagelComment}/></p>
+        <h2>风控合规风险提示应对建议</h2>
+        <p><HtmlText value={infoData.riskComment}/></p>
+        <h2>会议概况</h2>
+        <Table rowKey="id" className="approval-preview-table" columns={meetingInfoColumns} dataSource={infoData.meetingInfo || []} pagination={false} bordered/>
+        <h2>议案信息</h2>
+        <Table rowKey="id" className="approval-preview-table" columns={topicInfoColumns} dataSource={infoData.topicList || []} pagination={false} bordered/>
+        {(infoData.assessmentList || []).map((motion, index) => {
+            const rows = motion.assessmentList || [];
+            const hasDisqualified = rows.some((item) => item.sanhuiTopicModelFactorVo?.factorType === "2" && Number(item.assessResult) === 0);
+            const hasValidFactors = rows.some((item) => item.sanhuiTopicModelFactorVo?.factorType === "1");
+            const total = hasDisqualified || !hasValidFactors ? (hasDisqualified ? "不通过" : "通过") : Number(rows.filter((item) => item.sanhuiTopicModelFactorVo?.factorType !== "2").reduce((sum, item) => sum + (item.excludeFlag === "1" ? 0 : Number(item.assessResult || 0)), 0).toFixed(2));
+            return (<div className="approval-preview-topic" key={motion.title || index}>
+              <h3>{motion.title}</h3>
+              <div className="approval-preview-image-list">
+                {approvalPreviewImages.map((img) => <img key={img.id} src={img.fileUrl} alt={img.fileName}/>)}
+              </div>
+              <Table rowKey="id" className="approval-preview-table" columns={assessmentColumns(rows)} dataSource={rows} pagination={false} bordered summary={() => (<Table.Summary.Row>
+                <Table.Summary.Cell index={0} colSpan={3}>综合得分</Table.Summary.Cell>
+                <Table.Summary.Cell index={1} colSpan={5}>1、得分≥80分，议题通过；2、80分&gt;得≥60，议题通过，但要提出管理意见或提示项；3、得分&lt;60分，不通过；4、合规性维度任意一项不通过，议题不通过</Table.Summary.Cell>
+                <Table.Summary.Cell index={2}>{total}</Table.Summary.Cell>
+                <Table.Summary.Cell index={3}/>
+              </Table.Summary.Row>)}/>
+              <div className="approval-preview-line"><b>董监事的意见：</b><HtmlText value={motion.commentList}/></div>
+              <div className="approval-preview-line"><b>提请决策事项：</b><HtmlText value={motion.todoComment}/></div>
+            </div>);
+        })}
+        {infoData.commentList?.length ? (<>
+          <h2>相关部门意见</h2>
+          <Table rowKey="id" className="approval-preview-table" columns={opinionColumns} dataSource={infoData.commentList || []} pagination={false} bordered/>
+        </>) : null}
+        {infoData.topicOpnList?.length ? (<>
+          <h2>提请决策事项</h2>
+          {infoData.desc ? <div className="approval-preview-desc"><HtmlText value={infoData.desc}/></div> : null}
+          <Table rowKey="id" className="approval-preview-table" columns={decisionColumns} dataSource={infoData.topicOpnList || []} pagination={false} bordered/>
+        </>) : null}
+        {infoData.auth?.map((item, index) => <div key={index} className="approval-preview-desc">授权{item.auth}在{item.mtName}上代表本公司行使表决权</div>)}
+        {infoData.sanhuiVote ? <div className="approval-preview-desc"><HtmlText value={infoData.sanhuiVote}/></div> : null}
+      </div>
+    </Modal>);
+}
+export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, submitButtonText = "下一步", afterContent, useStructuredPreview = false }) {
     const [form] = Form.useForm();
     const materialData = initialMaterialPrepare;
     const [loading, setLoading] = useState(false);
@@ -426,6 +624,8 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
     }));
     const [pdfModalOpen, setPdfModalOpen] = useState(false);
     const [pdfCurrent, setPdfCurrent] = useState(0);
+    const [reviewOpen, setReviewOpen] = useState(false);
+    const [reviewType, setReviewType] = useState("1000");
     const [materialOpen, setMaterialOpen] = useState(null);
     const [previewTopic, setPreviewTopic] = useState(null);
     const [submitMeetingModalOpen, setSubmitMeetingModalOpen] = useState(false);
@@ -521,6 +721,11 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
         },
     });
     const onPreview = (type = "1000") => {
+        if (useStructuredPreview) {
+            setReviewType(type);
+            setReviewOpen(true);
+            return;
+        }
         setLoading(true);
         setTimeout(() => {
             setPdfUrl((current) => ({
@@ -542,7 +747,13 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
                 }
                 if (pdfType) {
                     setPdfCurrent(Math.max(0, pdfCurrentList.indexOf(pdfType)));
-                    onPreview(pdfType);
+                    if (useStructuredPreview) {
+                        setReviewType(pdfType);
+                        setReviewOpen(true);
+                    }
+                    else {
+                        onPreview(pdfType);
+                    }
                     return;
                 }
                 if (type === 2) {
@@ -777,6 +988,7 @@ export function MaterialPreparePanel({ isEdit, setActiveKey, onSubmitSuccess, su
         </>}>
         {pdfUrl[currentPreviewType] ? (<iframe title={previewTitleMap[currentPreviewType]} src={pdfUrl[currentPreviewType]} width="100%" height="100%"/>) : (<div>正在生成...</div>)}
       </Modal>
+      <ApprovalPreviewModal open={reviewOpen} onClose={() => setReviewOpen(false)} reviewType={reviewType}/>
       <EvaluationPreview open={Boolean(previewTopic)} topic={previewTopic} onClose={() => setPreviewTopic(null)} />
       <SupplementMaterials open={Boolean(materialOpen)} onClose={() => setMaterialOpen(null)} />
     </div>);
@@ -1384,7 +1596,7 @@ function PostMeetingMaterialPanel({ isEdit, setActiveKey }) {
             <JointOpinionTable isEdit={isEdit}/>
           </div>
           <div className="joint-material-section">
-            <MaterialPreparePanel isEdit={isEdit} setActiveKey={setActiveKey} afterContent={<AfterMeetingReplacementApplication isEdit={isEdit}/>}/>
+            <MaterialPreparePanel isEdit={isEdit} setActiveKey={setActiveKey} afterContent={<AfterMeetingReplacementApplication isEdit={isEdit}/>} useStructuredPreview/>
           </div>
         </div>
       </div>
