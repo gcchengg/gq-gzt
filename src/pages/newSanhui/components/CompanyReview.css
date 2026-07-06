@@ -112,9 +112,9 @@
 
 .review-panel {
   min-height: 480px;
-  padding: 14px;
-  border: 1px solid #e7ebf3;
-  border-radius: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   background: #fff;
 }
 
@@ -127,12 +127,26 @@
   overflow: hidden;
 }
 
-.ministry-meeting-panel > .ant-card {
+.ministry-meeting-content {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  border: 0;
-  border-radius: 0;
+  padding: 14px;
+}
+
+.ministry-meeting-panel .questions-title {
+  margin-top: 0;
+}
+
+.ministry-meeting-form-card {
+  padding: 18px 18px 4px;
+  border: 1px solid #e7ebf3;
+  border-radius: 0 0 8px 8px;
+  background: #fff;
+}
+
+.ministry-meeting-form-card .ant-form {
+  max-width: 1120px;
 }
 
 .filesReplace-wraper {
@@ -338,8 +352,8 @@
 .tabs-container-sanhui {
   min-height: 520px;
   height: 100%;
-  border: 1px solid #e7ebf3;
-  border-radius: 8px;
+  border: 0;
+  border-radius: 0;
   background: #fff;
   overflow: hidden;
 }
@@ -480,10 +494,32 @@
   overflow-y: auto;
 }
 
+.topic-approval-layout .tabs2-left {
+  padding: 14px 14px 0;
+  box-sizing: border-box;
+}
+
+.topic-approval-layout .tabs2-content {
+  padding: 4px 4px 24px;
+}
+
+.topic-approval-layout .approval-step-panel {
+  padding: 14px 12px 14px 14px;
+}
+
 .approval-step-title {
-  margin-bottom: 12px;
-  color: #25324a;
-  font-size: 14px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid #e7ebf3;
+  border-radius: 8px;
+  background: #fbfcff;
+  color: #262629;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -1031,8 +1067,8 @@
 .tabs4-container .approval-table {
   flex: 1;
   min-height: 0;
-  padding: 16px 18px 24px;
-  background: #f7f9fc;
+  padding: 14px;
+  background: #fff;
   overflow: auto;
 }
 
@@ -1081,38 +1117,15 @@
   display: inline-flex;
 }
 
-.tabs4-container .tableWrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 48px;
-  margin: 0;
-  padding: 10px 14px;
-  border-bottom: 1px solid #edf0f5;
-  background: #fbfcff;
-}
-
-.tabs4-container .tableTitle {
-  position: relative;
-  padding-left: 10px;
-  color: #25324a;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.tabs4-container .tableTitle::before {
-  position: absolute;
-  left: 0;
-  top: 4px;
-  width: 3px;
-  height: 14px;
-  border-radius: 999px;
-  content: "";
-  background: #1d4ed8;
-}
-
 .meeting-decision-section {
   overflow: hidden;
+}
+
+.meeting-decision-section .questions-title {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid #edf0f5;
+  border-radius: 0;
 }
 
 .meeting-decision-card-list {

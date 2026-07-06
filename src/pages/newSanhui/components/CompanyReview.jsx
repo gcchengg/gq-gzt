@@ -1000,7 +1000,12 @@ function MinistryMeetingPanel({ isEdit, setActiveKey }) {
         setActiveKey("4");
     };
     return (<div className="review-panel ministry-meeting-panel">
-      <Card title="提请部务会" size="small">
+      <div className="ministry-meeting-content">
+        <div className="questions-title">
+          <span className="title-dot"/>
+          <span className="title-text">提请部务会</span>
+        </div>
+        <div className="ministry-meeting-form-card">
         <Form form={form} layout="vertical" disabled={!isEdit} initialValues={{
             meetingSubject: "关于推进基金退出事项提请部务会审议",
             reason: "该事项涉及基金退出路径、交易对手沟通和风险应对安排，需提请部务会审议。",
@@ -1016,7 +1021,8 @@ function MinistryMeetingPanel({ isEdit, setActiveKey }) {
             <Input />
           </Form.Item>
         </Form>
-      </Card>
+        </div>
+      </div>
       {isEdit ? (
         <div className="projectBtn">
           <Button onClick={() => setActiveKey("1")}>
@@ -1042,7 +1048,10 @@ function ReviewApprovalSteps() {
         { role: "分管领导", name: "李秀柱", time: "2026-04-22 09:15:44", state: "approved", remark: "同意", muted: true },
     ];
     return (<div className="approval-step-panel">
-      <div className="approval-step-title">当前审批状态</div>
+      <div className="approval-step-title">
+        <span className="title-dot"/>
+        <span className="title-text">当前审批状态</span>
+      </div>
       <div className="approval-step-list">
         {steps.map((step, index, list) => (<div className={`approval-step-item ${step.state === "approved" ? "is-approved" : "is-start"} ${step.muted ? "is-muted" : ""}`} key={`${step.role}-${step.name}`}>
             <div className="approval-step-rail">
@@ -1192,7 +1201,7 @@ function TopicApprovalFlowPanel({ projectId, isEdit, onClosed, setActiveKey, inv
         });
         setFileImgList(data.decisionRequestScreenshotFile || []);
     }, []);
-    return (<div className="tabs2-container tabs-container-sanhui">
+    return (<div className="tabs2-container tabs-container-sanhui topic-approval-layout">
       <div className="tabs2-left">
         <div className="questions-title">
           <span className="title-dot"/>
@@ -1739,8 +1748,9 @@ function MeetingMinutesPanel({ projectId, isEdit, onClosed, currentInstanceCode,
             </div>
           </div>
           <div className="meeting-decision-section">
-            <div className="tableWrap">
-              <div className="tableTitle">会议决策</div>
+            <div className="questions-title">
+              <span className="title-dot"/>
+              <span className="title-text">会议决策</span>
             </div>
             {isShowTip && fileList.length > 0 && (<div className="jingshi-title">
                 <span className="jingshi-text">AI已经从会议纪要中提取了各议题的会议决策，请确认并补充遗漏或修改错误！</span>
