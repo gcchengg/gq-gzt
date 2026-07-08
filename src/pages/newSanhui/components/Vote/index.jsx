@@ -1,8 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Drawer, Empty, Input, Radio, Spin, Table, Tooltip, Upload, message } from "antd";
+import {
+  Button,
+  Drawer,
+  Empty,
+  Input,
+  Radio,
+  Spin,
+  Table,
+  Tooltip,
+  Upload,
+  message,
+} from "antd";
 import { QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { sanhuiVoteInitBySanhuiMgmtId, sanhuiVoteSave } from "../../mock/voteApi";
+import {
+  sanhuiVoteInitBySanhuiMgmtId,
+  sanhuiVoteSave,
+} from "../../mock/voteApi";
 import "./Vote.css";
 
 const MEETING_FILE_GROUPS = [
@@ -11,8 +25,9 @@ const MEETING_FILE_GROUPS = [
   { key: "shs", title: "股东会会议决议" },
 ];
 
-const MEETING_FILE_TYPES = ["我方发出版",'会议完整版'];
-const getFileCategory = (meetingTitle, fileType) => `${meetingTitle}-${fileType}`;
+const MEETING_FILE_TYPES = ["我方发出版", "会议完整版"];
+const getFileCategory = (meetingTitle, fileType) =>
+  `${meetingTitle}-${fileType}`;
 
 const getEmptyVoteFileMap = () =>
   MEETING_FILE_GROUPS.reduce((fileMap, meetingItem) => {
@@ -44,7 +59,51 @@ const voteDecisionOptions = [
   { label: "回避表决", value: "-1" },
 ];
 
-function UploadFile({ dataList = [], setDataList, disabled, accept, tipValue }) {
+const voteDecisionTextMap = voteDecisionOptions.reduce((textMap, item) => {
+  textMap[item.value] = item.label;
+  return textMap;
+}, {});
+
+const getTodayValue = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const formatDateText = (dateValue) => {
+  if (!dateValue) return "";
+  const [year, month, day] = dateValue.split("-");
+  if (!year || !month || !day) return dateValue;
+  return `${year}年${month}月${day}日`;
+};
+
+const getDecisionText = (record, flagKey, topicFlagKey) => {
+  if (record.itemData?.eoSanhuiTopic?.[topicFlagKey] === "0") return "未涉及";
+  return voteDecisionTextMap[record[flagKey]] || "未选择";
+};
+
+const getDefaultResolutionMatter = (record, dateValue) => {
+  const topicName = record.toipcName ? `《${record.toipcName}》` : "相关议题";
+  return `于${formatDateText(dateValue)}就${topicName}形成三会决议：董事会决议为${getDecisionText(
+    record,
+    "bodPassFlag",
+    "bodFlag",
+  )}，监事会决议为${getDecisionText(record, "bosPassFlag", "bosFlag")}，股东会决议/投委会决议为${getDecisionText(
+    record,
+    "shPassFlag",
+    "shsFlag",
+  )}。`;
+};
+
+function UploadFile({
+  dataList = [],
+  setDataList,
+  disabled,
+  accept,
+  tipValue,
+}) {
   return (
     <div className="vote-upload-file">
       <Upload
@@ -71,10 +130,16 @@ function UploadFile({ dataList = [], setDataList, disabled, accept, tipValue }) 
         maxCount={1}
       >
         <div className="vote-upload-row">
-          <Button disabled={disabled} icon={<UploadOutlined />} className="vote-upload-btn">
+          <Button
+            disabled={disabled}
+            icon={<UploadOutlined />}
+            className="vote-upload-btn"
+          >
             上传文件
           </Button>
-          {tipValue ? <span className="vote-upload-tip">{tipValue}</span> : null}
+          {tipValue ? (
+            <span className="vote-upload-tip">{tipValue}</span>
+          ) : null}
         </div>
       </Upload>
     </div>
@@ -89,7 +154,11 @@ export default function Vote(props) {
   const [registVisible, setRegistVisible] = useState(false);
   const [infoData, setInfoData] = useState({});
   const [rowData, setRowData] = useState({});
-  const [uploadDisabled, setUploadDisabled] = useState({ bod: true, bos: true, shs: true });
+  const [uploadDisabled, setUploadDisabled] = useState({
+    bod: true,
+    bos: true,
+    shs: true,
+  });
   const voteIdRef = useRef(null);
 
   useEffect(() => {
@@ -112,9 +181,12 @@ export default function Vote(props) {
           sanhuiVoteTopicList.map((item, index) => ({
             index,
             toipcName: item.eoSanhuiTopic?.toipcName,
-            resolutionDate: item.resolutionDate || "",
-            resolutionMatter: item.resolutionMatter || "",
             timelineFlag: item.timelineFlag || "0",
+            resolutionDate:
+              item.timelineFlag === "1" ? item.resolutionDate || "" : "",
+            resolutionMatter:
+              item.timelineFlag === "1" ? item.resolutionMatter || "" : "",
+            resolutionMatterGenerated: false,
             bodPassFlag: item.bodPassFlag,
             bosPassFlag: item.bosPassFlag,
             shPassFlag: item.shPassFlag,
@@ -141,9 +213,12 @@ export default function Vote(props) {
 
         const nextUploadDisabled = { bod: true, bos: true, shs: true };
         sanhuiScheduleVoList.forEach((item) => {
-          if (item.meetingType === "100") nextUploadDisabled.bod = !item.launchFlag;
-          if (item.meetingType === "200") nextUploadDisabled.bos = !item.launchFlag;
-          if (item.meetingType === "300") nextUploadDisabled.shs = !item.launchFlag;
+          if (item.meetingType === "100")
+            nextUploadDisabled.bod = !item.launchFlag;
+          if (item.meetingType === "200")
+            nextUploadDisabled.bos = !item.launchFlag;
+          if (item.meetingType === "300")
+            nextUploadDisabled.shs = !item.launchFlag;
         });
 
         voteIdRef.current = voteId;
@@ -168,9 +243,9 @@ export default function Vote(props) {
       id: item.itemData.id,
       topicId: item.topicId,
       voteId: item.itemData.voteId,
-      resolutionDate: item.resolutionDate,
-      resolutionMatter: item.resolutionMatter,
       timelineFlag: item.timelineFlag || "0",
+      resolutionDate: item.timelineFlag === "1" ? item.resolutionDate : "",
+      resolutionMatter: item.timelineFlag === "1" ? item.resolutionMatter : "",
       bodPassFlag: item.bodPassFlag,
       bosPassFlag: item.bosPassFlag,
       shPassFlag: item.shPassFlag,
@@ -216,80 +291,119 @@ export default function Vote(props) {
     });
   };
 
+  const updateDecisionFlag = (index, flagKey, value) => {
+    const next = [...dataSource];
+    const nextRecord = { ...next[index], [flagKey]: value };
+    next[index] = nextRecord.resolutionMatterGenerated
+      ? {
+          ...nextRecord,
+          resolutionMatter: getDefaultResolutionMatter(
+            nextRecord,
+            nextRecord.resolutionDate,
+          ),
+        }
+      : nextRecord;
+    setDataSource(next);
+  };
+
   const renderVoteDecision = (text, record, index, flagKey, topicFlagKey) =>
-    record.itemData?.eoSanhuiTopic?.[topicFlagKey] === "0" ? "-" : (
+    record.itemData?.eoSanhuiTopic?.[topicFlagKey] === "0" ? (
+      "-"
+    ) : (
       <Radio.Group
         className="vote-decision-radio"
         disabled={props.editStatus === "detail"}
         options={voteDecisionOptions}
         value={text}
         onChange={(event) => {
-          const next = [...dataSource];
-          next[index][flagKey] = event.target.value;
-          setDataSource(next);
+          updateDecisionFlag(index, flagKey, event.target.value);
         }}
       />
     );
 
-  const updateRowValue = (index, key, value) => {
+  const updateTimelineFlag = (index, value) => {
     const next = [...dataSource];
-    next[index] = { ...next[index], [key]: value };
+    if (value === "1") {
+      const resolutionDate = next[index].resolutionDate || getTodayValue();
+      const shouldUseDefaultMatter = !next[index].resolutionMatter;
+      const nextRecord = {
+        ...next[index],
+        timelineFlag: value,
+        resolutionDate,
+      };
+      next[index] = {
+        ...nextRecord,
+        resolutionMatter: shouldUseDefaultMatter
+          ? getDefaultResolutionMatter(nextRecord, resolutionDate)
+          : next[index].resolutionMatter,
+        resolutionMatterGenerated: shouldUseDefaultMatter,
+      };
+    } else {
+      next[index] = {
+        ...next[index],
+        timelineFlag: value,
+        resolutionDate: "",
+        resolutionMatter: "",
+        resolutionMatterGenerated: false,
+      };
+    }
+    setDataSource(next);
+  };
+
+  const updateResolutionDate = (index, value) => {
+    const next = [...dataSource];
+    const nextRecord = { ...next[index], resolutionDate: value };
+    next[index] = nextRecord.resolutionMatterGenerated
+      ? {
+          ...nextRecord,
+          resolutionMatter: getDefaultResolutionMatter(nextRecord, value),
+        }
+      : nextRecord;
+    setDataSource(next);
+  };
+
+  const updateResolutionMatter = (index, value) => {
+    const next = [...dataSource];
+    next[index] = {
+      ...next[index],
+      resolutionMatter: value,
+      resolutionMatterGenerated: false,
+    };
     setDataSource(next);
   };
 
   const columns = [
-    { title: "序号", dataIndex: "index", width: 60, align: "center", render: (_value, _record, index) => index + 1 },
+    {
+      title: "序号",
+      dataIndex: "index",
+      width: 60,
+      align: "center",
+      render: (_value, _record, index) => index + 1,
+    },
     { title: "议题名称", dataIndex: "toipcName", width: 220, align: "center" },
     {
       title: "董事会决议",
       dataIndex: "bodPassFlag",
       width: 400,
       align: "center",
-      render: (text, record, index) => renderVoteDecision(text, record, index, "bodPassFlag", "bodFlag"),
+      render: (text, record, index) =>
+        renderVoteDecision(text, record, index, "bodPassFlag", "bodFlag"),
     },
     {
       title: "监事会决议",
       dataIndex: "bosPassFlag",
       width: 400,
       align: "center",
-      render: (text, record, index) => renderVoteDecision(text, record, index, "bosPassFlag", "bosFlag"),
+      render: (text, record, index) =>
+        renderVoteDecision(text, record, index, "bosPassFlag", "bosFlag"),
     },
     {
       title: "股东会决议/投委会决议",
       dataIndex: "shPassFlag",
       width: 400,
       align: "center",
-      render: (text, record, index) => renderVoteDecision(text, record, index, "shPassFlag", "shsFlag"),
-    },
-    {
-      title: "日期",
-      dataIndex: "resolutionDate",
-      width: 150,
-      align: "center",
-      render: (text, _record, index) => (
-        <Input
-          className="vote-edit-input"
-          disabled={props.editStatus === "detail"}
-          type="date"
-          value={text}
-          onChange={(event) => updateRowValue(index, "resolutionDate", event.target.value)}
-        />
-      ),
-    },
-    {
-      title: "事项",
-      dataIndex: "resolutionMatter",
-      width: 220,
-      align: "center",
-      render: (text, _record, index) => (
-        <Input
-          className="vote-edit-input"
-          disabled={props.editStatus === "detail"}
-          value={text}
-          placeholder="请输入事项"
-          onChange={(event) => updateRowValue(index, "resolutionMatter", event.target.value)}
-        />
-      ),
+      render: (text, record, index) =>
+        renderVoteDecision(text, record, index, "shPassFlag", "shsFlag"),
     },
     {
       title: "是否列入生命时间轴事项",
@@ -301,7 +415,7 @@ export default function Vote(props) {
           className="vote-timeline-radio"
           disabled={props.editStatus === "detail"}
           value={text || "0"}
-          onChange={(event) => updateRowValue(index, "timelineFlag", event.target.value)}
+          onChange={(event) => updateTimelineFlag(index, event.target.value)}
         >
           <Radio value="1">是</Radio>
           <Radio value="0">否</Radio>
@@ -309,10 +423,50 @@ export default function Vote(props) {
       ),
     },
     {
+      title: "日期",
+      dataIndex: "resolutionDate",
+      width: 150,
+      align: "center",
+      render: (text, record, index) => (
+        <Input
+          className="vote-edit-input"
+          disabled={
+            props.editStatus === "detail" || record.timelineFlag !== "1"
+          }
+          type="date"
+          value={text}
+          onChange={(event) => updateResolutionDate(index, event.target.value)}
+        />
+      ),
+    },
+    {
+      title: "事项",
+      dataIndex: "resolutionMatter",
+      width: 360,
+      align: "center",
+      render: (text, record, index) => (
+        <Input.TextArea
+          className="vote-edit-input"
+          disabled={
+            props.editStatus === "detail" || record.timelineFlag !== "1"
+          }
+          value={text}
+          autoSize={{ minRows: 2, maxRows: 4 }}
+          placeholder="请输入事项"
+          onChange={(event) =>
+            updateResolutionMatter(index, event.target.value)
+          }
+        />
+      ),
+    },
+    {
       title: "产权登记状态",
       dataIndex: "registerPropStatus",
       width: 180,
-      render: (_value, record) => registerStatusText[record.itemData?.eoSanhuiTopic?.registerPropStatus] || "-",
+      render: (_value, record) =>
+        registerStatusText[
+          record.itemData?.eoSanhuiTopic?.registerPropStatus
+        ] || "-",
     },
     {
       title: "操作",
@@ -349,26 +503,41 @@ export default function Vote(props) {
             <div className="vote-section-title">三会会议决议上传</div>
             <div className="vote-upload-grid">
               {MEETING_FILE_GROUPS.map((meetingItem) => {
-                const uploadedCount = getMeetingUploadedCount(meetingItem.title);
+                const uploadedCount = getMeetingUploadedCount(
+                  meetingItem.title,
+                );
                 return (
                   <div key={meetingItem.key} className="vote-meeting-card">
                     <div className="vote-meeting-card-header">
-                      <div className="vote-meeting-card-title">{meetingItem.title}</div>
+                      <div className="vote-meeting-card-title">
+                        {meetingItem.title}
+                      </div>
                       <div className="vote-upload-count">{uploadedCount}/1</div>
                     </div>
                     {MEETING_FILE_TYPES.map((fileType) => {
-                      const fileCategory = getFileCategory(meetingItem.title, fileType);
+                      const fileCategory = getFileCategory(
+                        meetingItem.title,
+                        fileType,
+                      );
                       return (
-                        <div key={fileCategory} className="vote-file-upload-item">
+                        <div
+                          key={fileCategory}
+                          className="vote-file-upload-item"
+                        >
                           <div className="vote-file-upload-title">
                             <span>{fileType}</span>
                             <span>PDF</span>
                           </div>
                           <UploadFile
-                            disabled={props.editStatus === "detail" || uploadDisabled[meetingItem.key]}
+                            disabled={
+                              props.editStatus === "detail" ||
+                              uploadDisabled[meetingItem.key]
+                            }
                             accept=".pdf"
                             dataList={voteFileMap[fileCategory]}
-                            setDataList={(fileList) => setVoteFileList(fileCategory, fileList)}
+                            setDataList={(fileList) =>
+                              setVoteFileList(fileCategory, fileList)
+                            }
                             tipValue="支持拓展名：.pdf"
                           />
                         </div>
@@ -382,9 +551,11 @@ export default function Vote(props) {
           <div className="vote-section">
             <div className="vote-section-title">
               三会决议
-              <Tooltip title="1.选项统一 同意 反对 有条件同意 回避表决
+              <Tooltip
+                title="1.选项统一 同意 反对 有条件同意 回避表决
                2.	是否列入生命时间轴事项如果选择是，对应的工作写实和参股公司生命周期管理都要显示对应的数据
-              3.工作写实的文件就是对应会议的会议完整版文件">
+              3.工作写实的文件就是对应会议的会议完整版文件"
+              >
                 <QuestionCircleOutlined className="vote-section-help-icon" />
               </Tooltip>
             </div>
@@ -404,7 +575,9 @@ export default function Vote(props) {
         </Spin>
         {props.editStatus !== "detail" ? (
           <div className="vote-button-group">
-            <Button disabled={loading} onClick={() => onSave("0")}>保存</Button>
+            <Button disabled={loading} onClick={() => onSave("0")}>
+              保存
+            </Button>
             <Button
               disabled={loading}
               type="primary"
@@ -426,15 +599,25 @@ export default function Vote(props) {
           </div>
         ) : null}
       </div>
-      <Drawer title="产权登记信息" open={registVisible} width="70%" onClose={() => setRegistVisible(false)}>
+      <Drawer
+        title="产权登记信息"
+        open={registVisible}
+        width="70%"
+        onClose={() => setRegistVisible(false)}
+      >
         <div className="vote-register-placeholder">
           <div className="vote-section-title">产权登记发起</div>
           {rowData?.topicId ? (
             <>
               <p>议题ID：{rowData.topicId}</p>
-              <p>产权登记类型：{rowData.itemData?.eoSanhuiTopic?.propRegType || "-"}</p>
+              <p>
+                产权登记类型：
+                {rowData.itemData?.eoSanhuiTopic?.propRegType || "-"}
+              </p>
               <p>公司ID：{infoData.companyId || "-"}</p>
-              <p>原项目这里打开产权登记完整模块；当前新项目用本地占位保留入口和参数。</p>
+              <p>
+                原项目这里打开产权登记完整模块；当前新项目用本地占位保留入口和参数。
+              </p>
             </>
           ) : (
             <Empty description="暂无产权登记数据" />
