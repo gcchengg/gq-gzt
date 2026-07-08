@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Drawer, Empty, Radio, Spin, Table, Tooltip, Upload, message } from "antd";
+import { Button, Drawer, Empty, Input, Radio, Spin, Table, Tooltip, Upload, message } from "antd";
 import { QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { sanhuiVoteInitBySanhuiMgmtId, sanhuiVoteSave } from "../../mock/voteApi";
@@ -112,6 +112,9 @@ export default function Vote(props) {
           sanhuiVoteTopicList.map((item, index) => ({
             index,
             toipcName: item.eoSanhuiTopic?.toipcName,
+            resolutionDate: item.resolutionDate || "",
+            resolutionMatter: item.resolutionMatter || "",
+            timelineFlag: item.timelineFlag || "0",
             bodPassFlag: item.bodPassFlag,
             bosPassFlag: item.bosPassFlag,
             shPassFlag: item.shPassFlag,
@@ -165,6 +168,9 @@ export default function Vote(props) {
       id: item.itemData.id,
       topicId: item.topicId,
       voteId: item.itemData.voteId,
+      resolutionDate: item.resolutionDate,
+      resolutionMatter: item.resolutionMatter,
+      timelineFlag: item.timelineFlag || "0",
       bodPassFlag: item.bodPassFlag,
       bosPassFlag: item.bosPassFlag,
       shPassFlag: item.shPassFlag,
@@ -225,6 +231,12 @@ export default function Vote(props) {
       />
     );
 
+  const updateRowValue = (index, key, value) => {
+    const next = [...dataSource];
+    next[index] = { ...next[index], [key]: value };
+    setDataSource(next);
+  };
+
   const columns = [
     { title: "序号", dataIndex: "index", width: 60, align: "center", render: (_value, _record, index) => index + 1 },
     { title: "议题名称", dataIndex: "toipcName", width: 220, align: "center" },
@@ -248,6 +260,53 @@ export default function Vote(props) {
       width: 400,
       align: "center",
       render: (text, record, index) => renderVoteDecision(text, record, index, "shPassFlag", "shsFlag"),
+    },
+    {
+      title: "日期",
+      dataIndex: "resolutionDate",
+      width: 150,
+      align: "center",
+      render: (text, _record, index) => (
+        <Input
+          className="vote-edit-input"
+          disabled={props.editStatus === "detail"}
+          type="date"
+          value={text}
+          onChange={(event) => updateRowValue(index, "resolutionDate", event.target.value)}
+        />
+      ),
+    },
+    {
+      title: "事项",
+      dataIndex: "resolutionMatter",
+      width: 220,
+      align: "center",
+      render: (text, _record, index) => (
+        <Input
+          className="vote-edit-input"
+          disabled={props.editStatus === "detail"}
+          value={text}
+          placeholder="请输入事项"
+          onChange={(event) => updateRowValue(index, "resolutionMatter", event.target.value)}
+        />
+      ),
+    },
+    {
+      title: "是否列入生命时间轴事项",
+      dataIndex: "timelineFlag",
+      width: 190,
+      align: "center",
+      render: (text, _record, index) => (
+        <Radio.Group
+          className="vote-timeline-radio"
+          disabled={props.editStatus === "detail"}
+          value={text || "0"}
+          onChange={(event) => updateRowValue(index, "timelineFlag", event.target.value)}
+        >
+          <Radio value="1">是</Radio>
+          <Radio value="0">否</Radio>
+        </Radio.Group>
+      ),
     },
     {
       title: "产权登记状态",
@@ -323,7 +382,9 @@ export default function Vote(props) {
           <div className="vote-section">
             <div className="vote-section-title">
               三会决议
-              <Tooltip title="1.选项统一 同意 反对 有条件同意 回避表决">
+              <Tooltip title="1.选项统一 同意 反对 有条件同意 回避表决
+               2.	是否列入生命时间轴事项如果选择是，对应的工作写实和参股公司生命周期管理都要显示对应的数据
+              3.工作写实的文件就是对应会议的会议完整版文件">
                 <QuestionCircleOutlined className="vote-section-help-icon" />
               </Tooltip>
             </div>

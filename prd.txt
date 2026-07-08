@@ -3,3 +3,11 @@
 
 【议题审核】中删除页面底部【关闭审核页】按钮
 把【审批材料准备】【提请部务会】【议题审批】【联审意见确认】【会后材料替换】【一汽股权会议纪要】页面下面的操作按钮，放在页面底部
+
+/newSanhui的【议题审核】tab页面下【会后材料替换】tab页面下，点击【向总监汇报预览】【向分管领导汇报预览】【向总办会汇报预览】
+目前直接显示pdf，现在修改参考/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules/targetSet/pages/companyReview/newSanhui/tabs5.jsx
+中的【向总监汇报预览】的逻辑显示真实数据，接口数据如/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/yulan.json所示
+
+
+/newSanhui的【议题审核】tab页面下【提请部务会】的title 提请部务会
+希望跟【审批材料准备】 董事会提请决策事项管理建议补充 title样式保持一致，整体UI要有一致性

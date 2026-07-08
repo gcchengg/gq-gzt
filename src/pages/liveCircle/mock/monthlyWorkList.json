@@ -1,0 +1,250 @@
+{
+    "success": true,
+    "code": 200,
+    "message": "操作成功",
+    "data": [
+        {
+            "category": "500",
+            "list": [
+                {
+                    "id": "mmjJ2fLKMJqRn3BYRgCdc",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "500",
+                    "workDate": "2026-02-27",
+                    "workDetail": "按审计风控与法务部三会议题合规检查要求，完成联合富晟公司2025年三会议题相关信息整理及反馈",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                },
+                {
+                    "id": "bVsVnV7iT4IO0mvhgp7S9",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "500",
+                    "workDate": "2026-02-10",
+                    "workDetail": "推动富晟公司出具盖章版《关于配合一汽集团审计工作的情况说明》",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                }
+            ]
+        },
+        {
+            "category": "400",
+            "list": [
+                {
+                    "id": "pZ_Y3Y3gITo6M83OSl7Lp",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "400",
+                    "workDate": "2026-02-26",
+                    "workDetail": "收集并向部门反馈富晟公司2026年分红金额，预计收款月份和分红金额预测逻辑",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                },
+                {
+                    "id": "uc1i7EN5XZX0U-AMTajSq",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "400",
+                    "workDate": "2026-02-09",
+                    "workDetail": "推动富晟公司反馈1月财务数据及1+11滚动预算",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                }
+            ]
+        },
+        {
+            "category": "100",
+            "list": [
+                {
+                    "id": "JRQO8QN_YisgZIys0tgc2",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "100",
+                    "workDate": "2026-02-25",
+                    "workDetail": "收集富晟公司已被集团公司应用新智类项目2026年度工作计划，用于后续战略协同工作开展",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                },
+                {
+                    "id": "Vex-fV1hgHiYpAQEqy9fb",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "100",
+                    "workDate": "2026-02-11",
+                    "workDetail": "推动富晟公司反馈2026年被集团采纳与应用成果相关项目计划",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                }
+            ]
+        },
+        {
+            "category": "1100",
+            "list": [
+                {
+                    "id": "sanhui-20260618-exit-path",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "1100",
+                    "workDate": "2026-02-18",
+                    "workDetail": "推进基金退出路径比选及执行台账建立",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [
+                        {
+                            "id": "label-sanhui-20260618-exit-path-timeline",
+                            "workId": "sanhui-20260618-exit-path",
+                            "labelId": "fe26135e1fee11f0a54bfa163ec27914",
+                            "label": "列入生命时间轴事项",
+                            "category": "列入生命时间轴事项"
+                        }
+                    ],
+                    "fileList": [
+                        {
+                            "id": "file-sanhui-20260618-exit-path",
+                            "objectKey": "董事会会议决议-会议完整版.pdf",
+                            "fileName": "董事会会议决议-会议完整版.pdf"
+                        }
+                    ]
+                },
+                {
+                    "id": "sanhui-20260618-budget-adjust",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "1100",
+                    "workDate": "2026-02-18",
+                    "workDetail": "参股公司年度预算调整事项确认",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [
+                        {
+                            "id": "label-sanhui-20260618-budget-adjust-timeline",
+                            "workId": "sanhui-20260618-budget-adjust",
+                            "labelId": "fe26135e1fee11f0a54bfa163ec27914",
+                            "label": "列入生命时间轴事项",
+                            "category": "列入生命时间轴事项"
+                        }
+                    ],
+                    "fileList": [
+                        {
+                            "id": "file-sanhui-20260618-budget-adjust",
+                            "objectKey": "董事会会议决议-会议完整版.pdf",
+                            "fileName": "董事会会议决议-会议完整版.pdf"
+                        }
+                    ]
+                },
+                {
+                    "id": "LVgvvRfX6B_IEOMZwWI1R",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "1100",
+                    "workDate": "2026-02-06",
+                    "workDetail": "完成富晟公司董事会换届、董事长选举议案评估、审议",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [
+                        {
+                            "id": "4e1281f1dc8f8fd64a195286f7a628e9",
+                            "workId": "LVgvvRfX6B_IEOMZwWI1R",
+                            "labelId": "fe26135e1fee11f0a54bfa163ec27914",
+                            "label": "列入生命时间轴事项",
+                            "category": "列入生命时间轴事项"
+                        },
+                        {
+                            "id": "76d1ea72e306de87801916ff26cd64c5",
+                            "workId": "LVgvvRfX6B_IEOMZwWI1R",
+                            "labelId": "fe2725141fee11f0a54bfa163ec27913",
+                            "label": "董监高人员变更",
+                            "category": "参股企业事项"
+                        }
+                    ],
+                    "fileList": []
+                },
+                {
+                    "id": "xvMEkXf4YVznBLcR0FdCe",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "1100",
+                    "workDate": "2026-02-05",
+                    "workDetail": "推动富晟公司提报董事会换届、董事长选举议案",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [
+                        {
+                            "id": "1a9a5be5a551e9b08ef8816e10772bc6",
+                            "workId": "xvMEkXf4YVznBLcR0FdCe",
+                            "labelId": "fe26135e1fee11f0a54bfa163ec27914",
+                            "label": "列入生命时间轴事项",
+                            "category": "列入生命时间轴事项"
+                        },
+                        {
+                            "id": "3cb4a561c3741d9abc7bfc13566db2ed",
+                            "workId": "xvMEkXf4YVznBLcR0FdCe",
+                            "labelId": "fe2725141fee11f0a54bfa163ec27913",
+                            "label": "董监高人员变更",
+                            "category": "参股企业事项"
+                        }
+                    ],
+                    "fileList": []
+                }
+            ]
+        },
+        {
+            "category": "9000",
+            "list": [
+                {
+                    "id": "joeOq6oc_VFhusVQsvxG0",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "9000",
+                    "workDate": "2026-02-05",
+                    "workDetail": "完成富晟公司一口清材料更新",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                },
+                {
+                    "id": "BVd8pRq96gnbKmuvvxTBW",
+                    "reportId": "a7222e55d14631cf103fd50a2d48c936",
+                    "category": "9000",
+                    "workDate": "2026-02-02",
+                    "workDetail": "研讨并确定三富基本信息介绍材料模板，按模板完成富晟公司基本信息整理",
+                    "relatedDetail": null,
+                    "comment": null,
+                    "status": null,
+                    "source": null,
+                    "labelList": [],
+                    "fileList": []
+                }
+            ]
+        }
+    ],
+    "msgType": "I",
+    "errType": "N",
+    "errMsg": null,
+    "errCode": "YQJT0IGQ-0207_MSA_001N50200"
+}

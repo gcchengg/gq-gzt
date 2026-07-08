@@ -707,11 +707,19 @@
 
 .pdf-side-head {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 0 0 auto;
+    min-height: 76px;
+}
+
+.pdf-side-title-row {
+    display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    flex: 0 0 auto;
-    min-height: 46px;
+    width: 100%;
+    min-width: 0;
 }
 
 .pdf-side-title {
@@ -723,22 +731,29 @@
 
 .pdf-side-actions {
     display: flex;
-    flex: 1 1 auto;
+    width: 100%;
     align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
+    justify-content: stretch;
     min-width: 0;
 }
 
 .pdf-annotation-filter {
     display: inline-flex;
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     gap: 4px;
     min-width: 0;
+    max-width: 100%;
     padding: 3px;
+    overflow-x: auto;
+    overflow-y: hidden;
     background: #f2f6fc;
     border: 1px solid #dbe5f2;
-    border-radius: 999px;
+    border-radius: 8px;
+    scrollbar-width: none;
+}
+
+.pdf-annotation-filter::-webkit-scrollbar {
+    display: none;
 }
 
 .pdf-annotation-filter button {
@@ -757,7 +772,7 @@
     cursor: pointer;
     background: transparent;
     border: 0;
-    border-radius: 999px;
+    border-radius: 6px;
 }
 
 .pdf-annotation-filter button.active {
@@ -890,6 +905,11 @@
     background: #fff2e6;
 }
 
+.pdf-tag.pdf-tag-company {
+    color: #0f766e;
+    background: #e7f8f5;
+}
+
 .pdf-task-main {
     margin-bottom: 10px;
     font-size: 18px;
@@ -902,9 +922,15 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding-top: 14px;
-    margin-top: 14px;
+    padding-top: 10px;
+    margin-top: 10px;
     border-top: 1px solid rgba(228, 233, 241, 0.96);
+}
+
+.pdf-task-card.collapsed .pdf-task-discussion {
+    gap: 0;
+    padding-top: 8px;
+    margin-top: 8px;
 }
 
 .pdf-discussion-summary {
@@ -938,9 +964,20 @@
     border-radius: 14px;
 }
 
-.pdf-discussion-message.suggestion {
+.pdf-discussion-message.suggestion,
+.pdf-discussion-message.evaluator {
     background: linear-gradient(180deg, rgba(242, 247, 255, 0.98), rgba(235, 243, 255, 0.98));
     border: 1px solid rgba(214, 226, 246, 0.96);
+}
+
+.pdf-discussion-message.company {
+    background: linear-gradient(180deg, rgba(235, 250, 247, 0.98), rgba(224, 245, 241, 0.98));
+    border: 1px solid rgba(176, 222, 214, 0.96);
+}
+
+.pdf-discussion-message.submitter {
+    background: linear-gradient(180deg, rgba(255, 248, 236, 0.98), rgba(255, 241, 219, 0.98));
+    border: 1px solid rgba(244, 211, 170, 0.96);
 }
 
 .pdf-discussion-head {
@@ -1255,6 +1292,249 @@
 
 .ant-modal-root:has(.pdf-note-reply-field) {
     z-index: 10060;
+}
+
+.pdf-share-floating {
+    position: fixed;
+    z-index: 12110;
+    width: 112px;
+    height: 48px;
+    user-select: none;
+}
+
+.pdf-share-toggle {
+    width: 112px;
+    height: 48px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #16a085, #21c6a8);
+    box-shadow: 0 16px 34px rgba(22, 160, 133, 0.28);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: grab;
+    touch-action: none;
+}
+
+.pdf-share-toggle:hover {
+    background: linear-gradient(135deg, #11856f, #18b79a);
+}
+
+.pdf-share-drawer .ant-drawer-body {
+    background: #f6f8fc;
+}
+
+.pdf-share-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pdf-share-section {
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #e4ebf6;
+    border-radius: 12px;
+}
+
+.pdf-share-section-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #2f3643;
+}
+
+.pdf-share-section > .pdf-share-section-title {
+    margin-bottom: 10px;
+}
+
+.pdf-share-section-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.pdf-share-mark-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.pdf-share-color {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    cursor: pointer;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px #cfd8e6;
+}
+
+.pdf-share-color.active {
+    box-shadow: 0 0 0 2px #1f5eff, 0 4px 10px rgba(31, 94, 255, 0.18);
+}
+
+.pdf-share-shot {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    max-height: 420px;
+    padding: 18px;
+    overflow: auto;
+    cursor: crosshair;
+    background: #eef3fb;
+    border: 1px solid #dbe5f3;
+    border-radius: 10px;
+    user-select: none;
+}
+
+.pdf-share-shot-stage {
+    position: relative;
+    width: min(100%, 620px);
+    cursor: crosshair;
+    user-select: none;
+}
+
+.pdf-share-shot-content {
+    pointer-events: none;
+}
+
+.pdf-share-shot-content .pdf-page {
+    width: 100% !important;
+    min-height: 0;
+    padding: 38px 42px 54px;
+    box-shadow: 0 10px 28px rgba(35, 55, 90, 0.08);
+}
+
+.pdf-share-shot-content .pdf-page-title {
+    font-size: 20px;
+    line-height: 1.45;
+}
+
+.pdf-share-shot-content .pdf-paragraph {
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.pdf-share-shot-content .pdf-table {
+    font-size: 12px;
+}
+
+.pdf-share-shot-content .pdf-annotation-box {
+    pointer-events: none;
+}
+
+.pdf-share-mark-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+.pdf-share-mark-rect {
+    position: absolute;
+    display: flex;
+    min-width: 54px;
+    min-height: 32px;
+    border: 2px solid;
+    border-radius: 6px;
+    box-shadow: 0 0 0 9999px rgba(255, 255, 255, 0.03), 0 6px 14px rgba(20, 36, 70, 0.12);
+    pointer-events: auto;
+    user-select: text;
+}
+
+.pdf-share-mark-rect.drafting {
+    border-style: dashed;
+    pointer-events: none;
+}
+
+.pdf-share-mark-input {
+    width: 100%;
+    height: 100%;
+    padding: 6px 8px;
+    overflow: auto;
+    color: #172033;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    white-space: pre-wrap;
+    cursor: text;
+    resize: none;
+    background: transparent;
+    border: 0;
+    outline: none;
+    caret-color: #172033;
+}
+
+.pdf-share-mark-input::placeholder {
+    color: rgba(23, 32, 51, 0.48);
+    font-weight: 600;
+}
+
+.pdf-share-empty {
+    padding: 52px 20px;
+    color: #7e8aa3;
+    font-size: 14px;
+}
+
+.pdf-share-tip {
+    margin-top: 8px;
+    color: #7e8aa3;
+    font-size: 12px;
+}
+
+.pdf-share-user-select .ant-select-selector {
+    min-height: 40px;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    border-radius: 10px !important;
+}
+
+.pdf-share-user-select .ant-select-selection-overflow {
+    row-gap: 4px;
+}
+
+.pdf-share-user-dropdown {
+    z-index: 12160;
+}
+
+.pdf-share-editor {
+    min-height: 140px;
+    padding: 12px 14px;
+    overflow: auto;
+    background: #fbfcff;
+    border: 1px solid #dce5f2;
+    border-radius: 10px;
+    color: #2f3643;
+    font-size: 14px;
+    line-height: 1.8;
+    outline: none;
+}
+
+.pdf-share-editor:focus {
+    border-color: #2a62e7;
+    box-shadow: 0 0 0 3px rgba(42, 98, 231, 0.12);
+}
+
+.pdf-share-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.pdf-share-success p {
+    margin: 0 0 8px;
+    color: #2f3643;
+    line-height: 1.7;
+}
+
+.pdf-share-success p:last-child {
+    margin-bottom: 0;
 }
 
 @media (max-width: 1200px) {

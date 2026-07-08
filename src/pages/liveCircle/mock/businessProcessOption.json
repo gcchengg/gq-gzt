@@ -1,0 +1,23 @@
+{
+    "success": true,
+    "code": 200,
+    "message": "操作成功",
+    "data": [
+        {
+            "bitUnitCode": "BU2412301615482687",
+            "bizUnitName": "三会管理"
+        },
+        {
+            "bitUnitCode": "BU2507271223181313",
+            "bizUnitName": "任务管理"
+        },
+        {
+            "bitUnitCode": "BU2412271137331487",
+            "bizUnitName": "股权投资流程"
+        }
+    ],
+    "msgType": "I",
+    "errType": "N",
+    "errMsg": null,
+    "errCode": "YQJT0IGQ-0207_MSA_001N50200"
+}

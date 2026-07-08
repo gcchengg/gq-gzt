@@ -86,6 +86,7 @@ export default function AppShell() {
     open: false,
     record: null,
   });
+  const [pdfEditorTaskVisible, setPdfEditorTaskVisible] = useState(false);
   const fullPath = pathname + search;
   const isShelllessPage = isShelllessPath(pathname);
 
@@ -122,6 +123,23 @@ export default function AppShell() {
       window.removeEventListener(
         "gq:sanhui-detail-context",
         handleSanhuiDetailContext,
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    const handlePdfEditorTaskVisible = (event) => {
+      setPdfEditorTaskVisible(Boolean(event.detail?.open));
+    };
+
+    window.addEventListener(
+      "gq:pdf-editor-task-visible",
+      handlePdfEditorTaskVisible,
+    );
+    return () => {
+      window.removeEventListener(
+        "gq:pdf-editor-task-visible",
+        handlePdfEditorTaskVisible,
       );
     };
   }, []);
@@ -193,7 +211,7 @@ export default function AppShell() {
       <main className="gq-app-main">
         <Outlet />
       </main>
-      {role === "director" && sanhuiDetailContext.open ? (
+      {sanhuiDetailContext.open && !pdfEditorTaskVisible ? (
         <TaskIssueDrawer
           key={sanhuiDetailContext.record?.id || "sanhui-task-drawer"}
           sanhuiRecord={sanhuiDetailContext.record}

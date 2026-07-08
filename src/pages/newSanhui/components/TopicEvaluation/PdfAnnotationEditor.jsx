@@ -1,17 +1,22 @@
-import { PlusOutlined, QuestionCircleOutlined, StarFilled, StarOutlined } from "@ant-design/icons";
+import { PlusOutlined, QuestionCircleOutlined, RedoOutlined, StarFilled, StarOutlined, UndoOutlined } from "@ant-design/icons";
 import {
     Button,
+    Drawer,
     Input,
     Modal,
     Pagination,
     Radio,
+    Select,
     Space,
+    Spin,
     Table,
     Tooltip,
     message,
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import TaskIssueDrawer from "@/components/TaskIssueDrawer";
+import userResponse from "@/pages/liveCircle/mock/user.json";
 import companyInfoImageUrl from "../../../../components/imgages/参股公司信息管理.png?url";
 import financeReportImageUrl from "../../../../components/imgages/财务报表.png?url";
 import strategyProgressImageUrl from "../../../../components/imgages/规划进展点检.png?url";
@@ -38,17 +43,36 @@ const pdfFiles = [
     "1.招标文件-备注版-明阳智能AI在多业务域应用试点项目-20250606.pdf",
 ];
 
+const seedDiscussionVersion = 2;
+
 const seedAnnotations = [
-    { id: "area-1", page: 1, type: "框选批注", rect: { left: 49, top: 51, width: 43, height: 20 }, content: "关键净值与拆除费用表格区域，需要在评估前补充附件来源说明。", author: "郑华峰 2025-06-21 19:05", favorite: true },
-    { id: "text-1", page: 1, type: "文字选择", textKey: "asset-status", content: "确认“无法再使用”的判断依据是否需要补充现场照片或附表说明。", author: "吴文君 2025-06-21 19:08" },
-    { id: "discussion-1", page: 2, type: "文字选择", textKey: "asset-status", content: "建议在董事会审议前完成净值口径、处置价格依据及资产完备性说明的补充标注，并同步形成任务清单。", author: "系统预置 2026-05-15 18:06", discussion: [
-        "吴文君：建议补充现场照片作为支撑，避免判断只停留在文字描述。",
-        "创建人：已补充现场照片，并同步到汇报材料。",
-        "郑华峰：建议把净值口径、处置价格依据和资产完备性说明拆成三条附件来源。",
+    { id: "area-1", page: 1, type: "框选批注", rect: { left: 49, top: 51, width: 43, height: 20 }, content: "关键净值与拆除费用表格区域，需要在评估前补充附件来源说明。", author: "郑华峰 2025-06-21 19:05", favorite: true, needReply: true, needCompanyReply: true, discussionVersion: seedDiscussionVersion, discussion: [
+        { role: "evaluator", name: "郑华峰", time: "2025-06-21 19:05", content: "请参股公司补充净值表格与拆除费用的原始附件来源，并说明是否与评估底稿一致。" },
+        { role: "company", name: "长春富维集团", time: "2025-06-22 09:18", content: "已补充固定资产卡片、处置评估底稿和拆除费用说明，附件已放入本议题材料包第3项。" },
+        { role: "evaluator", name: "郑华峰", time: "2025-06-22 11:32", content: "附件来源已收到。请继续补充附件日期与评估报告引用页码，便于后续闭环归档。" },
+        { role: "company", name: "长春富维集团", time: "2025-06-22 16:45", content: "已在净值测算表右上角补充附件日期，并在说明中标注评估报告第12页、第15页。" },
+        { role: "evaluator", name: "吴文君", time: "2025-06-23 10:10", content: "已核对，净值来源和拆除费用说明可以支撑本次评估意见，建议提报人同步更新正文描述。" },
+        { role: "submitter", name: "刘博", time: "2025-06-23 14:26", content: "正文已按批注意见更新，并补充附件索引页。" },
     ] },
+    { id: "text-1", page: 1, type: "文字选择", textKey: "asset-status", content: "确认“无法再使用”的判断依据是否需要补充现场照片或附表说明。", author: "吴文君 2025-06-21 19:08", favorite: true, needReply: true, needCompanyReply: true, discussionVersion: seedDiscussionVersion, discussion: [
+        { role: "evaluator", name: "吴文君", time: "2025-06-21 19:08", content: "请参股公司补充设备现场照片，以及“无法继续使用”的判定依据。" },
+        { role: "company", name: "长春富维集团", time: "2025-06-22 10:04", content: "已上传现场照片6张，并补充设备拆除验收单。" },
+        { role: "evaluator", name: "吴文君", time: "2025-06-22 14:30", content: "照片能证明拆除状态，但还缺设备编号和照片对应关系，请按资产清单顺序补充。" },
+        { role: "company", name: "长春富维集团", time: "2025-06-23 09:40", content: "已在照片文件名中补充设备编号，并新增照片编号与资产清单映射表。" },
+    ] },
+    { id: "discussion-1", page: 2, type: "文字选择", textKey: "asset-status", content: "建议在董事会审议前完成净值口径、处置价格依据及资产完备性说明的补充标注，并同步形成任务清单。", author: "系统预置 2026-05-15 18:06", discussionVersion: seedDiscussionVersion, discussion: [
+        { role: "evaluator", name: "吴文君", time: "2026-05-15 18:06", content: "建议补充现场照片作为支撑，避免判断只停留在文字描述。" },
+        { role: "submitter", name: "刘博", time: "2026-05-16 09:22", content: "已补充现场照片，并同步到汇报材料。" },
+        { role: "evaluator", name: "郑华峰", time: "2026-05-16 11:18", content: "建议把净值口径、处置价格依据和资产完备性说明拆成三条附件来源，由参股公司逐项反馈。" },
+        { role: "company", name: "长春富维集团", time: "2026-05-16 16:35", content: "净值口径已按财务账面净值更新，处置价格依据已补充评估公司询价记录。" },
+        { role: "evaluator", name: "郑华峰", time: "2026-05-17 09:10", content: "处置价格依据已满足要求，资产完备性说明仍需补充缺失设备的处置原因。" },
+        { role: "company", name: "长春富维集团", time: "2026-05-17 15:42", content: "已补充缺失设备原因，涉及设备均为前期拆除后统一暂存，未发生对外处置。" },
+    ], favorite: true, needReply: true, needCompanyReply: true },
 ];
 
 const screenshotStorageKey = "newSanhui.annotationScreenshotPages";
+const annotationsStorageKey = "newSanhui.pdfAnnotations";
+const companyFeedbackStorageKey = "newSanhui.companyFeedbackRows";
 const defaultScreenshotPages = {
     [pdfFiles[0]]: [1, 2],
     [pdfFiles[1]]: [2, 5],
@@ -60,6 +84,25 @@ const referenceActions = [
     { label: "战略规划", url: strategyProgressImageUrl },
     { label: "财务报表", url: financeReportImageUrl },
 ];
+
+const shareUserOptions = (Array.isArray(userResponse.data) ? userResponse.data : []).slice(0, 80).map((item) => ({
+    label: `${item.fullName || item.loginId || "未命名用户"}${item.orgName ? `（${item.orgName}）` : ""}`,
+    value: item.id || item.loginId || item.userCode,
+    raw: item,
+}));
+
+function createShareSnapshotMarkup(element) {
+    if (!element) return "";
+    const clone = element.cloneNode(true);
+    clone.querySelectorAll("button").forEach((button) => {
+        button.setAttribute("disabled", "true");
+    });
+    clone.querySelectorAll("input, textarea, select").forEach((field) => {
+        field.setAttribute("disabled", "true");
+    });
+    clone.classList.add("pdf-share-captured-page");
+    return clone.outerHTML;
+}
 
 function openReferenceImage(url) {
     const opened = window.open(url, "_blank", "noopener,noreferrer");
@@ -83,18 +126,124 @@ function writeScreenshotPages(value) {
     window.dispatchEvent(new CustomEvent("newSanhui:annotationScreenshotPagesChange", { detail: value }));
 }
 
+function normalizeDiscussionItem(item, index = 0) {
+    if (typeof item === "string") {
+        const matched = item.match(/^([^：:]+)[：:]\s*(.*)$/);
+        const speaker = matched?.[1] || "评估人员";
+        const content = matched?.[2] || item;
+        const role = speaker.includes("参股公司")
+            ? "company"
+            : speaker.includes("提报人") || speaker.includes("创建人")
+              ? "submitter"
+              : "evaluator";
+        return {
+            role,
+            name: speaker,
+            time: "",
+            content,
+            legacyKey: `${speaker}-${content}-${index}`,
+        };
+    }
+    return {
+        role: item?.role || "evaluator",
+        name: item?.name || (item?.role === "company" ? "参股公司" : item?.role === "submitter" ? "提报人" : "评估人员"),
+        time: item?.time || "",
+        content: item?.content || "",
+        legacyKey: `${item?.role || "evaluator"}-${item?.name || ""}-${item?.content || ""}-${index}`,
+    };
+}
+
+function normalizeDiscussionList(list = []) {
+    return (Array.isArray(list) ? list : []).map(normalizeDiscussionItem).filter((item) => item.content);
+}
+
+function getDiscussionRoleText(role) {
+    if (role === "company") return "参股公司";
+    if (role === "submitter") return "提报人";
+    return "评估人员";
+}
+
+function readAnnotations() {
+    if (typeof window === "undefined") return seedAnnotations;
+    try {
+        const stored = JSON.parse(window.localStorage.getItem(annotationsStorageKey));
+        if (!Array.isArray(stored)) return seedAnnotations;
+        const storedMap = new Map(stored.map((item) => [item.id, item]));
+        const mergedSeeds = seedAnnotations.map((seed) => ({
+            ...seed,
+            ...storedMap.get(seed.id),
+            needReply: seed.needReply,
+            needCompanyReply: seed.needCompanyReply,
+            discussionVersion: seedDiscussionVersion,
+            discussion: storedMap.get(seed.id)?.discussionVersion >= seedDiscussionVersion && storedMap.get(seed.id)?.discussion?.length
+                ? normalizeDiscussionList(storedMap.get(seed.id).discussion)
+                : seed.discussion,
+        }));
+        const extraItems = stored
+            .filter((item) => !seedAnnotations.some((seed) => seed.id === item.id))
+            .map((item) => ({ ...item, discussion: normalizeDiscussionList(item.discussion) }));
+        return [...mergedSeeds, ...extraItems];
+    } catch {
+        return seedAnnotations;
+    }
+}
+
+function readCompanyFeedbackRows() {
+    if (typeof window === "undefined") return [];
+    try {
+        return JSON.parse(window.localStorage.getItem(companyFeedbackStorageKey)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function buildCompanyFeedbackFromAnnotation(annotation, fileName) {
+    const existed = readCompanyFeedbackRows().find((item) => item.annotationId === annotation.id);
+    return {
+        id: existed?.id || `company-feedback-${annotation.id}`,
+        annotationId: annotation.id,
+        topicName: existed?.topicName || "一汽解放汽车有限公司发动机分公司31项报废设备购入及处置方案",
+        pdfName: existed?.pdfName || fileName || pdfFiles[0],
+        page: annotation.page,
+        feedbackContent: annotation.content,
+        companyAnswer: existed?.companyAnswer || "",
+        feedbackTime: existed?.feedbackTime || annotation.author?.match(/\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/)?.[0] || "2026-05-13 10:20",
+        answerTime: existed?.answerTime || "",
+        rounds: existed?.rounds?.length ? existed.rounds : normalizeDiscussionList(annotation.discussion),
+    };
+}
+
+function writeAnnotations(value, activeFile = pdfFiles[0]) {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(annotationsStorageKey, JSON.stringify(value));
+    const existedRows = readCompanyFeedbackRows();
+    const existedMap = new Map(existedRows.map((item) => [item.annotationId, item]));
+    const nextRows = value
+        .filter((item) => item.needCompanyReply)
+        .map((item) => ({
+            ...buildCompanyFeedbackFromAnnotation(item, activeFile),
+            ...existedMap.get(item.id),
+            page: item.page,
+            feedbackContent: item.content,
+        }));
+    window.localStorage.setItem(companyFeedbackStorageKey, JSON.stringify(nextRows));
+    window.dispatchEvent(new CustomEvent("newSanhui:pdfAnnotationsChange", { detail: value }));
+    window.dispatchEvent(new CustomEvent("newSanhui:companyFeedbackChange", { detail: nextRows }));
+}
+
 export default function PdfAnnotationEditor({ open, fileName, mode = "annotation", showNeedReply = true, onClose }) {
     const [activeFile, setActiveFile] = useState(fileName || pdfFiles[0]);
     const [compareFiles, setCompareFiles] = useState([fileName || pdfFiles[0], pdfFiles[1]]);
     const [scope, setScope] = useState(mode === "associate" ? "existing" : "all");
     const [markMode, setMarkMode] = useState("area");
     const [currentPage, setCurrentPage] = useState(1);
-    const [annotations, setAnnotations] = useState(seedAnnotations);
+    const [annotations, setAnnotations] = useState(() => readAnnotations());
     const [linkedPages, setLinkedPages] = useState([1]);
     const [noteOpen, setNoteOpen] = useState(false);
     const [editing, setEditing] = useState(null);
     const [note, setNote] = useState("");
     const [needReply, setNeedReply] = useState(false);
+    const [needCompanyReply, setNeedCompanyReply] = useState(false);
     const [compareOpen, setCompareOpen] = useState(false);
     const [contextOpen, setContextOpen] = useState(false);
     const [replyingId, setReplyingId] = useState(null);
@@ -104,12 +253,28 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     const [drawingRect, setDrawingRect] = useState(null);
     const [screenshotPages, setScreenshotPages] = useState(() => readScreenshotPages());
     const [annotationPage, setAnnotationPage] = useState(1);
-    const [annotationFavoriteOnly, setAnnotationFavoriteOnly] = useState(false);
+    const [annotationFilter, setAnnotationFilter] = useState("all");
+    const [expandedAnnotationIds, setExpandedAnnotationIds] = useState([]);
     const [factorTableOpen, setFactorTableOpen] = useState(false);
     const [factorButtonPosition, setFactorButtonPosition] = useState({ x: 32, y: 116 });
+    const [shareButtonPosition, setShareButtonPosition] = useState({ x: 32, y: 196 });
+    const [shareOpen, setShareOpen] = useState(false);
+    const [shareSnapshotMarkup, setShareSnapshotMarkup] = useState("");
+    const [shareLoading, setShareLoading] = useState(false);
+    const [shareUsers, setShareUsers] = useState([]);
+    const [shareAdvice, setShareAdvice] = useState("<p>请查看当前 PDF 批注截图，并结合批注内容反馈处理意见。</p>");
+    const [shareMarkColor, setShareMarkColor] = useState("#e11d48");
+    const [shareMarks, setShareMarks] = useState([]);
+    const [shareRedoMarks, setShareRedoMarks] = useState([]);
+    const [shareDraftMark, setShareDraftMark] = useState(null);
+    const [shareConfirmOpen, setShareConfirmOpen] = useState(false);
+    const [shareSuccessOpen, setShareSuccessOpen] = useState(false);
     const pageRef = useRef(null);
     const drawStartRef = useRef(null);
     const factorDragRef = useRef(null);
+    const shareDragRef = useRef(null);
+    const shareShotRef = useRef(null);
+    const shareMarkStartRef = useRef(null);
 
     const visiblePages = useMemo(() => pages.filter((page) => {
         if (scope === "existing") return page.annotated || annotations.some((item) => item.page === page.page);
@@ -118,9 +283,19 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     }), [annotations, scope]);
     const activePage = visiblePages.find((page) => page.page === currentPage) || visiblePages[0] || pages[0];
     const activeAnnotations = annotations.filter((item) => item.page === activePage.page);
-    const filteredAnnotations = annotationFavoriteOnly ? activeAnnotations.filter((item) => item.favorite) : activeAnnotations;
+    const filteredAnnotations = activeAnnotations.filter((item) => {
+        if (annotationFilter === "favorite") return item.favorite;
+        if (annotationFilter === "submitter") return item.needReply;
+        if (annotationFilter === "company") return item.needCompanyReply;
+        return true;
+    });
     const pagedAnnotations = filteredAnnotations.slice((annotationPage - 1) * 5, annotationPage * 5);
     const isAnnotationScreenshotPage = screenshotPages[activeFile]?.includes(activePage.page);
+    const shareSelectedNames = useMemo(() => shareUserOptions
+        .filter((item) => shareUsers.includes(item.value))
+        .map((item) => item.label)
+        .slice(0, 3)
+        .join("、"), [shareUsers]);
 
     useEffect(() => {
         const maxPage = Math.max(Math.ceil(filteredAnnotations.length / 5), 1);
@@ -131,22 +306,61 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
 
     useEffect(() => {
         if (!open) return undefined;
+        const handleAnnotationsChange = (event) => {
+            setAnnotations(Array.isArray(event.detail) ? event.detail : readAnnotations());
+        };
+        window.addEventListener("newSanhui:pdfAnnotationsChange", handleAnnotationsChange);
+        return () => window.removeEventListener("newSanhui:pdfAnnotationsChange", handleAnnotationsChange);
+    }, [open]);
+
+    useEffect(() => {
+        writeAnnotations(annotations, activeFile);
+    }, [activeFile, annotations]);
+
+    useEffect(() => {
+        window.dispatchEvent(new CustomEvent("gq:pdf-editor-task-visible", { detail: { open } }));
+        return () => {
+            window.dispatchEvent(new CustomEvent("gq:pdf-editor-task-visible", { detail: { open: false } }));
+        };
+    }, [open]);
+
+    useEffect(() => {
+        if (!open) return undefined;
         const handlePointerMove = (event) => {
             const drag = factorDragRef.current;
-            if (!drag) return;
-            const nextX = Math.min(Math.max(event.clientX - drag.offsetX, 16), window.innerWidth - 148);
-            const nextY = Math.min(Math.max(event.clientY - drag.offsetY, 84), window.innerHeight - 76);
-            if (Math.abs(nextX - drag.startX) > 3 || Math.abs(nextY - drag.startY) > 3) {
-                drag.moved = true;
+            const shareDrag = shareDragRef.current;
+            if (drag) {
+                const nextX = Math.min(Math.max(event.clientX - drag.offsetX, 16), window.innerWidth - 148);
+                const nextY = Math.min(Math.max(event.clientY - drag.offsetY, 84), window.innerHeight - 76);
+                if (Math.abs(nextX - drag.startX) > 3 || Math.abs(nextY - drag.startY) > 3) {
+                    drag.moved = true;
+                }
+                setFactorButtonPosition({ x: nextX, y: nextY });
+                return;
             }
-            setFactorButtonPosition({ x: nextX, y: nextY });
+            if (shareDrag) {
+                const nextX = Math.min(Math.max(event.clientX - shareDrag.offsetX, 16), window.innerWidth - 132);
+                const nextY = Math.min(Math.max(event.clientY - shareDrag.offsetY, 84), window.innerHeight - 72);
+                if (Math.abs(nextX - shareDrag.startX) > 3 || Math.abs(nextY - shareDrag.startY) > 3) {
+                    shareDrag.moved = true;
+                }
+                setShareButtonPosition({ x: nextX, y: nextY });
+            }
         };
         const handlePointerUp = () => {
             const drag = factorDragRef.current;
-            if (!drag) return;
-            factorDragRef.current = null;
-            if (!drag.moved) {
-                setFactorTableOpen((value) => !value);
+            const shareDrag = shareDragRef.current;
+            if (drag) {
+                factorDragRef.current = null;
+                if (!drag.moved) {
+                    setFactorTableOpen((value) => !value);
+                }
+            }
+            if (shareDrag) {
+                shareDragRef.current = null;
+                if (!shareDrag.moved) {
+                    handleOpenShare();
+                }
             }
         };
         window.addEventListener("pointermove", handlePointerMove);
@@ -167,6 +381,16 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
             moved: false,
         };
     };
+    const startShareButtonDrag = (event) => {
+        event.preventDefault();
+        shareDragRef.current = {
+            offsetX: event.clientX - shareButtonPosition.x,
+            offsetY: event.clientY - shareButtonPosition.y,
+            startX: shareButtonPosition.x,
+            startY: shareButtonPosition.y,
+            moved: false,
+        };
+    };
 
     const selectPage = (page) => {
         setCurrentPage(page.page);
@@ -181,13 +405,14 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
         setDraftTarget(target);
         setNote(annotation?.content || "");
         setNeedReply(Boolean(annotation?.needReply));
+        setNeedCompanyReply(Boolean(annotation?.needCompanyReply));
         setNoteOpen(true);
     };
     const saveNote = () => {
         if (!note.trim()) return;
         setAnnotations((current) => editing
-            ? current.map((item) => item.id === editing.id ? { ...item, content: note, needReply } : item)
-            : [{ id: `note-${Date.now()}`, page: activePage.page, type: draftTarget?.type === "area" ? "框选批注" : "文字选择", rect: draftTarget?.rect, textKey: draftTarget?.textKey, content: note, needReply, author: "系统预置 2026-05-13 10:20" }, ...current]);
+            ? current.map((item) => item.id === editing.id ? { ...item, content: note, needReply, needCompanyReply } : item)
+            : [{ id: `note-${Date.now()}`, page: activePage.page, type: draftTarget?.type === "area" ? "框选批注" : "文字选择", rect: draftTarget?.rect, textKey: draftTarget?.textKey, content: note, needReply, needCompanyReply, author: "系统预置 2026-05-13 10:20" }, ...current]);
         setNoteOpen(false);
         setDraftTarget(null);
         setCreationArmed(false);
@@ -255,10 +480,105 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
     const sendReply = (id) => {
         if (!reply.trim()) return;
         setAnnotations((current) => current.map((item) => item.id === id
-            ? { ...item, discussion: [...(item.discussion || []), `创建人：${reply}`] }
+            ? { ...item, discussion: [...normalizeDiscussionList(item.discussion), { role: "evaluator", name: "评估人员", time: "刚刚", content: reply }] }
             : item));
         setReply("");
         setReplyingId(null);
+    };
+    const toggleAnnotationExpanded = (id) => {
+        setExpandedAnnotationIds((current) => current.includes(id)
+            ? current.filter((item) => item !== id)
+            : [...current, id]);
+    };
+    const pointInShareShot = (event) => {
+        const bounds = shareShotRef.current?.getBoundingClientRect();
+        if (!bounds) return null;
+        return {
+            x: Math.min(Math.max((event.clientX - bounds.left) / bounds.width * 100, 0), 100),
+            y: Math.min(Math.max((event.clientY - bounds.top) / bounds.height * 100, 0), 100),
+        };
+    };
+    const startShareMark = (event) => {
+        if (!shareSnapshotMarkup || event.button !== 0) return;
+        const point = pointInShareShot(event);
+        if (!point) return;
+        shareMarkStartRef.current = point;
+        setShareDraftMark({ left: point.x, top: point.y, width: 0, height: 0, color: shareMarkColor });
+        event.currentTarget.setPointerCapture(event.pointerId);
+    };
+    const moveShareMark = (event) => {
+        if (!shareMarkStartRef.current) return;
+        const point = pointInShareShot(event);
+        if (!point) return;
+        setShareDraftMark({
+            left: Math.min(shareMarkStartRef.current.x, point.x),
+            top: Math.min(shareMarkStartRef.current.y, point.y),
+            width: Math.abs(point.x - shareMarkStartRef.current.x),
+            height: Math.abs(point.y - shareMarkStartRef.current.y),
+            color: shareMarkColor,
+        });
+    };
+    const finishShareMark = () => {
+        if (!shareMarkStartRef.current) return;
+        shareMarkStartRef.current = null;
+        setShareDraftMark((mark) => {
+            if (mark && mark.width >= 1 && mark.height >= 1) {
+                setShareMarks((current) => [...current, { ...mark, id: `share-mark-${Date.now()}`, text: "" }]);
+                setShareRedoMarks([]);
+            }
+            return null;
+        });
+    };
+    const updateShareMarkText = (id, text) => {
+        setShareMarks((current) => current.map((mark) => mark.id === id ? { ...mark, text } : mark));
+    };
+    const undoShareMark = () => {
+        setShareMarks((current) => {
+            const removed = current.at(-1);
+            if (!removed) return current;
+            setShareRedoMarks((redo) => [removed, ...redo]);
+            return current.slice(0, -1);
+        });
+    };
+    const redoShareMark = () => {
+        setShareRedoMarks((current) => {
+            const restored = current[0];
+            if (!restored) return current;
+            setShareMarks((marks) => [...marks, restored]);
+            return current.slice(1);
+        });
+    };
+    const handleOpenShare = async () => {
+        if (!pageRef.current) {
+            message.warning("未找到可分享的 PDF 内容区域");
+            return;
+        }
+        setShareOpen(true);
+        setShareLoading(true);
+        try {
+            setShareSnapshotMarkup(createShareSnapshotMarkup(pageRef.current));
+            setShareMarks([]);
+            setShareRedoMarks([]);
+            setShareDraftMark(null);
+            message.success("已截取当前 PDF 内容，可选择分享人后发送");
+        } catch (error) {
+            console.error("PDF内容截图失败:", error);
+            message.error("PDF内容截图失败，请稍后重试");
+        } finally {
+            setShareLoading(false);
+        }
+    };
+    const handleConfirmShare = () => {
+        if (!shareUsers.length) {
+            message.warning("请选择至少一位分享人");
+            return;
+        }
+        setShareConfirmOpen(true);
+    };
+    const sendShareMessage = () => {
+        setShareConfirmOpen(false);
+        setShareOpen(false);
+        setTimeout(() => setShareSuccessOpen(true), 120);
     };
     const toggleAnnotationFavorite = (id) => {
         setAnnotations((current) => current.map((item) => item.id === id ? { ...item, favorite: !item.favorite } : item));
@@ -513,45 +833,71 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                     </main>
                     <aside className="pdf-side">
                         <div className="pdf-side-head">
-                            <div className="pdf-side-title">{mode === "associate" ? "关联项列表" : "批注列表"}</div>
+                            <div className="pdf-side-title-row">
+                                <div className="pdf-side-title">{mode === "associate" ? "关联项列表" : "批注列表"}</div>
+                                {mode !== "associate" ? <Button type="primary" icon={<PlusOutlined />} onClick={() => armCreation(markMode)}>新增</Button> : null}
+                            </div>
                             <div className="pdf-side-actions">
                                 {mode !== "associate" ? (
                                     <div className="pdf-annotation-filter" aria-label="批注收藏过滤">
                                         <button
-                                            className={!annotationFavoriteOnly ? "active" : ""}
+                                            className={annotationFilter === "all" ? "active" : ""}
                                             type="button"
                                             onClick={() => {
-                                                setAnnotationFavoriteOnly(false);
+                                                setAnnotationFilter("all");
                                                 setAnnotationPage(1);
                                             }}
                                         >
                                             全部
                                         </button>
                                         <button
-                                            className={annotationFavoriteOnly ? "active" : ""}
+                                            className={annotationFilter === "favorite" ? "active" : ""}
                                             type="button"
                                             onClick={() => {
-                                                setAnnotationFavoriteOnly(true);
+                                                setAnnotationFilter("favorite");
                                                 setAnnotationPage(1);
                                             }}
                                         >
                                             <StarFilled />
                                             已收藏
                                         </button>
+                                        <button
+                                            className={annotationFilter === "submitter" ? "active" : ""}
+                                            type="button"
+                                            onClick={() => {
+                                                setAnnotationFilter("submitter");
+                                                setAnnotationPage(1);
+                                            }}
+                                        >
+                                            提报人回复
+                                        </button>
+                                        <button
+                                            className={annotationFilter === "company" ? "active" : ""}
+                                            type="button"
+                                            onClick={() => {
+                                                setAnnotationFilter("company");
+                                                setAnnotationPage(1);
+                                            }}
+                                        >
+                                            参股公司回复
+                                        </button>
                                     </div>
                                 ) : null}
-                                {mode !== "associate" ? <Button type="primary" icon={<PlusOutlined />} onClick={() => armCreation(markMode)}>新增</Button> : null}
                             </div>
                         </div>
                         <div className="pdf-task-scroll">
                           <div className="pdf-task-list">
-                            {pagedAnnotations.map((item, index) => (
-                                <article className={`pdf-task-card ${index === 0 ? "active" : ""}`} key={item.id}>
+                            {pagedAnnotations.map((item, index) => {
+                                const discussionList = normalizeDiscussionList(item.discussion);
+                                const isExpanded = expandedAnnotationIds.includes(item.id);
+                                return (
+                                <article className={`pdf-task-card ${index === 0 ? "active" : ""} ${isExpanded ? "expanded" : "collapsed"}`} key={item.id}>
                                     <div className="pdf-task-top">
                                         <div className="pdf-task-tags">
                                             <span className="pdf-tag pdf-tag-page">第{item.page}页</span>
                                             <span className="pdf-tag pdf-tag-type">{item.type}</span>
-                                            {item.needReply ? <span className="pdf-tag pdf-tag-thread">需协同回复</span> : null}
+                                            {item.needReply ? <span className="pdf-tag pdf-tag-thread">需提报人回复</span> : null}
+                                            {item.needCompanyReply ? <span className="pdf-tag pdf-tag-company">需参股公司回复</span> : null}
                                         </div>
                                         <button
                                             className={`pdf-task-favorite ${item.favorite ? "active" : ""}`}
@@ -564,23 +910,28 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                                         </button>
                                     </div>
                                     <div className="pdf-task-main">{item.content}</div>
-                                    {(item.discussion || []).length ? (
+                                    {discussionList.length ? (
                                         <div className="pdf-task-discussion">
                                             <div className="pdf-discussion-summary">
-                                                <span>共 {item.discussion.length} 轮讨论</span>
-                                                <button type="button">展开更早讨论</button>
+                                                <span>共 {discussionList.length} 轮讨论</span>
                                             </div>
-                                            <div className="pdf-discussion-latest">
-                                                {(item.discussion || []).map((text) => (
-                                                    <div className="pdf-discussion-message suggestion" key={text}>
-                                                        <div className="pdf-discussion-head">评估人员 · 建议</div>
-                                                        <div className="pdf-discussion-body">{text}</div>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                            {isExpanded ? (
+                                                <div className="pdf-discussion-latest">
+                                                    {discussionList.map((discussion, discussionIndex) => (
+                                                        <div className={`pdf-discussion-message ${discussion.role}`} key={discussion.legacyKey || `${item.id}-${discussionIndex}`}>
+                                                            <div className="pdf-discussion-head">
+                                                                {getDiscussionRoleText(discussion.role)}
+                                                                {discussion.name ? ` · ${discussion.name}` : ""}
+                                                                {discussion.time ? ` · ${discussion.time}` : ""}
+                                                            </div>
+                                                            <div className="pdf-discussion-body">{discussion.content}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : null}
                                         </div>
                                     ) : null}
-                                    {replyingId === item.id ? (
+                                    {isExpanded && replyingId === item.id ? (
                                         <Space.Compact block className="pdf-discussion-composer active">
                                             <Input value={reply} onChange={(event) => setReply(event.target.value)} placeholder="请输入建议或回复内容" />
                                             <Button type="primary" onClick={() => sendReply(item.id)}>发送</Button>
@@ -589,14 +940,19 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                                     <div className="pdf-task-foot">
                                         <div className="pdf-task-meta">{item.author}</div>
                                         <div className="pdf-task-actions">
-                                            <button type="button" onClick={() => setReplyingId(item.id)}>回复</button>
+                                            <button type="button" onClick={() => toggleAnnotationExpanded(item.id)}>{isExpanded ? "收起" : "展开"}</button>
+                                            <button type="button" onClick={() => {
+                                                setExpandedAnnotationIds((current) => current.includes(item.id) ? current : [...current, item.id]);
+                                                setReplyingId(item.id);
+                                            }}>回复</button>
                                             <button type="button" onClick={() => openNote(item)}>编辑</button>
                                             <button className="danger" type="button" onClick={() => setAnnotations((current) => current.filter((annotation) => annotation.id !== item.id))}>删除</button>
                                         </div>
                                     </div>
                                 </article>
-                            ))}
-                            {!filteredAnnotations.length ? <div className="pdf-empty-annotations">{annotationFavoriteOnly ? "本页暂无收藏批注" : "本页暂无批注"}</div> : null}
+                                );
+                            })}
+                            {!filteredAnnotations.length ? <div className="pdf-empty-annotations">当前筛选下暂无批注</div> : null}
                           </div>
                           {filteredAnnotations.length > 5 ? (
                             <Pagination
@@ -636,6 +992,19 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                             />
                         </div>
                     ) : null}
+                </div>
+                <div
+                    className="pdf-share-floating"
+                    style={{ left: shareButtonPosition.x, top: shareButtonPosition.y }}
+                >
+                    <button
+                        className="pdf-share-toggle"
+                        type="button"
+                        aria-label="分享当前PDF内容"
+                        onPointerDown={startShareButtonDrag}
+                    >
+                        分享
+                    </button>
                 </div>
                 <div className={`pdf-compare-overlay ${compareOpen ? "open" : ""}`} aria-hidden={!compareOpen}>
                     <button className="pdf-compare-mask" type="button" aria-label="关闭文件对比" onClick={() => setCompareOpen(false)} />
@@ -695,6 +1064,158 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                     </div>
                 </div>
             </section>
+            <Drawer
+                title="分享批注截图"
+                width={760}
+                open={shareOpen}
+                onClose={() => setShareOpen(false)}
+                zIndex={12140}
+                className="pdf-share-drawer"
+                footer={(
+                    <div className="pdf-share-footer">
+                        <Button onClick={() => setShareOpen(false)}>取消</Button>
+                        <Button type="primary" onClick={handleConfirmShare}>确认分享</Button>
+                    </div>
+                )}
+            >
+                <Spin spinning={shareLoading} tip="正在截取PDF内容...">
+                    <div className="pdf-share-content">
+                        <section className="pdf-share-section">
+                                <div className="pdf-share-section-title-row">
+                                <div className="pdf-share-section-title">截图批注</div>
+                                <div className="pdf-share-mark-tools">
+                                    {["#e11d48", "#f59e0b", "#2563eb", "#16a34a"].map((color) => (
+                                        <button
+                                            className={`pdf-share-color ${shareMarkColor === color ? "active" : ""}`}
+                                            key={color}
+                                            type="button"
+                                            style={{ backgroundColor: color }}
+                                            onClick={() => setShareMarkColor(color)}
+                                            aria-label={`选择${color}批注颜色`}
+                                        />
+                                    ))}
+                                    <Button size="small" icon={<UndoOutlined />} disabled={!shareMarks.length} onClick={undoShareMark}>撤销</Button>
+                                    <Button size="small" icon={<RedoOutlined />} disabled={!shareRedoMarks.length} onClick={redoShareMark}>重做</Button>
+                                </div>
+                            </div>
+                            <div className="pdf-share-shot">
+                                {shareSnapshotMarkup ? (
+                                    <div
+                                        className="pdf-share-shot-stage"
+                                        ref={shareShotRef}
+                                        onPointerDown={startShareMark}
+                                        onPointerMove={moveShareMark}
+                                        onPointerUp={finishShareMark}
+                                        onPointerLeave={finishShareMark}
+                                    >
+                                        <div className="pdf-share-shot-content" dangerouslySetInnerHTML={{ __html: shareSnapshotMarkup }} />
+                                        <div className="pdf-share-mark-layer">
+                                            {shareMarks.map((mark) => (
+                                                <div
+                                                    className="pdf-share-mark-rect"
+                                                    key={mark.id}
+                                                    style={{
+                                                        left: `${mark.left}%`,
+                                                        top: `${mark.top}%`,
+                                                        width: `${mark.width}%`,
+                                                        height: `${mark.height}%`,
+                                                        borderColor: mark.color,
+                                                        backgroundColor: `${mark.color}18`,
+                                                    }}
+                                                >
+                                                    <textarea
+                                                        className="pdf-share-mark-input"
+                                                        value={mark.text}
+                                                        placeholder="输入批注"
+                                                        onPointerDown={(event) => event.stopPropagation()}
+                                                        onChange={(event) => updateShareMarkText(mark.id, event.target.value)}
+                                                    />
+                                                </div>
+                                            ))}
+                                            {shareDraftMark ? (
+                                                <div
+                                                    className="pdf-share-mark-rect drafting"
+                                                    style={{
+                                                        left: `${shareDraftMark.left}%`,
+                                                        top: `${shareDraftMark.top}%`,
+                                                        width: `${shareDraftMark.width}%`,
+                                                        height: `${shareDraftMark.height}%`,
+                                                        borderColor: shareDraftMark.color,
+                                                        backgroundColor: `${shareDraftMark.color}18`,
+                                                    }}
+                                                />
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="pdf-share-empty">暂无截图，请重新点击分享按钮生成。</div>
+                                )}
+                            </div>
+                            <div className="pdf-share-tip">仅截取左侧 PDF 正文内容，不包含右侧批注列表；拖拽框选后可在框内输入批注文字。</div>
+                        </section>
+
+                        <section className="pdf-share-section">
+                            <div className="pdf-share-section-title">分享人</div>
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                showSearch
+                                value={shareUsers}
+                                options={shareUserOptions}
+                                optionFilterProp="label"
+                                placeholder="请选择需要发送钉钉消息的人员"
+                                className="pdf-share-user-select"
+                                popupClassName="pdf-share-user-dropdown"
+                                style={{ width: "100%" }}
+                                maxTagCount="responsive"
+                                getPopupContainer={() => document.body}
+                                onChange={setShareUsers}
+                            />
+                        </section>
+
+                        <section className="pdf-share-section">
+                            <div className="pdf-share-section-title">分享建议</div>
+                            <div
+                                className="pdf-share-editor"
+                                contentEditable
+                                suppressContentEditableWarning
+                                dangerouslySetInnerHTML={{ __html: shareAdvice }}
+                                onInput={(event) => setShareAdvice(event.currentTarget.innerHTML)}
+                            />
+                        </section>
+                    </div>
+                </Spin>
+            </Drawer>
+            <Modal
+                title="确认分享"
+                open={shareConfirmOpen}
+                zIndex={12220}
+                okText="确认发送"
+                cancelText="取消"
+                onCancel={() => setShareConfirmOpen(false)}
+                onOk={sendShareMessage}
+            >
+                <div className="pdf-share-success">
+                    <p>确认后将向选中的 {shareUsers.length} 位人员发送钉钉消息。</p>
+                    {shareSelectedNames ? <p>接收人：{shareSelectedNames}{shareUsers.length > 3 ? " 等" : ""}</p> : null}
+                    <p>消息中会包含当前 PDF 截图批注和分享建议。</p>
+                </div>
+            </Modal>
+            <Modal
+                title="分享成功"
+                open={shareSuccessOpen}
+                zIndex={12230}
+                okText="知道了"
+                cancelButtonProps={{ style: { display: "none" } }}
+                onCancel={() => setShareSuccessOpen(false)}
+                onOk={() => setShareSuccessOpen(false)}
+            >
+                <div className="pdf-share-success">
+                    <p>已模拟向 {shareUsers.length} 位人员发送钉钉消息。</p>
+                    {shareSelectedNames ? <p>接收人：{shareSelectedNames}{shareUsers.length > 3 ? " 等" : ""}</p> : null}
+                    <p>消息内容包含当前 PDF 截图批注和分享建议。</p>
+                </div>
+            </Modal>
             <Modal
                 title={editing ? "编辑批注" : "填写说明"}
                 open={noteOpen}
@@ -705,13 +1226,20 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                 onOk={saveNote}
             >
                 <Input.TextArea value={note} onChange={(event) => setNote(event.target.value)} placeholder="请输入批注说明" autoSize={{ minRows: 4, maxRows: 8 }} />
-                {showNeedReply && !editing ? (<div className="pdf-note-reply-field">
+                {showNeedReply ? (<div className="pdf-note-reply-field">
                     <span>是否需要提报人回复：</span>
                     <Radio.Group value={needReply} onChange={(event) => setNeedReply(event.target.value)}>
                         <Radio value={true}>是</Radio>
                         <Radio value={false}>否</Radio>
                     </Radio.Group>
                 </div>) : null}
+                <div className="pdf-note-reply-field">
+                    <span>是否需要参股公司回复：</span>
+                    <Radio.Group value={needCompanyReply} onChange={(event) => setNeedCompanyReply(event.target.value)}>
+                        <Radio value={true}>是</Radio>
+                        <Radio value={false}>否</Radio>
+                    </Radio.Group>
+                </div>
             </Modal>
             <Modal
                 title="参考信息"
@@ -757,6 +1285,13 @@ export default function PdfAnnotationEditor({ open, fileName, mode = "annotation
                     </div>
                 </div>
             </Modal>
+            <TaskIssueDrawer
+                zIndex={12120}
+                title="议题评估任务浮窗"
+                onSubmit={(payload) => {
+                    console.log(payload);
+                }}
+            />
         </>
     );
 

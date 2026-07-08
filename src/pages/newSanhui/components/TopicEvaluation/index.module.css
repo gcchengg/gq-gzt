@@ -53,6 +53,77 @@
   font-size: 13px;
 }
 
+.mutedText {
+  color: #9aa3b2;
+}
+
+.feedbackAnswerCell {
+  display: grid;
+  gap: 6px;
+  color: #4c5668;
+  line-height: 20px;
+}
+
+.feedbackAnswerCell :global(.ant-tag) {
+  width: fit-content;
+  margin-inline-end: 0;
+}
+
+.feedbackStatusTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.feedbackTimeline {
+  display: grid;
+  gap: 10px;
+  padding: 6px 8px 6px 34px;
+}
+
+.feedbackTimelineItem {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.feedbackTimelineSendDot,
+.feedbackTimelineReplyDot {
+  width: 8px;
+  height: 8px;
+  margin-top: 7px;
+  border-radius: 999px;
+}
+
+.feedbackTimelineSendDot {
+  background: #4f70e8;
+}
+
+.feedbackTimelineReplyDot {
+  background: #13a88b;
+}
+
+.feedbackTimelineHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #7a8496;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.feedbackTimelineHead span:first-child {
+  color: #2f3a4d;
+  font-weight: 600;
+}
+
+.feedbackTimelineBody {
+  color: #4c5668;
+  font-size: 13px;
+  line-height: 22px;
+}
+
 .topicName {
   color: #1f2a44;
   font-weight: 600;
@@ -138,6 +209,138 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 14px;
+}
+
+.companyFeedbackModal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  min-height: 660px;
+}
+
+.pdfPreviewPane {
+  min-height: 660px;
+  overflow: hidden;
+  border: 1px solid #dfe6f1;
+  border-radius: 8px;
+  background: #f3f6fb;
+}
+
+.feedbackTopicTabs,
+.feedbackPdfTabs {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+}
+
+.feedbackTopicTabs :global(.ant-tabs-nav),
+.feedbackPdfTabs :global(.ant-tabs-nav) {
+  margin: 0;
+  padding: 0 12px;
+  background: #fff;
+}
+
+.feedbackTopicTabs :global(.ant-tabs-content-holder),
+.feedbackTopicTabs :global(.ant-tabs-content),
+.feedbackTopicTabs :global(.ant-tabs-tabpane),
+.feedbackPdfTabs :global(.ant-tabs-content-holder),
+.feedbackPdfTabs :global(.ant-tabs-content),
+.feedbackPdfTabs :global(.ant-tabs-tabpane) {
+  min-height: 0;
+  height: 100%;
+}
+
+.feedbackTopicPanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 616px;
+  background: #f3f6fb;
+}
+
+.feedbackTopicHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #dfe6f1;
+  background: #fbfcff;
+  color: #1f2a44;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.feedbackTopicHead span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedbackPdfPanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 568px;
+}
+
+.pdfPreviewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #dfe6f1;
+  background: #fff;
+  color: #263244;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pdfPreviewHeader span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedbackPdfFrame {
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+.feedbackPdfNotes {
+  display: grid;
+  gap: 8px;
+  max-height: 120px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  border-top: 1px solid #dfe6f1;
+  background: #fbfcff;
+}
+
+.feedbackPdfNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: #4d586a;
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.feedbackPdfNote :global(.ant-tag) {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  margin-inline-end: 0;
+}
+
+.companyContactForm {
+  padding: 16px;
+  border: 1px solid #e3e8f1;
+  border-radius: 8px;
+  background: #fbfcff;
 }
 
 .topicEditDrawerShell :global(.ant-drawer-body) {

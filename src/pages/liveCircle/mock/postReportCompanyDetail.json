@@ -1,0 +1,19 @@
+{
+  "code": 200,
+  "message": "success",
+  "data": {
+    "id": "cbba4ef9b59543a2acea4ecf26020217",
+    "companyName": "长春富晟集团有限公司",
+    "shortForm": "富晟公司",
+    "opsProgStatus": "50000",
+    "registeredAddress": "长春市汽车经济技术开发区振兴路593号",
+    "registeredCapitalAmt": 30000,
+    "investCostAmt": 7500,
+    "shRatio": 25,
+    "dutyUserName": "杜月",
+    "dutyEmail": "liangguoxia@fawsn.com.cn",
+    "baseName": "吉林省长春市净月区和美路中懋天地8号楼19层、20层",
+    "industryName": "汽车零部件及配件制造",
+    "bizScope": "汽车零部件研发、制造及配套服务。"
+  }
+}

@@ -1,5 +1,5 @@
 import { Button, DatePicker, Drawer, Form, Input, Modal, Select, Tabs, Upload, message } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./TaskIssueDrawer.css";
 
 const taskTypeOptions = [
@@ -58,6 +58,7 @@ export default function TaskIssueDrawer({
   ifFromTask,
   isSanhui,
   sanhuiRecord,
+  zIndex = 12080,
 }) {
   const [form] = Form.useForm();
   const [activeTab, setActiveTab] = useState("create");
@@ -65,6 +66,10 @@ export default function TaskIssueDrawer({
   const [innerOpen, setInnerOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState(null);
+  const [triggerPosition, setTriggerPosition] = useState(null);
+  const [dragging, setDragging] = useState(false);
+  const triggerDragRef = useRef(null);
+  const suppressClickRef = useRef(false);
   const isControlled = typeof open === "boolean";
   const mergedOpen = isControlled ? open : innerOpen;
   const currentTaskType = useMemo(() => taskTypeOptions.find((item) => item.value === taskType), [taskType]);
@@ -93,9 +98,56 @@ export default function TaskIssueDrawer({
   }, [form, sanhuiRecord, taskType]);
 
   const handleOpen = () => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
     onOpen?.();
     if (!isControlled) {
       setInnerOpen(true);
+    }
+  };
+
+  const handleTriggerPointerDown = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    triggerDragRef.current = {
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      startX: event.clientX,
+      startY: event.clientY,
+      moved: false,
+    };
+    setDragging(true);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handleTriggerPointerMove = (event) => {
+    const drag = triggerDragRef.current;
+    if (!drag) return;
+
+    const moved = Math.abs(event.clientX - drag.startX) > 4 || Math.abs(event.clientY - drag.startY) > 4;
+    if (moved) {
+      drag.moved = true;
+      suppressClickRef.current = true;
+    }
+
+    const triggerWidth = 160;
+    const triggerHeight = 64;
+    const maxLeft = Math.max(window.innerWidth - triggerWidth - 12, 12);
+    const maxTop = Math.max(window.innerHeight - triggerHeight - 12, 12);
+    setTriggerPosition({
+      left: Math.min(Math.max(event.clientX - drag.offsetX, 12), maxLeft),
+      top: Math.min(Math.max(event.clientY - drag.offsetY, 72), maxTop),
+    });
+  };
+
+  const handleTriggerPointerUp = (event) => {
+    const drag = triggerDragRef.current;
+    triggerDragRef.current = null;
+    setDragging(false);
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    if (!drag?.moved) {
+      suppressClickRef.current = false;
     }
   };
 
@@ -143,7 +195,26 @@ export default function TaskIssueDrawer({
   return (
     <>
       {showTrigger && !mergedOpen ? (
-        <button type="button" className="task-issue-trigger" onClick={handleOpen}>
+        <button
+          type="button"
+          className={`task-issue-trigger${dragging ? " is-dragging" : ""}`}
+          style={{
+            zIndex,
+            ...(triggerPosition
+              ? {
+                  left: triggerPosition.left,
+                  top: triggerPosition.top,
+                  right: "auto",
+                  bottom: "auto",
+                }
+              : null),
+          }}
+          onClick={handleOpen}
+          onPointerDown={handleTriggerPointerDown}
+          onPointerMove={handleTriggerPointerMove}
+          onPointerUp={handleTriggerPointerUp}
+          onPointerCancel={handleTriggerPointerUp}
+        >
           <span className="task-issue-trigger__icon">+</span>
           <span>
             任务浮窗
@@ -159,6 +230,7 @@ export default function TaskIssueDrawer({
         onClose={handleClose}
         destroyOnClose
         className="task-issue-drawer"
+        zIndex={zIndex}
       >
         <div className="task-issue-drawer__hint">直接选择任务类型并填写信息，支持跨页面复用。</div>
         <Tabs
@@ -354,6 +426,7 @@ export default function TaskIssueDrawer({
         cancelText="取消"
         onCancel={() => setConfirmOpen(false)}
         onOk={handleConfirmSubmit}
+        zIndex={zIndex + 10}
       >
         <div>确认提交后将立即创建任务，是否继续？</div>
       </Modal>

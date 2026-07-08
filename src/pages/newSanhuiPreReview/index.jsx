@@ -118,7 +118,7 @@ function MeetingManageInfo() {
   );
 }
 
-function PreReviewDetail({ open, topic, reviewType, onClose }) {
+function PreReviewDetail({ open, topic, reviewType, reviewOpinion, onReviewOpinionChange, onClose }) {
   const [pdfEditor, setPdfEditor] = useState(null);
 
   const attachmentColumns = [
@@ -149,7 +149,7 @@ function PreReviewDetail({ open, topic, reviewType, onClose }) {
   return (
     <>
       <Drawer
-        title="初审详情"
+        title={`初审详情 · ${topic?.topicName || ""}`}
         open={open}
         width="92%"
         onClose={onClose}
@@ -173,6 +173,25 @@ function PreReviewDetail({ open, topic, reviewType, onClose }) {
           </section>
 
           <EvaluationModelScore hideModelAction hideMaterialAction hideExecutionColumn hideExceptionColumn />
+
+          <section className="pre-review-section">
+            <div className="pre-review-section-head">
+              <div>
+                <h3>初审意见</h3>
+                <p>请针对当前议题填写初审最终意见，提交后将按议题保存。</p>
+              </div>
+              <Tag color={reviewOpinion?.trim() ? "success" : "warning"}>
+                {reviewOpinion?.trim() ? "已填写" : "待填写"}
+              </Tag>
+            </div>
+            <div className="pre-review-topic-opinion-title">{topic?.topicName || "当前议题"}</div>
+            <Input.TextArea
+              value={reviewOpinion}
+              onChange={(event) => onReviewOpinionChange?.(event.target.value)}
+              placeholder="请输入本议题初审最终意见"
+              autoSize={{ minRows: 5, maxRows: 8 }}
+            />
+          </section>
         </div>
       </Drawer>
 
@@ -191,10 +210,19 @@ export default function NewSanhuiPreReview() {
   const [reviewType] = useState(getReviewType);
   const [topics] = useState(createInitialTopics);
   const [activeTopic, setActiveTopic] = useState(null);
-  const [reviewOpinion, setReviewOpinion] = useState("");
+  const [topicReviewOpinions, setTopicReviewOpinions] = useState({});
   const [legalMeetingOpinion, setLegalMeetingOpinion] = useState("");
   const [legalRiskAdvice, setLegalRiskAdvice] = useState("");
   const orderedTopics = useMemo(() => sortTopics(topics), [topics]);
+  const activeTopicId = activeTopic?.id;
+  const finishPreReview = () => {
+    const missingTopics = orderedTopics.filter((topic) => !topicReviewOpinions[topic.id]?.trim());
+    if (missingTopics.length) {
+      message.warning(`还有 ${missingTopics.length} 个议题未填写初审意见`);
+      return;
+    }
+    message.success(`${reviewType}已提交`);
+  };
 
   const columns = [
     { title: "序号", width: 72, align: "center", render: (_, __, index) => index + 1 },
@@ -206,6 +234,12 @@ export default function NewSanhuiPreReview() {
     { title: "董事会", dataIndex: "boardMeeting", width: 86, align: "center", render: (value) => value ? "√" : "-" },
     { title: "监事会", dataIndex: "supervisorMeeting", width: 86, align: "center", render: (value) => value ? "√" : "-" },
     { title: "股东会", dataIndex: "shareholderMeeting", width: 86, align: "center", render: (value) => value ? "√" : "-" },
+    {
+      title: "初审意见",
+      width: 120,
+      align: "center",
+      render: (_, record) => topicReviewOpinions[record.id]?.trim() ? <Tag color="success">已填写</Tag> : <Tag color="warning">待填写</Tag>,
+    },
     { title: "初审状态", dataIndex: "status", width: 110, align: "center", render: (status) => <Tag color="processing">{status}</Tag> },
     {
       title: "操作",
@@ -238,20 +272,7 @@ export default function NewSanhuiPreReview() {
           pagination={false}
           columns={columns}
           dataSource={orderedTopics}
-          scroll={{ x: 1220 }}
-        />
-      </section>
-
-      <section className="pre-review-card">
-        <div className="pre-review-card-head">
-          <span>初审意见</span>
-          <strong>重点：请填写初审最终意见，并及时汇报至部门总监</strong>
-        </div>
-        <Input.TextArea
-          value={reviewOpinion}
-          onChange={(event) => setReviewOpinion(event.target.value)}
-          placeholder="请输入初审最终意见"
-          autoSize={{ minRows: 5, maxRows: 8 }}
+          scroll={{ x: 1340 }}
         />
       </section>
 
@@ -285,7 +306,7 @@ export default function NewSanhuiPreReview() {
 
       <div className="pre-review-footer">
         <Button onClick={() => history.back()}>返回</Button>
-        <Button type="primary" onClick={() => message.success(`${reviewType}已提交`)}>
+        <Button type="primary" onClick={finishPreReview}>
           完成初审
         </Button>
       </div>
@@ -294,6 +315,11 @@ export default function NewSanhuiPreReview() {
         open={Boolean(activeTopic)}
         topic={activeTopic}
         reviewType={reviewType}
+        reviewOpinion={activeTopicId ? topicReviewOpinions[activeTopicId] || "" : ""}
+        onReviewOpinionChange={(value) => {
+          if (!activeTopicId) return;
+          setTopicReviewOpinions((current) => ({ ...current, [activeTopicId]: value }));
+        }}
         onClose={() => setActiveTopic(null)}
       />
     </div>

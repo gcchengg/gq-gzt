@@ -5,6 +5,8 @@ const GztDemo = lazy(() => import("@/pages/gztDemo"));
 const Assign = lazy(() => import("@/pages/assign"));
 const NewSanhui = lazy(() => import("@/pages/newSanhui"));
 const NewSanhuiPreReview = lazy(() => import("@/pages/newSanhuiPreReview"));
+const LiveCircle = lazy(() => import("@/pages/liveCircle"));
+const PostReport = lazy(() => import("@/pages/liveCircle/postReport"));
 const ThreeMeetingPlan = lazy(() => import("@/pages/threeMeetingPlan"));
 const AdviceReview = lazy(() => import("@/pages/adviceReview"));
 const AdviceReview1 = lazy(() => import("@/pages/adviceReview1"));
@@ -70,6 +72,22 @@ export const routes = [
     element: (
       <Suspense>
         <NewSanhuiPreReview />
+      </Suspense>
+    ),
+  },
+  {
+    path: "liveCircle",
+    element: (
+      <Suspense>
+        <LiveCircle />
+      </Suspense>
+    ),
+  },
+  {
+    path: "postReport",
+    element: (
+      <Suspense>
+        <PostReport />
       </Suspense>
     ),
   },

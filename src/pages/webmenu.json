@@ -13,6 +13,16 @@
         "id": "new-sanhui",
         "title": "三会全流程管理",
         "key": "/newSanhui"
+      },
+      {
+        "id": "live-circle",
+        "title": "参股公司全生命周期管理",
+        "key": "/liveCircle"
+      },
+      {
+        "id": "post-report",
+        "title": "参股公司投后报告",
+        "key": "/postReport"
       }
     ]
   },

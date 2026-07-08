@@ -1,0 +1,10 @@
+{
+  "code": 200,
+  "success": true,
+  "message": "success",
+  "data": {
+    "id": "company-001",
+    "companyName": "中联汽车电子有限公司",
+    "opsProgStatus": "43000"
+  }
+}

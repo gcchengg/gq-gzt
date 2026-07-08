@@ -14,12 +14,19 @@
   background: linear-gradient(135deg, #2454e6, #4f7cff);
   box-shadow: 0 16px 36px rgba(36, 84, 230, 0.28);
   color: #fff;
-  cursor: pointer;
+  cursor: grab;
   text-align: left;
+  touch-action: none;
+  user-select: none;
 }
 
 .task-issue-trigger:hover {
   background: linear-gradient(135deg, #1743c8, #3d6af0);
+}
+
+.task-issue-trigger.is-dragging {
+  cursor: grabbing;
+  box-shadow: 0 20px 44px rgba(36, 84, 230, 0.36);
 }
 
 .task-issue-trigger__icon {

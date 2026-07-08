@@ -19,10 +19,15 @@ export async function sanhuiVoteInitBySanhuiMgmtId(params = {}) {
 
 export async function sanhuiVoteSave(params = {}) {
   await sleep();
+  const previousTopicMap = new Map((voteData.sanhuiVoteTopicList || []).map((item) => [item.id || item.topicId, item]));
+  const nextTopicList = (params.sanhuiVoteTopicList || voteData.sanhuiVoteTopicList || []).map((item) => ({
+    ...(previousTopicMap.get(item.id || item.topicId) || {}),
+    ...item,
+  }));
   voteData = {
     ...voteData,
     voteId: params.voteId || voteData.voteId || saveResponse.data.voteId,
-    sanhuiVoteTopicList: params.sanhuiVoteTopicList || voteData.sanhuiVoteTopicList,
+    sanhuiVoteTopicList: nextTopicList,
     sanhuiVoteFileList: params.sanhuiVoteFileList || voteData.sanhuiVoteFileList,
     status: params.status,
   };

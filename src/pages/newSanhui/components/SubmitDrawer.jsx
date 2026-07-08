@@ -108,6 +108,7 @@ const smartSubmitTip = (
   <div className="submit-distribution-tip">
     <p>1.操作列新增 【上移】【下移】</p>
     <p>2.点击下一步时，需要使用E签宝把非pdf文件转为pdf文件，方便在评估时标注</p>
+    <p>3.初始化选择公司时，不能选择已退出的公司</p>
   </div>
 );
 const launchedSubmitTasks = [
