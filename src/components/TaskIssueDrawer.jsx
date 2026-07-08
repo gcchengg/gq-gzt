@@ -1,4 +1,15 @@
-import { Button, DatePicker, Drawer, Form, Input, Modal, Select, Tabs, Upload, message } from "antd";
+import {
+  Button,
+  DatePicker,
+  Drawer,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Tabs,
+  Upload,
+  message,
+} from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./TaskIssueDrawer.css";
 
@@ -27,8 +38,7 @@ const taskTypeOptions = [
   {
     label: "协同事项",
     value: "500",
-    desc: "跨部门协同事项，当前仅做展示。",
-    disabled: true,
+    desc: "跨部门协同事项，用于发起协作处理任务。",
   },
 ];
 
@@ -59,10 +69,11 @@ export default function TaskIssueDrawer({
   isSanhui,
   sanhuiRecord,
   zIndex = 12080,
+  defaultTaskType = "300",
 }) {
   const [form] = Form.useForm();
   const [activeTab, setActiveTab] = useState("create");
-  const [taskType, setTaskType] = useState("300");
+  const [taskType, setTaskType] = useState(defaultTaskType);
   const [innerOpen, setInnerOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingValues, setPendingValues] = useState(null);
@@ -72,20 +83,35 @@ export default function TaskIssueDrawer({
   const suppressClickRef = useRef(false);
   const isControlled = typeof open === "boolean";
   const mergedOpen = isControlled ? open : innerOpen;
-  const currentTaskType = useMemo(() => taskTypeOptions.find((item) => item.value === taskType), [taskType]);
+  const currentTaskType = useMemo(
+    () => taskTypeOptions.find((item) => item.value === taskType),
+    [taskType],
+  );
   const mergedCompanyOptions = useMemo(() => {
     if (!sanhuiRecord?.companyId) return companyOptions;
-    if (companyOptions.some((item) => String(item.value) === String(sanhuiRecord.companyId))) {
+    if (
+      companyOptions.some(
+        (item) => String(item.value) === String(sanhuiRecord.companyId),
+      )
+    ) {
       return companyOptions;
     }
     return [
       {
-        label: sanhuiRecord.companyName || sanhuiRecord.companyShortName || "当前三会事项公司",
+        label:
+          sanhuiRecord.companyName ||
+          sanhuiRecord.companyShortName ||
+          "当前三会事项公司",
         value: sanhuiRecord.companyId,
       },
       ...companyOptions,
     ];
   }, [sanhuiRecord]);
+
+  useEffect(() => {
+    setTaskType(defaultTaskType);
+    form.setFieldsValue({ taskType: defaultTaskType });
+  }, [defaultTaskType, form]);
 
   useEffect(() => {
     if (!sanhuiRecord) return;
@@ -125,7 +151,9 @@ export default function TaskIssueDrawer({
     const drag = triggerDragRef.current;
     if (!drag) return;
 
-    const moved = Math.abs(event.clientX - drag.startX) > 4 || Math.abs(event.clientY - drag.startY) > 4;
+    const moved =
+      Math.abs(event.clientX - drag.startX) > 4 ||
+      Math.abs(event.clientY - drag.startY) > 4;
     if (moved) {
       drag.moved = true;
       suppressClickRef.current = true;
@@ -232,7 +260,9 @@ export default function TaskIssueDrawer({
         className="task-issue-drawer"
         zIndex={zIndex}
       >
-        <div className="task-issue-drawer__hint">直接选择任务类型并填写信息，支持跨页面复用。</div>
+        <div className="task-issue-drawer__hint">
+          直接选择任务类型并填写信息，支持跨页面复用。
+        </div>
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
@@ -257,8 +287,12 @@ export default function TaskIssueDrawer({
                             disabled={item.disabled}
                             className={[
                               "task-issue-drawer__type-card",
-                              active ? "task-issue-drawer__type-card--active" : "",
-                              item.disabled ? "task-issue-drawer__type-card--disabled" : "",
+                              active
+                                ? "task-issue-drawer__type-card--active"
+                                : "",
+                              item.disabled
+                                ? "task-issue-drawer__type-card--disabled"
+                                : "",
                             ].join(" ")}
                             onClick={() => handleTaskTypeChange(item)}
                           >
@@ -284,48 +318,135 @@ export default function TaskIssueDrawer({
                       }}
                     >
                       <div className="task-issue-drawer__base-grid">
-                        <Form.Item label="任务发起人" name="issueUserId" rules={[{ required: true, message: "请选择任务发起人" }]}>
-                          <Select options={userOptions} showSearch optionFilterProp="label" />
+                        <Form.Item
+                          label="任务发起人"
+                          name="issueUserId"
+                          rules={[
+                            { required: true, message: "请选择任务发起人" },
+                          ]}
+                        >
+                          <Select
+                            options={userOptions}
+                            showSearch
+                            optionFilterProp="label"
+                          />
                         </Form.Item>
-                        <Form.Item label="任务执行人" name="dutyUserId" rules={[{ required: true, message: "请选择任务执行人" }]}>
-                          <Select options={userOptions} showSearch optionFilterProp="label" />
+                        <Form.Item
+                          label="任务执行人"
+                          name="dutyUserId"
+                          rules={[
+                            { required: true, message: "请选择任务执行人" },
+                          ]}
+                        >
+                          <Select
+                            options={userOptions}
+                            showSearch
+                            optionFilterProp="label"
+                          />
                         </Form.Item>
                       </div>
 
                       <div className="task-issue-drawer__base-grid">
-                        <Form.Item label="任务类型选择" name="taskType" rules={[{ required: true, message: "请选择任务类型" }]}>
+                        <Form.Item
+                          label="任务类型选择"
+                          name="taskType"
+                          rules={[
+                            { required: true, message: "请选择任务类型" },
+                          ]}
+                        >
                           <Select
                             options={taskTypeOptions.map((item) => ({
                               label: item.label,
                               value: item.value,
                               disabled: item.disabled,
                             }))}
-                            onChange={(value) => handleTaskTypeChange(taskTypeOptions.find((item) => item.value === value))}
+                            onChange={(value) =>
+                              handleTaskTypeChange(
+                                taskTypeOptions.find(
+                                  (item) => item.value === value,
+                                ),
+                              )
+                            }
                           />
                         </Form.Item>
-                        <Form.Item label="目标公司" name="companyId" rules={[{ required: true, message: "请选择目标公司" }]}>
-                          <Select disabled={Boolean(ifFromTask)} options={mergedCompanyOptions} showSearch optionFilterProp="label" />
+                        <Form.Item
+                          label="目标公司"
+                          name="companyId"
+                          rules={[
+                            { required: true, message: "请选择目标公司" },
+                          ]}
+                        >
+                          <Select
+                            disabled={Boolean(ifFromTask)}
+                            options={mergedCompanyOptions}
+                            showSearch
+                            optionFilterProp="label"
+                          />
                         </Form.Item>
                       </div>
 
                       {taskType === "200" ? (
                         <>
                           <div className="task-issue-drawer__base-grid task-issue-drawer__meeting-grid">
-                            <Form.Item label="会议开始时间" name="startTime" rules={[{ required: true, message: "请选择会议开始时间" }]}>
-                              <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD HH:mm:ss" showTime />
+                            <Form.Item
+                              label="会议开始时间"
+                              name="startTime"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "请选择会议开始时间",
+                                },
+                              ]}
+                            >
+                              <DatePicker
+                                style={{ width: "100%" }}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                showTime
+                              />
                             </Form.Item>
-                            <Form.Item label="会议结束时间" name="endTime" rules={[{ required: true, message: "请选择会议结束时间" }]}>
-                              <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD HH:mm:ss" showTime />
+                            <Form.Item
+                              label="会议结束时间"
+                              name="endTime"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "请选择会议结束时间",
+                                },
+                              ]}
+                            >
+                              <DatePicker
+                                style={{ width: "100%" }}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                showTime
+                              />
                             </Form.Item>
-                            <Form.Item label="会议地点" name="meetLocation" rules={[{ required: true, message: "请输入会议地点" }]}>
+                            <Form.Item
+                              label="会议地点"
+                              name="meetLocation"
+                              rules={[
+                                { required: true, message: "请输入会议地点" },
+                              ]}
+                            >
                               <Input />
                             </Form.Item>
-                            <Form.Item label="主要与会人员" name="attendUsers" rules={[{ required: true, message: "请输入主要与会人员" }]}>
+                            <Form.Item
+                              label="主要与会人员"
+                              name="attendUsers"
+                              rules={[
+                                {
+                                  required: true,
+                                  message: "请输入主要与会人员",
+                                },
+                              ]}
+                            >
                               <Input />
                             </Form.Item>
                           </div>
                           <Form.Item label="会议有关议题" name="meetTopic">
-                            <Input.TextArea rows={4} placeholder="请输入会议有关议题" />
+                            <Input.TextArea
+                              rows={4}
+                              placeholder="请输入会议有关议题"
+                            />
                           </Form.Item>
                         </>
                       ) : null}
@@ -333,21 +454,38 @@ export default function TaskIssueDrawer({
                       {taskType === "100" ? (
                         <>
                           <div className="task-issue-drawer__base-grid">
-                            <Form.Item label="走访城市" name="cityName" rules={[{ required: true, message: "请输入走访城市" }]}>
+                            <Form.Item
+                              label="走访城市"
+                              name="cityName"
+                              rules={[
+                                { required: true, message: "请输入走访城市" },
+                              ]}
+                            >
                               <Input />
                             </Form.Item>
                             <Form.Item label="随行人员" name="visitUsers">
                               <Select mode="multiple" options={userOptions} />
                             </Form.Item>
                             <Form.Item label="出发时间" name="leaveTime">
-                              <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD HH:mm:ss" showTime />
+                              <DatePicker
+                                style={{ width: "100%" }}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                showTime
+                              />
                             </Form.Item>
                             <Form.Item label="返回时间" name="returnTime">
-                              <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD HH:mm:ss" showTime />
+                              <DatePicker
+                                style={{ width: "100%" }}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                showTime
+                              />
                             </Form.Item>
                           </div>
                           <Form.Item label="走访计划" name="visitPlan">
-                            <Input.TextArea rows={4} placeholder="请输入走访计划" />
+                            <Input.TextArea
+                              rows={4}
+                              placeholder="请输入走访计划"
+                            />
                           </Form.Item>
                         </>
                       ) : null}
@@ -356,30 +494,69 @@ export default function TaskIssueDrawer({
                         <>
                           {taskType === "300" ? (
                             <>
-                              <Form.Item name="sanhuiMgmtId" hidden rules={[{ required: true, message: "缺少三会事项" }]}>
+                              <Form.Item
+                                name="sanhuiMgmtId"
+                                hidden
+                                rules={[
+                                  { required: true, message: "缺少三会事项" },
+                                ]}
+                              >
                                 <Input />
                               </Form.Item>
                               <Form.Item
                                 label="会议及议题编码"
                                 name="sanhuiMgmtNo"
-                                rules={[{ required: true, message: "缺少会议及议题编码" }]}
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "缺少会议及议题编码",
+                                  },
+                                ]}
                               >
-                                <Input disabled placeholder="打开三会详情后自动带入" />
+                                <Input
+                                  disabled
+                                  placeholder="打开三会详情后自动带入"
+                                />
                               </Form.Item>
                             </>
                           ) : null}
-                          <Form.Item label="任务标题" name="taskTitle" rules={[{ required: true, message: "请输入任务标题" }]}>
+                          <Form.Item
+                            label="任务标题"
+                            name="taskTitle"
+                            rules={[
+                              { required: true, message: "请输入任务标题" },
+                            ]}
+                          >
                             <Input placeholder="请输入任务标题" />
                           </Form.Item>
-                          <Form.Item label="任务描述" name="taskDesc" rules={[{ required: true, message: "请输入任务描述" }]}>
-                            <Input.TextArea rows={5} placeholder="请输入任务描述" />
+                          <Form.Item
+                            label="任务描述"
+                            name="taskDesc"
+                            rules={[
+                              { required: true, message: "请输入任务描述" },
+                            ]}
+                          >
+                            <Input.TextArea
+                              rows={5}
+                              placeholder="请输入任务描述"
+                            />
                           </Form.Item>
                         </>
                       ) : null}
 
                       <div className="task-issue-drawer__base-grid">
-                        <Form.Item label="任务完成时间" name="planCmplTime" rules={[{ required: true, message: "请选择任务完成时间" }]}>
-                          <DatePicker style={{ width: "100%" }} format="YYYY-MM-DD HH:mm:ss" showTime />
+                        <Form.Item
+                          label="任务完成时间"
+                          name="planCmplTime"
+                          rules={[
+                            { required: true, message: "请选择任务完成时间" },
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            format="YYYY-MM-DD HH:mm:ss"
+                            showTime
+                          />
                         </Form.Item>
                         <Form.Item label="上传附件" name="files">
                           <Upload beforeUpload={() => false}>
@@ -390,10 +567,20 @@ export default function TaskIssueDrawer({
                     </Form>
                   </section>
                   <div className="task-issue-drawer__footer">
-                    <span>保存后可继续补充，创建任务后自动写入关联任务列表。</span>
+                    <span>
+                      保存后可继续补充，创建任务后自动写入关联任务列表。
+                    </span>
                     <div>
-                      <Button onClick={handleSave} loading={loading}>保存</Button>
-                      <Button type="primary" onClick={handleSubmit} loading={loading}>创建任务</Button>
+                      <Button onClick={handleSave} loading={loading}>
+                        保存
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={handleSubmit}
+                        loading={loading}
+                      >
+                        创建任务
+                      </Button>
                     </div>
                   </div>
                 </div>

@@ -158,14 +158,42 @@ function mergeSeedCompanyFeedbackRows(stored) {
     ...storedMap.get(seed.id),
     companyAnswer: storedMap.get(seed.id)?.companyAnswer || seed.companyAnswer,
     answerTime: storedMap.get(seed.id)?.answerTime || seed.answerTime,
-    rounds: storedMap.get(seed.id)?.rounds?.length
-      ? storedMap.get(seed.id).rounds
-      : seed.rounds,
+    rounds: normalizeFeedbackRounds(
+      storedMap.get(seed.id)?.rounds?.length
+        ? storedMap.get(seed.id).rounds
+        : seed.rounds,
+    ),
   }));
-  const extraItems = stored.filter(
-    (item) => !seedCompanyFeedbackRows.some((seed) => seed.id === item.id),
-  );
+  const extraItems = stored
+    .filter(
+      (item) => !seedCompanyFeedbackRows.some((seed) => seed.id === item.id),
+    )
+    .map((item) => ({
+      ...item,
+      rounds: normalizeFeedbackRounds(item.rounds),
+    }));
   return [...mergedSeeds, ...extraItems];
+}
+
+function getFeedbackRoleText(role) {
+  if (role === "company") return "参股公司";
+  if (role === "submitter") return "提报人";
+  if (role === "evaluator") return "评估人员";
+  return role || "评估人员";
+}
+
+function normalizeFeedbackRounds(rounds = []) {
+  return (Array.isArray(rounds) ? rounds : []).map((round) => ({
+    ...round,
+    role: getFeedbackRoleText(round.role),
+  }));
+}
+
+function getFeedbackRoleClass(role) {
+  const roleText = getFeedbackRoleText(role);
+  if (roleText === "参股公司") return "feedbackTimelineCompany";
+  if (roleText === "提报人") return "feedbackTimelineSubmitter";
+  return "feedbackTimelineEvaluator";
 }
 
 function readStorageList(key, fallback = []) {
@@ -226,7 +254,11 @@ function parseCsvLine(line) {
 function isPendingCompanyReply(record) {
   const lastRound = record.rounds?.at(-1);
   if (!lastRound) return !record.companyAnswer;
-  return lastRound.type === "send" || lastRound.role === "评估人员";
+  return (
+    lastRound.type === "send" ||
+    lastRound.role === "评估人员" ||
+    lastRound.role === "evaluator"
+  );
 }
 
 function getPdfFileUrl(pdfName) {
@@ -350,6 +382,35 @@ function CompanyFeedbackTab({ topics }) {
         isPendingCompanyReply(record) ? "-" : value || "-",
     },
   ];
+
+  const renderFeedbackTimeline = (record) => (
+    <div className={styles.feedbackTimeline}>
+      {(record.rounds || []).map((round, index) => (
+        <div
+          className={[
+            styles.feedbackTimelineItem,
+            styles[getFeedbackRoleClass(round.role)],
+          ].join(" ")}
+          key={`${record.id}-${round.time}-${index}`}
+        >
+          <span
+            className={
+              round.type === "reply"
+                ? styles.feedbackTimelineReplyDot
+                : styles.feedbackTimelineSendDot
+            }
+          />
+          <div>
+            <div className={styles.feedbackTimelineHead}>
+              <span>{getFeedbackRoleText(round.role)}</span>
+              <span>{round.time}</span>
+            </div>
+            <div className={styles.feedbackTimelineBody}>{round.content}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   const persistRows = (nextRows) => {
     setRows(nextRows);
@@ -528,33 +589,7 @@ function CompanyFeedbackTab({ topics }) {
               }),
             }}
             expandable={{
-              expandedRowRender: (record) => (
-                <div className={styles.feedbackTimeline}>
-                  {(record.rounds || []).map((round, index) => (
-                    <div
-                      className={styles.feedbackTimelineItem}
-                      key={`${record.id}-${round.time}-${index}`}
-                    >
-                      <span
-                        className={
-                          round.type === "reply"
-                            ? styles.feedbackTimelineReplyDot
-                            : styles.feedbackTimelineSendDot
-                        }
-                      />
-                      <div>
-                        <div className={styles.feedbackTimelineHead}>
-                          <span>{round.role}</span>
-                          <span>{round.time}</span>
-                        </div>
-                        <div className={styles.feedbackTimelineBody}>
-                          {round.content}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ),
+              expandedRowRender: renderFeedbackTimeline,
               rowExpandable: (record) => Boolean(record.rounds?.length),
             }}
             pagination={{ pageSize: 6 }}
@@ -567,7 +602,7 @@ function CompanyFeedbackTab({ topics }) {
             disabled={!selectedRowKeys.length}
             onClick={() => setSubmitOpen(true)}
           >
-            提交
+            分享
           </Button>
         </div>
       </div>
@@ -583,54 +618,71 @@ function CompanyFeedbackTab({ topics }) {
       >
         <div className={styles.companyFeedbackModal}>
           <div className={styles.pdfPreviewPane}>
-            <Tabs
-              className={styles.feedbackTopicTabs}
-              items={selectedTopicGroups.map((topicGroup, topicIndex) => ({
-                key: topicGroup.topicName,
-                label: `议题 ${topicIndex + 1}`,
-                children: (
-                  <div className={styles.feedbackTopicPanel}>
-                    <div className={styles.feedbackTopicHead}>
-                      <span>{topicGroup.topicName}</span>
-                      <Tag color="processing">
-                        {topicGroup.pdfGroups.length}个PDF
-                      </Tag>
+            <div className={styles.feedbackSubmitBlock}>
+              <div className={styles.feedbackSubmitBlockHead}>
+                <span>关联材料</span>
+                <span>
+                  {selectedTopicGroups.length}个议题 / {selectedRows.length}
+                  条反馈
+                </span>
+              </div>
+              <div className={styles.feedbackFileList}>
+                {selectedTopicGroups.map((topicGroup, topicIndex) => (
+                  <section
+                    className={styles.feedbackFileGroup}
+                    key={topicGroup.topicName}
+                  >
+                    <div className={styles.feedbackFileTopic}>
+                      <span>议题 {topicIndex + 1}</span>
+                      <strong>{topicGroup.topicName}</strong>
                     </div>
-                    <Tabs
-                      className={styles.feedbackPdfTabs}
-                      items={topicGroup.pdfGroups.map((group, index) => ({
-                        key: group.pdfName,
-                        label: `PDF ${index + 1}`,
-                        children: (
-                          <div className={styles.feedbackPdfPanel}>
-                            <div className={styles.pdfPreviewHeader}>
-                              <span>{group.pdfName}</span>
-                              <Tag color="blue">{group.rows.length}条反馈</Tag>
-                            </div>
-                            <iframe
-                              className={styles.feedbackPdfFrame}
-                              title={group.pdfName}
-                              src={group.pdfUrl}
-                            />
-                            <div className={styles.feedbackPdfNotes}>
-                              {group.rows.map((item) => (
-                                <div
-                                  className={styles.feedbackPdfNote}
-                                  key={item.id}
-                                >
-                                  <Tag color="blue">第{item.page}页</Tag>
-                                  <span>{item.feedbackContent}</span>
-                                </div>
-                              ))}
-                            </div>
+                    <div className={styles.feedbackFileRows}>
+                      {topicGroup.pdfGroups.map((group) => (
+                        <div
+                          className={styles.feedbackFileRow}
+                          key={group.pdfName}
+                        >
+                          <div className={styles.feedbackFileMeta}>
+                            <span>{group.pdfName}</span>
+                            <Tag color="blue">{group.rows.length}条反馈</Tag>
                           </div>
-                        ),
-                      }))}
-                    />
-                  </div>
-                ),
-              }))}
-            />
+                          <Button
+                            type="link"
+                            href={group.pdfUrl}
+                            target="_blank"
+                          >
+                            查看材料
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </div>
+            <div className={styles.feedbackSubmitBlock}>
+              <div className={styles.feedbackSubmitBlockHead}>
+                <span>已选反馈数据</span>
+                <span>{selectedRows.length}条</span>
+              </div>
+              <Table
+                rowKey="id"
+                bordered
+                size="small"
+                columns={columns}
+                dataSource={selectedRows}
+                expandable={{
+                  expandedRowRender: renderFeedbackTimeline,
+                  expandedRowKeys: selectedRows
+                    .filter((item) => item.rounds?.length)
+                    .map((item) => item.id),
+                  rowExpandable: (record) => Boolean(record.rounds?.length),
+                  showExpandColumn: false,
+                }}
+                pagination={false}
+                scroll={{ x: 1320, y: 280 }}
+              />
+            </div>
           </div>
           <Form
             form={form}
@@ -1332,6 +1384,7 @@ export default function TopicEvaluation({ projectData, onClose }) {
       <EvaluationDetail
         open={Boolean(activeTopic)}
         topic={activeTopic}
+        projectData={projectData}
         onClose={() => setActiveTopic(null)}
       />
       <TopicEditDrawer

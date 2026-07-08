@@ -77,8 +77,8 @@
 
 .feedbackTimeline {
   display: grid;
-  gap: 10px;
-  padding: 6px 8px 6px 34px;
+  gap: 12px;
+  padding: 8px 10px 8px 24px;
 }
 
 .feedbackTimelineItem {
@@ -86,6 +86,10 @@
   grid-template-columns: 10px minmax(0, 1fr);
   gap: 10px;
   align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid #dfe7f3;
+  border-radius: 8px;
+  background: #f8fbff;
 }
 
 .feedbackTimelineSendDot,
@@ -102,6 +106,48 @@
 
 .feedbackTimelineReplyDot {
   background: #13a88b;
+}
+
+.feedbackTimelineEvaluator {
+  border-color: #d8e4fb;
+  background: #f3f7ff;
+}
+
+.feedbackTimelineEvaluator .feedbackTimelineSendDot,
+.feedbackTimelineEvaluator .feedbackTimelineReplyDot {
+  background: #4f70e8;
+}
+
+.feedbackTimelineEvaluator .feedbackTimelineHead span:first-child {
+  color: #2753c8;
+}
+
+.feedbackTimelineCompany {
+  border-color: #bfe4dc;
+  background: #f0fbf8;
+}
+
+.feedbackTimelineCompany .feedbackTimelineSendDot,
+.feedbackTimelineCompany .feedbackTimelineReplyDot {
+  background: #13a88b;
+}
+
+.feedbackTimelineCompany .feedbackTimelineHead span:first-child {
+  color: #0f766e;
+}
+
+.feedbackTimelineSubmitter {
+  border-color: #f2d4a8;
+  background: #fff8ed;
+}
+
+.feedbackTimelineSubmitter .feedbackTimelineSendDot,
+.feedbackTimelineSubmitter .feedbackTimelineReplyDot {
+  background: #d97706;
+}
+
+.feedbackTimelineSubmitter .feedbackTimelineHead span:first-child {
+  color: #b45309;
 }
 
 .feedbackTimelineHead {
@@ -219,11 +265,113 @@
 }
 
 .pdfPreviewPane {
+  display: grid;
+  gap: 14px;
+  align-content: start;
   min-height: 660px;
-  overflow: hidden;
+  padding: 14px;
+  overflow: auto;
   border: 1px solid #dfe6f1;
   border-radius: 8px;
   background: #f3f6fb;
+}
+
+.feedbackSubmitBlock {
+  overflow: hidden;
+  border: 1px solid #dfe6f1;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.feedbackSubmitBlockHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5ebf4;
+  color: #1f2a44;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.feedbackSubmitBlockHead span:last-child {
+  flex: 0 0 auto;
+  color: #697386;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.feedbackFileList {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+}
+
+.feedbackFileGroup {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #edf1f7;
+  border-radius: 8px;
+  background: #fbfcff;
+}
+
+.feedbackFileTopic {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.feedbackFileTopic span {
+  color: #7b8495;
+  font-size: 12px;
+}
+
+.feedbackFileTopic strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #1f2a44;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedbackFileRows {
+  display: grid;
+  gap: 8px;
+}
+
+.feedbackFileRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #f4f7fb;
+}
+
+.feedbackFileMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.feedbackFileMeta span {
+  min-width: 0;
+  overflow: hidden;
+  color: #2d3748;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedbackFileMeta :global(.ant-tag) {
+  flex: 0 0 auto;
+  margin-inline-end: 0;
 }
 
 .feedbackTopicTabs,
@@ -1100,7 +1248,11 @@
 
 .evalPreviewSideCard.active {
   border-color: rgba(84, 139, 245, 0.98);
-  background: linear-gradient(180deg, rgba(248, 251, 255, 0.99), rgba(239, 246, 255, 0.99));
+  background: linear-gradient(
+    180deg,
+    rgba(248, 251, 255, 0.99),
+    rgba(239, 246, 255, 0.99)
+  );
   box-shadow: 0 0 0 4px rgba(68, 114, 220, 0.12);
 }
 

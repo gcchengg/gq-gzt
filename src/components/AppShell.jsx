@@ -145,6 +145,13 @@ export default function AppShell() {
   }, []);
 
   useEffect(() => {
+    window.__gqAppRole = role;
+    window.dispatchEvent(
+      new CustomEvent("gq:app-role-change", { detail: { role } }),
+    );
+  }, [role]);
+
+  useEffect(() => {
     if (pathname !== "/newSanhui" && sanhuiDetailContext.open) {
       setSanhuiDetailContext({ open: false, record: null });
     }
@@ -211,7 +218,9 @@ export default function AppShell() {
       <main className="gq-app-main">
         <Outlet />
       </main>
-      {sanhuiDetailContext.open && !pdfEditorTaskVisible ? (
+      {role === "director" &&
+      sanhuiDetailContext.open &&
+      !pdfEditorTaskVisible ? (
         <TaskIssueDrawer
           key={sanhuiDetailContext.record?.id || "sanhui-task-drawer"}
           sanhuiRecord={sanhuiDetailContext.record}
