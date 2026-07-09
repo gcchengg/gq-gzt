@@ -23,11 +23,6 @@
         "id": "post-report",
         "title": "参股公司投后报告",
         "key": "/postReport"
-      },
-      {
-        "id": "recommendation-letter",
-        "title": "下发推荐函",
-        "key": "/recommendationLetter"
       }
     ]
   },

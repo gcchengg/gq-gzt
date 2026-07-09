@@ -38,7 +38,25 @@ const PrintComponent = ({
 
     // 创建打印窗口
     const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      setIsPrinting(false);
+      onAfterPrint();
+      return;
+    }
     const printDocument = printWindow.document;
+    let finished = false;
+    const finishPrint = () => {
+      if (finished) return;
+      finished = true;
+      setIsPrinting(false);
+      onAfterPrint();
+      if (!printWindow.closed) {
+        printWindow.close();
+      }
+      window.focus();
+    };
+    printWindow.onafterprint = finishPrint;
+    printWindow.addEventListener?.("afterprint", finishPrint);
 
     // 写入HTML结构
     printDocument.write(`
@@ -63,11 +81,7 @@ const PrintComponent = ({
     printWindow.onload = () => {
       printWindow.focus();
       printWindow.print();
-      printWindow.onafterprint = () => {
-        setIsPrinting(false);
-        onAfterPrint();
-        printWindow.close();
-      };
+      window.setTimeout(finishPrint, 300);
     };
   };
 
@@ -79,17 +93,18 @@ const PrintComponent = ({
       ) : (
         <button
           onClick={handlePrint}
+          disabled={isPrinting}
           style={{
             padding: "4px 12px",
-            backgroundColor: "#0D5FE9",
+            backgroundColor: isPrinting ? "#8fb7f5" : "#0D5FE9",
             color: "white",
             border: "none",
             borderRadius: "4px",
-            cursor: "pointer",
+            cursor: isPrinting ? "not-allowed" : "pointer",
             fontSize: "14px",
           }}
         >
-          {"打印/另存为PDF"}
+          {isPrinting ? "处理中..." : "打印/另存为PDF"}
         </button>
       )}
 

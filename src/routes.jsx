@@ -47,6 +47,14 @@ export const routes = [
     ),
   },
   {
+    path: "djghome",
+    element: (
+      <Suspense>
+        <GztHome />
+      </Suspense>
+    ),
+  },
+  {
     path: "gztDemo",
     element: (
       <Suspense>

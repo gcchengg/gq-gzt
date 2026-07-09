@@ -88,10 +88,30 @@ export default function AppShell() {
   });
   const [pdfEditorTaskVisible, setPdfEditorTaskVisible] = useState(false);
   const fullPath = pathname + search;
+  const normalizedPathname = pathname.toLowerCase();
   const isShelllessPage = isShelllessPath(pathname);
+  const isRecommendationArea = ["/djghome", "/recommendationletter"].includes(
+    normalizedPathname,
+  );
+  const activeMenus = useMemo(
+    () =>
+      isRecommendationArea
+        ? [
+            {
+              id: "recommendation-letter-only",
+              title: "下发推荐函",
+              key:
+                normalizedPathname === "/djghome"
+                  ? "/djghome"
+                  : "/recommendationLetter",
+            },
+          ]
+        : webmenu,
+    [isRecommendationArea, normalizedPathname],
+  );
 
-  const menuItems = useMemo(() => createMenuItems(webmenu), []);
-  const leafMenus = useMemo(() => flattenMenus(webmenu), []);
+  const menuItems = useMemo(() => createMenuItems(activeMenus), [activeMenus]);
+  const leafMenus = useMemo(() => flattenMenus(activeMenus), [activeMenus]);
 
   const selectedKey = useMemo(() => {
     const matched = leafMenus.find(
@@ -101,14 +121,14 @@ export default function AppShell() {
   }, [leafMenus, pathname]);
 
   const [openKeys, setOpenKeys] = useState(
-    () => findParentKeys(webmenu, fullPath) || [],
+    () => findParentKeys(activeMenus, fullPath) || [],
   );
 
   useEffect(() => {
     if (!collapsed) {
-      setOpenKeys(findParentKeys(webmenu, fullPath) || []);
+      setOpenKeys(findParentKeys(activeMenus, fullPath) || []);
     }
-  }, [collapsed, fullPath]);
+  }, [activeMenus, collapsed, fullPath]);
 
   useEffect(() => {
     const handleSanhuiDetailContext = (event) => {

@@ -97,11 +97,15 @@ const MeetingReviewDocument = ({ infoData = {}, title }) => {
 
   const renderCompanySection = (data = infoData, index = 0) => (
     <section
+      className="meeting-review-company-section"
       key={data.id || data.companyId || data.companyName || index}
       style={{
-        marginTop: index === 0 ? 0 : "42px",
-        paddingTop: index === 0 ? 0 : "34px",
-        borderTop: index === 0 ? "none" : "1px dashed #cfd6e4",
+        marginTop: 0,
+        paddingTop: 0,
+        breakBefore: index === 0 ? "auto" : "page",
+        pageBreakBefore: index === 0 ? "auto" : "always",
+        breakInside: "avoid-page",
+        pageBreakInside: "avoid",
       }}
     >
       <h1 style={heading1Styles}>
@@ -149,6 +153,14 @@ const MeetingReviewDocument = ({ infoData = {}, title }) => {
         p, h2, h3, tr {
           break-inside: avoid;
           page-break-inside: avoid;
+        }
+        .meeting-review-company-section {
+          break-inside: avoid-page;
+          page-break-inside: avoid;
+        }
+        .meeting-review-company-section + .meeting-review-company-section {
+          break-before: page;
+          page-break-before: always;
         }
         img {
           max-width: 100%;

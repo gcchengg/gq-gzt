@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import "./index.css";
 const taskKeyMap = {
   topicApproval: "议题审批",
   meetingVote: "三会表决",
-  recommendationLetter: "下发推荐函",
 };
 const taskTabs = [
   "议题反馈建议",
@@ -21,9 +25,9 @@ const taskTabs = [
   "表决建议",
   "三会表决",
   "决策执行",
-  "下发推荐函",
   "任务管理",
 ];
+const djgTaskTabs = ["下发推荐函"];
 const metrics = [
   { label: "总待办数", value: "4450" },
   { label: "总逾期数", value: "0", tone: "red" },
@@ -363,8 +367,18 @@ function TaskRow({ task, secondary, onDescriptionClick }) {
   );
 }
 function TaskPanel() {
+  const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
-  const taskFromUrl = taskKeyMap[searchParams.get("task")] || "议题反馈建议";
+  const normalizedPathname = pathname.toLowerCase();
+  const isDjgHome = normalizedPathname === "/djghome";
+  const availableTaskTabs = isDjgHome ? djgTaskTabs : taskTabs;
+  const taskFromUrl = useMemo(() => {
+    if (isDjgHome) {
+      return "下发推荐函";
+    }
+    const mappedTask = taskKeyMap[searchParams.get("task")];
+    return availableTaskTabs.includes(mappedTask) ? mappedTask : "议题反馈建议";
+  }, [availableTaskTabs, isDjgHome, searchParams]);
   const [activeTab, setActiveTab] = useState(taskFromUrl);
   const [popover, setPopover] = useState({
     text: "",
@@ -383,6 +397,10 @@ function TaskPanel() {
     () => ["list-panel", showSecondary ? "show-secondary" : ""].join(" "),
     [showSecondary],
   );
+  useEffect(() => {
+    setActiveTab(taskFromUrl);
+  }, [taskFromUrl]);
+
   useEffect(() => {
     const hidePopover = () => {
       setPopover((current) => ({ ...current, visible: false }));
@@ -414,7 +432,7 @@ function TaskPanel() {
   return (
     <>
       <section className="tab-strip" aria-label="任务卡片">
-        {taskTabs.map((tab) => (
+        {availableTaskTabs.map((tab) => (
           <button
             className={["task-card", activeTab === tab ? "active" : ""].join(
               " ",
