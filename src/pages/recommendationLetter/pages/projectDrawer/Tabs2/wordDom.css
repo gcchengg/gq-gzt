@@ -1,0 +1,115 @@
+.word-preview {
+  background: #fff;
+  padding: 20px;
+  max-height: 600px;
+  overflow: auto;
+  font-family: SimSun, STSong, serif;
+}
+
+.word-page {
+  background: white;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 900px;
+  padding: 40px 60px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.header-top {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.company-header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h1 {
+    font-size: 36px;
+    color: #d0021b;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 2px;
+  }
+}
+
+.doc-no {
+  text-align: center;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.divider-red {
+  height: 2px;
+  background: #d0021b;
+  margin-bottom: 30px;
+}
+
+.doc-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.doc-content {
+  font-size: 16px;
+  line-height: 2;
+  margin-bottom: 80px;
+  .pStyle {
+    text-indent: 4em;
+  }
+
+  p {
+    margin: 10px 0;
+    text-indent: 2em;
+  }
+}
+
+.doc-footer {
+  text-align: right;
+  font-size: 16px;
+  margin-bottom: 60px;
+
+  p {
+    margin: 5px 0;
+  }
+}
+
+.secret-remind {
+  text-align: center;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.page-number {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.footer-bottom {
+  max-width: 800px;
+  margin: 20px auto 0;
+  background: white;
+  padding: 10px 60px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.footer-divider {
+  border-top: 1px solid #333;
+  margin-bottom: 5px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #333;
+}

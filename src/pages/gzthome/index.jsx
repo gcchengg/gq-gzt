@@ -4,6 +4,7 @@ import "./index.css";
 const taskKeyMap = {
   topicApproval: "议题审批",
   meetingVote: "三会表决",
+  recommendationLetter: "下发推荐函",
 };
 const taskTabs = [
   "议题反馈建议",
@@ -20,6 +21,7 @@ const taskTabs = [
   "表决建议",
   "三会表决",
   "决策执行",
+  "下发推荐函",
   "任务管理",
 ];
 const metrics = [
@@ -97,6 +99,11 @@ const taskCopyByCard = {
     title: "决策执行",
     description: "参股公司三会决策执行",
     href: "/newSanhui?task=decisionExecution&autoOpen=1",
+  },
+  下发推荐函: {
+    title: "下发推荐函",
+    description: "编制并下发董监高选聘推荐函",
+    href: "/recommendationLetter?bizId=req-001",
   },
   任务管理: {
     title: "任务管理",
@@ -342,9 +349,15 @@ function TaskRow({ task, secondary, onDescriptionClick }) {
       <div className="row-actions">
         {actionNode}
         <span className="sep" />
-        <button className="action-link" type="button">
-          查看详情
-        </button>
+        {task.href?.startsWith("/") ? (
+          <Link className="action-link" to={task.href}>
+            查看详情
+          </Link>
+        ) : (
+          <a className="action-link" href={task.href ?? "#"}>
+            查看详情
+          </a>
+        )}
       </div>
     </article>
   );

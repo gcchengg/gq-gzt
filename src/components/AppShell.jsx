@@ -215,7 +215,14 @@ export default function AppShell() {
         </div>
       </aside>
 
-      <main className="gq-app-main">
+      <main
+        className={[
+          "gq-app-main",
+          pathname === "/recommendationLetter" ? "gq-app-main-white" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <Outlet />
       </main>
       {role === "director" &&

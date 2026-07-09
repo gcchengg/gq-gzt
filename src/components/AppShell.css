@@ -16,7 +16,9 @@
   border-right: 1px solid #e6e8ec;
   background: #fff;
   color: #20242b;
-  transition: width 0.2s ease, min-width 0.2s ease;
+  transition:
+    width 0.2s ease,
+    min-width 0.2s ease;
 }
 
 .gq-app-sidebar.is-collapsed {
@@ -182,6 +184,10 @@
   flex: 1;
   overflow: auto;
   background: #eef3f8;
+}
+
+.gq-app-main-white {
+  background: #fff;
 }
 
 @media (max-width: 900px) {

@@ -7,6 +7,9 @@ const NewSanhui = lazy(() => import("@/pages/newSanhui"));
 const NewSanhuiPreReview = lazy(() => import("@/pages/newSanhuiPreReview"));
 const LiveCircle = lazy(() => import("@/pages/liveCircle"));
 const PostReport = lazy(() => import("@/pages/liveCircle/postReport"));
+const RecommendationLetter = lazy(
+  () => import("@/pages/recommendationLetter/pages"),
+);
 const ThreeMeetingPlan = lazy(() => import("@/pages/threeMeetingPlan"));
 const AdviceReview = lazy(() => import("@/pages/adviceReview"));
 const AdviceReview1 = lazy(() => import("@/pages/adviceReview1"));
@@ -88,6 +91,14 @@ export const routes = [
     element: (
       <Suspense>
         <PostReport />
+      </Suspense>
+    ),
+  },
+  {
+    path: "recommendationLetter",
+    element: (
+      <Suspense>
+        <RecommendationLetter />
       </Suspense>
     ),
   },

@@ -1,0 +1,255 @@
+.page {
+  min-height: 100%;
+  width: 100%;
+  padding: 20px 10px;
+  color: #262629;
+  background: #fff;
+  font-family: "PingFang SC", sans-serif;
+  font-size: 14px;
+}
+
+.page :global(.ant-spin-container) {
+  min-height: 100%;
+  background: #fff;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.titleWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.titleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: #3a2ae4;
+  background: #f3f2ff;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.titleWrap h1 {
+  margin: 0;
+  color: #262629;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.titleWrap p {
+  margin: 2px 0 0;
+  color: #828290;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.filterSection {
+  width: 100%;
+  margin-bottom: 14px;
+  padding: 16px 16px 0;
+  background: #fff;
+  border: 1px solid #edf0f5;
+  border-radius: 6px;
+}
+
+.filterForm {
+  width: 100%;
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+  align-items: end;
+  gap: 10px 12px;
+}
+
+.filterActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-bottom: 24px;
+  white-space: nowrap;
+}
+
+.filterActions :global(.ant-btn-primary) {
+  background: #3a2ae4;
+}
+
+.tableSection {
+  width: 100%;
+  padding: 0 0 8px;
+  background: #fff;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  margin-bottom: 8px;
+}
+
+.tableTitle {
+  position: relative;
+  padding-left: 14px;
+  color: #262629;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.tableTitle::before {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 4px;
+  height: 16px;
+  content: "";
+  background: #3a2ae4;
+  border-radius: 2px;
+  transform: translateY(-50%);
+}
+
+.tableMeta {
+  color: #828290;
+  font-size: 13px;
+}
+
+.table {
+  background: #fff;
+  color: #262629;
+}
+
+.table :global(.ant-table-thead .ant-table-cell) {
+  color: #262629;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center !important;
+  background: #fafafa;
+}
+
+.table :global(.ant-table-tbody .ant-table-cell) {
+  color: #262629;
+  font-size: 14px;
+}
+
+.table :global(.ant-table-tbody > tr:hover > td) {
+  background: #f7f8ff !important;
+}
+
+.page :global(.ant-form-item-label > label) {
+  color: #262629;
+  font-size: 14px;
+}
+
+.paginationTotal {
+  color: #5f6270;
+}
+
+.statusText {
+  color: #262629;
+  font-weight: 500;
+}
+
+.batchActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  min-height: 56px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #edf0f5;
+  background: #fff;
+}
+
+.batchActions :global(.ant-btn-primary:not(:disabled)) {
+  background: #3a2ae4;
+}
+
+.batchActions :global(.ant-btn-primary:disabled) {
+  color: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #d9d9d9;
+  box-shadow: none;
+}
+
+.knowledgeAll {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.itemContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+}
+
+.itemLeft {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 80%;
+}
+
+.itemLeftH {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  column-gap: 10px;
+  width: 100%;
+}
+
+.itemRight {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  width: 20%;
+  margin-top: 4px;
+}
+
+.submmitFooter {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.ellipsisContainer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+  text-wrap: auto;
+}
+
+@media (max-width: 1100px) {
+  .filterGrid {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
+  .filterActions {
+    justify-content: flex-start;
+  }
+}

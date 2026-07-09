@@ -1,0 +1,81 @@
+.tabs2-recommendation-letter {
+  padding: 20px;
+  background: #fff;
+  .ant-picker {
+    width: 100%;
+  }
+  .form-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #f5f7fa;
+    border-radius: 4px;
+    margin-bottom: 24px;
+
+    .section-title {
+      font-weight: 500;
+      font-size: 14px;
+      color: #1f2329;
+    }
+
+    .approval-detail-btn {
+      padding: 4px 16px;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+  }
+
+  .ant-form-item {
+    margin-bottom: 16px;
+
+    &.half-width {
+      width: calc(50% - 8px);
+    }
+  }
+
+  .ant-form-item-label {
+    padding-bottom: 4px;
+
+    label {
+      font-size: 14px;
+      color: #1f2329;
+      font-weight: 500;
+    }
+  }
+
+  .ant-input,
+  .ant-input-textarea {
+    border-radius: 4px;
+    font-size: 14px;
+  }
+
+  .ant-input-textarea {
+    min-height: 120px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 24px;
+    border-top: 1px solid #e5e6eb;
+    margin-top: 24px;
+
+    .footer-right {
+      display: flex;
+      gap: 12px;
+    }
+  }
+}
+
+.tabs2-recommendation-letter .form-section-header,
+.tabs2-recommendation-letter .ant-form,
+.tabs2-recommendation-letter .form-footer {
+  background: #fff !important;
+}
