@@ -158,6 +158,13 @@ const MeetingReviewDocument = ({ infoData = {}, title }) => {
           break-inside: avoid-page;
           page-break-inside: avoid;
         }
+        @media screen {
+          .meeting-review-company-section + .meeting-review-company-section {
+            margin-top: 72px !important;
+            padding-top: 40px !important;
+            border-top: 1px dashed #cfd6e4;
+          }
+        }
         .meeting-review-company-section + .meeting-review-company-section {
           break-before: page;
           page-break-before: always;

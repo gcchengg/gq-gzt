@@ -23,6 +23,7 @@ import SearchModal from "../components/SearchModal/index";
 import UserSelect from "../components/userSelect/index";
 import { hrSubmit } from "../../api/index";
 import PdfView from "./pdfView";
+import PdfModal from "../PDFReview/PdfModal/index";
 import "./index.css";
 const { RangePicker } = DatePicker;
 moment.locale("zh-cn");
@@ -43,6 +44,7 @@ const Tabs2 = ({
   const [sendUserList, setSendUserList] = useState([]); // 联审人员
   const [sendUserList1, setSendUserList1] = useState([]); // 列席人列表
   const [infoData, setInfoData] = useState({});
+  const [reportPreviewOpen, setReportPreviewOpen] = useState(false);
   const [leaderList, setLeaderList] = useState([]); // 分管领导
   const presUserId = Form.useWatch("presUserId", form); // 预设汇报人
 
@@ -78,7 +80,7 @@ const Tabs2 = ({
           .then((res) => {
             if (res.code === 200) {
               message.success("提交成功");
-              onClosed("submit");
+              onClosed("submit", data);
               setTimeout(() => {
                 setLoading(false);
               }, 500);
@@ -300,6 +302,7 @@ const Tabs2 = ({
                     dataList={[pdfData]}
                     disabled={true}
                     setDataList={(data) => setFileList(data)}
+                    onPreview={() => setReportPreviewOpen(true)}
                     uploadText="上传文件"
                   />
                 </Form.Item>
@@ -320,6 +323,15 @@ const Tabs2 = ({
           </div>
         </div>
       </div>
+      {reportPreviewOpen ? (
+        <PdfModal
+          open={reportPreviewOpen}
+          setOpen={setReportPreviewOpen}
+          title="上会汇报预览"
+          infoData={parentInfoData}
+          labelTitle={title}
+        />
+      ) : null}
     </Drawer>
   );
 };

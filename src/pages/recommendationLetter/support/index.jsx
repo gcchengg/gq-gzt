@@ -143,10 +143,12 @@ export function UploadFileWps({
   disabled,
   setDataList,
   uploadText = "上传文件",
+  onPreview,
 }) {
   return (
     <Upload
-      disabled={disabled}
+      disabled={false}
+      showUploadList={{ showRemoveIcon: !disabled }}
       fileList={dataList.map((file, index) => ({
         uid: file.uid || file.objectKey || `${index}`,
         name: file.fileName || file.name || `附件${index + 1}`,
@@ -154,6 +156,7 @@ export function UploadFileWps({
         url: file.fileUrl,
       }))}
       beforeUpload={(file) => {
+        if (disabled) return false;
         const nextFile = {
           uid: file.uid,
           fileName: file.name,
@@ -165,11 +168,17 @@ export function UploadFileWps({
         return false;
       }}
       onRemove={(file) => {
+        if (disabled) return false;
         setDataList(
           (dataList || []).filter(
             (item) => (item.uid || item.objectKey) !== file.uid,
           ),
         );
+      }}
+      onPreview={(file) => {
+        if (onPreview) {
+          onPreview(file);
+        }
       }}
     >
       {!disabled ? (

@@ -126,6 +126,23 @@
   font-size: 13px;
 }
 
+.tableHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.selectionTip {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  color: #5f6270;
+  font-size: 13px;
+  line-height: 20px;
+  background: #f7f9ff;
+  border: 1px solid #e4ebff;
+  border-radius: 4px;
+}
+
 .table {
   background: #fff;
   color: #262629;
@@ -176,6 +193,18 @@
 
 .batchActions :global(.ant-btn-primary:not(:disabled)) {
   background: #3a2ae4;
+}
+
+.historyDetail {
+  display: grid;
+  gap: 8px;
+  padding: 8px 16px;
+  color: #5f6270;
+  font-size: 13px;
+  line-height: 20px;
+  background: #fafbff;
+  border: 1px solid #edf0f5;
+  border-radius: 4px;
 }
 
 .batchActions :global(.ant-btn-primary:disabled) {
