@@ -80,6 +80,7 @@ const Tabs2 = ({
           .then((res) => {
             if (res.code === 200) {
               message.success("提交成功");
+              setReviewModal(false);
               onClosed("submit", data);
               setTimeout(() => {
                 setLoading(false);
@@ -304,6 +305,19 @@ const Tabs2 = ({
                     setDataList={(data) => setFileList(data)}
                     onPreview={() => setReportPreviewOpen(true)}
                     uploadText="上传文件"
+                  />
+                  <Input
+                    style={{ marginTop: 8 }}
+                    value={pdfData.fileName}
+                    placeholder="请输入文件名称"
+                    onChange={(event) => {
+                      const fileName = event.target.value;
+                      setPdfData((current) => ({
+                        ...current,
+                        fileName,
+                        name: fileName,
+                      }));
+                    }}
                   />
                 </Form.Item>
                 <Form.Item label="备注" name="comment">

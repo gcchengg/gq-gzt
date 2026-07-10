@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Modal, Select, Steps, Tag, Upload } from "antd";
+import { Button, Descriptions, Modal, Select, Steps, Tag, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 export const dictInfo = {
@@ -57,19 +57,80 @@ export const sanhuiStatus = (value, options = []) => {
 
 export const runWithCheckVer = (callback) => callback();
 
-export function ApprovalStep({ title = "审批流程" }) {
+export function ApprovalStep({ title = "审批流程", id }) {
+  const steps = [
+    {
+      title: "提交申请",
+      description: "股权管理部已发起上会方案审批",
+    },
+    {
+      title: "部门负责人审批",
+      description: "张明已审批通过",
+    },
+    {
+      title: "分管领导审批",
+      description: "李娜审批中",
+    },
+    {
+      title: "党委会秘书确认",
+      description: "等待分管领导审批完成后处理",
+    },
+    {
+      title: "流程归档",
+      description: "审批通过后自动归档",
+    },
+  ];
+
   return (
-    <div>
-      <div style={{ marginBottom: 16, fontWeight: 600 }}>{title}</div>
+    <div style={{ color: "#262629" }}>
+      <div
+        style={{
+          marginBottom: 16,
+          padding: "14px 16px",
+          background: "#f7f9ff",
+          border: "1px solid #e4ebff",
+          borderRadius: 6,
+        }}
+      >
+        <div style={{ marginBottom: 8, fontSize: 16, fontWeight: 600 }}>
+          {title}
+        </div>
+        <Descriptions
+          size="small"
+          column={2}
+          items={[
+            { label: "审批单号", children: id || "OA-MOCK-0001" },
+            {
+              label: "当前状态",
+              children: <Tag color="processing">审批中</Tag>,
+            },
+            { label: "当前节点", children: "分管领导审批" },
+            { label: "发起部门", children: "股权管理部" },
+          ]}
+        />
+      </div>
       <Steps
         direction="vertical"
-        current={1}
-        items={[
-          { title: "发起", description: "模拟审批流已创建" },
-          { title: "审批中", description: "等待后续替换真实接口" },
-          { title: "完成" },
-        ]}
+        current={2}
+        items={steps.map((step, index) => ({
+          ...step,
+          status: index < 2 ? "finish" : index === 2 ? "process" : "wait",
+        }))}
       />
+      <div
+        style={{
+          marginTop: 16,
+          padding: "12px 14px",
+          color: "#5f6270",
+          fontSize: 13,
+          lineHeight: "20px",
+          background: "#fafafa",
+          border: "1px solid #edf0f5",
+          borderRadius: 6,
+        }}
+      >
+        审批通过后，系统将进入党委会材料归档与后续下发推荐函流程。
+      </div>
     </div>
   );
 }

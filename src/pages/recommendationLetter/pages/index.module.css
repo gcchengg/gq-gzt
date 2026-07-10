@@ -273,6 +273,17 @@
   text-wrap: auto;
 }
 
+.historyActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.historyActions :global(.ant-btn-link) {
+  padding-inline: 4px;
+}
+
 @media (max-width: 1100px) {
   .filterGrid {
     grid-template-columns: repeat(2, minmax(180px, 1fr));

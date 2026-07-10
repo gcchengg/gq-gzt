@@ -10,6 +10,7 @@ import {
   Spin,
   Select,
   message,
+  Modal,
 } from "antd";
 import React from "react";
 import {
@@ -20,7 +21,12 @@ import {
 } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import ProjectDrawer from "./projectDrawer/index";
-import { getDictInfo, getQueryStringGcc, sanhuiStatus } from "../support";
+import {
+  ApprovalStep,
+  getDictInfo,
+  getQueryStringGcc,
+  sanhuiStatus,
+} from "../support";
 import { getCompanySupervisorPage, getInfo, saveCompany } from "../api/index";
 import PdfModal from "./PDFReview/PdfModal";
 import OaView from "./projectDrawer/oaView";
@@ -60,7 +66,7 @@ const defaultMeetingHistory = [
     previewData: {
       companyName: "一汽股权一号、启明信息",
       shortForm: "一汽股权一号、启明信息",
-      reqOrgName: "股权管理部",
+      reqOrgName: "",
       companyList: [
         {
           companyName: "一汽股权一号有限公司",
@@ -89,6 +95,7 @@ const defaultMeetingHistory = [
       ],
     },
     oaParams: {
+      oaReqId: "oa-recommendation-001",
       topicType: "2",
       topic: "关于一汽股权一号等公司董监高推荐方案的议题",
       applDate: "2026-07-08",
@@ -135,6 +142,7 @@ const defaultMeetingHistory = [
       ],
     },
     oaParams: {
+      oaReqId: "oa-recommendation-002",
       topicType: "2",
       topic: "关于富奥股份董事重新选聘方案的议题",
       applDate: "2026-07-06",
@@ -176,6 +184,7 @@ const defaultMeetingHistory = [
       ],
     },
     oaParams: {
+      oaReqId: "oa-recommendation-003",
       topicType: "2",
       topic: "关于一汽财务监事撤回方案的议题",
       applDate: "2026-07-03",
@@ -253,6 +262,7 @@ const NeedSubmit = () => {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyRecords, setHistoryRecords] = useState(defaultMeetingHistory);
   const [historyPreviewData, setHistoryPreviewData] = useState(null);
+  const [approvalRecord, setApprovalRecord] = useState(null);
 
   const calculateRowSpan = (data, field, index) => {
     // 如果当前行是第一个出现的值，计算合并的行数
@@ -440,12 +450,17 @@ const NeedSubmit = () => {
     },
     {
       title: "操作",
-      width: 120,
+      width: 190,
       fixed: "right",
       render: (_, record) => (
-        <Button type="link" onClick={() => setHistoryPreviewData(record)}>
-          预览材料
-        </Button>
+        <div className={css.historyActions}>
+          <Button type="link" onClick={() => setHistoryPreviewData(record)}>
+            预览材料
+          </Button>
+          <Button type="link" onClick={() => setApprovalRecord(record)}>
+            审批详情
+          </Button>
+        </div>
       ),
     },
   ];
@@ -576,6 +591,8 @@ const NeedSubmit = () => {
   const createHistoryRecord = (submitData) => {
     const oaParams = {
       ...(submitData?.oaParams || {}),
+      oaReqId:
+        submitData?.oaParams?.oaReqId || `oa-recommendation-${Date.now()}`,
       reportFileList: submitData?.reportFileList || [],
     };
     const previewData = {
@@ -604,6 +621,7 @@ const NeedSubmit = () => {
   };
 
   const completeBatchSubmit = async (type, submitData) => {
+    setBatchSubmitOpen(false);
     setLoading(true);
     try {
       const details = await getSelectedDetails();
@@ -625,7 +643,6 @@ const NeedSubmit = () => {
       }
       setSelectedRowKeys([]);
       setSelectedRows([]);
-      setBatchSubmitOpen(false);
       getList({ currentPage: pagination.current });
     } finally {
       setLoading(false);
@@ -874,6 +891,19 @@ const NeedSubmit = () => {
           labelTitle={historyPreviewData.oaParams?.topic}
         />
       ) : null}
+      <Modal
+        title="审批详情"
+        open={Boolean(approvalRecord)}
+        footer={null}
+        width={560}
+        onCancel={() => setApprovalRecord(null)}
+      >
+        <ApprovalStep
+          isOA={true}
+          id={approvalRecord?.oaParams?.oaReqId}
+          title={approvalRecord?.oaParams?.topic || "审批流程"}
+        />
+      </Modal>
     </Spin>
   );
 };

@@ -1,0 +1,7 @@
+下发推荐函-董监高选聘需求更改
+1.table新增列 是否需要上会 是否已提交（下方显示/Users/guocc/Documents/guquan/files/gq-gzt/需求/董监高/0710/table.png）
+2.由每家公司有单独的提交党委会和向党委会汇报预览改为table选中多家参股公司一起提交党委会（下方显示/Users/guocc/Documents/guquan/files/gq-gzt/需求/董监高/0710/pdf预览.png 和
+/Users/guocc/Documents/guquan/files/gq-gzt/需求/董监高/0710/提交党委会.png）
+3.新增上会历史记录，每次提交党委会的数据都留存，并且操作列添加审批详情页面（下方显示/Users/guocc/Documents/guquan/files/gq-gzt/需求/董监高/0710/历史.png）
+4.董监高选聘step中提交不进入下发推荐函，只改是否已提交状态，提交党委会审批后才进入下发推荐函
+
