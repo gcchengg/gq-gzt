@@ -602,7 +602,7 @@ function CompanyFeedbackTab({ topics }) {
             disabled={!selectedRowKeys.length}
             onClick={() => setSubmitOpen(true)}
           >
-            分享
+            发送
           </Button>
         </div>
       </div>

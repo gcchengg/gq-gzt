@@ -177,6 +177,7 @@ export default function Vote(props) {
           voteId,
         } = res.data || {};
         setInfoData(res.data || {});
+        debugger;
         setDataSource(
           sanhuiVoteTopicList.map((item, index) => ({
             index,
@@ -564,7 +565,7 @@ export default function Vote(props) {
                 className="vote-table"
                 size="small"
                 bordered
-                scroll={{ x: "max-content", y: 220 }}
+                scroll={{ x: "max-content", y: 280 }}
                 columns={columns}
                 dataSource={dataSource}
                 rowKey="index"

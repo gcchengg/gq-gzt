@@ -1,7 +1,2 @@
-/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules/oneStrategy/page/projectDrawer/index.jsx
-我是产品经理，想对此页面重新设计
-这是我新接手的项目，我先知道前序输入 管理预期 实际定位 对应策略匹配 任务清单整备 预立项 的逻辑
-1.比如数据重哪来
-2.tab页如何限定，和显示内容逻辑
-3.哪块有什么
-总之越详细越好
+我仔细讲解下任务执行和任务完善，然后你补充下完整假数据
+1.

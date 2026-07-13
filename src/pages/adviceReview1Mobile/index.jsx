@@ -19,7 +19,7 @@ const pdfPreviewUrl = "/advice-review/6a2133fde4b0cb6abf664a41.pdf.png";
 const adviceTopics = [
   {
     id: "topic-001",
-    name: "测试1",
+    name: "年度财务决算报告",
     category:
       "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
     meeting: "董事会",
@@ -28,7 +28,7 @@ const adviceTopics = [
   },
   {
     id: "topic-002",
-    name: "测试1",
+    name: "年度财务决算报告",
     category:
       "1. 经营类 / 1.3 定期监管报告 / 1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
     meeting: "董事会",
@@ -38,10 +38,18 @@ const adviceTopics = [
 ];
 const initialTopicFiles = {
   "topic-001": [
-    { id: "advice-reference-001", name: "羿动科技董事会会议材料.pdf", url: pdfUrl },
+    {
+      id: "advice-reference-001",
+      name: "羿动科技董事会会议材料.pdf",
+      url: pdfUrl,
+    },
   ],
   "topic-002": [
-    { id: "advice-reference-002", name: "羿动科技临时股东会表决材料.pdf", url: pdfUrl },
+    {
+      id: "advice-reference-002",
+      name: "羿动科技临时股东会表决材料.pdf",
+      url: pdfUrl,
+    },
   ],
 };
 
@@ -237,10 +245,7 @@ export default function AdviceReview1MobilePage() {
           </div>
         </Section>
 
-        <Section
-          title={`董事建议与交办`}
-          icon={<SendOutlined />}
-        >
+        <Section title={`董事建议与交办`} icon={<SendOutlined />}>
           <input
             ref={fileInputRef}
             className="advice1-mobile-file-input"
@@ -251,82 +256,101 @@ export default function AdviceReview1MobilePage() {
             {adviceTopics.map((topic, index) => {
               const isCollapsed = collapsedTopicIds.has(topic.id);
               return (
-              <article className="advice1-mobile-reply-card" key={topic.id}>
-                <div className="advice1-mobile-topic-head">
-                  <div className="advice1-mobile-topic-index">
-                    {String(index + 1).padStart(2, "0")}
-                  </div>
-                  <div>
-                    <h3>{topic.name}</h3>
-                    <p>{topic.category}</p>
-                  </div>
-                  <Button size="mini" fill="none" aria-expanded={!isCollapsed} onClick={() => toggleTopicCollapsed(topic.id)}>
-                    {isCollapsed ? <RightOutlined /> : <DownOutlined />}
-                    {isCollapsed ? "展开" : "收起"}
-                  </Button>
-                </div>
-                <div className="advice1-mobile-topic-body" hidden={isCollapsed}>
-                  <div className="advice1-mobile-reference">
-                    <div className="advice1-mobile-reference-head">
-                      <strong><PaperClipOutlined /> 参考文件</strong>
-                      <Button
-                        size="mini"
-                        fill="outline"
-                        color="primary"
-                        onClick={() => handleReferenceUpload(topic.id)}
-                      >
-                        <UploadOutlined /> 上传
-                      </Button>
+                <article className="advice1-mobile-reply-card" key={topic.id}>
+                  <div className="advice1-mobile-topic-head">
+                    <div className="advice1-mobile-topic-index">
+                      {String(index + 1).padStart(2, "0")}
                     </div>
-                    <div className="advice1-mobile-reference-list">
-                      {(topicFiles[topic.id] || []).map((file) => (
-                        <a href={file.url} target="_blank" rel="noreferrer" key={file.id}>
-                          {file.name}
-                        </a>
-                      ))}
+                    <div>
+                      <h3>{topic.name}</h3>
+                      <p>{topic.category}</p>
                     </div>
-                  </div>
-                  <div className="advice1-mobile-reply-meta">
-                    <Tag color="primary">{topic.meeting}</Tag>
-                    {savedAtByTopic[topic.id] ? (
-                      <Tag color="success">已保存</Tag>
-                    ) : (
-                      <Tag>未保存</Tag>
-                    )}
-                  </div>
-                  <TextArea
-                    value={topicReplies[topic.id]}
-                    onChange={(value) =>
-                      setTopicReplies((current) => ({
-                        ...current,
-                        [topic.id]: value,
-                      }))
-                    }
-                    placeholder={`请输入“${topic.name}”的表决建议`}
-                    autoSize={{ minRows: 4, maxRows: 7 }}
-                    showCount
-                    maxLength={500}
-                  />
-                  <div className="advice1-mobile-voice-actions">
                     <Button
-                      size="small"
-                      color={
-                        listeningTopicId === topic.id ? "warning" : "primary"
-                      }
-                      fill={listeningTopicId === topic.id ? "solid" : "outline"}
-                      onClick={() => handleSpeechToText(topic.id)}
+                      size="mini"
+                      fill="none"
+                      aria-expanded={!isCollapsed}
+                      onClick={() => toggleTopicCollapsed(topic.id)}
                     >
-                      <AudioOutlined />
-                      {listeningTopicId === topic.id ? "停止识别" : "语音转文字"}
+                      {isCollapsed ? <RightOutlined /> : <DownOutlined />}
+                      {isCollapsed ? "展开" : "收起"}
                     </Button>
                   </div>
-                  {savedAtByTopic[topic.id] ? (
-                    <p className="advice1-mobile-saved-at">
-                      最近保存：{savedAtByTopic[topic.id]}
-                    </p>
-                  ) : null}
-                </div>
-              </article>
+                  <div
+                    className="advice1-mobile-topic-body"
+                    hidden={isCollapsed}
+                  >
+                    <div className="advice1-mobile-reference">
+                      <div className="advice1-mobile-reference-head">
+                        <strong>
+                          <PaperClipOutlined /> 参考文件
+                        </strong>
+                        <Button
+                          size="mini"
+                          fill="outline"
+                          color="primary"
+                          onClick={() => handleReferenceUpload(topic.id)}
+                        >
+                          <UploadOutlined /> 上传
+                        </Button>
+                      </div>
+                      <div className="advice1-mobile-reference-list">
+                        {(topicFiles[topic.id] || []).map((file) => (
+                          <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            key={file.id}
+                          >
+                            {file.name}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="advice1-mobile-reply-meta">
+                      <Tag color="primary">{topic.meeting}</Tag>
+                      {savedAtByTopic[topic.id] ? (
+                        <Tag color="success">已保存</Tag>
+                      ) : (
+                        <Tag>未保存</Tag>
+                      )}
+                    </div>
+                    <TextArea
+                      value={topicReplies[topic.id]}
+                      onChange={(value) =>
+                        setTopicReplies((current) => ({
+                          ...current,
+                          [topic.id]: value,
+                        }))
+                      }
+                      placeholder={`请输入“${topic.name}”的表决建议`}
+                      autoSize={{ minRows: 4, maxRows: 7 }}
+                      showCount
+                      maxLength={500}
+                    />
+                    <div className="advice1-mobile-voice-actions">
+                      <Button
+                        size="small"
+                        color={
+                          listeningTopicId === topic.id ? "warning" : "primary"
+                        }
+                        fill={
+                          listeningTopicId === topic.id ? "solid" : "outline"
+                        }
+                        onClick={() => handleSpeechToText(topic.id)}
+                      >
+                        <AudioOutlined />
+                        {listeningTopicId === topic.id
+                          ? "停止识别"
+                          : "语音转文字"}
+                      </Button>
+                    </div>
+                    {savedAtByTopic[topic.id] ? (
+                      <p className="advice1-mobile-saved-at">
+                        最近保存：{savedAtByTopic[topic.id]}
+                      </p>
+                    ) : null}
+                  </div>
+                </article>
               );
             })}
           </div>

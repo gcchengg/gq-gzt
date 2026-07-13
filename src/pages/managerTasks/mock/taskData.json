@@ -1,0 +1,36 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "id": "task-demo-001",
+      "parentId": "task-demo-001",
+      "taskType": "400",
+      "taskSource": "议题评估-PDF批注协同",
+      "companyId": "company-001",
+      "companyName": "一汽富维汽车零部件股份有限公司",
+      "issueUserId": "hezhen",
+      "issueUserName": "何震",
+      "dutyUserId": "luzhengming",
+      "dutyUserName": "路正明",
+      "planCmplDate": "2026-07-20 18:00:00",
+      "taskDesc": "<p>请查看当前 PDF 批注截图，并结合批注内容反馈处理意见。</p>",
+      "taskDesc1": "",
+      "collaboration": {
+        "title": "发动机分公司31项报废设备购入及处置方案批注协同",
+        "meetingTopicNo": "SH-2026-0713-001",
+        "sourcePage": "议题评估 / 编辑PDF / 协同事项",
+        "shareAdvice": "请查看当前 PDF 批注截图，重点核实评估净值、拆除费用口径及附件来源说明，并反馈处理意见。",
+        "annotationSummary": "批注要求补充关键净值与拆除费用表格附件来源，同时确认“无法再使用”的判断依据。",
+        "executionFeedback": "已核对评估明细，补充了设备评估报告附件页码说明，并与参股公司确认拆除费用测算口径。",
+        "resultDescription": "处理结果将随确认操作提交给任务发起人。",
+        "screenshotUrl": "/src/截屏2026-07-13 10.34.17.png"
+      },
+      "taskFollow": {
+        "taskDesc": "<p>请查看当前 PDF 批注截图，并结合批注内容反馈处理意见。</p>",
+        "fileList": []
+      },
+      "fileList": [],
+      "cmplComment": "<p>已完成批注事项核实，补充材料及处理说明符合要求，同意闭环。</p>"
+    }
+  ]
+}

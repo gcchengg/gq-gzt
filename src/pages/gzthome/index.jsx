@@ -9,6 +9,7 @@ import "./index.css";
 const taskKeyMap = {
   topicApproval: "议题审批",
   meetingVote: "三会表决",
+  collaborationExecution: "任务执行",
 };
 const taskTabs = [
   "议题反馈建议",
@@ -25,6 +26,8 @@ const taskTabs = [
   "表决建议",
   "三会表决",
   "决策执行",
+  "任务执行",
+  "任务闭环",
   "任务管理",
 ];
 const djgTaskTabs = ["下发推荐函"];
@@ -103,6 +106,16 @@ const taskCopyByCard = {
     title: "决策执行",
     description: "参股公司三会决策执行",
     href: "/newSanhui?task=decisionExecution&autoOpen=1",
+  },
+  任务执行: {
+    title: "任务执行",
+    description: "执行任务并反馈阶段成果",
+    href: "/managerTasks?bizId=task-demo-001&status=300",
+  },
+  任务闭环: {
+    title: "任务闭环",
+    description: "确认任务成果并完成闭环",
+    href: "/managerTasks?bizId=task-demo-001&status=400",
   },
   下发推荐函: {
     title: "下发推荐函",

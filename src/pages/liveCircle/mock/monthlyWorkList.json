@@ -103,8 +103,8 @@
           "id": "sanhui-20260618-exit-path",
           "reportId": "a7222e55d14631cf103fd50a2d48c936",
           "category": "1100",
-          "workDate": "2026-02-18",
-          "workDetail": "于2026年07月08日就《关于推进基金退出事项的议案》形成三会决议：董事会决议为同意，监事会决议为同意，股东会决议/投委会决议为同意。",
+          "workDate": "2026-04-20",
+          "workDetail": "同意决策两富新兴业务领域设立合资公司",
           "relatedDetail": null,
           "comment": null,
           "status": null,
@@ -130,8 +130,8 @@
           "id": "sanhui-20260618-budget-adjust",
           "reportId": "a7222e55d14631cf103fd50a2d48c936",
           "category": "1100",
-          "workDate": "2026-02-18",
-          "workDetail": "于2026年07月08日就《关于参股公司年度预算调整的议案》形成三会决议：董事会决议为有条件同意，监事会决议为未涉及，股东会决议/投委会决议为有条件同意。",
+          "workDate": "2026-04-21",
+          "workDetail": "收到富维公司2025年分红款1100万元",
           "relatedDetail": null,
           "comment": null,
           "status": null,
@@ -157,8 +157,8 @@
           "id": "LVgvvRfX6B_IEOMZwWI1R",
           "reportId": "a7222e55d14631cf103fd50a2d48c936",
           "category": "1100",
-          "workDate": "2026-02-06",
-          "workDetail": "完成富晟公司董事会换届、董事长选举议案评估、审议",
+          "workDate": "2026-02-10",
+          "workDetail": "同意向一汽旗翼（深圳）科技有限公司增资",
           "relatedDetail": null,
           "comment": null,
           "status": null,
@@ -170,13 +170,6 @@
               "labelId": "fe26135e1fee11f0a54bfa163ec27914",
               "label": "列入生命时间轴事项",
               "category": "列入生命时间轴事项"
-            },
-            {
-              "id": "76d1ea72e306de87801916ff26cd64c5",
-              "workId": "LVgvvRfX6B_IEOMZwWI1R",
-              "labelId": "fe2725141fee11f0a54bfa163ec27913",
-              "label": "董监高人员变更",
-              "category": "参股企业事项"
             }
           ],
           "fileList": []
@@ -185,8 +178,8 @@
           "id": "xvMEkXf4YVznBLcR0FdCe",
           "reportId": "a7222e55d14631cf103fd50a2d48c936",
           "category": "1100",
-          "workDate": "2026-02-05",
-          "workDetail": "推动富晟公司提报董事会换届、董事长选举议案",
+          "workDate": "2025-12-29",
+          "workDetail": "同意公司2026年度财务预算",
           "relatedDetail": null,
           "comment": null,
           "status": null,
@@ -198,13 +191,27 @@
               "labelId": "fe26135e1fee11f0a54bfa163ec27914",
               "label": "列入生命时间轴事项",
               "category": "列入生命时间轴事项"
-            },
+            }
+          ],
+          "fileList": []
+        },
+        {
+          "id": "xvMEkXf4YVznBLcR0FdCe1",
+          "reportId": "a7222e55d14631cf103fd50a2d48c9361",
+          "category": "1100",
+          "workDate": "2025-12-29",
+          "workDetail": "同意公司2026年度投资计划",
+          "relatedDetail": null,
+          "comment": null,
+          "status": null,
+          "source": null,
+          "labelList": [
             {
-              "id": "3cb4a561c3741d9abc7bfc13566db2ed",
-              "workId": "xvMEkXf4YVznBLcR0FdCe",
-              "labelId": "fe2725141fee11f0a54bfa163ec27913",
-              "label": "董监高人员变更",
-              "category": "参股企业事项"
+              "id": "1a9a5be5a551e9b08ef8816e10772bc6",
+              "workId": "xvMEkXf4YVznBLcR0FdCe1",
+              "labelId": "fe26135e1fee11f0a54bfa163ec27914",
+              "label": "列入生命时间轴事项",
+              "category": "列入生命时间轴事项"
             }
           ],
           "fileList": []

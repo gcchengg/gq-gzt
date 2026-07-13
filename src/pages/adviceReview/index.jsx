@@ -32,7 +32,7 @@ const adviceTopics = [
     categoryLv2Name: "1.3 定期监管报告",
     categoryLv3Name:
       "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
-    topicName: "测试1",
+    topicName: "年度财务决算报告",
     board: true,
     supervisor: false,
     shareholder: false,
@@ -44,7 +44,7 @@ const adviceTopics = [
     categoryLv2Name: "1.3 定期监管报告",
     categoryLv3Name:
       "1.3.1 按国家部委等上级机构监管要求定期报告事项（含反洗钱、反欺诈、重大风险评估、绩效追索扣回、离任审计、内部控制等）",
-    topicName: "测试1",
+    topicName: "年度财务决算报告",
     board: true,
     supervisor: false,
     shareholder: false,
@@ -57,9 +57,24 @@ const adviceTopicColumns = [
   { title: "议题分类（中）", dataIndex: "categoryLv2Name", width: 180 },
   { title: "议题分类（小）", dataIndex: "categoryLv3Name", width: 720 },
   { title: "议题名称", dataIndex: "topicName", width: 120 },
-  { title: "董事会", dataIndex: "board", width: 88, render: (value) => (value ? "√" : "-") },
-  { title: "监事会", dataIndex: "supervisor", width: 88, render: (value) => (value ? "√" : "-") },
-  { title: "股东会", dataIndex: "shareholder", width: 88, render: (value) => (value ? "√" : "-") },
+  {
+    title: "董事会",
+    dataIndex: "board",
+    width: 88,
+    render: (value) => (value ? "√" : "-"),
+  },
+  {
+    title: "监事会",
+    dataIndex: "supervisor",
+    width: 88,
+    render: (value) => (value ? "√" : "-"),
+  },
+  {
+    title: "股东会",
+    dataIndex: "shareholder",
+    width: 88,
+    render: (value) => (value ? "√" : "-"),
+  },
   { title: "审批层级", dataIndex: "reviewLevel", width: 120 },
 ];
 
@@ -243,7 +258,11 @@ function AnnotationDrawer({ open, onClose, imageData, onSubmit }) {
       destroyOnHidden
       extra={
         <Space>
-          <Button onClick={undo} disabled={currentActionIndex <= 0} icon={<UndoOutlined />}>
+          <Button
+            onClick={undo}
+            disabled={currentActionIndex <= 0}
+            icon={<UndoOutlined />}
+          >
             撤销
           </Button>
           <Button
@@ -344,7 +363,10 @@ function AnnotationDrawer({ open, onClose, imageData, onSubmit }) {
             label="督办描述"
             rules={[{ required: true, message: "请输入督办描述" }]}
           >
-            <Input.TextArea rows={3} placeholder="请输入需要对方关注的 PDF 标注说明" />
+            <Input.TextArea
+              rows={3}
+              placeholder="请输入需要对方关注的 PDF 标注说明"
+            />
           </Form.Item>
           <Form.Item
             name="deadlineDate"
@@ -388,7 +410,10 @@ export default function AdviceReview() {
           </div>
         </div>
 
-        <Card title={`议题列表（${adviceTopics.length}）`} className="advice-pdf-card">
+        <Card
+          title={`议题列表（${adviceTopics.length}）`}
+          className="advice-pdf-card"
+        >
           <Table
             rowKey="id"
             columns={adviceTopicColumns}

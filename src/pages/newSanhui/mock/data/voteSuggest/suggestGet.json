@@ -15,7 +15,7 @@
     "sanhuiTopicAssessMiscVoList": [
       {
         "id": "misc-001",
-        "topicName": "关于推进基金退出事项的议案",
+        "topicName": "年度财务决算报告",
         "bodFlag": "1",
         "bodCompResult": "1",
         "bodVoteElusionFlag": "0",
@@ -28,7 +28,7 @@
       },
       {
         "id": "misc-002",
-        "topicName": "关于参股公司年度预算调整的议案",
+        "topicName": "年度利润分配报告",
         "bodFlag": "1",
         "bodCompResult": "2",
         "bodVoteElusionFlag": "0",
@@ -41,7 +41,7 @@
       },
       {
         "id": "misc-003",
-        "topicName": "关于授权签署补充协议的议案",
+        "topicName": "年度预算报告",
         "bodFlag": "1",
         "bodCompResult": "0",
         "bodVoteElusionFlag": "0",
@@ -54,7 +54,7 @@
       },
       {
         "id": "misc-004",
-        "topicName": "关于外部董事意见采纳情况说明的议案",
+        "topicName": "总经理工作报告",
         "bodFlag": "1",
         "bodCompResult": "-1",
         "bodVoteElusionFlag": "0",

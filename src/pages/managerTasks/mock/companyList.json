@@ -1,0 +1,7 @@
+{
+  "code": 200,
+  "data": [
+    { "id": "company-001", "companyName": "一汽富维汽车零部件股份有限公司" },
+    { "id": "company-002", "companyName": "一汽财务有限公司" }
+  ]
+}

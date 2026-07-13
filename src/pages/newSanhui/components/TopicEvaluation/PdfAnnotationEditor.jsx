@@ -676,7 +676,7 @@ export default function PdfAnnotationEditor({
   const [shareLoading, setShareLoading] = useState(false);
   const [shareUsers, setShareUsers] = useState([]);
   const [shareSendTask, setShareSendTask] = useState(false);
-  const [shareTaskType, setShareTaskType] = useState("500");
+  const [shareTaskType, setShareTaskType] = useState("400");
   const [sharePlanCmplTime, setSharePlanCmplTime] = useState(null);
   const [shareAdvice, setShareAdvice] = useState(
     "<p>请查看当前 PDF 批注截图，并结合批注内容反馈处理意见。</p>",
@@ -1138,6 +1138,12 @@ export default function PdfAnnotationEditor({
   const sendShareMessage = () => {
     setShareConfirmOpen(false);
     setShareOpen(false);
+    if (shareSendTask) {
+      window.setTimeout(() => {
+        window.location.href = "/GztHome?task=collaborationExecution";
+      }, 120);
+      return;
+    }
     setTimeout(() => setShareSuccessOpen(true), 120);
   };
   const toggleAnnotationFavorite = (id) => {
@@ -1858,7 +1864,7 @@ export default function PdfAnnotationEditor({
             aria-label="分享当前PDF内容"
             onPointerDown={startShareButtonDrag}
           >
-            分享
+            协同事项
           </button>
         </div>
         <div
@@ -2155,7 +2161,7 @@ export default function PdfAnnotationEditor({
                       <Select
                         id="pdf-share-task-type"
                         value={shareTaskType}
-                        options={[{ label: "协同事项", value: "500" }]}
+                        options={[{ label: "协同事项", value: "400" }]}
                         className="pdf-share-user-select"
                         style={{ width: "100%" }}
                         getPopupContainer={() => document.body}
@@ -2237,7 +2243,7 @@ export default function PdfAnnotationEditor({
         onOk={() => setShareSuccessOpen(false)}
       >
         <div className="pdf-share-success">
-          <p>已模拟向 {shareUsers.length} 位人员发送钉钉消息。</p>
+          <p>已向 {shareUsers.length} 位人员发送钉钉消息。</p>
           {shareSelectedNames ? (
             <p>
               接收人：{shareSelectedNames}
