@@ -93,11 +93,22 @@ export default function AppShell() {
   const isRecommendationArea = ["/djghome", "/recommendationletter"].includes(
     normalizedPathname,
   );
-  const isCompanyListArea = normalizedPathname === "/comapnylist";
+  const isCompanyListArea = [
+    "/comapnylist",
+    "/companymaintenancelist",
+    "/companymaintenance",
+  ].includes(normalizedPathname);
   const activeMenus = useMemo(
     () =>
       isCompanyListArea
-        ? [{ id: "company-list-only", title: "一口清", key: "/comapnyList" }]
+        ? [
+            { id: "company-list-only", title: "一口清", key: "/comapnyList" },
+            {
+              id: "company-maintenance-only",
+              title: "公司维护",
+              key: "/companyMaintenanceList",
+            },
+          ]
         : isRecommendationArea
           ? [
               {

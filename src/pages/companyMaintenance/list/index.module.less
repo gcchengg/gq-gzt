@@ -1,0 +1,14 @@
+.page { width: 100%; min-width: 0; min-height: 100%; box-sizing: border-box; padding: 22px 24px; background: #f3f6fb; }
+.content { width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.formCard, .tableCard { border: 1px solid #e5eaf2; border-radius: 14px; box-shadow: 0 10px 30px rgba(31,35,41,.06); }
+.actions { display: flex; align-items: flex-end; justify-content: flex-end; padding-bottom: 24px; }
+.tableTop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; strong { font-size: 17px; } span { color: #64748b; } }
+.drawerContent { display: flex; flex-direction: column; gap: 14px; }
+.drawerTip { padding: 10px 14px; border-radius: 8px; background: #f0f5ff; color: #3b5b92; }
+.comparableCard { border-radius: 10px; }
+.fileMeta { display: grid; grid-template-columns: 90px 1fr 70px 1fr; gap: 8px 12px; margin-bottom: 12px; span { color: #7b8798; } }
+.fileGroup { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid #edf0f5; &:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; } }
+.fileItem { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; background: #f7f9fc; }
+.fileItem + .fileItem { margin-top: 6px; }
+.reportSection { h3 { margin: 0 0 10px; padding-left: 10px; border-left: 3px solid #2563eb; } p { margin: 0; padding: 14px; border-radius: 8px; background: #f7f9fc; line-height: 1.8; color: #3d4757; } :global(.ant-table-wrapper) { margin-bottom: 12px; } }
+@media (max-width: 768px) { .page { padding: 12px; } .actions { justify-content: flex-start; } }

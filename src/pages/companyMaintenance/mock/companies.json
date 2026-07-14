@@ -1,0 +1,84 @@
+{
+  "company": {
+    "id": "cc-001",
+    "name": "长春一东离合器股份有限公司",
+    "stockCode": "600148.SH",
+    "industry": "汽车零部件",
+    "region": "吉林省长春市"
+  },
+  "comparables": [
+    {
+      "id": "cp-001",
+      "name": "铁流股份",
+      "stockCode": "603926.SH",
+      "industry": "汽车零部件",
+      "market": "上交所",
+      "status": "已维护"
+    },
+    {
+      "id": "cp-002",
+      "name": "亚太股份",
+      "stockCode": "002284.SZ",
+      "industry": "汽车零部件",
+      "market": "深交所",
+      "status": "已维护"
+    }
+  ],
+  "companyList": [
+    {
+      "id": "cc-001",
+      "name": "长春一东离合器股份有限公司",
+      "stockCode": "600148.SH",
+      "industry": "汽车零部件",
+      "region": "吉林省",
+      "comparableCount": 5,
+      "reportPeriod": "2025年报",
+      "updated": "2026-07-12",
+      "status": "维护中"
+    },
+    {
+      "id": "cc-002",
+      "name": "富奥汽车零部件股份有限公司",
+      "stockCode": "000030.SZ",
+      "industry": "汽车零部件",
+      "region": "吉林省",
+      "comparableCount": 6,
+      "reportPeriod": "2025年报",
+      "updated": "2026-07-10",
+      "status": "已完成"
+    },
+    {
+      "id": "cc-003",
+      "name": "长春富维集团汽车零部件股份有限公司",
+      "stockCode": "600742.SH",
+      "industry": "汽车零部件",
+      "region": "吉林省",
+      "comparableCount": 4,
+      "reportPeriod": "2025年报",
+      "updated": "2026-07-08",
+      "status": "待维护"
+    },
+    {
+      "id": "cc-004",
+      "name": "一汽解放集团股份有限公司",
+      "stockCode": "000800.SZ",
+      "industry": "商用车",
+      "region": "吉林省",
+      "comparableCount": 7,
+      "reportPeriod": "2025年报",
+      "updated": "2026-07-06",
+      "status": "已完成"
+    },
+    {
+      "id": "cc-005",
+      "name": "一汽富华生态有限公司",
+      "stockCode": "非上市",
+      "industry": "综合服务",
+      "region": "吉林省",
+      "comparableCount": 3,
+      "reportPeriod": "2025年报",
+      "updated": "2026-07-03",
+      "status": "待维护"
+    }
+  ]
+}

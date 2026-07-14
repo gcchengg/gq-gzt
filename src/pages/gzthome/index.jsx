@@ -30,7 +30,7 @@ const taskTabs = [
   "任务闭环",
   "任务管理",
 ];
-const djgTaskTabs = ["下发推荐函"];
+const djgTaskTabs = ["下发推荐函", "公司维护"];
 const metrics = [
   { label: "总待办数", value: "4450" },
   { label: "总逾期数", value: "0", tone: "red" },
@@ -121,6 +121,11 @@ const taskCopyByCard = {
     title: "下发推荐函",
     description: "编制并下发董监高选聘推荐函",
     href: "/recommendationLetter?bizId=req-001",
+  },
+  公司维护: {
+    title: "公司维护",
+    description: "维护本公司及可比公司材料并确认AI对标分析报告",
+    href: "/companyMaintenance?fromTask=1&companyId=cc-001",
   },
   任务管理: {
     title: "任务管理",

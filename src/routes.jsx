@@ -22,8 +22,28 @@ const AssignFollowTask = lazy(() => import("@/pages/assignFollowTask"));
 const ManagerTasks = lazy(() => import("@/pages/managerTasks"));
 const AiPricing = lazy(() => import("@/pages/aiPricing"));
 const CompanyList = lazy(() => import("@/pages/companyList"));
+const CompanyMaintenance = lazy(() => import("@/pages/companyMaintenance"));
+const CompanyMaintenanceList = lazy(
+  () => import("@/pages/companyMaintenance/list"),
+);
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
+  {
+    path: "companyMaintenance",
+    element: (
+      <Suspense>
+        <CompanyMaintenance />
+      </Suspense>
+    ),
+  },
+  {
+    path: "companyMaintenanceList",
+    element: (
+      <Suspense>
+        <CompanyMaintenanceList />
+      </Suspense>
+    ),
+  },
   {
     path: "comapnyList",
     element: (
