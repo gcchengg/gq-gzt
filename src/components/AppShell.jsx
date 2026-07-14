@@ -93,21 +93,24 @@ export default function AppShell() {
   const isRecommendationArea = ["/djghome", "/recommendationletter"].includes(
     normalizedPathname,
   );
+  const isCompanyListArea = normalizedPathname === "/comapnylist";
   const activeMenus = useMemo(
     () =>
-      isRecommendationArea
-        ? [
-            {
-              id: "recommendation-letter-only",
-              title: "下发推荐函",
-              key:
-                normalizedPathname === "/djghome"
-                  ? "/djghome"
-                  : "/recommendationLetter",
-            },
-          ]
-        : webmenu,
-    [isRecommendationArea, normalizedPathname],
+      isCompanyListArea
+        ? [{ id: "company-list-only", title: "一口清", key: "/comapnyList" }]
+        : isRecommendationArea
+          ? [
+              {
+                id: "recommendation-letter-only",
+                title: "下发推荐函",
+                key:
+                  normalizedPathname === "/djghome"
+                    ? "/djghome"
+                    : "/recommendationLetter",
+              },
+            ]
+          : webmenu,
+    [isCompanyListArea, isRecommendationArea, normalizedPathname],
   );
 
   const menuItems = useMemo(() => createMenuItems(activeMenus), [activeMenus]);

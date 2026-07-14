@@ -21,8 +21,17 @@ const FollowUp = lazy(() => import("@/pages/followUp"));
 const AssignFollowTask = lazy(() => import("@/pages/assignFollowTask"));
 const ManagerTasks = lazy(() => import("@/pages/managerTasks"));
 const AiPricing = lazy(() => import("@/pages/aiPricing"));
+const CompanyList = lazy(() => import("@/pages/companyList"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
+  {
+    path: "comapnyList",
+    element: (
+      <Suspense>
+        <CompanyList />
+      </Suspense>
+    ),
+  },
   {
     index: true,
     element: (

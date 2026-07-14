@@ -1,2 +1,9 @@
-我仔细讲解下任务执行和任务完善，然后你补充下完整假数据
-1.
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/managerTasks/mock/taskData.json
+我对上面文件作出了修改，并且任务类型添加了400 协同事项：
+这次模拟的应该是【协同事项】的任务，
+我先讲解下这块需求是怎么来的，你根据描述的内容，合理的生成任务执行和任务闭环的假数据，显示内容和需要填写内容你自行补充
+1.当状态为400时，任务执行需要截图，默认显示/Users/guocc/Documents/guquan/files/gq-gzt/src/截屏2026-07-13 10.34.17.png 假数据
+
+来源讲解：
+是从/newSanhui中【议题评估】tab中，【编辑PDF】抽屉页面中，点击【协同事项】弹出【分享批注截图】抽屉页，点击【确认分享】按钮，
+应该跳转到/GztHome页面，然后发起【任务执行】的任务

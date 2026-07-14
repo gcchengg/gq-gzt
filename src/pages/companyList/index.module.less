@@ -1,0 +1,73 @@
+@ink: #172a3d;
+@blue: #234f7d;
+@red: #a9442d;
+@line: #dbe2e8;
+
+.page { display: flex; height: 100%; min-height: 0; background: #e9edf0; color: @ink; }
+.companyRail { display: flex; width: 272px; min-width: 272px; flex-direction: column; border-right: 1px solid #d7dee4; background: #f8fafb; }
+.railHeader { padding: 22px 16px 14px; border-bottom: 1px solid #e0e6ea; background: #fff; }
+.railHeader > div:first-child { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; color: #263b4d; font-family: "STSong", "SimSun", serif; font-size: 20px; font-weight: 700; }
+.railHeader strong { color: #8b9aa7; font-family: Georgia, serif; font-size: 13px; }
+.companyList { flex: 1; overflow: auto; padding: 8px; }
+.companyItem { position: relative; display: grid; grid-template-columns: 30px minmax(0, 1fr) 30px; align-items: center; min-height: 48px; margin-bottom: 3px; padding: 5px 7px; border-left: 3px solid transparent; border-radius: 2px 7px 7px 2px; cursor: pointer; transition: .18s ease; }
+.companyItem:hover { background: #eef3f6; }
+.companyItem.active { border-left-color: @red; background: #e7eef4; box-shadow: inset 0 0 0 1px rgba(35,79,125,.08); }
+.companyNo { color: #9aa7b1; font-family: Georgia, serif; font-size: 11px; }
+.companyName { overflow: hidden; color: #34495a; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.active .companyName { color: #153b63; font-weight: 700; }
+.configButton { color: #647b90 !important; }
+.workspace { flex: 1; min-width: 0; overflow: auto; padding: 28px clamp(22px, 4vw, 64px) 56px; background: radial-gradient(circle at 50% 0, #f7f8f8 0, #e9edf0 55%); }
+.paper { max-width: 1040px; min-height: 100%; margin: 0 auto; padding: 58px clamp(34px, 6vw, 86px) 40px; border: 1px solid #d8dcdf; background: #fffefb; box-shadow: 0 18px 55px rgba(36,48,58,.13), 0 2px 5px rgba(36,48,58,.06); font-family: "Noto Serif SC", "STSong", "SimSun", serif; }
+.documentHeader { padding-bottom: 32px; border-bottom: 3px double #8fa0ae; text-align: center; }
+.kicker { color: @red; font-family: "Microsoft YaHei", sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
+.documentHeader h1 { margin: 15px 0 25px; color: #142f49; font-size: clamp(30px, 3vw, 42px); font-weight: 700; letter-spacing: 5px; }
+.metaGrid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid @line; border-left: 1px solid @line; text-align: left; }
+.metaGrid > div { display: flex; min-width: 0; border-right: 1px solid @line; border-bottom: 1px solid @line; }
+.metaGrid span { width: 76px; flex: 0 0 76px; padding: 9px 10px; background: #f1f4f5; color: #607181; font-family: "Microsoft YaHei", sans-serif; font-size: 12px; }
+.metaGrid b { overflow: hidden; padding: 9px 10px; color: #243c51; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.block { margin-top: 42px; content-visibility: auto; contain-intrinsic-size: 0 500px; }
+.block > h2 { display: flex; align-items: center; justify-content: space-between; margin: 0 0 23px; padding: 0 0 11px; border-bottom: 2px solid @blue; color: @blue; font-size: 22px; letter-spacing: 1px; }
+.block > h2 span:first-child::before { display: inline-block; width: 5px; height: 21px; margin-right: 11px; background: @red; content: ""; vertical-align: -3px; }
+.sourceLabel, .tableNote { color: #758594 !important; font-family: "Microsoft YaHei", sans-serif; font-size: 12px !important; font-weight: 400 !important; }
+.sub { margin: 0 0 29px; }
+.sub h3 { margin: 0 0 11px; color: #20384e; font-size: 17px; }
+.sub p { margin: 0; color: #334657; font-size: 15px; line-height: 2.05; text-align: justify; }
+.sub a { color: #235f99; font-weight: 700; text-decoration: underline; text-decoration-color: #a9bfd2; text-underline-offset: 4px; }
+.analysis h4 { display: inline-flex; margin: 13px 0 6px; padding: 3px 10px; background: #e9f0f5; color: @blue; font-size: 14px; letter-spacing: 2px; }
+.comparisonTable { overflow-x: auto; margin: 12px 0; }
+.comparisonTable table { width: 100%; min-width: 720px; border-collapse: collapse; font-family: "Microsoft YaHei", sans-serif; font-size: 12px; }
+.comparisonTable th, .comparisonTable td { padding: 9px 8px; border: 1px solid #cad4dc; text-align: center; }
+.comparisonTable th { background: #254d72; color: white; font-weight: 600; }
+.comparisonTable td:first-child { background: #edf2f5; font-weight: 700; }
+.conclusion { margin-top: 16px; padding: 16px 20px; border-left: 4px solid @red; background: #f7f2ed; color: #3a4650; font-size: 15px; line-height: 1.9; }
+.conclusion b { margin-right: 12px; color: @red; }
+.financeTable { margin-top: 10px; font-family: "Microsoft YaHei", sans-serif; }
+.financeTable :global(.ant-table-thead > tr > th) { background: #edf2f5 !important; color: #29445c; text-align: center; }
+.financeTable :global(.ant-table-cell) { text-align: center; }
+.topicList { margin-top: 15px; border-top: 1px solid @line; }
+.topic { display: grid; grid-template-columns: 44px 1fr; gap: 8px; padding: 16px 0; border-bottom: 1px solid @line; }
+.topic > span { color: #aab5be; font-family: Georgia, serif; font-size: 22px; }
+.topic b { margin-right: 8px; color: #263d52; font-size: 14px; }
+.topic p { margin-top: 7px; padding-left: 12px; border-left: 2px solid #dce5eb; font-size: 13px; line-height: 1.7; }
+.twoCol, .strategyGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.twoCol p, .strategyGrid p { padding: 17px; border: 1px solid #dce3e8; background: #fafbfa; font-size: 14px; line-height: 1.8; }
+.twoCol b, .strategyGrid b { display: block; margin-bottom: 4px; color: @blue; }
+.strategyGrid { grid-template-columns: repeat(3, 1fr); }
+.paper footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid #bdc8d0; color: #8b98a2; font-family: "Microsoft YaHei", sans-serif; font-size: 11px; letter-spacing: 2px; text-align: center; }
+.modalIntro { margin-bottom: 15px; color: #657483; }
+.configGroup { display: block; max-height: 55vh; overflow: auto; }
+.configSection { margin-bottom: 10px; padding: 13px 14px; border: 1px solid #e1e6ea; border-radius: 7px; background: #fafbfc; }
+.configSection > div { display: flex; flex-wrap: wrap; gap: 8px 15px; margin: 10px 0 0 24px; }
+
+@media (max-width: 1050px) {
+  .companyRail { width: 220px; min-width: 220px; }
+  .metaGrid { grid-template-columns: repeat(2, 1fr); }
+  .strategyGrid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .page { display: block; overflow: auto; }
+  .companyRail { width: 100%; height: 190px; min-width: 0; }
+  .workspace { overflow: visible; padding: 12px; }
+  .paper { padding: 32px 20px; }
+  .metaGrid, .twoCol { grid-template-columns: 1fr; }
+}
