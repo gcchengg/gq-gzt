@@ -9,7 +9,6 @@ import {
 import {
   Button,
   Card,
-  DatePicker,
   Form,
   Input,
   message,
@@ -20,7 +19,6 @@ import {
   Tag,
   Upload,
 } from "antd";
-import dayjs from "dayjs";
 import data from "./mock/companies.json";
 import styles from "./index.module.less";
 
@@ -102,8 +100,7 @@ function FileScope({ title, subtitle, editable }) {
   const [rows, setRows] = useState([
     {
       id: `${title}-1`,
-      fileType: fileTypes[0].value,
-      period: dayjs("2025-12-31"),
+      fileType: "年度定期报告",
       files: [
         {
           uid: `${title}-file`,
@@ -133,7 +130,6 @@ function FileScope({ title, subtitle, editable }) {
                 {
                   id: `${title}-${Date.now()}`,
                   fileType: fileTypes[0].value,
-                  period: dayjs("2025-12-31"),
                   files: [],
                 },
               ])
@@ -143,6 +139,11 @@ function FileScope({ title, subtitle, editable }) {
           </Button>
         ) : null}
       </div>
+      <div className={styles.fileColumns} aria-hidden="true">
+        <span>文件类型</span>
+        <span>上传文件</span>
+        <span />
+      </div>
       {rows.map((row) => (
         <div className={styles.fileRow} key={row.id}>
           <Select
@@ -151,34 +152,31 @@ function FileScope({ title, subtitle, editable }) {
             options={fileTypes}
             onChange={(fileType) => updateRow(row.id, { fileType })}
           />
-          <DatePicker
-            disabled={!editable}
-            picker="month"
-            value={row.period}
-            format="YYYY年MM月"
-            onChange={(period) => updateRow(row.id, { period })}
-          />
-          <Upload
-            multiple
-            disabled={!editable}
-            fileList={row.files}
-            beforeUpload={(file) => {
-              updateRow(row.id, { files: [...row.files, file] });
-              return false;
-            }}
-            onRemove={
-              editable
-                ? (file) =>
-                    updateRow(row.id, {
-                      files: row.files.filter((item) => item.uid !== file.uid),
-                    })
-                : false
-            }
-          >
-            {editable ? (
-              <Button icon={<UploadOutlined />}>上传文件</Button>
-            ) : null}
-          </Upload>
+          <div className={styles.uploadCell}>
+            <Upload
+              multiple
+              disabled={!editable}
+              fileList={row.files}
+              beforeUpload={(file) => {
+                updateRow(row.id, { files: [...row.files, file] });
+                return false;
+              }}
+              onRemove={
+                editable
+                  ? (file) =>
+                      updateRow(row.id, {
+                        files: row.files.filter(
+                          (item) => item.uid !== file.uid,
+                        ),
+                      })
+                  : false
+              }
+            >
+              {editable ? (
+                <Button icon={<UploadOutlined />}>上传文件</Button>
+              ) : null}
+            </Upload>
+          </div>
           {editable ? (
             <Popconfirm
               title="确认删除该材料？"
@@ -203,19 +201,28 @@ export default function CompanyMaintenance() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const fromTask = searchParams.get("fromTask") === "1";
+  const reportYear = searchParams.get("year") || "2025";
+  const reportCycle =
+    searchParams.get("period") === "semiannual" ? "半年度" : "年度";
   const view = searchParams.get("view") || (fromTask ? "task" : "comparables");
   const editable = fromTask;
   const showComparables = view === "task" || view === "comparables";
   const showAnalysis = view === "task" || view === "analysis";
   const [maintained, setMaintained] = useState(data.comparables);
-  const [candidate, setCandidate] = useState({ name: "", stockCode: "" });
+  const [candidate, setCandidate] = useState({
+    name: "",
+    companyType: "上市公司",
+    stockCode: "",
+  });
   const [analyzing, setAnalyzing] = useState(false);
   const [report, setReport] = useState(view === "analysis" ? reportSeed : null);
   const company = data.company;
   const addComparable = () => {
-    if (!candidate.name.trim() || !candidate.stockCode.trim())
-      return message.warning("请填写可比公司名称和股票编码");
+    if (!candidate.name.trim()) return message.warning("请填写可比公司名称");
+    if (candidate.companyType === "上市公司" && !candidate.stockCode.trim())
+      return message.warning("上市公司请填写股票编码");
     if (
+      candidate.stockCode &&
       maintained.some((item) => item.stockCode === candidate.stockCode.trim())
     )
       return message.warning("该可比公司已维护");
@@ -224,13 +231,17 @@ export default function CompanyMaintenance() {
       {
         id: `cp-${Date.now()}`,
         name: candidate.name.trim(),
-        stockCode: candidate.stockCode.trim(),
+        companyType: candidate.companyType,
+        stockCode:
+          candidate.companyType === "上市公司"
+            ? candidate.stockCode.trim()
+            : null,
         industry: "汽车零部件",
         market: "待识别",
         status: "已维护",
       },
     ]);
-    setCandidate({ name: "", stockCode: "" });
+    setCandidate({ name: "", companyType: "上市公司", stockCode: "" });
   };
   const runAnalysis = () => {
     setAnalyzing(true);
@@ -289,6 +300,13 @@ export default function CompanyMaintenance() {
           </div>
           <div className={styles.headMeta}>
             <div>
+              <span>报告周期</span>
+              <strong>
+                {reportYear}
+                {reportCycle}
+              </strong>
+            </div>
+            <div>
               <span>任务状态</span>
               <strong>{fromTask ? "执行中" : "已归档"}</strong>
             </div>
@@ -314,8 +332,25 @@ export default function CompanyMaintenance() {
                 {editable ? (
                   <div className={styles.comparableLeft}>
                     <h3>维护可比公司</h3>
-                    <p>录入可比公司名称和股票编码，点击维护后加入右侧清单。</p>
+                    <p>选择公司类型并录入基本信息，非上市公司无需股票编码。</p>
                     <Form layout="vertical">
+                      <Form.Item label="公司类型" required>
+                        <Select
+                          value={candidate.companyType}
+                          options={["上市公司", "非上市公司"].map((value) => ({
+                            label: value,
+                            value,
+                          }))}
+                          onChange={(companyType) =>
+                            setCandidate((v) => ({
+                              ...v,
+                              companyType,
+                              stockCode:
+                                companyType === "非上市公司" ? "" : v.stockCode,
+                            }))
+                          }
+                        />
+                      </Form.Item>
                       <Form.Item label="可比公司名称" required>
                         <Input
                           value={candidate.name}
@@ -328,18 +363,20 @@ export default function CompanyMaintenance() {
                           }
                         />
                       </Form.Item>
-                      <Form.Item label="股票编码" required>
-                        <Input
-                          value={candidate.stockCode}
-                          placeholder="例如：603926.SH"
-                          onChange={(e) =>
-                            setCandidate((v) => ({
-                              ...v,
-                              stockCode: e.target.value,
-                            }))
-                          }
-                        />
-                      </Form.Item>
+                      {candidate.companyType === "上市公司" ? (
+                        <Form.Item label="股票编码" required>
+                          <Input
+                            value={candidate.stockCode}
+                            placeholder="例如：603926.SH"
+                            onChange={(e) =>
+                              setCandidate((v) => ({
+                                ...v,
+                                stockCode: e.target.value,
+                              }))
+                            }
+                          />
+                        </Form.Item>
+                      ) : null}
                       <Button block type="primary" onClick={addComparable}>
                         维护
                       </Button>
@@ -356,9 +393,13 @@ export default function CompanyMaintenance() {
                   {maintained.map((item) => (
                     <div className={styles.comparableItem} key={item.id}>
                       <div>
-                        <strong>{item.name}</strong>
+                        <strong>
+                          {item.name}{" "}
+                          <Tag>{item.companyType || "上市公司"}</Tag>
+                        </strong>
                         <span>
-                          {item.stockCode} · {item.industry}
+                          {item.stockCode ? `${item.stockCode} · ` : ""}
+                          {item.industry}
                         </span>
                       </div>
                       {editable ? (
@@ -399,7 +440,7 @@ export default function CompanyMaintenance() {
                   editable={editable}
                   key={item.id}
                   title={item.name}
-                  subtitle={`可比公司 · ${item.stockCode}`}
+                  subtitle={`可比公司 · ${item.stockCode || "非上市公司"}`}
                 />
               ))}
             </Card>

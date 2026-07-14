@@ -71,18 +71,31 @@ export default function CompanyMaintenanceList() {
   const [drawer, setDrawer] = useState({ open: false, type: "", record: null });
   const rows = useMemo(
     () =>
-      data.companyList.filter(
-        (item) =>
-          (!filters.keyword ||
-            `${item.name}${item.stockCode}`.includes(filters.keyword)) &&
-          (!filters.industry || item.industry === filters.industry) &&
-          (!filters.status || item.status === filters.status),
-      ),
+      data.companyList
+        .flatMap((item) => [
+          { ...item, id: `${item.id}-annual`, reportPeriod: "2025年度" },
+          { ...item, id: `${item.id}-semiannual`, reportPeriod: "2025半年度" },
+        ])
+        .filter(
+          (item) =>
+            (!filters.keyword ||
+              `${item.name}${item.stockCode}`.includes(filters.keyword)) &&
+            (!filters.industry || item.industry === filters.industry) &&
+            (!filters.companyType ||
+              item.companyType === filters.companyType) &&
+            (!filters.status || item.status === filters.status),
+        ),
     [filters],
   );
   const columns = [
     { title: "公司名称", dataIndex: "name", minWidth: 220 },
-    { title: "股票编码", dataIndex: "stockCode", width: 130 },
+    { title: "公司类型", dataIndex: "companyType", width: 110 },
+    {
+      title: "股票编码",
+      dataIndex: "stockCode",
+      width: 130,
+      render: (value) => value || "--",
+    },
     { title: "所属行业", dataIndex: "industry", width: 140 },
     {
       title: "可比公司数",
@@ -128,12 +141,12 @@ export default function CompanyMaintenanceList() {
         <Card className={styles.formCard}>
           <Form form={form} layout="vertical" onFinish={setFilters}>
             <Row gutter={16}>
-              <Col xs={24} md={6}>
+              <Col xs={24} md={5}>
                 <Form.Item label="公司名称/股票编码" name="keyword">
                   <Input allowClear placeholder="请输入公司名称或股票编码" />
                 </Form.Item>
               </Col>
-              <Col xs={24} md={6}>
+              <Col xs={24} md={5}>
                 <Form.Item label="所属行业" name="industry">
                   <Select
                     allowClear
@@ -145,7 +158,18 @@ export default function CompanyMaintenanceList() {
                   />
                 </Form.Item>
               </Col>
-              <Col xs={24} md={6}>
+              <Col xs={24} md={5}>
+                <Form.Item label="公司类型" name="companyType">
+                  <Select
+                    allowClear
+                    options={["上市公司", "非上市公司"].map((value) => ({
+                      value,
+                      label: value,
+                    }))}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={5}>
                 <Form.Item label="维护状态" name="status">
                   <Select
                     allowClear
@@ -156,7 +180,7 @@ export default function CompanyMaintenanceList() {
                   />
                 </Form.Item>
               </Col>
-              <Col xs={24} md={6} className={styles.actions}>
+              <Col xs={24} md={4} className={styles.actions}>
                 <Space>
                   <Button
                     onClick={() => {
@@ -192,14 +216,14 @@ export default function CompanyMaintenanceList() {
           width="min(880px, 92vw)"
           title={
             drawer.type === "comparables"
-              ? `${drawer.record?.name || ""} · 可比公司`
-              : `${drawer.record?.name || ""} · AI分析详情`
+              ? `${drawer.record?.name || ""} · ${drawer.record?.reportPeriod || ""} · 可比公司`
+              : `${drawer.record?.name || ""} · ${drawer.record?.reportPeriod || ""} · AI分析详情`
           }
           open={drawer.open}
           onClose={() => setDrawer({ open: false, type: "", record: null })}
         >
           {drawer.type === "comparables" ? (
-            <ComparableDrawer />
+            <ComparableDrawer record={drawer.record} />
           ) : drawer.type === "analysis" ? (
             <AnalysisDrawer />
           ) : null}
@@ -209,19 +233,18 @@ export default function CompanyMaintenanceList() {
   );
 }
 
-function ComparableDrawer() {
+function ComparableDrawer({ record }) {
+  const reportPeriod = record?.reportPeriod || "2025年度";
+  const isSemiannual = reportPeriod.includes("半年度");
   const fileGroups = [
     {
-      type: "年度定期报告",
-      period: "2025年度",
-      names: ["2025年度报告.pdf", "2025年度财务数据.xlsx"],
+      type: isSemiannual ? "半年度定期报告" : "年度定期报告",
+      period: reportPeriod,
+      names: isSemiannual
+        ? ["2025半年度报告.pdf", "2025半年度财务数据.xlsx"]
+        : ["2025年度报告.pdf", "2025年度财务数据.xlsx"],
     },
-    {
-      type: "年度业绩公告",
-      period: "2025年度",
-      names: ["2025年度业绩公告.pdf"],
-    },
-    { type: "公开信息", period: "2026年06月", names: ["公司公开信息汇编.pdf"] },
+    { type: "公开信息", period: reportPeriod, names: ["公司公开信息汇编.pdf"] },
   ];
   return (
     <div className={styles.drawerContent}>
@@ -234,7 +257,7 @@ function ComparableDrawer() {
           className={styles.comparableCard}
           key={item.id}
           title={item.name}
-          extra={<Tag color="blue">{item.stockCode}</Tag>}
+          extra={<Tag color="blue">{item.stockCode || "非上市公司"}</Tag>}
         >
           {fileGroups.map((group) => (
             <div className={styles.fileGroup} key={group.type}>

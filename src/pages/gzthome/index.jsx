@@ -125,7 +125,7 @@ const taskCopyByCard = {
   公司维护: {
     title: "公司维护",
     description: "维护本公司及可比公司材料并确认AI对标分析报告",
-    href: "/companyMaintenance?fromTask=1&companyId=cc-001",
+    href: "/companyMaintenance?fromTask=1&companyId=cc-001&year=2025&period=annual",
   },
   任务管理: {
     title: "任务管理",
@@ -143,6 +143,18 @@ const secondaryTaskCopyByCard = {
     description: "维护表决建议",
   },
 };
+const companyMaintenanceTasks = [
+  {
+    title: "2025年度公司维护",
+    description: "完成2025年度可比公司材料维护并确认AI对标分析报告",
+    href: "/companyMaintenance?fromTask=1&companyId=cc-001&year=2025&period=annual",
+  },
+  {
+    title: "2025半年度公司维护",
+    description: "完成2025半年度可比公司材料维护并确认AI对标分析报告",
+    href: "/companyMaintenance?fromTask=1&companyId=cc-001&year=2025&period=semiannual",
+  },
+];
 function BrandMark() {
   return (
     <svg viewBox="0 0 24 24">
@@ -406,7 +418,20 @@ function TaskPanel() {
   });
   const primaryTask = taskCopyByCard[activeTab];
   const secondaryTask = secondaryTaskCopyByCard[activeTab];
-  const showSecondary = Boolean(secondaryTask);
+  const taskRows =
+    activeTab === "公司维护"
+      ? companyMaintenanceTasks
+      : [
+          primaryTask,
+          secondaryTask
+            ? {
+                ...secondaryTask,
+                href: "2-非上市：退出决策.html",
+                secondary: true,
+              }
+            : null,
+        ].filter(Boolean);
+  const showSecondary = taskRows.length > 1;
   const rowsClassName = useMemo(
     () => ["rows", showSecondary ? "show-secondary" : ""].join(" "),
     [showSecondary],
@@ -488,14 +513,14 @@ function TaskPanel() {
         </div>
 
         <div className={rowsClassName}>
-          <TaskRow task={primaryTask} onDescriptionClick={openDescription} />
-          {secondaryTask ? (
+          {taskRows.map((task, index) => (
             <TaskRow
-              task={{ ...secondaryTask, href: "2-非上市：退出决策.html" }}
-              secondary
+              key={task.href}
+              task={task}
+              secondary={index > 0 || task.secondary}
               onDescriptionClick={openDescription}
             />
-          ) : null}
+          ))}
         </div>
       </section>
 

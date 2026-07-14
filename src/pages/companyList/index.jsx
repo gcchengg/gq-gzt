@@ -10,6 +10,7 @@ import {
   Empty,
   Input,
   Modal,
+  Select,
   Table,
   Tag,
 } from "antd";
@@ -80,6 +81,10 @@ export default function CompanyList() {
   }, []);
   const [selectedId, setSelectedId] = useState(companies[0]?.id);
   const [keyword, setKeyword] = useState("");
+  const [globalYear, setGlobalYear] = useState("2025");
+  const [globalPeriod, setGlobalPeriod] = useState("年度");
+  const [documentYear, setDocumentYear] = useState("2025");
+  const [documentPeriod, setDocumentPeriod] = useState("年度");
   const [configOpen, setConfigOpen] = useState(false);
   const [configs, setConfigs] = useState({});
   const selected =
@@ -91,6 +96,14 @@ export default function CompanyList() {
   const checked = (key) => enabled.includes(key);
   const visibleCompanies = companies.filter((item) =>
     `${item.companyName}${item.shortForm}`.includes(keyword.trim()),
+  );
+  const reportLabel = `${documentYear}${documentPeriod}`;
+  const reportCutoff =
+    documentPeriod === "年度"
+      ? `${documentYear}年12月`
+      : `${documentYear}年6月`;
+  const visibleFinanceRows = financeRows.filter(
+    (item) => Number(item.year) <= Number(documentYear),
   );
   const products =
     detail?.productList
@@ -150,6 +163,25 @@ export default function CompanyList() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
             />
+            <div className={styles.globalReportFilter}>
+              <span>全部公司报告</span>
+              <Select
+                value={globalYear}
+                onChange={setGlobalYear}
+                options={["2025", "2024", "2023"].map((value) => ({
+                  value,
+                  label: `${value}年`,
+                }))}
+              />
+              <Select
+                value={globalPeriod}
+                onChange={setGlobalPeriod}
+                options={["年度", "半年度"].map((value) => ({
+                  value,
+                  label: value,
+                }))}
+              />
+            </div>
           </div>
           <div className={styles.companyList}>
             {visibleCompanies.length ? (
@@ -165,7 +197,11 @@ export default function CompanyList() {
                     {String(companies.indexOf(item) + 1).padStart(2, "0")}
                   </span>
                   <span className={styles.companyName}>
-                    {item.shortForm || item.companyName}
+                    <b>{item.shortForm || item.companyName}</b>
+                    <small>
+                      {globalYear}
+                      {globalPeriod}
+                    </small>
                   </span>
                   {item.id === selectedId ? (
                     <Button
@@ -191,12 +227,37 @@ export default function CompanyList() {
         </aside>
 
         <main className={styles.workspace}>
+          <div className={styles.documentFilter}>
+            <div>
+              <span>当前公司报告</span>
+              <strong>{displayName}</strong>
+            </div>
+            <Select
+              value={documentYear}
+              onChange={setDocumentYear}
+              options={["2025", "2024", "2023"].map((value) => ({
+                value,
+                label: `${value}年`,
+              }))}
+            />
+            <Select
+              value={documentPeriod}
+              onChange={setDocumentPeriod}
+              options={["年度", "半年度"].map((value) => ({
+                value,
+                label: value,
+              }))}
+            />
+          </div>
           <div className={styles.paper}>
             <header className={styles.documentHeader}>
               <div className={styles.kicker}>
                 <FileTextOutlined /> 一企一档 · 一口清
               </div>
               <h1>{displayName}</h1>
+              <div className={styles.reportPeriod}>
+                {reportLabel}一企一档报告
+              </div>
               <div className={styles.metaGrid}>
                 <div>
                   <span>公司简称</span>
@@ -357,14 +418,14 @@ export default function CompanyList() {
             <Block id="finance" title="二、财务状况“清”" checked={checked}>
               <Sub id="finance-0" title="1. 本期经营完成" checked={checked}>
                 <p>
-                  截至2026年5月，
+                  截至{reportCutoff}，
                   <S source={source.finance}>
                     {displayName}完成营业收入35805.11万元
                   </S>
                   ，<S source={source.finance}>预算完成度46.72%</S>，
                   <S source={source.finance}>实现归母净利润920.40万元</S>，
-                  <S source={source.finance}>预算完成度68.48%</S>
-                  。2026年度营业收入预算
+                  <S source={source.finance}>预算完成度68.48%</S>。
+                  {documentYear}年度营业收入预算
                   <S source={source.finance}>80,232万元</S>，较2025年决算
                   <S source={source.financeCalc}>增长4.71%</S>；归母净利润预算
                   <S source={source.finance}>1344万元</S>，较2025年决算
@@ -379,7 +440,7 @@ export default function CompanyList() {
                   className={styles.financeTable}
                   rowKey="year"
                   columns={financeColumns}
-                  dataSource={financeRows}
+                  dataSource={visibleFinanceRows}
                   bordered
                   pagination={false}
                   size="small"
@@ -388,7 +449,8 @@ export default function CompanyList() {
               </Sub>
               <Sub id="finance-2" title="3. 分红情况" checked={checked}>
                 <p>
-                  {displayName}本年度
+                  {displayName}
+                  {reportLabel}
                   <S source={source.operation}>完成分红93.8万元</S>，
                   <S source={source.operation}>历史累计分红458万元</S>。
                 </p>
