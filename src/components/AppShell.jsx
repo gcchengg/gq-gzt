@@ -26,7 +26,8 @@ const normalizePath = (path = "") => {
 };
 
 const getPathOnly = (path = "") => path.split("?")[0];
-const isShelllessPath = (path = "") => path === "/ai-pricing";
+const isShelllessPath = (path = "") =>
+  ["/ai-pricing", "/companyreportshare"].includes(path.toLowerCase());
 
 const flattenMenus = (menus = []) =>
   menus.flatMap((item) => {

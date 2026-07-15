@@ -1,20 +1,27 @@
 import {
   CheckOutlined,
+  EyeOutlined,
   FileTextOutlined,
+  HolderOutlined,
+  PrinterOutlined,
   SettingOutlined,
+  ShareAltOutlined,
+  TrophyOutlined,
 } from "@ant-design/icons";
 import {
   Button,
   Checkbox,
   ConfigProvider,
+  Drawer,
   Empty,
   Input,
   Modal,
   Select,
   Table,
   Tag,
+  message,
 } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import companyList from "@/pages/companyReview/list.json";
 import companyDetail from "@/pages/companyReview/长春一东.json";
 import SourceMark from "./components/SourceMark";
@@ -43,6 +50,7 @@ const source = {
   financeCalc: "根据投后工作报告-财务指标表格计算得知",
   operation: "投后工作报告-经营情况",
   topic: "三会管理工作台-议题交办",
+  risk: "风险管理",
 };
 
 function Block({ id, title, checked, titleSource, children }) {
@@ -71,6 +79,107 @@ function Sub({ id, title, checked, children }) {
   ) : null;
 }
 
+function MedalQuestionBankButton({ onOpen }) {
+  const buttonRef = useRef(null);
+  const dragState = useRef(null);
+  const dragged = useRef(false);
+  const [position, setPosition] = useState(null);
+
+  useEffect(() => {
+    const keepInViewport = () => {
+      if (!position || !buttonRef.current) return;
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPosition({
+        left: Math.min(
+          Math.max(12, position.left),
+          window.innerWidth - rect.width - 12,
+        ),
+        top: Math.min(
+          Math.max(12, position.top),
+          window.innerHeight - rect.height - 12,
+        ),
+      });
+    };
+    window.addEventListener("resize", keepInViewport);
+    return () => window.removeEventListener("resize", keepInViewport);
+  }, [position]);
+
+  const handlePointerDown = (event) => {
+    if (event.button !== 0) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    dragged.current = false;
+    dragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event) => {
+    const state = dragState.current;
+    if (!state || state.pointerId !== event.pointerId) return;
+    if (
+      Math.hypot(event.clientX - state.startX, event.clientY - state.startY) > 4
+    ) {
+      dragged.current = true;
+    }
+    if (!dragged.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    setPosition({
+      left: Math.min(
+        Math.max(12, event.clientX - state.offsetX),
+        window.innerWidth - rect.width - 12,
+      ),
+      top: Math.min(
+        Math.max(12, event.clientY - state.offsetY),
+        window.innerHeight - rect.height - 12,
+      ),
+    });
+  };
+
+  const handlePointerUp = (event) => {
+    if (dragState.current?.pointerId === event.pointerId) {
+      dragState.current = null;
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      className={styles.medalFloatButton}
+      style={position ? { left: position.left, top: position.top } : undefined}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onClick={() => {
+        if (dragged.current) {
+          dragged.current = false;
+          return;
+        }
+        onOpen();
+      }}
+      aria-label="打开勋章管家题库入口"
+    >
+      <span className={styles.dragHandle} aria-hidden="true">
+        <HolderOutlined />
+      </span>
+      <span className={styles.medalIcon}>
+        <TrophyOutlined />
+      </span>
+      <span className={styles.medalCopy}>
+        <b>勋章管家</b>
+        <small>进入题库</small>
+      </span>
+    </button>
+  );
+}
+
 export default function CompanyList() {
   const companies = useMemo(() => {
     const rows = companyList.data?.list || [];
@@ -79,20 +188,48 @@ export default function CompanyList() {
         Number(b.shortForm === "长春一东") - Number(a.shortForm === "长春一东"),
     );
   }, []);
-  const [selectedId, setSelectedId] = useState(companies[0]?.id);
+  const sharedParams = useMemo(
+    () => new URLSearchParams(window.location.search),
+    [],
+  );
+  const isSharedView =
+    window.location.pathname.toLowerCase() === "/companyreportshare";
+  const sharedSections = useMemo(() => {
+    const sections =
+      sharedParams.get("sections")?.split(",").filter(Boolean) || [];
+    return sections.length
+      ? sections.filter((key) => allKeys.includes(key))
+      : allKeys;
+  }, [sharedParams]);
+  const [selectedId, setSelectedId] = useState(
+    sharedParams.get("companyId") || companies[0]?.id,
+  );
   const [keyword, setKeyword] = useState("");
   const [globalYear, setGlobalYear] = useState("2025");
   const [globalPeriod, setGlobalPeriod] = useState("年度");
-  const [documentYear, setDocumentYear] = useState("2025");
-  const [documentPeriod, setDocumentPeriod] = useState("年度");
+  const [documentYear, setDocumentYear] = useState(
+    sharedParams.get("year") || "2025",
+  );
+  const [documentPeriod, setDocumentPeriod] = useState(
+    sharedParams.get("period") || "年度",
+  );
   const [configOpen, setConfigOpen] = useState(false);
+  const [medalOpen, setMedalOpen] = useState(false);
+  const [pdfPreviewOpen, setPdfPreviewOpen] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState("");
   const [configs, setConfigs] = useState({});
+  const paperRef = useRef(null);
+  const previewRef = useRef(null);
+  const [messageApi, messageContextHolder] = message.useMessage();
   const selected =
-    companies.find((item) => item.id === selectedId) || companies[0];
+    companies.find((item) => String(item.id) === String(selectedId)) ||
+    companies[0];
   const isYidong = selected?.shortForm === "长春一东";
   const detail = isYidong ? companyDetail.data.companyHis : selected;
   const shares = isYidong ? companyDetail.data.companyShsHis : null;
-  const enabled = configs[selectedId] || allKeys;
+  const enabled = isSharedView
+    ? sharedSections
+    : configs[selectedId] || allKeys;
   const checked = (key) => enabled.includes(key);
   const visibleCompanies = companies.filter((item) =>
     `${item.companyName}${item.shortForm}`.includes(keyword.trim()),
@@ -114,6 +251,114 @@ export default function CompanyList() {
     detail?.shortForm || selected?.shortForm || selected?.companyName;
   const setCompanyConfig = (values) =>
     setConfigs((current) => ({ ...current, [selectedId]: values }));
+
+  const openPdfPreview = () => {
+    if (!paperRef.current) return;
+    setPreviewHtml(paperRef.current.innerHTML);
+    setPdfPreviewOpen(true);
+  };
+
+  const copyShareUrl = async () => {
+    const url = new URL("/companyReportShare", window.location.origin);
+    url.searchParams.set("companyId", selectedId);
+    url.searchParams.set("year", documentYear);
+    url.searchParams.set("period", documentPeriod);
+    url.searchParams.set("sections", enabled.join(","));
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url.toString());
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = url.toString();
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+      messageApi.success("分享链接已复制，可粘贴到新的浏览器打开");
+    } catch (error) {
+      console.error("Copy share URL failed", error);
+      messageApi.error("复制失败，请检查浏览器剪贴板权限");
+    }
+  };
+
+  const printPdf = () => {
+    if (!previewRef.current) return;
+    const printWindow = window.open("", "_blank", "width=1100,height=800");
+    if (!printWindow) {
+      messageApi.warning("浏览器阻止了打印窗口，请允许弹出窗口后重试");
+      return;
+    }
+
+    const documentTitle = `${displayName}-${reportLabel}一企一档报告`;
+    const escapedTitle = documentTitle.replace(
+      /[&<>"']/g,
+      (char) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[char],
+    );
+    const inheritedStyles = [
+      ...document.head.querySelectorAll('style, link[rel="stylesheet"]'),
+    ]
+      .map((node) => node.outerHTML)
+      .join("");
+    const printStyles = `
+      @page { size: A4 portrait; margin: 12mm; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; background: #fff !important; }
+      body { color: #172a3d; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .${styles.paper} {
+        width: auto !important; max-width: none !important; min-height: 0 !important;
+        margin: 0 !important; padding: 0 !important; border: 0 !important;
+        background: #fff !important; box-shadow: none !important;
+      }
+      .${styles.block} { content-visibility: visible !important; contain: none !important; }
+      .${styles.block} > h2, .${styles.sub} > h3 { break-after: avoid-page; page-break-after: avoid; }
+      .${styles.documentHeader}, .${styles.metaGrid}, .${styles.conclusion},
+      .${styles.financeTable}, .${styles.comparisonTable}, .${styles.topic},
+      .${styles.twoCol} > p, .${styles.strategyGrid} > p {
+        break-inside: avoid-page; page-break-inside: avoid;
+      }
+      .${styles.comparisonTable} { overflow: visible !important; }
+      .${styles.comparisonTable} table { min-width: 0 !important; table-layout: fixed; }
+      .${styles.financeTable} .ant-table-content { overflow: visible !important; }
+      .${styles.financeTable} table { width: 100% !important; table-layout: fixed !important; }
+      .${styles.metaGrid} { grid-template-columns: repeat(3, 1fr) !important; }
+      .${styles.strategyGrid} { grid-template-columns: repeat(3, 1fr) !important; }
+      a { color: inherit !important; text-decoration: none !important; }
+      @media print { .no-print { display: none !important; } }
+    `;
+
+    printWindow.document.open();
+    printWindow.document
+      .write(`<!doctype html><html><head><meta charset="UTF-8" />
+      <title>${escapedTitle}</title>${inheritedStyles}<style>${printStyles}</style>
+      </head><body>${previewRef.current.outerHTML}</body></html>`);
+    printWindow.document.close();
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.onafterprint = () => printWindow.close();
+    };
+  };
+
+  const enterMedalQuestionBank = () => {
+    setMedalOpen(false);
+    window.dispatchEvent(
+      new CustomEvent("gq:open-medal-question-bank", {
+        detail: { companyId: selectedId, companyName: displayName },
+      }),
+    );
+    messageApi.success("已选择进入勋章管家题库");
+  };
 
   const financeColumns = [
     { title: "年度", dataIndex: "year", fixed: "left" },
@@ -150,143 +395,166 @@ export default function CompanyList() {
         },
       }}
     >
-      <div className={styles.page}>
-        <aside className={styles.companyRail}>
-          <div className={styles.railHeader}>
-            <div>
-              <span>企业索引</span>
-              <strong>{companies.length}</strong>
+      <div
+        className={`${styles.page} ${isSharedView ? styles.sharedPage : ""}`}
+      >
+        {messageContextHolder}
+        {!isSharedView ? (
+          <aside className={styles.companyRail}>
+            <div className={styles.railHeader}>
+              <div>
+                <span>企业索引</span>
+                <strong>{companies.length}</strong>
+              </div>
+              <Input.Search
+                allowClear
+                placeholder="搜索公司"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+              />
+              <div className={styles.globalReportFilter}>
+                <span>全部公司报告</span>
+                <Select
+                  value={globalYear}
+                  onChange={setGlobalYear}
+                  options={["2025", "2024", "2023"].map((value) => ({
+                    value,
+                    label: `${value}年`,
+                  }))}
+                />
+                <Select
+                  value={globalPeriod}
+                  onChange={setGlobalPeriod}
+                  options={["年度", "半年度"].map((value) => ({
+                    value,
+                    label: value,
+                  }))}
+                />
+              </div>
             </div>
-            <Input.Search
-              allowClear
-              placeholder="搜索公司"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-            />
-            <div className={styles.globalReportFilter}>
-              <span>全部公司报告</span>
+            <div className={styles.companyList}>
+              {visibleCompanies.length ? (
+                visibleCompanies.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`${styles.companyItem} ${item.id === selectedId ? styles.active : ""}`}
+                    onClick={() => setSelectedId(item.id)}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <span className={styles.companyNo}>
+                      {String(companies.indexOf(item) + 1).padStart(2, "0")}
+                    </span>
+                    <span className={styles.companyName}>
+                      <b>{item.shortForm || item.companyName}</b>
+                      <small>
+                        {globalYear}
+                        {globalPeriod}
+                      </small>
+                    </span>
+                    {item.id === selectedId ? (
+                      <Button
+                        type="text"
+                        className={styles.configButton}
+                        icon={<SettingOutlined />}
+                        aria-label="配置显示模块"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfigOpen(true);
+                        }}
+                      />
+                    ) : null}
+                  </div>
+                ))
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="未找到公司"
+                />
+              )}
+            </div>
+          </aside>
+        ) : null}
+
+        <main
+          className={`${styles.workspace} ${isSharedView ? styles.sharedWorkspace : ""}`}
+        >
+          {!isSharedView ? (
+            <div className={styles.documentFilter}>
+              <div>
+                <span>当前公司报告</span>
+                <strong>{displayName}</strong>
+              </div>
               <Select
-                value={globalYear}
-                onChange={setGlobalYear}
+                value={documentYear}
+                onChange={setDocumentYear}
                 options={["2025", "2024", "2023"].map((value) => ({
                   value,
                   label: `${value}年`,
                 }))}
               />
               <Select
-                value={globalPeriod}
-                onChange={setGlobalPeriod}
+                value={documentPeriod}
+                onChange={setDocumentPeriod}
                 options={["年度", "半年度"].map((value) => ({
                   value,
                   label: value,
                 }))}
               />
+              <Button
+                className={styles.pdfButton}
+                icon={<EyeOutlined />}
+                onClick={openPdfPreview}
+              >
+                PDF 预览
+              </Button>
             </div>
-          </div>
-          <div className={styles.companyList}>
-            {visibleCompanies.length ? (
-              visibleCompanies.map((item) => (
-                <div
-                  key={item.id}
-                  className={`${styles.companyItem} ${item.id === selectedId ? styles.active : ""}`}
-                  onClick={() => setSelectedId(item.id)}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <span className={styles.companyNo}>
-                    {String(companies.indexOf(item) + 1).padStart(2, "0")}
-                  </span>
-                  <span className={styles.companyName}>
-                    <b>{item.shortForm || item.companyName}</b>
-                    <small>
-                      {globalYear}
-                      {globalPeriod}
-                    </small>
-                  </span>
-                  {item.id === selectedId ? (
-                    <Button
-                      type="text"
-                      className={styles.configButton}
-                      icon={<SettingOutlined />}
-                      aria-label="配置显示模块"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setConfigOpen(true);
-                      }}
-                    />
-                  ) : null}
+          ) : null}
+          <div
+            className={`${styles.paper} ${isSharedView ? styles.sharedPaper : ""}`}
+            ref={paperRef}
+          >
+            {!isSharedView ? (
+              <header className={styles.documentHeader}>
+                <div className={styles.kicker}>
+                  <FileTextOutlined /> 一企一档 · 一口清
                 </div>
-              ))
-            ) : (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="未找到公司"
-              />
-            )}
-          </div>
-        </aside>
-
-        <main className={styles.workspace}>
-          <div className={styles.documentFilter}>
-            <div>
-              <span>当前公司报告</span>
-              <strong>{displayName}</strong>
-            </div>
-            <Select
-              value={documentYear}
-              onChange={setDocumentYear}
-              options={["2025", "2024", "2023"].map((value) => ({
-                value,
-                label: `${value}年`,
-              }))}
-            />
-            <Select
-              value={documentPeriod}
-              onChange={setDocumentPeriod}
-              options={["年度", "半年度"].map((value) => ({
-                value,
-                label: value,
-              }))}
-            />
-          </div>
-          <div className={styles.paper}>
-            <header className={styles.documentHeader}>
-              <div className={styles.kicker}>
-                <FileTextOutlined /> 一企一档 · 一口清
-              </div>
-              <h1>{displayName}</h1>
-              <div className={styles.reportPeriod}>
-                {reportLabel}一企一档报告
-              </div>
-              <div className={styles.metaGrid}>
-                <div>
-                  <span>公司简称</span>
-                  <b>{displayName}</b>
+                <h1>{displayName}</h1>
+                <div className={styles.reportPeriod}>
+                  {reportLabel}一企一档报告
                 </div>
-                <div>
-                  <span>管户</span>
-                  <b>
-                    {detail?.dutyUserName || selected?.dutyUserName || "丛圣元"}
-                  </b>
+                <div className={styles.metaGrid}>
+                  <div>
+                    <span>公司简称</span>
+                    <b>{displayName}</b>
+                  </div>
+                  <div>
+                    <span>管户</span>
+                    <b>
+                      {detail?.dutyUserName ||
+                        selected?.dutyUserName ||
+                        "丛圣元"}
+                    </b>
+                  </div>
+                  <div>
+                    <span>管理部门</span>
+                    <b>股权运营部</b>
+                  </div>
+                  <div>
+                    <span>持股比例</span>
+                    <b>{detail?.shRatio ?? selected?.shRatio ?? "—"}%</b>
+                  </div>
+                  <div>
+                    <span>管理分类</span>
+                    <b>成长期股权投资</b>
+                  </div>
+                  <div>
+                    <span>股权分类</span>
+                    <b>保留</b>
+                  </div>
                 </div>
-                <div>
-                  <span>管理部门</span>
-                  <b>股权运营部</b>
-                </div>
-                <div>
-                  <span>持股比例</span>
-                  <b>{detail?.shRatio ?? selected?.shRatio ?? "—"}%</b>
-                </div>
-                <div>
-                  <span>管理分类</span>
-                  <b>成长期股权投资</b>
-                </div>
-                <div>
-                  <span>股权分类</span>
-                  <b>保留</b>
-                </div>
-              </div>
-            </header>
+              </header>
+            ) : null}
 
             <Block id="base" title="一、基础底数“清”" checked={checked}>
               <Sub id="base-0" title="1. 企业画像" checked={checked}>
@@ -502,7 +770,7 @@ export default function CompanyList() {
               </Sub>
               <Sub id="governance-2" title="3. 委派董事履职" checked={checked}>
                 <p>
-                  <S source="委派董事月报复核">
+                  <S source="委派董事月报复核，需要在委派董事月报复核中添加议题统计">
                     {displayName}
                     共2名委派董事，为副董事长李秀柱、董事马振来。截至2026年6月，委派董事完成4次董事会31项议题的审议
                   </S>
@@ -519,13 +787,22 @@ export default function CompanyList() {
             >
               <Sub id="synergy-0" title="产业协同情况" checked={checked}>
                 <p>
-                  <b>战略定位：</b>集团公司商用车传动系统零部件的重要供应方。
+                  <b>战略定位：</b>
+                  <S source={source.later}>
+                    集团公司商用车传动系统零部件的重要供应方。
+                  </S>
                   <br />
                   <b>集团内客户及产品：</b>
-                  客户为一汽解放，供应商用车离合器总成及液压举升器。
+                  <S source="参股公司基础信息-产品信息">
+                    {" "}
+                    客户为一汽解放，供应商用车离合器总成及液压举升器。
+                  </S>
+
                   <br />
                   <b>协同项目：</b>
-                  重卡离合器占一汽解放本部65%、解放青岛38%供应份额；AMT车型10档、12档离合器项目按计划推进。
+                  <S source="需要在投后报告-重点推进情况-添加协同项目">
+                    重卡离合器占一汽解放本部65%、解放青岛38%供应份额；AMT车型10档、12档离合器项目按计划推进。
+                  </S>
                 </p>
               </Sub>
             </Block>
@@ -533,7 +810,7 @@ export default function CompanyList() {
               id="risk"
               title="五、风险隐患“清”"
               checked={checked}
-              titleSource={source.later}
+              titleSource={source.risk}
             >
               <Sub id="risk-0" title="风险与整改" checked={checked}>
                 <div className={styles.twoCol}>
@@ -575,6 +852,42 @@ export default function CompanyList() {
           </div>
         </main>
 
+        {!isSharedView ? (
+          <MedalQuestionBankButton onOpen={() => setMedalOpen(true)} />
+        ) : null}
+
+        {!isSharedView ? (
+          <Drawer
+            title={`${displayName} · ${reportLabel}一企一档报告预览`}
+            width="100%"
+            open={pdfPreviewOpen}
+            onClose={() => setPdfPreviewOpen(false)}
+            className={styles.pdfPreviewDrawer}
+            extra={
+              <div className={styles.previewActions}>
+                <Button icon={<ShareAltOutlined />} onClick={copyShareUrl}>
+                  复制分享链接
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<PrinterOutlined />}
+                  onClick={printPdf}
+                >
+                  打印 / 另存为 PDF
+                </Button>
+              </div>
+            }
+          >
+            <div className={styles.previewStage}>
+              <div
+                ref={previewRef}
+                className={`${styles.paper} ${styles.previewPaper}`}
+                dangerouslySetInnerHTML={{ __html: previewHtml }}
+              />
+            </div>
+          </Drawer>
+        ) : null}
+
         <Modal
           title={`${displayName} · 显示配置`}
           open={configOpen}
@@ -611,6 +924,32 @@ export default function CompanyList() {
               </div>
             ))}
           </Checkbox.Group>
+        </Modal>
+
+        <Modal
+          title="进入勋章管家题库"
+          open={medalOpen}
+          onCancel={() => setMedalOpen(false)}
+          footer={[
+            <Button key="stay" onClick={() => setMedalOpen(false)}>
+              暂不进入
+            </Button>,
+            <Button key="enter" type="primary" onClick={enterMedalQuestionBank}>
+              确认进入
+            </Button>,
+          ]}
+          width={430}
+          centered
+        >
+          <div className={styles.medalConfirm}>
+            <span>
+              <TrophyOutlined />
+            </span>
+            <div>
+              <b>是否进入勋章管家的题库？</b>
+              <p>进入后可查看与当前企业相关的题目和学习任务。</p>
+            </div>
+          </div>
         </Modal>
       </div>
     </ConfigProvider>

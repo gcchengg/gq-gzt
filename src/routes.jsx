@@ -53,6 +53,14 @@ export const routes = [
     ),
   },
   {
+    path: "companyReportShare",
+    element: (
+      <Suspense>
+        <CompanyList />
+      </Suspense>
+    ),
+  },
+  {
     index: true,
     element: (
       <Suspense>

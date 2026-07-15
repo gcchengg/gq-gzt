@@ -19,6 +19,15 @@
 .configButton { color: #647b90 !important; }
 .workspace { flex: 1; min-width: 0; overflow: auto; padding: 28px clamp(22px, 4vw, 64px) 56px; background: radial-gradient(circle at 50% 0, #f7f8f8 0, #e9edf0 55%); }
 .documentFilter { position: sticky; z-index: 5; top: 0; display: flex; align-items: center; gap: 10px; max-width: 1040px; margin: 0 auto 12px; padding: 10px 14px; border: 1px solid #d8e0e6; border-radius: 8px; background: rgba(255,255,255,.96); box-shadow: 0 5px 18px rgba(36,48,58,.08); font-family: "Microsoft YaHei", sans-serif; > div { min-width: 0; flex: 1; span, strong { display: block; } span { color: #7d8b97; font-size: 11px; } strong { overflow: hidden; color: #29445c; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; } } :global(.ant-select) { width: 112px; } }
+.pdfButton { height: 32px; border-color: #234f7d; color: #234f7d; font-weight: 600; white-space: nowrap; &:hover { border-color: #a9442d !important; color: #a9442d !important; } }
+.pdfPreviewDrawer :global(.ant-drawer-header) { padding: 14px 22px; border-bottom-color: #dce3e8; }
+.pdfPreviewDrawer :global(.ant-drawer-body) { padding: 0; background: #e9edf0; }
+.previewActions { display: flex; gap: 10px; }
+.previewStage { min-height: 100%; overflow: auto; padding: 28px 24px 60px; background: radial-gradient(circle at 50% 0, #f8f9f9 0, #e9edf0 58%); }
+.previewPaper { width: 210mm; max-width: 100%; min-height: 297mm; padding: 16mm 17mm 14mm; content-visibility: visible; contain: none; .block { content-visibility: visible; contain: none; } .comparisonTable { overflow: visible; } .comparisonTable table { min-width: 0; table-layout: fixed; } .financeTable :global(.ant-table-content) { overflow: visible !important; } .financeTable :global(.ant-table-content table) { width: 100% !important; min-width: 0 !important; table-layout: fixed !important; } }
+.sharedPage { min-height: 100vh; height: auto; background: #eef1f3; }
+.sharedWorkspace { min-height: 100vh; overflow: visible; padding: 30px 24px 60px; background: radial-gradient(circle at 50% 0, #fafafa 0, #eef1f3 62%); }
+.sharedPaper { width: 210mm; max-width: 100%; min-height: 297mm; padding: 14mm 17mm; content-visibility: visible; contain: none; .block { content-visibility: visible; contain: none; &:first-child { margin-top: 0; } } .comparisonTable { overflow: visible; } .comparisonTable table { min-width: 0; table-layout: fixed; } .financeTable :global(.ant-table-content) { overflow: visible !important; } .financeTable :global(.ant-table-content table) { width: 100% !important; min-width: 0 !important; table-layout: fixed !important; } }
 .paper { max-width: 1040px; min-height: 100%; margin: 0 auto; padding: 58px clamp(34px, 6vw, 86px) 40px; border: 1px solid #d8dcdf; background: #fffefb; box-shadow: 0 18px 55px rgba(36,48,58,.13), 0 2px 5px rgba(36,48,58,.06); font-family: "Noto Serif SC", "STSong", "SimSun", serif; }
 .documentHeader { padding-bottom: 32px; border-bottom: 3px double #8fa0ae; text-align: center; }
 .kicker { color: @red; font-family: "Microsoft YaHei", sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; }
@@ -61,6 +70,11 @@
 .configGroup { display: block; max-height: 55vh; overflow: auto; }
 .configSection { margin-bottom: 10px; padding: 13px 14px; border: 1px solid #e1e6ea; border-radius: 7px; background: #fafbfc; }
 .configSection > div { display: flex; flex-wrap: wrap; gap: 8px 15px; margin: 10px 0 0 24px; }
+.medalFloatButton { position: fixed; z-index: 30; right: 28px; bottom: 26px; display: grid; grid-template-columns: 18px 38px 1fr; align-items: center; min-width: 166px; height: 58px; padding: 0 16px 0 8px; border: 1px solid rgba(255,255,255,.3); border-radius: 18px; background: linear-gradient(135deg, #153b63 0%, #234f7d 58%, #a9442d 145%); box-shadow: 0 13px 30px rgba(22,48,73,.28), inset 0 1px rgba(255,255,255,.18); color: #fff; cursor: grab; touch-action: none; user-select: none; transition: box-shadow .2s ease, transform .2s ease; &:hover { box-shadow: 0 17px 36px rgba(22,48,73,.36), inset 0 1px rgba(255,255,255,.22); transform: translateY(-2px); } &:active { cursor: grabbing; transform: scale(.98); } }
+.dragHandle { color: rgba(255,255,255,.45); font-size: 14px; }
+.medalIcon { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(255,255,255,.22); border-radius: 11px; background: rgba(255,255,255,.12); color: #f6d998; font-size: 18px; }
+.medalCopy { display: flex; flex-direction: column; align-items: flex-start; margin-left: 8px; line-height: 1.2; b { font-size: 14px; letter-spacing: 1px; } small { margin-top: 3px; color: rgba(255,255,255,.7); font-size: 10px; } }
+.medalConfirm { display: flex; gap: 16px; padding: 12px 2px 6px; > span { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border-radius: 14px; background: #edf3f8; color: #a9442d; font-size: 23px; } b { display: block; margin: 2px 0 6px; color: #21384d; font-size: 16px; } p { margin: 0; color: #74828f; line-height: 1.7; } }
 
 @media (max-width: 1050px) {
   .companyRail { width: 220px; min-width: 220px; }
@@ -71,7 +85,11 @@
   .page { display: block; overflow: auto; }
   .companyRail { width: 100%; height: 190px; min-width: 0; }
   .workspace { overflow: visible; padding: 12px; }
-  .documentFilter { flex-wrap: wrap; > div { flex-basis: 100%; } :global(.ant-select) { width: calc(50% - 5px); } }
+  .documentFilter { flex-wrap: wrap; > div { flex-basis: 100%; } :global(.ant-select) { width: calc(50% - 5px); } .pdfButton { width: 100%; } }
   .paper { padding: 32px 20px; }
   .metaGrid, .twoCol { grid-template-columns: 1fr; }
+  .medalFloatButton { right: 14px; bottom: 14px; min-width: 150px; }
+  .previewActions { gap: 6px; :global(.ant-btn) { padding-inline: 9px; } }
+  .sharedWorkspace { padding: 0; }
+  .sharedPaper { width: 100%; max-width: none; min-height: 100vh; padding: 28px 20px; border: 0; box-shadow: none; }
 }
