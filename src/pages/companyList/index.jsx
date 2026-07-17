@@ -24,10 +24,15 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import companyList from "@/pages/companyReview/list.json";
 import companyDetail from "@/pages/companyReview/长春一东.json";
+import { generatedAnalysis } from "@/pages/executiveMaintenance/data";
 import SourceMark from "./components/SourceMark";
 import {
+  auditProblemRows,
   comparisonRows,
   financeRows,
+  financialAnalysisSections,
+  financialWarningItems,
+  riskTrackingRows,
   sectionOptions,
   topicDemos,
 } from "./data";
@@ -40,12 +45,43 @@ const allKeys = sectionOptions.flatMap((section) => [
   section.key,
   ...section.children.map((_, i) => `${section.key}-${i}`),
 ]);
+const directorKeyTopics = [
+  "关于聘任赵德良为公司总经理的议案",
+  "2026年度全面预算报告",
+  "关于公司未来三年股东回报规划（2026年-2028年）的议案",
+  "关于2025年度利润分配方案的议案",
+  "关于2026年度投资计划的议案",
+];
+const synergyInitializationItems = [
+  {
+    title: "集团内客户及产品",
+    content: "客户为一汽解放，供应商用车离合器总成及液压举升器。",
+    source: "参股公司基础信息-产品信息",
+  },
+  {
+    title: "战略定位",
+    content: "取“一企一策”战略定位情况，工作台未上线前进行初始化导入",
+  },
+  {
+    title: "战略执行",
+    content: "取“一企一策”战略执行情况，工作台未上线前进行初始化导入",
+  },
+  {
+    title: "战略成果",
+    content: "取“一企一策”战略成果情况，工作台未上线前进行初始化导入",
+  },
+  {
+    title: "产业协同",
+    content: "取“一企一策”确定的产业协同任务，工作台未上线前进行初始化导入",
+  },
+];
 const source = {
   basic: "参股公司信息管理-基础信息",
   product: "参股公司信息管理-产品信息",
   later: "需要后续补充",
   shareholder: "参股公司信息管理-股东信息",
   director: "参股公司信息管理-董监事信息",
+  compliance: "参股公司信息管理-合规管理",
   finance: "投后工作报告-财务指标",
   financeCalc: "根据投后工作报告-财务指标表格计算得知",
   operation: "投后工作报告-经营情况",
@@ -249,6 +285,11 @@ export default function CompanyList() {
       .join("、") || "商用车离合器总成、液压举升器";
   const displayName =
     detail?.shortForm || selected?.shortForm || selected?.companyName;
+  const specialResolutionRequirement =
+    (isYidong
+      ? companyDetail.data.companySoInfoHis?.superReqDtlFlag
+      : selected?.companySoInfoHis?.superReqDtlFlag) ||
+    "公司章程规定，修改公司章程、增加或者减少注册资本、公司合并、分立、解散、清算或者变更公司形式等特殊决议事项，须经出席股东会会议的股东所持表决权三分之二以上通过；涉及重大资产处置、对外担保及其他对股东权益有重大影响的事项，按照公司章程及议事规则履行特别审议程序。";
   const setCompanyConfig = (values) =>
     setConfigs((current) => ({ ...current, [selectedId]: values }));
 
@@ -324,7 +365,8 @@ export default function CompanyList() {
       .${styles.block} > h2, .${styles.sub} > h3 { break-after: avoid-page; page-break-after: avoid; }
       .${styles.documentHeader}, .${styles.metaGrid}, .${styles.conclusion},
       .${styles.financeTable}, .${styles.comparisonTable}, .${styles.topic},
-      .${styles.twoCol} > p, .${styles.strategyGrid} > p {
+      .${styles.twoCol} > p, .${styles.strategyGrid} > p,
+      .${styles.auditIssueCard}, .${styles.riskTrackingCard} {
         break-inside: avoid-page; page-break-inside: avoid;
       }
       .${styles.comparisonTable} { overflow: visible !important; }
@@ -332,7 +374,8 @@ export default function CompanyList() {
       .${styles.financeTable} .ant-table-content { overflow: visible !important; }
       .${styles.financeTable} table { width: 100% !important; table-layout: fixed !important; }
       .${styles.metaGrid} { grid-template-columns: repeat(3, 1fr) !important; }
-      .${styles.strategyGrid} { grid-template-columns: repeat(3, 1fr) !important; }
+      .${styles.strategyGrid} { grid-template-columns: 1fr !important; }
+      .${styles.strategyGrid} > p { grid-template-columns: 118px minmax(0, 1fr) !important; }
       a { color: inherit !important; text-decoration: none !important; }
       @media print { .no-print { display: none !important; } }
     `;
@@ -462,7 +505,9 @@ export default function CompanyList() {
                           e.stopPropagation();
                           setConfigOpen(true);
                         }}
-                      />
+                      >
+                        配置
+                      </Button>
                     ) : null}
                   </div>
                 ))
@@ -630,11 +675,11 @@ export default function CompanyList() {
                 <div className={styles.analysis}>
                   <h4>看行业</h4>
                   <p>
-                    国内商用车离合器行业规模约135亿元，年增6%-8%；国六升级、老旧货车淘汰支撑传统配套，混动商用车电控离合器增量显著，但纯电重卡长期挤压传统产品。行业加速国产替代，技术向轻量化、电控化迭代。
+                    2025年国内商用车销量429.6万辆，同比增长10.9%，其中重卡销量114.5万辆，同比增长27%，行业复苏为离合器、驾驶室液压翻转机构等传统配套产品提供了需求支撑。与此同时，新能源商用车销量达到87.1万辆，同比增长63.7%，市场渗透率升至26.9%；新能源重卡销量23.11万辆，同比增长182%。行业需求正由单一燃油车型向燃油、燃气、混动和纯电多路线并行切换。对长春一东而言，重卡复苏有利于稳住现有基本盘，但纯电车型减少传统离合器用量，主机厂持续压价、原材料价格波动也会挤压利润空间，AMT执行机构、扭转减振器及新能源相关部件将成为中长期转型重点。
                   </p>
                   <h4>看市场</h4>
                   <p>
-                    市场分整车配套与售后两大板块。长春一东依托一汽系主机配套，国内重卡定点资源稳固，外贸出口稳步扩容，但售后业务体量偏小。
+                    长春一东形成了“主机配套为主、售后零售与外贸出口协同”的市场结构，产品已覆盖国内主流商用车主机厂并进入重卡前五企业配套体系。2025年离合器配套业务收入同比增长26.45%，液压翻转机构业务收入同比增长8.35%；外贸出口实现收入1.07亿元，约占营业收入14%，产品覆盖中亚、欧美及东南亚，液压翻转机构已进入国际一流商用车集团供应链。售后市场通过渠道拓展、双品牌运营和大客户专属模式推动大马力、天然气车型订单增长，但与铁流股份覆盖近万家维修终端、拥有全车件智慧供应链平台相比，长春一东的后市场品类广度、渠道下沉和一站式服务能力仍有提升空间。
                   </p>
                   <h4>看竞争</h4>
                   <div className={styles.comparisonTable}>
@@ -666,18 +711,18 @@ export default function CompanyList() {
                     </table>
                   </div>
                   <p>
-                    铁流营收为长春一东3倍，盈利规模大幅领先；长春一东净利率仅1.49%，规模效应不足，产品线相对单一。
+                    从经营规模看，长春一东7.66亿元营收在六家公司中最低，约为铁流股份的32%、亚太股份的14%；归母净利润1,143万元，净利率约1.49%，也明显低于对标企业。铁流股份与长春一东同处离合器赛道，但已形成传动系统、高精密零部件和商用车后市场服务三大板块，并布局近两千种离合器型号、AMT、自调整离合器、双质量飞轮及混动系统产品。亚太股份、万安科技依靠制动与底盘电子系统扩大智能化产品矩阵；长源东谷通过发动机零部件向新能源混动客户延伸；南方精工则以精密轴承、单向离合器切入新能源和机器人领域。相比之下，长春一东细分市场份额领先，但收入体量、产品多元化和利润转化能力偏弱。
                   </p>
                   <h4>看自己</h4>
                   <p>
                     <b>优势：</b>
-                    背靠两大央企集团，重卡配套壁垒高，离合器25%市占率、液压翻转机构35%市占率行业第一。
+                    公司离合器市场占有率25%、重卡液压翻转机构市场占有率35%，均处行业领先地位；拥有国家级企业技术中心、博士后科研工作站和CNAS实验室，长春、苏州双研发中心能够支撑主机厂同步开发。2025年取得大马力离合器、AMT、扭转减振器等重点项目32项，申请专利54项，关键工序自动化覆盖率达到85%，客户资源和制造质量构成较高进入壁垒。
                     <b>短板：</b>
-                    业务聚焦离合器及液压机构，售后与海外渠道布局滞后。
+                    业务仍集中于离合器和液压翻转机构，规模效应不足，2025年毛利率16.22%、净利率约1.49%，盈利韧性弱于多数对标企业；研发费用1,927万元，同比下降19.34%，新业务虽已获得小批量订单，但尚未形成足以对冲传统离合器需求收缩的收入支柱。海外市场和售后渠道已有突破，覆盖深度及产品丰富度仍需继续提升。
                   </p>
                   <div className={styles.conclusion}>
                     <b>整体结论</b>
-                    客户壁垒突出、重卡配套地位稳固，但规模、多元布局、盈利能力弱于对标企业。需加大售后市场开拓，丰富AMT、电控离合器产品线。
+                    长春一东属于“细分冠军、规模偏小、转型加速”的企业：短期受益于重卡复苏和配套份额提升，中长期则需把客户与技术优势转化为AMT、混动减振及新能源部件的批量收入，同时复制铁流股份的后市场渠道能力，扩大海外本地化服务，通过产品结构升级、精益降本和规模增长改善盈利水平。
                   </div>
                 </div>
               </Sub>
@@ -723,9 +768,73 @@ export default function CompanyList() {
                   <S source={source.operation}>历史累计分红458万元</S>。
                 </p>
               </Sub>
+              <Sub id="finance-3" title="4. 财务分析" checked={checked}>
+                <SourceMark source="参股公司投后报告-财务指标-财务综合评价报告-AI分析">
+                  <span className={styles.tableNote}>数据来源</span>
+                </SourceMark>
+                <div className={styles.financialAnalysis}>
+                  <section className={styles.analysisPanel}>
+                    <div className={styles.analysisPanelTitle}>
+                      <b>参股公司财务分析</b>
+                      <span>综合评价：稳中向好</span>
+                    </div>
+                    <p className={styles.analysisSummary}>
+                      {displayName}
+                      2025年经营表现较上年改善，收入恢复增长并实现扭亏，经营现金流同步增强；但净利率仍处低位，费用控制、营运资金周转以及新业务规模化贡献仍是后续财务管理重点。
+                    </p>
+                    <div className={styles.analysisGrid}>
+                      {financialAnalysisSections.map((item) => (
+                        <article
+                          className={styles.analysisCard}
+                          key={item.title}
+                        >
+                          <div>
+                            <b>{item.title}</b>
+                            <span className={styles[item.tone]}>
+                              {item.status}
+                            </span>
+                          </div>
+                          <strong>{item.summary}</strong>
+                          {item.details.map((detail) => (
+                            <p key={detail}>{detail}</p>
+                          ))}
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                  <section className={styles.warningPanel}>
+                    <div className={styles.analysisPanelTitle}>
+                      <b>预警总结</b>
+                      <span>共识别3项关注事项</span>
+                    </div>
+                    <div className={styles.warningList}>
+                      {financialWarningItems.map((item) => (
+                        <article key={item.title}>
+                          <span>{item.level}</span>
+                          <div>
+                            <b>{item.title}</b>
+                            <p>{item.content}</p>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+              </Sub>
             </Block>
 
             <Block id="governance" title="三、治理行权“清”" checked={checked}>
+              <div className={styles.specialResolution}>
+                <span>合规管理</span>
+                <div>
+                  <b>特殊决议事项和通过要求具体内容</b>
+                  <p>
+                    <S source={source.compliance}>
+                      {specialResolutionRequirement}
+                    </S>
+                  </p>
+                </div>
+              </div>
               <Sub id="governance-0" title="1. 三会议题管理" checked={checked}>
                 <p>
                   <S source={source.topic}>
@@ -763,19 +872,26 @@ export default function CompanyList() {
               <Sub id="governance-1" title="2. 委派高管履职" checked={checked}>
                 <p>
                   <S source="外派高管月报复核">
-                    截至2026年6月，共有1名委派高管，为副总经理（财务负责人）高英。高英围绕提质增效、运营管理、风险控制开展履职工作，并在股东减持、产业协同等方面发挥桥梁作用
+                    {isYidong
+                      ? generatedAnalysis
+                      : `${displayName}委派高管履职分析尚未维护。`}
                   </S>
-                  。
                 </p>
               </Sub>
               <Sub id="governance-2" title="3. 委派董事履职" checked={checked}>
                 <p>
-                  <S source="委派董事月报复核，需要在委派董事月报复核中添加议题统计">
+                  <S source="三会工作台-需总办会审核议题">
                     {displayName}
                     共2名委派董事，为副董事长李秀柱、董事马振来。截至2026年6月，委派董事完成4次董事会31项议题的审议
                   </S>
                   。
                 </p>
+                <p className={styles.keyTopicLead}>其中关键议题为：</p>
+                <ol className={styles.keyTopicList}>
+                  {directorKeyTopics.map((topic) => (
+                    <li key={topic}>{topic}</li>
+                  ))}
+                </ol>
               </Sub>
             </Block>
 
@@ -786,24 +902,20 @@ export default function CompanyList() {
               titleSource={source.later}
             >
               <Sub id="synergy-0" title="产业协同情况" checked={checked}>
-                <p>
-                  <b>战略定位：</b>
-                  <S source={source.later}>
-                    集团公司商用车传动系统零部件的重要供应方。
-                  </S>
-                  <br />
-                  <b>集团内客户及产品：</b>
-                  <S source="参股公司基础信息-产品信息">
-                    {" "}
-                    客户为一汽解放，供应商用车离合器总成及液压举升器。
-                  </S>
-
-                  <br />
-                  <b>协同项目：</b>
-                  <S source="需要在投后报告-重点推进情况-添加协同项目">
-                    重卡离合器占一汽解放本部65%、解放青岛38%供应份额；AMT车型10档、12档离合器项目按计划推进。
-                  </S>
-                </p>
+                <div className={styles.synergyInitializationList}>
+                  {synergyInitializationItems.map((item) => (
+                    <p key={item.title}>
+                      <b>{item.title}：</b>
+                      {item.source ? (
+                        <S source={item.source}>{item.content}</S>
+                      ) : (
+                        <span className={styles.synergyInitializationContent}>
+                          {item.content}
+                        </span>
+                      )}
+                    </p>
+                  ))}
+                </div>
               </Sub>
             </Block>
             <Block
@@ -812,16 +924,141 @@ export default function CompanyList() {
               checked={checked}
               titleSource={source.risk}
             >
-              <Sub id="risk-0" title="风险与整改" checked={checked}>
-                <div className={styles.twoCol}>
-                  <p>
-                    <b>审计及整改情况</b>
-                    {displayName}暂无审计及专项整改事项
-                  </p>
-                  <p>
-                    <b>风险情况</b>
-                    {displayName}暂无风险上报
-                  </p>
+              <Sub
+                id="risk-0"
+                title="1. 审计发现问题及整改明细"
+                checked={checked}
+              >
+                <div className={styles.recordSectionMeta}>
+                  <S source="审计管理-审计发现问题及整改明细">审计整改数据</S>
+                  <span>共 {auditProblemRows.length} 条</span>
+                </div>
+                <div className={styles.auditIssueList}>
+                  {auditProblemRows.map((record, index) => (
+                    <article className={styles.auditIssueCard} key={record.key}>
+                      <header>
+                        <div className={styles.recordIdentity}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <div>
+                            <b>{record.projectName}</b>
+                            <small>{record.opinionCode}</small>
+                          </div>
+                        </div>
+                        <Tag
+                          color={
+                            record.status === "已完成"
+                              ? "success"
+                              : record.status === "整改进行中"
+                                ? "processing"
+                                : "warning"
+                          }
+                        >
+                          {record.status}
+                        </Tag>
+                      </header>
+                      <div className={styles.auditIssueFacts}>
+                        <div>
+                          <span>问题编号</span>
+                          <strong>{record.draftIndex}</strong>
+                        </div>
+                        <div>
+                          <span>责任单位</span>
+                          <strong>{record.problemFinderName}</strong>
+                        </div>
+                        <div>
+                          <span>距整改到期</span>
+                          <strong>
+                            {record.distance === "—"
+                              ? "已完成"
+                              : `${record.distance}天`}
+                          </strong>
+                        </div>
+                      </div>
+                      <div className={styles.auditIssueSummary}>
+                        <span>问题摘要</span>
+                        <p>{record.problemSummary}</p>
+                      </div>
+                      <dl className={styles.auditDateLine}>
+                        <div>
+                          <dt>预计完成</dt>
+                          <dd>{record.estimateEndDate}</dd>
+                        </div>
+                        <div>
+                          <dt>实际开始</dt>
+                          <dd>{record.actualityStartDate}</dd>
+                        </div>
+                        <div>
+                          <dt>实际完成</dt>
+                          <dd>{record.actualityEndDate}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))}
+                </div>
+              </Sub>
+              <Sub id="risk-1" title="2. 风险情况" checked={checked}>
+                <div className={styles.recordSectionMeta}>
+                  <S source="风险管理-风险跟踪">风险跟踪数据</S>
+                  <span>共 {riskTrackingRows.length} 条</span>
+                </div>
+                <div className={styles.riskTrackingList}>
+                  {riskTrackingRows.map((record, index) => (
+                    <article
+                      className={styles.riskTrackingCard}
+                      key={record.key}
+                    >
+                      <header>
+                        <div className={styles.recordIdentity}>
+                          <span>{String(index + 1).padStart(2, "0")}</span>
+                          <div>
+                            <b>{record.riskName}</b>
+                            <small>{record.companyName}</small>
+                          </div>
+                        </div>
+                        <div className={styles.riskTags}>
+                          <Tag
+                            color={
+                              record.riskLevelName === "中风险"
+                                ? "warning"
+                                : "success"
+                            }
+                          >
+                            {record.riskLevelName}
+                          </Tag>
+                          <Tag color="processing">{record.progStatus}</Tag>
+                        </div>
+                      </header>
+                      <div className={styles.riskCategoryPath}>
+                        <span>{record.riskCategoryLv1Name}</span>
+                        <i>›</i>
+                        <span>{record.riskCategoryLv2Name}</span>
+                        <i>›</i>
+                        <span>{record.riskTypeName}</span>
+                      </div>
+                      <dl className={styles.riskFacts}>
+                        <div>
+                          <dt>风险属性</dt>
+                          <dd>{record.eventOrInfo}</dd>
+                        </div>
+                        <div>
+                          <dt>发生时间</dt>
+                          <dd>{record.riskOccTime}</dd>
+                        </div>
+                        <div>
+                          <dt>识别方式</dt>
+                          <dd>{record.riskMethod}</dd>
+                        </div>
+                        <div>
+                          <dt>点检频率</dt>
+                          <dd>{record.inspFreq}</dd>
+                        </div>
+                        <div>
+                          <dt>责任人</dt>
+                          <dd>{record.fullName}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  ))}
                 </div>
               </Sub>
             </Block>
@@ -831,22 +1068,39 @@ export default function CompanyList() {
               checked={checked}
               titleSource="初始化导入，待一企一策上线后，同步抓取数据"
             >
-              <Sub id="strategy-0" title="管理策略" checked={checked}>
-                <div className={styles.strategyGrid}>
-                  <p>
-                    <b>产业协同</b>
-                    延续双方良好的市场化合作机制，在AMT、限扭减振器等新能源商用车领域继续合作。
-                  </p>
-                  <p>
-                    <b>经营管理</b>
-                    紧盯总部利润，通过压降管理费用、汇率套期、专项清收等方式提升归母净利润。
-                  </p>
-                  <p>
-                    <b>股权经营</b>
-                    谋划股权经营方案，优化股权运营和记账方式，为股权增利储备机会。
-                  </p>
-                </div>
-              </Sub>
+              {checked("strategy-0") ||
+              checked("strategy-1") ||
+              checked("strategy-2") ? (
+                <article className={styles.sub}>
+                  <h3>管理策略</h3>
+                  <div className={styles.strategyGrid}>
+                    {checked("strategy-0") ? (
+                      <p>
+                        <b>产业协同</b>
+                        <span className={styles.strategyBody}>
+                          推动长春一东保持与解放公司长期稳定、互利共赢的市场化合作机制，保持传统零部件份额稳定的同时，聚焦商用车电动化转型赛道，开展AMT系统、限扭减震器等零部件合作。推动双方立足新能源商用车市场发展需求，持续开展技术联合攻关、产品迭代升级与国产化配套落地，依托属地产业协同优势，打通研发、试验、量产全流程合作链路，持续拓展合作广度与深度，助力一汽新能源商用车产品提质降本、迭代升级，巩固双方在商用车核心零部件领域的竞争优势与市场话语权。
+                        </span>
+                      </p>
+                    ) : null}
+                    {checked("strategy-1") ? (
+                      <p>
+                        <b>经营管理</b>
+                        <span className={styles.strategyBody}>
+                          紧盯长春一东总部利润情况，从成本端强化刚性约束，督促管理层实施全周期费用精益管控，划定管理费用压降目标，压缩非必要行政、后勤、差旅等低效开支，优化组织架构与人员统筹，杜绝无效资源消耗，持续拓宽利润空间。针对海外业务汇率波动侵蚀收益的风险，推动企业常态化开展汇率套期保值操作，提前锁定结算汇率，对冲汇兑损失，保障账面利润稳定可控。同时加大存量债权资产治理力度，部署应收账款专项清收行动，督导经营层建立客户分级催收机制，厘清逾期账款台账，通过对账、限期回款、法务介入等手段加速资金回流，降低资产减值计提。依托费用节流、风险对冲、资产盘活三维管理手段同步发力，有效对冲各类经营减利因素，稳步增厚归母净利润，持续提升公司净资产收益水平，切实维护全体股东投资收益。
+                        </span>
+                      </p>
+                    ) : null}
+                    {checked("strategy-2") ? (
+                      <p>
+                        <b>股权经营</b>
+                        <span className={styles.strategyBody}>
+                          深入分析长春一东近五年营收、利润贡献及与集团公司协作情况，初步确定该参股公司近年来总体营收下滑、经营质量下降、利润贡献不足，且与解放公司建立良好的市场化合作机制，长期持有股权的战略性目标已达成，管理定位应从战略持有调整为获取财务收益；设计撤回委派至长春一东的董事、高管方案，并确定完成撤回后长春一东股权可由“长期股权投资”转变为“交易性金融资产”，预计年度增利2.78亿元，储备股权增利机会。
+                        </span>
+                      </p>
+                    ) : null}
+                  </div>
+                </article>
+              ) : null}
             </Block>
             <footer>一企一档 · 数据更新至 2026年6月</footer>
           </div>
@@ -889,31 +1143,68 @@ export default function CompanyList() {
         ) : null}
 
         <Modal
-          title={`${displayName} · 显示配置`}
+          title={
+            <div className={styles.configTitle}>
+              <span>显示配置</span>
+              <small>{displayName} · 一口清档案</small>
+            </div>
+          }
           open={configOpen}
           onCancel={() => setConfigOpen(false)}
           onOk={() => setConfigOpen(false)}
           okText="完成"
           cancelText="取消"
-          width={560}
+          width={700}
+          className={styles.configModal}
         >
+          <div className={styles.configOverview}>
+            <div>
+              <span>当前显示</span>
+              <strong>
+                {
+                  sectionOptions.filter((section) => checked(section.key))
+                    .length
+                }
+                <small> / {sectionOptions.length} 大模块</small>
+              </strong>
+            </div>
+            <div className={styles.configQuickActions}>
+              <Button size="small" onClick={() => setCompanyConfig(allKeys)}>
+                全部显示
+              </Button>
+              <Button size="small" onClick={() => setCompanyConfig([])}>
+                全部隐藏
+              </Button>
+            </div>
+          </div>
           <p className={styles.modalIntro}>
-            选择需要在该公司“一口清”档案中展示的模块。配置仅作用于当前公司。
+            按模块配置报告内容，子项可独立控制；本次设置仅作用于当前公司。
           </p>
           <Checkbox.Group
             className={styles.configGroup}
             value={enabled}
             onChange={setCompanyConfig}
           >
-            {sectionOptions.map((section) => (
+            {sectionOptions.map((section, sectionIndex) => (
               <div className={styles.configSection} key={section.key}>
-                <Checkbox value={section.key}>
-                  <b>{section.label}</b>
-                </Checkbox>
-                <div>
-                  {section.children.map((child, i) => (
+                <div className={styles.configSectionHead}>
+                  <span>{String(sectionIndex + 1).padStart(2, "0")}</span>
+                  <Checkbox value={section.key}>
+                    <b>{section.label}</b>
+                  </Checkbox>
+                  <small>
+                    {
+                      section.children.filter((_, childIndex) =>
+                        checked(`${section.key}-${childIndex}`),
+                      ).length
+                    }
+                    /{section.children.length}项
+                  </small>
+                </div>
+                <div className={styles.configChildren}>
+                  {section.children.map((child, childIndex) => (
                     <Checkbox
-                      value={`${section.key}-${i}`}
+                      value={`${section.key}-${childIndex}`}
                       key={child}
                       disabled={!checked(section.key)}
                     >

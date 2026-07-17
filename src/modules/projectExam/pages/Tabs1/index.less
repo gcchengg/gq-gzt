@@ -1,0 +1,1022 @@
+.exam-manage-section,
+.exam-result-modal {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1f2329;
+      margin: 0 0 4px 0;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  .search-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    .ant-select .ant-select-selector,
+    .ant-input {
+      border-radius: 12px;
+      height: 40px;
+      border-color: #d1d8ef;
+      .ant-select-selection-item {
+        padding-top: 4px;
+      }
+    }
+
+    .status-select {
+      width: 200px;
+    }
+
+    .name-input {
+      width: 280px;
+    }
+  }
+
+  .common-table {
+    .ant-table-thead > tr > th {
+      background-color: #fafbff;
+      font-weight: 500;
+    }
+  }
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .action-buttons-edit {
+    display: flex;
+    gap: 8px;
+    .ant-btn {
+      padding: 4px 4px;
+    }
+  }
+}
+.add-exam-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  padding-bottom: 64px;
+
+  // 表单主体样式
+  .form-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 24px 24px;
+
+    .form-section {
+      margin-bottom: 32px;
+      padding: 20px;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e0e5f4;
+      .ant-form-item-required {
+        color: #5b6384;
+      }
+      .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 16px 0;
+      }
+      .section-nav {
+        font-size: 14px;
+        font-weight: 600;
+        color: #9da1b5;
+        margin: 0 0 10px 0;
+      }
+      .section-tip {
+        font-size: 12px;
+        color: #999;
+        margin: 0 0 10px 0;
+      }
+      .section-desc {
+        font-size: 13px;
+        color: #999;
+        margin: 0 0 16px 0;
+      }
+    }
+
+    // 双列表单行（考试名称+合格分、总题量+时长）
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      .form-row-item {
+        display: flex;
+        gap: 8px;
+        flex: 1;
+      }
+      .ant-form-item {
+        flex: 1;
+        margin-bottom: 0;
+      }
+      &.date-row {
+        align-items: flex-end;
+        .date-separator {
+          line-height: 32px;
+          color: #666;
+          padding: 0 8px;
+        }
+      }
+    }
+
+    // 部门多选样式
+    .form-item {
+      margin-bottom: 16px;
+      .form-label {
+        display: block;
+        font-size: 14px;
+        color: #333;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+      .dept-checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid #e8e8e8;
+        border-radius: 8px;
+        background: #fafafa;
+        .dept-checkbox {
+          font-size: 14px;
+          color: #333;
+        }
+      }
+
+      // 人员搜索+列表样式
+      .staff-search-input {
+        margin-bottom: 12px;
+        height: 32px;
+        border-radius: 8px;
+      }
+      .staff-list-wrapper {
+        min-height: 120px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 12px;
+        border: 1px solid #e8e8e8;
+        border-radius: 8px;
+        background: #fff;
+        .staff-checkbox-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          .staff-checkbox {
+            font-size: 14px;
+            color: #333;
+            padding: 4px 0;
+            border-bottom: 1px dashed #e8e8e8;
+            &:last-child {
+              border-bottom: none;
+            }
+          }
+          .no-staff-tip {
+            font-size: 13px;
+            color: #999;
+            text-align: center;
+            padding: 20px 0;
+          }
+        }
+      }
+      .selected-count {
+        font-size: 13px;
+        color: #999;
+        margin-top: 8px;
+      }
+    }
+
+    // 统一表单控件样式（和你现有页面保持一致：高度32px、圆角8px）
+    .ant-input,
+    .ant-input-number,
+    .ant-select-selector,
+    .ant-picker {
+      border-color: #d1d8ef;
+      height: 32px !important;
+      border-radius: 8px !important;
+      font-size: 14px;
+    }
+    .ant-input-number-input {
+      height: 30px !important;
+    }
+  }
+  .projectBtn {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    height: 64px;
+    gap: 16px;
+    align-items: center;
+    padding: 0 24px;
+    width: 95%;
+    border-top: 1px solid #d8d8d8;
+    z-index: 10;
+    background-color: #fff;
+    .ant-btn {
+      border-radius: 8px;
+      height: 40px;
+      padding: 0 16px;
+
+      &.ant-btn-background-ghost.ant-btn-primary {
+        background-color: #eef2fe;
+        color: #364fc2;
+        border-color: #dae0f6;
+      }
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+  }
+}
+// ExamResult.less
+.exam-result-page {
+  background-color: #ffffff;
+  min-height: 100vh;
+  box-sizing: border-box;
+  font-size: 14px; /* 全局基础字体14px */
+
+  /* 顶部区域 */
+  .header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+
+    .title-group {
+      .main-title {
+        font-size: 20px; /* 标题按比例缩小 */
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 12px 0;
+      }
+
+      .subtitle-desc {
+        font-size: 14px; /* 基础字体14px */
+        color: #64748b;
+        margin: 0;
+      }
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 16px;
+
+      .export-button {
+        width: 80px;
+        height: 40px;
+        font-size: 14px; /* 按钮字体14px */
+        color: #3b82f6;
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+      }
+
+      .close-button {
+        width: 80px;
+        height: 40px;
+        font-size: 14px; /* 按钮字体14px */
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+      }
+    }
+  }
+
+  /* 统计卡片区域 */
+  .stats-container {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+
+    .stat-card {
+      flex: 1;
+      padding: 6px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background-color: #f8fafc;
+
+      .stat-label {
+        font-size: 14px; /* 基础字体14px */
+        color: #475569;
+      }
+
+      .stat-value {
+        font-size: 24px; /* 统计数值按比例缩小 */
+        font-weight: 700;
+        color: #2563eb;
+        margin: 0;
+      }
+    }
+  }
+  .stats-list {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .stat-card {
+      padding: 4px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background-color: #fff;
+      cursor: pointer;
+      &.active {
+        background-color: #eff3fe;
+        border-color: #364fc2;
+        .stat-label {
+          color: #364fc2;
+          font-weight: 500;
+        }
+      }
+
+      .stat-label {
+        font-size: 14px; /* 基础字体14px */
+        color: #475569;
+      }
+    }
+  }
+
+  /* 表格区域 */
+  .table-wrapper {
+    .exam-table {
+      .ant-table-thead > tr > th {
+        background-color: #fafbff;
+        font-size: 14px; /* 表格表头14px */
+        color: #475569;
+        padding: 12px;
+      }
+
+      .ant-table-tbody > tr > td {
+        font-size: 14px; /* 表格内容14px */
+        color: #1e293b;
+        padding: 12px;
+      }
+
+      .detail-button {
+        width: 100px;
+        height: 36px;
+        font-size: 14px; /* 详情按钮14px */
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+      }
+    }
+  }
+}
+
+// 试题编辑弹窗样式
+.question-modal {
+  .ant-modal-content {
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f5f6ff 100%);
+    border: 2px solid rgba(54, 79, 194, 0.1);
+  }
+
+  .ant-modal-header {
+    border-radius: 16px 16px 0 0;
+    background: transparent;
+    border-bottom: none;
+    padding: 20px 24px 8px;
+
+    .ant-modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #364fc2;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 16px 24px 20px;
+  }
+
+  .ant-modal-close {
+    top: 16px;
+    right: 16px;
+  }
+
+  .question-drawer-container {
+    .form-content {
+      .form-section {
+        margin-bottom: 24px;
+
+        .section-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #4a5568;
+          margin: 0 0 16px 0;
+        }
+
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+
+          .ant-btn {
+            border-radius: 10px;
+            border-color: #c7d2fe;
+            color: #364fc2;
+            background: #f4f4ff;
+            height: 32px;
+            font-size: 13px;
+
+            &:hover {
+              border-color: #818cf8;
+              color: #1d35a8;
+              background: #eef1ff;
+            }
+          }
+        }
+      }
+
+      .qtype-row {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        margin-bottom: 16px;
+
+        .ant-form-item {
+          flex: 1;
+          margin-bottom: 0;
+        }
+      }
+
+      .qtype-select {
+        width: 100%;
+
+        .ant-select-selector {
+          border-radius: 12px;
+          border-color: #c7d2fe;
+          background-color: #fff;
+          box-shadow: 0 1px 3px rgba(54, 79, 194, 0.05);
+          transition: all 0.3s ease;
+
+          &:hover {
+            border-color: #818cf8;
+          }
+        }
+      }
+
+      .tag-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .tag-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #4a5568;
+          margin-bottom: 4px;
+        }
+
+        .tag-radio {
+          margin-right: 16px;
+          font-size: 14px;
+          color: #4a5568;
+        }
+
+        .company-select {
+          .ant-select-selector {
+            border-radius: 12px;
+            border-color: #f59e0b;
+            background-color: #fffbeb;
+            box-shadow: 0 1px 3px rgba(245, 158, 11, 0.1);
+            transition: all 0.3s ease;
+
+            &:hover {
+              border-color: #d97706;
+            }
+
+            &:focus,
+            &.ant-select-focused {
+              border-color: #f59e0b;
+              box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+            }
+          }
+        }
+      }
+
+      .question-input {
+        border-radius: 12px;
+        border-color: #c7d2fe;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(54, 79, 194, 0.05);
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: #818cf8;
+        }
+
+        &:focus,
+        &.ant-input-focused {
+          border-color: #364fc2;
+          box-shadow: 0 0 0 2px rgba(54, 79, 194, 0.1);
+        }
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+
+        .option-item {
+          .ant-form-item {
+            margin-bottom: 0;
+          }
+
+          .option-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+
+          .ant-input {
+            border-radius: 12px;
+            border-color: #c7d2fe;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(54, 79, 194, 0.05);
+            transition: all 0.3s ease;
+            flex: 1;
+
+            &:hover {
+              border-color: #818cf8;
+            }
+
+            &:focus,
+            &.ant-input-focused {
+              border-color: #364fc2;
+              box-shadow: 0 0 0 2px rgba(54, 79, 194, 0.1);
+            }
+          }
+
+          .remove-option-btn {
+            padding: 4px 8px;
+            color: #ef4444;
+            font-size: 13px;
+            border: 1px solid #fee2e2;
+            border-radius: 8px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            &:hover {
+              color: #dc2626;
+              background: #fef2f2;
+              border-color: #fecaca;
+            }
+          }
+        }
+      }
+
+      .answer-tip {
+        font-size: 12px;
+        color: #718096;
+        margin: 8px 0 0 0;
+      }
+    }
+
+    .footer-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(54, 79, 194, 0.1);
+      margin-top: 16px;
+
+      .ant-btn {
+        border-radius: 12px;
+        height: 42px;
+        padding: 0 28px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+
+        &.ant-btn-default {
+          border-color: #c7d2fe;
+          color: #4a5568;
+          background-color: #fff;
+
+          &:hover {
+            border-color: #818cf8;
+            color: #364fc2;
+          }
+        }
+
+        &.ant-btn-primary {
+          background: linear-gradient(135deg, #364fc2 0%, #1d35a8 100%);
+          border: none;
+          box-shadow: 0 4px 12px rgba(54, 79, 194, 0.3);
+
+          &:hover {
+            box-shadow: 0 6px 16px rgba(54, 79, 194, 0.4);
+            transform: translateY(-1px);
+          }
+        }
+
+        &.ant-btn-text {
+          color: #364fc2;
+
+          &:hover {
+            color: #1d35a8;
+          }
+        }
+      }
+    }
+  }
+}
+.exam-result-modal {
+  /* 顶部区域 */
+  .header-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title-group {
+      .main-title {
+        font-size: 20px; /* 标题按比例缩小 */
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 12px 0;
+      }
+
+      .subtitle-desc {
+        font-size: 14px; /* 基础字体14px */
+        color: #64748b;
+        margin: 0;
+      }
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 16px;
+
+      .export-button {
+        width: 80px;
+        height: 40px;
+        font-size: 14px; /* 按钮字体14px */
+        color: #3b82f6;
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+      }
+
+      .close-button {
+        width: 80px;
+        height: 40px;
+        font-size: 14px; /* 按钮字体14px */
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+      }
+    }
+  }
+  .stats-list {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    .stat-card {
+      padding: 4px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background-color: #fff;
+      cursor: pointer;
+      &.active {
+        background-color: #eff3fe;
+        border-color: #364fc2;
+        .stat-label {
+          color: #364fc2;
+          font-weight: 500;
+        }
+      }
+
+      .stat-label {
+        font-size: 14px; /* 基础字体14px */
+        color: #475569;
+      }
+    }
+  }
+  .ant-btn {
+    margin-right: 8px;
+    border-radius: 8px;
+    height: 40px;
+    padding: 0 16px;
+    &.ant-btn-default {
+      border-color: #d5dbf0;
+      color: #666;
+    }
+    &.ant-btn-background-ghost.ant-btn-primary {
+      background-color: #eef2fe;
+      color: #364fc2;
+      border-color: #dae0f6;
+    }
+    &.ant-btn-default.ant-btn-dangerous {
+      background-color: #fdf3f3;
+      color: #d22124;
+      border-color: #eac9cc;
+    }
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+  .table-wrapper {
+    .exam-table {
+      .ant-table-thead > tr > th {
+        background-color: #fafbff;
+        font-size: 14px; /* 表格表头14px */
+        color: #475569;
+        padding: 12px;
+      }
+
+      .ant-table-tbody > tr > td {
+        font-size: 14px; /* 表格内容14px */
+        color: #1e293b;
+        padding: 12px;
+      }
+
+      .detail-button {
+        width: 100px;
+        height: 36px;
+        font-size: 14px; /* 详情按钮14px */
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+      }
+    }
+  }
+}
+
+// 试题编辑弹窗样式
+.question-modal {
+  .ant-modal-content {
+    border-radius: 16px;
+    background: #fbfcff;
+    border: 2px solid rgba(54, 79, 194, 0.1);
+  }
+  .ant-form-item-required {
+    color: #5b6384;
+  }
+  .ant-modal-header {
+    border-radius: 16px 16px 0 0;
+    background: transparent;
+    border-bottom: none;
+    padding: 20px 24px 8px;
+
+    .ant-modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #364fc2;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 16px 24px 20px;
+  }
+
+  .ant-modal-close {
+    top: 16px;
+    right: 16px;
+  }
+
+  .question-drawer-container {
+    .form-content {
+      .form-section {
+        margin-bottom: 24px;
+
+        .section-title {
+          font-size: 14px;
+          font-weight: 600;
+          color: #4a5568;
+          margin: 0 0 16px 0;
+        }
+
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+
+          .ant-btn {
+            border-radius: 10px;
+            border-color: #c7d2fe;
+            color: #364fc2;
+            background: #f4f4ff;
+            height: 32px;
+            font-size: 13px;
+
+            &:hover {
+              border-color: #818cf8;
+              color: #1d35a8;
+              background: #eef1ff;
+            }
+          }
+        }
+      }
+
+      .qtype-row {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        margin-bottom: 16px;
+
+        .ant-form-item {
+          flex: 1;
+          margin-bottom: 0;
+        }
+      }
+
+      .qtype-select {
+        width: 100%;
+
+        .ant-select-selector {
+          border-radius: 12px;
+          border-color: #c7d2fe;
+          background-color: #fff;
+          box-shadow: 0 1px 3px rgba(54, 79, 194, 0.05);
+          transition: all 0.3s ease;
+
+          &:hover {
+            border-color: #818cf8;
+          }
+        }
+      }
+
+      .tag-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .tag-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #4a5568;
+          margin-bottom: 4px;
+        }
+
+        .tag-radio {
+          margin-right: 16px;
+          font-size: 14px;
+          color: #4a5568;
+        }
+
+        .company-select {
+          .ant-select-selector {
+            border-radius: 12px;
+            border-color: #c7d2fe;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(245, 158, 11, 0.1);
+            transition: all 0.3s ease;
+          }
+        }
+      }
+
+      .question-input {
+        border-radius: 12px;
+        border-color: #c7d2fe;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(54, 79, 194, 0.05);
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: #818cf8;
+        }
+
+        &:focus,
+        &.ant-input-focused {
+          border-color: #364fc2;
+          box-shadow: 0 0 0 2px rgba(54, 79, 194, 0.1);
+        }
+      }
+
+      .options-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+
+        .option-item {
+          position: relative;
+          .ant-form-item {
+            margin-bottom: 0;
+          }
+
+          .option-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+
+          .ant-input {
+            border-radius: 12px;
+            border-color: #c7d2fe;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(54, 79, 194, 0.05);
+            transition: all 0.3s ease;
+            flex: 1;
+
+            &:hover {
+              border-color: #818cf8;
+            }
+
+            &:focus,
+            &.ant-input-focused {
+              border-color: #364fc2;
+              box-shadow: 0 0 0 2px rgba(54, 79, 194, 0.1);
+            }
+          }
+
+          .remove-option-btn {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 4px 8px;
+            color: #ef4444;
+            font-size: 13px;
+            border: none;
+            border-radius: 8px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            &:hover {
+              color: #dc2626;
+              background: #fef2f2;
+              border-color: #fecaca;
+            }
+          }
+        }
+      }
+
+      .answer-tip {
+        font-size: 12px;
+        color: #718096;
+        margin: 8px 0 0 0;
+      }
+    }
+
+    .footer-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(54, 79, 194, 0.1);
+      margin-top: 16px;
+
+      .ant-btn {
+        border-radius: 12px;
+        height: 42px;
+        padding: 0 28px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+
+        &.ant-btn-default {
+          border-color: #c7d2fe;
+          color: #4a5568;
+          background-color: #fff;
+
+          &:hover {
+            border-color: #818cf8;
+            color: #364fc2;
+          }
+        }
+
+        &.ant-btn-primary {
+          background: linear-gradient(135deg, #364fc2 0%, #1d35a8 100%);
+          border: none;
+          box-shadow: 0 4px 12px rgba(54, 79, 194, 0.3);
+
+          &:hover {
+            box-shadow: 0 6px 16px rgba(54, 79, 194, 0.4);
+            transform: translateY(-1px);
+          }
+        }
+
+        &.ant-btn-text {
+          color: #364fc2;
+
+          &:hover {
+            color: #1d35a8;
+          }
+        }
+      }
+    }
+  }
+}

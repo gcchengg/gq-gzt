@@ -1,0 +1,183 @@
+@ink: #1f2a3d;
+@muted: #68758a;
+@navy: #193765;
+@blue: #274f9d;
+@accent: #b48a45;
+@line: #e3e8f0;
+
+.page {
+  min-height: 100vh;
+  padding: 20px 22px 28px;
+  color: @ink;
+  background:
+    linear-gradient(rgba(27, 55, 99, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(27, 55, 99, 0.025) 1px, transparent 1px),
+    #f5f7fb;
+  background-size: 28px 28px;
+  overflow-y: auto;
+}
+
+.content { max-width: 1440px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+
+.pageHeader {
+  position: relative;
+  display: grid;
+  grid-template-columns: 150px 1fr auto;
+  align-items: center;
+  min-height: 96px;
+  padding: 18px 22px;
+  overflow: hidden;
+  color: @ink;
+  background: #fff;
+  border: 1px solid @line;
+  border-top: 3px solid @navy;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(31,42,61,.055);
+}
+
+.backButton { z-index: 1; padding: 7px 10px; color: @blue; background: #f2f6fc; border: 1px solid #dfe7f3; border-radius: 8px; cursor: pointer; text-align: left; }
+.backButton:hover { color: @navy; background: #eaf1fb; }
+.backButton span { margin-right: 6px; }
+.titleBlock { z-index: 1; }
+.titleBlock h1 { margin: 0 0 4px; color: @navy; font-family: "STSong", "SimSun", serif; font-size: 27px; letter-spacing: 1px; }
+.titleBlock p { margin: 0; color: @muted; font-size: 13px; }
+.taskStamp { z-index: 1; display: grid; grid-template-columns: 30px 1fr; align-items: center; gap: 1px 9px; min-width: 190px; padding: 11px 14px; color: @navy; background: #f3f7fd; border: 1px solid #dce6f4; border-radius: 9px; }
+.taskStamp :global(.anticon) { grid-row: span 2; color: @blue; font-size: 22px; }
+.taskStamp span { color: @muted; font-size: 11px; }
+.taskStamp strong { font-size: 14px; }
+
+.overviewCard, .rosterCard, .profileCard, .sectionCard, .analysisCard { background: #fff; border: 1px solid @line; border-radius: 14px; box-shadow: 0 8px 24px rgba(31,42,61,.055); }
+.overviewCard { display: grid; grid-template-columns: minmax(300px, 1.2fr) 2fr; align-items: stretch; overflow: hidden; }
+.overviewCompany { display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 22px 26px; color: #fff; background: linear-gradient(135deg, #1b3a68, #285795); }
+.overviewCompany span { color: rgba(255,255,255,.62); font-size: 12px; }
+.overviewCompany strong { font-family: "STSong", "SimSun", serif; font-size: 20px; letter-spacing: .5px; }
+.overviewCompany small { color: rgba(255,255,255,.68); }
+.overviewFacts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: @line; }
+.overviewFacts > div { display: flex; flex-direction: column; justify-content: center; gap: 7px; min-width: 0; padding: 18px 20px; background: #fff; }
+.overviewFacts span { color: @muted; font-size: 12px; }
+.overviewFacts strong { color: @navy; font-size: 18px; }
+.overviewFacts .successText { color: #278266; }
+.overviewFacts .processingText { color: #3972c6; }
+
+.workspaceGrid { display: grid; grid-template-columns: 276px minmax(0, 1fr); align-items: start; gap: 14px; }
+.personWorkspace { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+.rosterCard { position: sticky; top: 16px; max-height: calc(100vh - 32px); padding: 18px; overflow-y: auto; }
+.rosterHeader { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.rosterHeader > div:first-child { flex: 1; }
+.rosterHeader h2 { margin: 0 0 2px; color: @navy; font-family: "STSong", "SimSun", serif; font-size: 20px; }
+.rosterHeader p { margin: 0; color: @muted; font-size: 13px; }
+.rosterHeader .companyTag { display: none; }
+.personGrid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.personCard { position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 11px; min-height: 106px; padding: 13px; color: @ink; background: #fbfcfe; border: 1px solid @line; border-radius: 10px; cursor: pointer; text-align: left; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.personCard:hover { border-color: #aebfdd; transform: translateY(-1px); }
+.personCard.personSelected { background: linear-gradient(135deg, #f4f7fd, #fff); border-color: @blue; box-shadow: inset 3px 0 0 @blue, 0 8px 20px rgba(39,79,157,.1); }
+.personAvatar { display: grid; place-items: center; width: 46px; height: 46px; color: #fff; background: linear-gradient(145deg, #b89453, #86642f); border-radius: 50%; box-shadow: inset 0 0 0 4px rgba(255,255,255,.18); font-family: "STKaiti", serif; font-size: 21px; }
+.personMain { display: flex; flex-direction: column; min-width: 0; }
+.personMain strong { font-size: 17px; }
+.personMain small { margin-top: 2px; overflow: hidden; color: #4d5b70; text-overflow: ellipsis; white-space: nowrap; }
+.personMain em { margin-top: 5px; color: #8793a4; font-size: 11px; font-style: normal; }
+.personProgress { grid-column: 2; display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 7px; }
+.personProgress small { color: @muted; white-space: nowrap; }
+.personProgress :global(.ant-tag) { margin: 0; }
+
+.profileCard { display: grid; grid-template-columns: 320px 1fr; align-items: center; padding: 22px 26px; }
+.profileIdentity { display: flex; align-items: center; gap: 16px; padding-right: 28px; border-right: 1px solid @line; }
+.avatar { display: grid; place-items: center; width: 64px; height: 64px; color: #fff; background: linear-gradient(145deg, #b89453, #86642f); border-radius: 50%; box-shadow: inset 0 0 0 5px rgba(255,255,255,.18); font-family: "STKaiti", serif; font-size: 28px; }
+.profileLabel { color: @muted; font-size: 12px; }
+.profileName { font-size: 21px; font-weight: 700; }
+.profilePosition { margin-top: 2px; color: @muted; font-size: 13px; }
+.profileFacts { display: grid; grid-template-columns: 1.5fr .65fr 1fr .8fr; gap: 24px; padding-left: 28px; }
+.profileFacts div { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.profileFacts span { color: @muted; font-size: 12px; }
+.profileFacts strong { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.profileFacts .progressValue { color: #278266; }
+
+.sectionCard, .analysisCard { padding: 20px; }
+.sectionHeader, .analysisHeader { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.sectionHeader > div:first-child, .analysisHeader > div:nth-child(2) { flex: 1; }
+.sectionHeader h2, .analysisHeader h2 { margin: 0; color: @navy; font-family: "STSong", "SimSun", serif; font-size: 21px; }
+.sectionHeader p { margin: 4px 0 0; color: @muted; font-size: 12px; }
+.companyTag { margin: 0; padding: 4px 12px; color: @blue; background: #edf3ff; border: 0; border-radius: 14px; }
+.reportList { display: flex; flex-direction: column; gap: 10px; }
+.reportItem { overflow: hidden; border: 1px solid @line; border-radius: 11px; transition: border-color .2s, box-shadow .2s; }
+.reportItem.expanded { border-color: #b8c9e8; box-shadow: 0 8px 22px rgba(39,79,157,.08); }
+.reportTrigger { display: grid; grid-template-columns: 50px minmax(220px, 1fr) 80px 128px 20px; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; color: @ink; background: #fff; border: 0; cursor: pointer; text-align: left; }
+.reportTrigger:hover { background: #f8faff; }
+.monthBadge { display: flex; align-items: baseline; justify-content: center; width: 48px; height: 48px; color: @navy; background: #eef3fa; border-radius: 8px; }
+.monthBadge strong { font-family: Georgia, serif; font-size: 24px; line-height: 48px; }
+.monthBadge span { margin-left: 2px; font-size: 12px; }
+.reportTitle { font-weight: 700; }
+.reportMeta { margin-top: 4px; color: @muted; font-size: 12px; }
+.status { color: #278266; font-size: 13px; }
+.status :global(.anticon) { margin-right: 4px; }
+.reportTrigger time { color: @muted; font-size: 12px; }
+.expandIcon { color: @blue; text-align: center; }
+.reportDetail { padding: 4px 18px 20px 76px; background: linear-gradient(180deg, #fbfcff, #fff); border-top: 1px solid @line; animation: reveal .26s ease-out; }
+@keyframes reveal { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+.basicInfo { margin: 18px 0; padding: 14px 16px; background: #f4f7fc; border-left: 3px solid @blue; }
+.basicInfo span, .infoBlock span, .attachments > span { color: @navy; font-size: 13px; font-weight: 700; }
+.basicInfo p, .infoBlock p { margin: 6px 0 0; color: #445168; line-height: 1.75; }
+.detailGroup { margin-top: 20px; }
+.detailGroup h3 { margin: 0 0 10px; padding-bottom: 8px; color: @navy; font-size: 15px; border-bottom: 1px solid @line; }
+.workList { display: flex; flex-direction: column; }
+.workItem { display: grid; grid-template-columns: 36px minmax(0, 1fr) 90px; align-items: start; gap: 12px; padding: 13px 4px; border-bottom: 1px dashed #e6eaf0; }
+.workItem:last-child { border-bottom: 0; }
+.workIndex { color: #9ba8bb; font-family: Georgia, serif; font-size: 12px; }
+.workItem strong { color: #29364a; font-size: 14px; }
+.workItem p { margin: 4px 0 0; color: #5d687a; line-height: 1.7; }
+.roleTag { justify-self: end; margin: 0; color: #86642f; background: #fbf5e9; border-color: #ead9b9; }
+.detailGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 18px; }
+.infoBlock { padding: 13px 15px; background: #fafbfc; border: 1px solid #edf0f4; border-radius: 8px; }
+.attachments { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+
+.aiMark { display: grid; place-items: center; width: 44px; height: 44px; color: #fff; background: @navy; border-radius: 10px; font-size: 22px; box-shadow: 0 6px 16px rgba(25,55,101,.2); }
+.analysisHeader p { margin: 4px 0 0; color: @muted; font-size: 13px; }
+.analysisEditor { overflow: hidden; border: 1px solid #cfd8e7; border-radius: 10px; }
+.analysisEditor :global(.ant-input) { padding: 16px; border: 0; border-radius: 0; box-shadow: none; line-height: 1.9; resize: vertical; }
+.editorFooter { display: flex; justify-content: space-between; padding: 8px 14px; color: @muted; background: #f7f9fc; border-top: 1px solid @line; font-size: 12px; }
+.countWarn { color: #b25b48; }
+.actionBar { position: sticky; bottom: 0; z-index: 5; display: flex; align-items: center; justify-content: flex-end; gap: 22px; min-height: 72px; padding: 14px 22px; background: rgba(255,255,255,.94); border: 1px solid @line; border-radius: 14px; box-shadow: 0 -8px 24px rgba(31,42,61,.08); backdrop-filter: blur(10px); }
+.actionBar :global(.ant-btn) { min-width: 120px; }
+.confirmHint { color: @muted; font-size: 13px; }
+.confirmHint :global(.anticon) { margin-right: 6px; color: #278266; }
+.confirmHint span { margin-left: 16px; padding-left: 16px; border-left: 1px solid @line; }
+
+@media (max-width: 1000px) {
+  .page { padding: 18px; }
+  .pageHeader { grid-template-columns: 1fr; gap: 16px; }
+  .backButton { align-self: auto; }
+  .taskStamp { display: none; }
+  .overviewCard { grid-template-columns: 1fr; }
+  .overviewFacts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .workspaceGrid { grid-template-columns: 1fr; }
+  .rosterCard { position: static; max-height: none; }
+  .personGrid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .profileCard { grid-template-columns: 1fr; gap: 18px; }
+  .profileIdentity { border-right: 0; }
+  .profileFacts { grid-template-columns: 1fr 1fr; padding-left: 0; }
+  .reportTrigger { grid-template-columns: 54px 1fr 90px 24px; }
+  .reportTrigger time { display: none; }
+  .reportDetail { padding-left: 24px; }
+}
+
+@media (max-width: 680px) {
+  .page { padding: 10px; }
+  .pageHeader, .rosterCard, .sectionCard, .analysisCard { padding: 18px; }
+  .overviewFacts { grid-template-columns: 1fr 1fr; }
+  .overviewFacts > div { padding: 14px; }
+  .personGrid { grid-template-columns: 1fr; }
+  .personCard { grid-template-columns: 46px 1fr; }
+  .personAvatar { width: 46px; height: 46px; }
+  .personProgress { grid-column: 2; flex-direction: row; align-items: center; }
+  .profileFacts, .detailGrid { grid-template-columns: 1fr; }
+  .reportTrigger { grid-template-columns: 48px 1fr 22px; gap: 10px; }
+  .status { display: none; }
+  .reportDetail { padding: 0 14px 18px; }
+  .workItem { grid-template-columns: 28px 1fr; }
+  .roleTag { grid-column: 2; justify-self: start; }
+  .analysisHeader { align-items: flex-start; flex-wrap: wrap; }
+  .analysisHeader :global(.ant-btn) { width: 100%; }
+  .actionBar { align-items: flex-start; flex-direction: column; }
+  .actionBar :global(.ant-btn) { width: 100%; }
+  .confirmHint span { display: block; margin: 6px 0 0; padding: 0; border: 0; }
+}

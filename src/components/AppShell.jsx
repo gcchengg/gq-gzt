@@ -98,6 +98,9 @@ export default function AppShell() {
     "/comapnylist",
     "/companymaintenancelist",
     "/companymaintenance",
+    "/executivemaintenancelist",
+    "/executivemaintenance",
+    "/projectexam",
   ].includes(normalizedPathname);
   const activeMenus = useMemo(
     () =>
@@ -108,6 +111,16 @@ export default function AppShell() {
               id: "company-maintenance-only",
               title: "公司维护",
               key: "/companyMaintenanceList",
+            },
+            {
+              id: "executive-maintenance-only",
+              title: "外派高管维护",
+              key: "/executiveMaintenanceList",
+            },
+            {
+              id: "project-exam-only",
+              title: "勋章管家",
+              key: "/projectExam",
             },
           ]
         : isRecommendationArea
@@ -129,11 +142,14 @@ export default function AppShell() {
   const leafMenus = useMemo(() => flattenMenus(activeMenus), [activeMenus]);
 
   const selectedKey = useMemo(() => {
+    if (normalizedPathname === "/executivemaintenance") {
+      return "/executiveMaintenanceList";
+    }
     const matched = leafMenus.find(
       (item) => getPathOnly(item.key) === pathname,
     );
     return matched?.key || pathname;
-  }, [leafMenus, pathname]);
+  }, [leafMenus, normalizedPathname, pathname]);
 
   const [openKeys, setOpenKeys] = useState(
     () => findParentKeys(activeMenus, fullPath) || [],

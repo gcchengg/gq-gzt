@@ -1,0 +1,90 @@
+.bank-manage-section {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1f2329;
+      margin: 0 0 4px 0;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  .common-table {
+    .ant-table-thead > tr > th {
+      background-color: #fafbff;
+      font-weight: 500;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+
+      .ant-btn {
+        border-radius: 6px;
+      }
+    }
+  }
+}
+.add-result-modal, .weihu-result-modal {
+  .add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    .addNav {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      .addNav-title {
+        color: #5b6384;
+      }
+      .input-wrapper {
+      }
+      .file-wrapper {
+        border: 1px solid #d1d8ef;
+        border-radius: 10px;
+        padding: 12px;
+      }
+    }
+  }
+  .ant-input {
+    border-radius: 12px;
+    height: 40px;
+    border-color: #d1d8ef;
+    .ant-select-selection-item {
+      padding-top: 4px;
+    }
+  }
+  .ant-btn {
+    margin-right: 8px;
+    border-radius: 8px;
+    height: 40px;
+    padding: 0 16px;
+    &.ant-btn-default {
+      border-color: #d5dbf0;
+      color: #666;
+    }
+    &.ant-btn-background-ghost.ant-btn-primary {
+      background-color: #eef2fe;
+      color: #364fc2;
+      border-color: #dae0f6;
+    }
+    &.ant-btn-default.ant-btn-dangerous {
+      background-color: #fdf3f3;
+      color: #d22124;
+      border-color: #eac9cc;
+    }
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}

@@ -26,8 +26,21 @@ const CompanyMaintenance = lazy(() => import("@/pages/companyMaintenance"));
 const CompanyMaintenanceList = lazy(
   () => import("@/pages/companyMaintenance/list"),
 );
+const ExecutiveMaintenance = lazy(() => import("@/pages/executiveMaintenance"));
+const ExecutiveMaintenanceList = lazy(
+  () => import("@/pages/executiveMaintenance/list"),
+);
+const ProjectExam = lazy(() => import("@/modules/projectExam/pages"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
+  {
+    path: "projectExam",
+    element: (
+      <Suspense>
+        <ProjectExam />
+      </Suspense>
+    ),
+  },
   {
     path: "companyMaintenance",
     element: (
@@ -41,6 +54,22 @@ export const routes = [
     element: (
       <Suspense>
         <CompanyMaintenanceList />
+      </Suspense>
+    ),
+  },
+  {
+    path: "executiveMaintenance",
+    element: (
+      <Suspense>
+        <ExecutiveMaintenance />
+      </Suspense>
+    ),
+  },
+  {
+    path: "executiveMaintenanceList",
+    element: (
+      <Suspense>
+        <ExecutiveMaintenanceList />
       </Suspense>
     ),
   },

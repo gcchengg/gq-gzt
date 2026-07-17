@@ -1,0 +1,79 @@
+.medal-manager-page {
+  padding: 24px;
+  background-color: #f5f6fc; // 页面背景白色
+  min-height: 100vh;
+  .ant-card-body {
+    padding: 0;
+  }
+  .ant-btn {
+    margin-right: 8px;
+    border-radius: 8px;
+    height: 40px;
+    padding: 0 16px;
+    &.ant-btn-default {
+      border-color: #D5DBF0;
+      color: #666;
+    }
+    &.ant-btn-background-ghost.ant-btn-primary {
+      background-color: #EEF2FE;
+      color: #364FC2;
+      border-color: #DAE0F6;
+    }
+    &.ant-btn-default.ant-btn-dangerous {
+      background-color: #FDF3F3;
+      color: #d22124;
+      border-color: #EAC9CC;
+    }
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+  .page-header {
+    margin-bottom: 24px;
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1f2329;
+      margin: 0 0 8px 0;
+    }
+
+    .page-desc {
+      font-size: 14px;
+      color: #6b7280;
+      margin: 0;
+    }
+  }
+
+  .tab-buttons {
+    margin-bottom: 24px;
+
+    .tab-btn {
+      margin-right: 8px;
+      border-radius: 12px;
+      height: 46px;
+      padding: 0 16px;
+      font-size: 15px;
+      color: #fff;
+      font-weight: 600;
+      &.primary {
+        border: none;
+        background-color: #364fc2;
+      }
+      &.default {
+        border: 1px solid #d7ddf3;
+        background-color: #f9faff;
+        color: #000;
+      }
+      &:hover {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .content-card {
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.08); // 添加卡片阴影
+    padding: 24px;
+  }
+}
