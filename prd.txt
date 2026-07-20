@@ -1,13 +1,2 @@
-/Users/guocc/Documents/guquan/files/gq-gzt/src/components/AppShell.jsx
-中：
-[
-            { id: "company-list-only", title: "一口清", key: "/comapnyList" },
-            {
-              id: "company-maintenance-only",
-              title: "公司维护",
-              key: "/companyMaintenanceList",
-            },
-          ]
-添加新的路径勋章管家
-把/Users/guocc/Documents/guquan/github/gq-0207_app_015_uwone-mc/src/modules/projectExam
-文件夹完整的拿入现在的项目中，你只需要完全一致的拿过来，显示页面就行，至于API等我回自己替换假数据
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/companyList/index.jsx
+使用 later: "需要后续补充",的地方标记红色

@@ -23,7 +23,7 @@ export const sectionOptions = [
   {
     key: "risk",
     label: "五、风险隐患“清”",
-    children: ["审计发现问题及整改明细", "风险情况"],
+    children: ["审计发现问题及整改明细", "风险情况", "国资委监管要求整改"],
   },
   {
     key: "strategy",
@@ -149,13 +149,18 @@ export const topicDemos = [
     advice: "持续跟踪总部利润和预算执行偏差，按月形成闭环分析。",
     follow: "已建立月度经营分析机制，重点指标纳入经管层督办台账。",
   },
-  {
-    title: "《关于修订公司内部控制制度的议案》",
-    result: "同意",
-    advice: "",
-    follow: "",
-  },
 ];
+
+export const sasacRectification = {
+  key: "sasac-veto-right",
+  problem: "公司章程、股东协议约定非国有股东对一些事项具有一票否决权",
+  planDate: "2026年12月",
+  planContent: "推动参股公司修改公司章程、股东协议，取消非国有股东一票否决权",
+  owner: "丛圣元",
+  status: "进行中",
+  evidence:
+    "截至2026年7月，已与参股公司全体股东就公司章程、股东协议修订事项达成一致意见，正推动参股公司准备议案，提请董事会、股东会决议",
+};
 
 export const auditProblemRows = [
   {

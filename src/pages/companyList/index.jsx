@@ -33,6 +33,7 @@ import {
   financialAnalysisSections,
   financialWarningItems,
   riskTrackingRows,
+  sasacRectification,
   sectionOptions,
   topicDemos,
 } from "./data";
@@ -60,19 +61,18 @@ const synergyInitializationItems = [
   },
   {
     title: "战略定位",
-    content: "取“一企一策”战略定位情况，工作台未上线前进行初始化导入",
+    content:
+      "长春一东为集团核心供应商，但未纳入集团中长期规划，亦不属于前瞻、短板、卡脖子等关键领域。（未来来源：一企一策，当前初始化导入）集团内客户为一汽解放，供应商用车离合器总成及液压举升器。（取数来源：参股公司信息管理-产品情况）",
   },
   {
     title: "战略执行",
-    content: "取“一企一策”战略执行情况，工作台未上线前进行初始化导入",
+    content:
+      "长春一东研发投入强度为4.62%，处于行业合理水平，资源主要投向AMT及限扭减震器等新能源零部件的研发；长春一东属于商用车离合器领域龙头企业，具备行业级核心资质认证；长春一东现有产能可以匹配集团需求与交付节奏。",
   },
   {
     title: "战略成果",
-    content: "取“一企一策”战略成果情况，工作台未上线前进行初始化导入",
-  },
-  {
-    title: "产业协同",
-    content: "取“一企一策”确定的产业协同任务，工作台未上线前进行初始化导入",
+    content:
+      "长春一东暂未与集团开展技术联合研发，未承接集团专项协同任务。长春一东当前配套集团产品为商用车（重卡）离合器及液压举升机构，占一汽解放份额分别为46.23%、69.41%。",
   },
 ];
 const source = {
@@ -106,10 +106,16 @@ function Block({ id, title, checked, titleSource, children }) {
   );
 }
 
-function Sub({ id, title, checked, children }) {
+function Sub({ id, title, titleSource, checked, children }) {
   return checked(id) ? (
     <article className={styles.sub}>
-      <h3>{title}</h3>
+      <h3>
+        {titleSource ? (
+          <SourceMark source={titleSource}>{title}</SourceMark>
+        ) : (
+          title
+        )}
+      </h3>
       {children}
     </article>
   ) : null;
@@ -242,12 +248,12 @@ export default function CompanyList() {
   );
   const [keyword, setKeyword] = useState("");
   const [globalYear, setGlobalYear] = useState("2025");
-  const [globalPeriod, setGlobalPeriod] = useState("年度");
+  const [globalPeriod, setGlobalPeriod] = useState("半年度");
   const [documentYear, setDocumentYear] = useState(
-    sharedParams.get("year") || "2025",
+    sharedParams.get("year") || "2026",
   );
   const [documentPeriod, setDocumentPeriod] = useState(
-    sharedParams.get("period") || "年度",
+    sharedParams.get("period") || "半年度",
   );
   const [configOpen, setConfigOpen] = useState(false);
   const [medalOpen, setMedalOpen] = useState(false);
@@ -366,7 +372,8 @@ export default function CompanyList() {
       .${styles.documentHeader}, .${styles.metaGrid}, .${styles.conclusion},
       .${styles.financeTable}, .${styles.comparisonTable}, .${styles.topic},
       .${styles.twoCol} > p, .${styles.strategyGrid} > p,
-      .${styles.auditIssueCard}, .${styles.riskTrackingCard} {
+      .${styles.auditIssueCard}, .${styles.riskTrackingCard},
+      .${styles.rectificationCard} {
         break-inside: avoid-page; page-break-inside: avoid;
       }
       .${styles.comparisonTable} { overflow: visible !important; }
@@ -590,7 +597,7 @@ export default function CompanyList() {
                     <b>{detail?.shRatio ?? selected?.shRatio ?? "—"}%</b>
                   </div>
                   <div>
-                    <span>管理分类</span>
+                    <span>记账方式</span>
                     <b>成长期股权投资</b>
                   </div>
                   <div>
@@ -626,7 +633,7 @@ export default function CompanyList() {
                   </S>
                   ，法定代表人
                   <S source={source.later}>{isYidong ? "孟庆洪" : "待补充"}</S>
-                  ，注册地址为
+                  ，办公地址为
                   <S source={source.basic}>
                     {detail?.registeredAddress ||
                       selected?.registeredAddress ||
@@ -671,7 +678,12 @@ export default function CompanyList() {
                   <S source={source.basic}>党建要求已进章程，已成立党组织</S>。
                 </p>
               </Sub>
-              <Sub id="base-3" title="4. 对标情况（AI生成）" checked={checked}>
+              <Sub
+                id="base-3"
+                title="4. 对标情况"
+                titleSource="AI生成"
+                checked={checked}
+              >
                 <div className={styles.analysis}>
                   <h4>看行业</h4>
                   <p>
@@ -1060,6 +1072,40 @@ export default function CompanyList() {
                     </article>
                   ))}
                 </div>
+              </Sub>
+              <Sub
+                id="risk-2"
+                title="3. 国资委监管要求整改"
+                titleSource="财务工作台-财务分析-产权管理-国资委监管要求"
+                checked={checked}
+              >
+                <article className={styles.rectificationCard}>
+                  <header>
+                    <div>
+                      <span>整改问题</span>
+                      <b>{sasacRectification.problem}</b>
+                    </div>
+                    <Tag color="processing">{sasacRectification.status}</Tag>
+                  </header>
+                  <dl className={styles.rectificationFacts}>
+                    <div>
+                      <dt>计划时间</dt>
+                      <dd>{sasacRectification.planDate}</dd>
+                    </div>
+                    <div>
+                      <dt>责任人</dt>
+                      <dd>{sasacRectification.owner}</dd>
+                    </div>
+                  </dl>
+                  <div className={styles.rectificationDetail}>
+                    <span>计划内容</span>
+                    <p>{sasacRectification.planContent}</p>
+                  </div>
+                  <div className={styles.rectificationDetail}>
+                    <span>备证说明</span>
+                    <p>{sasacRectification.evidence}</p>
+                  </div>
+                </article>
               </Sub>
             </Block>
             <Block
