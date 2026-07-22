@@ -7,6 +7,7 @@ export const sectionOptions = [
       "业务与定位",
       "股权与治理结构",
       "对标情况（AI生成）",
+      "生命周期重要事项",
     ],
   },
   {
@@ -69,6 +70,15 @@ export const comparisonRows = [
   ["毛利率", "16.22%", "17.59%", "20.83%", "27.20%", "32.33%", "16.37%"],
   ["市值/规模排序", "6", "3", "1", "4", "5", "2"],
 ];
+
+export const lifecycleMilestone = {
+  key: "lifecycle-board-approval",
+  date: "2026-06-24",
+  category: "三会管理",
+  content:
+    "接收长春一东临时董事会议题（选举独立董事、选举董事、接收国有资本预算金）并完成审批",
+  relatedParty: "无",
+};
 
 export const financialAnalysisSections = [
   {

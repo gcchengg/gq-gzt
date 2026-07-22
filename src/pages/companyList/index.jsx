@@ -32,6 +32,7 @@ import {
   financeRows,
   financialAnalysisSections,
   financialWarningItems,
+  lifecycleMilestone,
   riskTrackingRows,
   sasacRectification,
   sectionOptions,
@@ -55,24 +56,22 @@ const directorKeyTopics = [
 ];
 const synergyInitializationItems = [
   {
-    title: "集团内客户及产品",
-    content: "客户为一汽解放，供应商用车离合器总成及液压举升器。",
-    source: "参股公司基础信息-产品信息",
-  },
-  {
     title: "战略定位",
     content:
-      "长春一东为集团核心供应商，但未纳入集团中长期规划，亦不属于前瞻、短板、卡脖子等关键领域。（未来来源：一企一策，当前初始化导入）集团内客户为一汽解放，供应商用车离合器总成及液压举升器。（取数来源：参股公司信息管理-产品情况）",
+      "长春一东为集团核心供应商，但未纳入集团中长期规划，亦不属于前瞻、短板、卡脖子等关键领域。集团内客户为一汽解放，供应商用车离合器总成及液压举升器。",
+    source: "取“一企一策”战略定位情况，工作台未上线前进行初始化导入。",
   },
   {
     title: "战略执行",
     content:
       "长春一东研发投入强度为4.62%，处于行业合理水平，资源主要投向AMT及限扭减震器等新能源零部件的研发；长春一东属于商用车离合器领域龙头企业，具备行业级核心资质认证；长春一东现有产能可以匹配集团需求与交付节奏。",
+    source: "取“一企一策”战略执行情况，工作台未上线前进行初始化导入。",
   },
   {
     title: "战略成果",
     content:
       "长春一东暂未与集团开展技术联合研发，未承接集团专项协同任务。长春一东当前配套集团产品为商用车（重卡）离合器及液压举升机构，占一汽解放份额分别为46.23%、69.41%。",
+    source: "取“一企一策”战略成果情况，工作台未上线前进行初始化导入。",
   },
 ];
 const source = {
@@ -373,7 +372,7 @@ export default function CompanyList() {
       .${styles.financeTable}, .${styles.comparisonTable}, .${styles.topic},
       .${styles.twoCol} > p, .${styles.strategyGrid} > p,
       .${styles.auditIssueCard}, .${styles.riskTrackingCard},
-      .${styles.rectificationCard} {
+      .${styles.rectificationCard}, .${styles.lifecycleCard} {
         break-inside: avoid-page; page-break-inside: avoid;
       }
       .${styles.comparisonTable} { overflow: visible !important; }
@@ -598,7 +597,7 @@ export default function CompanyList() {
                   </div>
                   <div>
                     <span>记账方式</span>
-                    <b>成长期股权投资</b>
+                    <b>长期股权投资</b>
                   </div>
                   <div>
                     <span>股权分类</span>
@@ -698,23 +697,17 @@ export default function CompanyList() {
                     <table>
                       <thead>
                         <tr>
-                          {[
-                            "指标",
-                            "长春一东",
-                            "铁流股份",
-                            "亚太股份",
-                            "长源东谷",
-                            "南方精工",
-                            "万安科技",
-                          ].map((x) => (
-                            <th key={x}>{x}</th>
-                          ))}
+                          {["指标", "长春一东", "铁流股份", "亚太股份"].map(
+                            (x) => (
+                              <th key={x}>{x}</th>
+                            ),
+                          )}
                         </tr>
                       </thead>
                       <tbody>
                         {comparisonRows.map((row) => (
                           <tr key={row[0]}>
-                            {row.map((x) => (
+                            {row.slice(0, 4).map((x) => (
                               <td key={x}>{x}</td>
                             ))}
                           </tr>
@@ -723,7 +716,7 @@ export default function CompanyList() {
                     </table>
                   </div>
                   <p>
-                    从经营规模看，长春一东7.66亿元营收在六家公司中最低，约为铁流股份的32%、亚太股份的14%；归母净利润1,143万元，净利率约1.49%，也明显低于对标企业。铁流股份与长春一东同处离合器赛道，但已形成传动系统、高精密零部件和商用车后市场服务三大板块，并布局近两千种离合器型号、AMT、自调整离合器、双质量飞轮及混动系统产品。亚太股份、万安科技依靠制动与底盘电子系统扩大智能化产品矩阵；长源东谷通过发动机零部件向新能源混动客户延伸；南方精工则以精密轴承、单向离合器切入新能源和机器人领域。相比之下，长春一东细分市场份额领先，但收入体量、产品多元化和利润转化能力偏弱。
+                    从经营规模看，长春一东7.66亿元营收在三家公司中最低，约为铁流股份的32%、亚太股份的14%；归母净利润1,143万元，净利率约1.49%，也明显低于两家对标企业。铁流股份与长春一东同处离合器赛道，但已形成传动系统、高精密零部件和商用车后市场服务三大板块，并布局近两千种离合器型号、AMT、自调整离合器、双质量飞轮及混动系统产品。亚太股份则依靠制动与底盘电子系统持续扩大智能化产品矩阵。相比之下，长春一东细分市场份额领先，但收入体量、产品多元化和利润转化能力偏弱。
                   </p>
                   <h4>看自己</h4>
                   <p>
@@ -737,6 +730,21 @@ export default function CompanyList() {
                     长春一东属于“细分冠军、规模偏小、转型加速”的企业：短期受益于重卡复苏和配套份额提升，中长期则需把客户与技术优势转化为AMT、混动减振及新能源部件的批量收入，同时复制铁流股份的后市场渠道能力，扩大海外本地化服务，通过产品结构升级、精益降本和规模增长改善盈利水平。
                   </div>
                 </div>
+              </Sub>
+              <Sub
+                id="base-4"
+                title="5. 生命周期重要事项"
+                titleSource="取数来源：投后报告-列入生命周期时间轴事项"
+                checked={checked}
+              >
+                <article className={styles.lifecycleCard}>
+                  <header className={styles.lifecycleMeta}>
+                    <Tag color="processing">{lifecycleMilestone.category}</Tag>
+                    <span>日期：{lifecycleMilestone.date}</span>
+                    <span>其他相关方：{lifecycleMilestone.relatedParty}</span>
+                  </header>
+                  <p>{lifecycleMilestone.content}</p>
+                </article>
               </Sub>
             </Block>
 
@@ -894,7 +902,7 @@ export default function CompanyList() {
                 <p>
                   <S source="三会工作台-需总办会审核议题">
                     {displayName}
-                    共2名委派董事，为副董事长李秀柱、董事马振来。截至2026年6月，委派董事完成4次董事会31项议题的审议
+                    共2名委派董事，为副董事长刘红艳、董事马振来。截至2026年6月，委派董事完成4次董事会31项议题的审议
                   </S>
                   。
                 </p>
@@ -913,7 +921,7 @@ export default function CompanyList() {
               checked={checked}
               titleSource={source.later}
             >
-              <Sub id="synergy-0" title="产业协同情况" checked={checked}>
+              <Sub id="synergy-0" title="" checked={checked}>
                 <div className={styles.synergyInitializationList}>
                   {synergyInitializationItems.map((item) => (
                     <p key={item.title}>

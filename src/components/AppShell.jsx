@@ -109,12 +109,12 @@ export default function AppShell() {
             { id: "company-list-only", title: "一口清", key: "/comapnyList" },
             {
               id: "company-maintenance-only",
-              title: "公司维护",
+              title: "可比公司维护",
               key: "/companyMaintenanceList",
             },
             {
               id: "executive-maintenance-only",
-              title: "外派高管维护",
+              title: "外派高管履职分析",
               key: "/executiveMaintenanceList",
             },
             {

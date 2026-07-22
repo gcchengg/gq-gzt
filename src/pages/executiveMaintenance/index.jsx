@@ -137,7 +137,7 @@ export default function ExecutiveMaintenance() {
               <span>←</span> 返回维护列表
             </button>
             <div className={styles.titleBlock}>
-              <h1>外派高管维护</h1>
+              <h1>外派高管履职分析</h1>
               <p>按人员复核月度履职记录，分别形成履职分析并确认归档</p>
             </div>
             <div className={styles.taskStamp}>
@@ -151,7 +151,7 @@ export default function ExecutiveMaintenance() {
 
           <section
             className={styles.overviewCard}
-            aria-label="公司维护任务总览"
+            aria-label="可比公司维护任务总览"
           >
             <div className={styles.overviewCompany}>
               <span>任职单位</span>

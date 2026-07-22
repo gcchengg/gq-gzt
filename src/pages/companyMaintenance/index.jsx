@@ -279,12 +279,12 @@ export default function CompanyMaintenance() {
             <div className={styles.headEyebrow}>
               <i />
               {fromTask
-                ? "公司维护任务"
+                ? "可比公司维护任务"
                 : view === "analysis"
                   ? "AI 分析档案"
                   : "公司档案"}
             </div>
-            <h1>{view === "analysis" ? "AI分析结果" : "公司维护"}</h1>
+            <h1>{view === "analysis" ? "AI分析结果" : "可比公司维护"}</h1>
             <p>
               {fromTask
                 ? "维护可比公司、分析材料与AI对标报告"
@@ -322,7 +322,7 @@ export default function CompanyMaintenance() {
               className={styles.sectionCard}
               title={
                 <span className={styles.sectionTitle}>
-                  <b>01</b> 公司维护
+                  <b>01</b> 可比公司维护
                 </span>
               }
             >

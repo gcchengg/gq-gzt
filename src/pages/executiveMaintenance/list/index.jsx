@@ -197,7 +197,7 @@ export default function ExecutiveMaintenanceList() {
 
         <Card className={styles.tableCard}>
           <div className={styles.tableTop}>
-            <strong>外派高管维护列表</strong>
+            <strong>外派高管履职分析列表</strong>
             <span>共 {rows.length} 条</span>
           </div>
           <Table

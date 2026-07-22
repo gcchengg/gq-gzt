@@ -200,7 +200,7 @@ export default function CompanyMaintenanceList() {
         </Card>
         <Card className={styles.tableCard}>
           <div className={styles.tableTop}>
-            <strong>公司维护列表</strong>
+            <strong>可比公司维护列表</strong>
             <span>共 {rows.length} 条</span>
           </div>
           <Table

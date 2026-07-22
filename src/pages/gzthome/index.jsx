@@ -30,7 +30,7 @@ const taskTabs = [
   "任务闭环",
   "任务管理",
 ];
-const djgTaskTabs = ["下发推荐函", "公司维护", "外派高管维护"];
+const djgTaskTabs = ["下发推荐函", "可比公司维护", "外派高管履职分析"];
 const metrics = [
   { label: "总待办数", value: "4450" },
   { label: "总逾期数", value: "0", tone: "red" },
@@ -122,13 +122,13 @@ const taskCopyByCard = {
     description: "编制并下发董监高选聘推荐函",
     href: "/recommendationLetter?bizId=req-001",
   },
-  公司维护: {
-    title: "公司维护",
+  可比公司维护: {
+    title: "可比公司维护",
     description: "维护本公司及可比公司材料并确认AI对标分析报告",
     href: "/companyMaintenance?fromTask=1&companyId=cc-001&year=2025&period=annual",
   },
-  外派高管维护: {
-    title: "2026年度外派高管维护",
+  外派高管履职分析: {
+    title: "2026年度外派高管履职分析",
     description: "复核长春一东外派高管月度履职情况并确认年度分析",
     href: "/executiveMaintenance?company=长春一东&year=2026",
   },
@@ -150,12 +150,12 @@ const secondaryTaskCopyByCard = {
 };
 const companyMaintenanceTasks = [
   {
-    title: "2025年度公司维护",
+    title: "2025年度可比公司维护",
     description: "完成2025年度可比公司材料维护并确认AI对标分析报告",
     href: "/companyMaintenance?fromTask=1&companyId=cc-001&year=2025&period=annual",
   },
   {
-    title: "2025半年度公司维护",
+    title: "2025半年度可比公司维护",
     description: "完成2025半年度可比公司材料维护并确认AI对标分析报告",
     href: "/companyMaintenance?fromTask=1&companyId=cc-001&year=2025&period=semiannual",
   },
@@ -424,7 +424,7 @@ function TaskPanel() {
   const primaryTask = taskCopyByCard[activeTab];
   const secondaryTask = secondaryTaskCopyByCard[activeTab];
   const taskRows =
-    activeTab === "公司维护"
+    activeTab === "可比公司维护"
       ? companyMaintenanceTasks
       : [
           primaryTask,
