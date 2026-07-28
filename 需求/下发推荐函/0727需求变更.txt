@@ -1,0 +1,5 @@
+4.董监高选聘添加驳回操作，有是否确认驳回确认
+/Users/guocc/Documents/guquan/files/gq-gzt/需求/下发推荐函/images/截屏2026-07-27 13.24.54.png
+驳回后，退回到任职需求提出
+5.下发推荐函，描述添加公司简称
+显示图片如下/Users/guocc/Documents/guquan/files/gq-gzt/需求/下发推荐函/images/iwEdAqNwbmcDAQTRB20F0QHZBrA-taF8QDaQRwo6EdwFwTgAB9JtH5V0CAAJomltCgAL0gACUEE.png

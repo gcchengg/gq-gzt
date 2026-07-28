@@ -1,0 +1,7 @@
+interface:
+  display_name: "一汽 PRD Word"
+  short_description: "生成一汽品牌风格的正式 PRD Word 需求文档"
+  icon_small: "./assets/icons/faw-equity-logo.png"
+  icon_large: "./assets/icons/faw-equity-logo.png"
+  brand_color: "#152A8C"
+  default_prompt: "使用 $faw-prd-word 根据需求和截图整理 PRD，先输出 Markdown 待确认稿，确认后生成一汽风格 Word。"
