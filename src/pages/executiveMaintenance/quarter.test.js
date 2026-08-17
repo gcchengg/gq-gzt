@@ -2,11 +2,46 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   buildExecutiveMaintenancePath,
+  buildQuarterlyMaintenanceRows,
   filterReportsByQuarter,
   getQuarterConfig,
   getQuarterStateKey,
   normalizeQuarter,
 } from "./quarter.js";
+
+test("builds four quarterly tasks and one independent URL for each", () => {
+  const rows = buildQuarterlyMaintenanceRows({
+    idPrefix: "cc-001-2026",
+    companyName: "长春一东离合器股份有限公司",
+    shortForm: "长春一东",
+    stockCode: "600148.SH",
+    year: "2026",
+  });
+  assert.deepEqual(
+    rows.map(({ period, reportProgress, status }) => ({
+      period,
+      reportProgress,
+      status,
+    })),
+    [
+      { period: "第一季度", reportProgress: "3 / 3", status: "已完成" },
+      { period: "第二季度", reportProgress: "3 / 3", status: "已完成" },
+      { period: "第三季度", reportProgress: "0 / 3", status: "待维护" },
+      { period: "第四季度", reportProgress: "0 / 3", status: "待维护" },
+    ],
+  );
+  const urls = rows.map(buildExecutiveMaintenancePath);
+  assert.deepEqual(
+    urls.map((url) =>
+      new URL(url, "http://localhost").searchParams.get("quater"),
+    ),
+    ["1", "2", "3", "4"],
+  );
+  assert.equal(
+    urls.some((url) => url.includes("period=")),
+    false,
+  );
+});
 
 test("normalizes quater values and falls back to quarter one", () => {
   assert.equal(normalizeQuarter("1"), "1");

@@ -34,3 +34,20 @@ export function buildExecutiveMaintenancePath(record) {
   });
   return `/executiveMaintenance?${params.toString()}`;
 }
+
+export function buildQuarterlyMaintenanceRows(baseRecord) {
+  return QUARTER_CONFIGS.map((quarter) => {
+    const hasReports = quarter.value === "1" || quarter.value === "2";
+    return {
+      ...baseRecord,
+      id: `${baseRecord.idPrefix}-q${quarter.value}`,
+      quarter: quarter.value,
+      period: quarter.label,
+      executiveCount: 1,
+      executiveProgress: hasReports ? "1 / 1" : "0 / 1",
+      reportProgress: hasReports ? "3 / 3" : "0 / 3",
+      updatedAt: hasReports ? "2026-07-08" : "-",
+      status: hasReports ? "已完成" : "待维护",
+    };
+  });
+}

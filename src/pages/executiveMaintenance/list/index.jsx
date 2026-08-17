@@ -12,36 +12,20 @@ import {
   Tag,
 } from "antd";
 import { useNavigate } from "react-router-dom";
+import {
+  buildExecutiveMaintenancePath,
+  buildQuarterlyMaintenanceRows,
+  QUARTER_CONFIGS,
+} from "../quarter";
 import styles from "./index.module.less";
 
-const maintenanceRows = [
-  {
-    id: "cc-001-2026-semiannual",
-    companyName: "长春一东离合器股份有限公司",
-    shortForm: "长春一东",
-    stockCode: "600148.SH",
-    year: "2026",
-    period: "半年度",
-    executiveCount: 1,
-    executiveProgress: "1 / 1",
-    reportProgress: "6 / 6",
-    updatedAt: "2026-07-08",
-    status: "已完成",
-  },
-  {
-    id: "cc-001-2026-annual",
-    companyName: "长春一东离合器股份有限公司",
-    shortForm: "长春一东",
-    stockCode: "600148.SH",
-    year: "2026",
-    period: "年度",
-    executiveCount: 1,
-    executiveProgress: "0 / 1",
-    reportProgress: "6 / 12",
-    updatedAt: "2026-07-08",
-    status: "维护中",
-  },
-];
+const maintenanceRows = buildQuarterlyMaintenanceRows({
+  idPrefix: "cc-001-2026",
+  companyName: "长春一东离合器股份有限公司",
+  shortForm: "长春一东",
+  stockCode: "600148.SH",
+  year: "2026",
+});
 
 const statusColor = {
   已完成: "success",
@@ -123,11 +107,7 @@ export default function ExecutiveMaintenanceList() {
       render: (_, record) => (
         <Button
           type="link"
-          onClick={() =>
-            navigate(
-              `/executiveMaintenance?company=${encodeURIComponent(record.shortForm)}&year=${record.year}&period=${record.period}`,
-            )
-          }
+          onClick={() => navigate(buildExecutiveMaintenancePath(record))}
         >
           {record.status === "已完成" ? "查看详情" : "去维护"}
         </Button>
@@ -158,9 +138,9 @@ export default function ExecutiveMaintenanceList() {
                 <Form.Item label="维护周期" name="period">
                   <Select
                     allowClear
-                    options={["年度", "半年度"].map((value) => ({
-                      value,
-                      label: value,
+                    options={QUARTER_CONFIGS.map(({ value, label }) => ({
+                      value: label,
+                      label,
                     }))}
                   />
                 </Form.Item>
