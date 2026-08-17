@@ -27,6 +27,7 @@ import {
   filterReportsByQuarter,
   getQuarterDetailContext,
   getQuarterStateKey,
+  setQuarterStateLoading,
 } from "./quarter";
 import styles from "./index.module.less";
 
@@ -41,7 +42,7 @@ export default function ExecutiveMaintenance() {
   );
   const [activeReportByState, setActiveReportByState] = useState({});
   const [analysisByState, setAnalysisByState] = useState({});
-  const [analyzingStateKey, setAnalyzingStateKey] = useState("");
+  const [analyzingByState, setAnalyzingByState] = useState({});
   const [confirmedByState, setConfirmedByState] = useState({});
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -101,7 +102,9 @@ export default function ExecutiveMaintenance() {
     const executiveId = selectedExecutive.id;
     const generatedAnalysis =
       generatedAnalysisByQuarterAndExecutive[quarter]?.[executiveId] || "";
-    setAnalyzingStateKey(selectedStateKey);
+    setAnalyzingByState((current) =>
+      setQuarterStateLoading(current, selectedStateKey, true),
+    );
     setConfirmedByState((current) => ({
       ...current,
       [selectedStateKey]: false,
@@ -111,7 +114,9 @@ export default function ExecutiveMaintenance() {
         ...current,
         [selectedStateKey]: generatedAnalysis,
       }));
-      setAnalyzingStateKey("");
+      setAnalyzingByState((current) =>
+        setQuarterStateLoading(current, selectedStateKey, false),
+      );
       messageApi.success(
         `${selectedExecutive.name}的${quarterLabel}AI履职分析已生成，可继续修改`,
       );
@@ -381,7 +386,7 @@ export default function ExecutiveMaintenance() {
                   <Button
                     type="primary"
                     icon={<RobotOutlined />}
-                    loading={analyzingStateKey === selectedStateKey}
+                    loading={Boolean(analyzingByState[selectedStateKey])}
                     disabled={selectedReports.length === 0}
                     onClick={handleAnalyze}
                   >

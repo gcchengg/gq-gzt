@@ -26,6 +26,15 @@ export function getQuarterStateKey(quarter, executiveId) {
   return `${normalizeQuarter(quarter)}:${executiveId}`;
 }
 
+export function setQuarterStateLoading(loadingByState, stateKey, isLoading) {
+  if (isLoading) {
+    return { ...loadingByState, [stateKey]: true };
+  }
+
+  const { [stateKey]: _, ...remainingLoading } = loadingByState;
+  return remainingLoading;
+}
+
 export function getQuarterDetailContext(rawQuarter, reports, executiveId) {
   const quarter = normalizeQuarter(rawQuarter);
   const config = getQuarterConfig(quarter);

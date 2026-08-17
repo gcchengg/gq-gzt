@@ -12,6 +12,7 @@ import {
   getQuarterDetailContext,
   getQuarterStateKey,
   normalizeQuarter,
+  setQuarterStateLoading,
 } from "./quarter.js";
 
 test("builds four quarterly tasks and one independent URL for each", () => {
@@ -82,6 +83,21 @@ test("filters reports by executive and quarter", () => {
 
 test("creates isolated quarter and executive state keys", () => {
   assert.equal(getQuarterStateKey("2", "gaoying"), "2:gaoying");
+});
+
+test("keeps a second scoped analysis pending when the first one completes", () => {
+  const q1Key = getQuarterStateKey("1", "gaoying");
+  const q2Key = getQuarterStateKey("2", "gaoying");
+  const q1AndQ2Pending = setQuarterStateLoading(
+    setQuarterStateLoading({}, q1Key, true),
+    q2Key,
+    true,
+  );
+
+  const afterQ1Completes = setQuarterStateLoading(q1AndQ2Pending, q1Key, false);
+
+  assert.equal(afterQ1Completes[q1Key], undefined);
+  assert.equal(afterQ1Completes[q2Key], true);
 });
 
 test("creates a normalized and isolated detail context", () => {
