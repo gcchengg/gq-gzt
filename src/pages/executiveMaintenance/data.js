@@ -276,9 +276,16 @@ export const monthlyReports = [
   },
 ];
 
-export const generatedAnalysis =
-  "截至2026年6月，共有1名委派高管，为副总经理（财务负责人）高英。上半年，高英围绕预算控制、降本增效和风险防控履职，推动主营业务收入、利润总额分别完成年度预算的56.14%和67.25%，落实58个重点降本项目，实现降本1780万元；推进财务共享及“两金”治理，清理逾期应收款3178万元。助力集团发展方面，配合完成股份减持及信息披露，减持金额7521万元、预计实现收益5000万元，并推动数智化与具身智能产业协同。总体履职成效较好，建议持续关注海外经营、汇率及“两金”占用风险。";
-
-export const generatedAnalysisByExecutive = {
-  gaoying: generatedAnalysis,
+export const generatedAnalysisByQuarterAndExecutive = {
+  1: {
+    gaoying:
+      "2026年第一季度，高英围绕预算管理、成本控制和资金风险防控履职，推动归母净利润达到470万元，实现降本438.69万元；同步推进财务共享、穿透式监管和合同管理系统建设，并配合完成股份减持及信息披露。总体履职成效良好，建议持续跟踪海外经营及“两金”占用风险。",
+  },
+  2: {
+    gaoying:
+      "2026年第二季度，高英持续推进预算控制、降本增效和风险防控，上半年主营业务收入、利润总额分别完成年度预算的56.14%和67.25%，累计实现降本1780万元；推进逾期应收和积压存货治理，并推动数智化及具身智能产业协同。建议继续关注海外回款、汇率波动和重点降本项目成效。",
+  },
 };
+
+export const generatedAnalysis =
+  generatedAnalysisByQuarterAndExecutive["2"].gaoying;

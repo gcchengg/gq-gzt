@@ -26,6 +26,18 @@ export function getQuarterStateKey(quarter, executiveId) {
   return `${normalizeQuarter(quarter)}:${executiveId}`;
 }
 
+export function getQuarterDetailContext(rawQuarter, reports, executiveId) {
+  const quarter = normalizeQuarter(rawQuarter);
+  const config = getQuarterConfig(quarter);
+  return {
+    quarter,
+    label: config.label,
+    months: config.months,
+    stateKey: getQuarterStateKey(quarter, executiveId),
+    reports: filterReportsByQuarter(reports, quarter, executiveId),
+  };
+}
+
 export function buildExecutiveMaintenancePath(record) {
   const params = new URLSearchParams({
     company: record.shortForm,

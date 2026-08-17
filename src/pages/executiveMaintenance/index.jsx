@@ -20,19 +20,17 @@ import {
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   executiveProfiles,
-  generatedAnalysisByExecutive,
+  generatedAnalysisByQuarterAndExecutive,
   monthlyReports,
 } from "./data";
+import {
+  filterReportsByQuarter,
+  getQuarterDetailContext,
+  getQuarterStateKey,
+} from "./quarter";
 import styles from "./index.module.less";
 
 const { TextArea } = Input;
-
-const initialActiveReports = Object.fromEntries(
-  executiveProfiles.map((person) => [
-    person.id,
-    monthlyReports.find((report) => report.executiveId === person.id)?.id || "",
-  ]),
-);
 
 export default function ExecutiveMaintenance() {
   const navigate = useNavigate();
@@ -41,11 +39,10 @@ export default function ExecutiveMaintenance() {
   const [selectedExecutiveId, setSelectedExecutiveId] = useState(
     executiveProfiles[0]?.id || "",
   );
-  const [activeReportByExecutive, setActiveReportByExecutive] =
-    useState(initialActiveReports);
-  const [analysisByExecutive, setAnalysisByExecutive] = useState({});
-  const [analyzingExecutiveId, setAnalyzingExecutiveId] = useState("");
-  const [confirmedByExecutive, setConfirmedByExecutive] = useState({});
+  const [activeReportByState, setActiveReportByState] = useState({});
+  const [analysisByState, setAnalysisByState] = useState({});
+  const [analyzingStateKey, setAnalyzingStateKey] = useState("");
+  const [confirmedByState, setConfirmedByState] = useState({});
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const selectedExecutive = useMemo(
@@ -54,54 +51,69 @@ export default function ExecutiveMaintenance() {
       executiveProfiles[0],
     [selectedExecutiveId],
   );
-  const selectedReports = useMemo(
+  const rawQuarter = searchParams.get("quater");
+  const quarterContext = useMemo(
     () =>
-      monthlyReports.filter(
-        (report) => report.executiveId === selectedExecutive?.id,
+      getQuarterDetailContext(
+        rawQuarter,
+        monthlyReports,
+        selectedExecutive?.id,
       ),
-    [selectedExecutive?.id],
+    [rawQuarter, selectedExecutive?.id],
   );
-  const analysis = analysisByExecutive[selectedExecutive?.id] || "";
-  const confirmed = Boolean(confirmedByExecutive[selectedExecutive?.id]);
-  const confirmedCount =
-    Object.values(confirmedByExecutive).filter(Boolean).length;
+  const {
+    quarter,
+    label: quarterLabel,
+    reports: selectedReports,
+  } = quarterContext;
+  const selectedStateKey = quarterContext.stateKey;
+  const activeReportId =
+    activeReportByState[selectedStateKey] ?? selectedReports[0]?.id ?? "";
+  const analysis = analysisByState[selectedStateKey] || "";
+  const confirmed = Boolean(confirmedByState[selectedStateKey]);
+  const confirmedCount = executiveProfiles.filter((person) =>
+    Boolean(confirmedByState[getQuarterStateKey(quarter, person.id)]),
+  ).length;
   const characterCount = useMemo(
     () => analysis.replace(/\s/g, "").length,
     [analysis],
   );
-  const maintenancePeriod = searchParams.get("period") || "半年度";
   const maintenanceYear =
     searchParams.get("year") || selectedExecutive?.year || "2026";
-  const totalReports = monthlyReports.length;
+  const totalReports = monthlyReports.filter((report) =>
+    quarterContext.months.includes(report.month),
+  ).length;
 
   const updateAnalysis = (value) => {
-    setAnalysisByExecutive((current) => ({
+    setAnalysisByState((current) => ({
       ...current,
-      [selectedExecutive.id]: value,
+      [selectedStateKey]: value,
     }));
-    setConfirmedByExecutive((current) => ({
+    setConfirmedByState((current) => ({
       ...current,
-      [selectedExecutive.id]: false,
+      [selectedStateKey]: false,
     }));
   };
 
   const handleAnalyze = () => {
+    if (!selectedReports.length) return;
+
     const executiveId = selectedExecutive.id;
-    setAnalyzingExecutiveId(executiveId);
-    setConfirmedByExecutive((current) => ({
+    const generatedAnalysis =
+      generatedAnalysisByQuarterAndExecutive[quarter]?.[executiveId] || "";
+    setAnalyzingStateKey(selectedStateKey);
+    setConfirmedByState((current) => ({
       ...current,
-      [executiveId]: false,
+      [selectedStateKey]: false,
     }));
     window.setTimeout(() => {
-      setAnalysisByExecutive((current) => ({
+      setAnalysisByState((current) => ({
         ...current,
-        [executiveId]:
-          generatedAnalysisByExecutive[executiveId] ||
-          `截至${maintenanceYear}年6月，${selectedExecutive.name}已完成阶段性履职报告。`,
+        [selectedStateKey]: generatedAnalysis,
       }));
-      setAnalyzingExecutiveId("");
+      setAnalyzingStateKey("");
       messageApi.success(
-        `${selectedExecutive.name}的AI履职分析已生成，可继续修改`,
+        `${selectedExecutive.name}的${quarterLabel}AI履职分析已生成，可继续修改`,
       );
     }, 650);
   };
@@ -144,7 +156,7 @@ export default function ExecutiveMaintenance() {
               <SafetyCertificateOutlined />
               <span>维护周期</span>
               <strong>
-                {maintenanceYear}年 · {maintenancePeriod}
+                {maintenanceYear}年 · {quarterLabel}
               </strong>
             </div>
           </header>
@@ -204,8 +216,14 @@ export default function ExecutiveMaintenance() {
               <div className={styles.personGrid}>
                 {executiveProfiles.map((person) => {
                   const selected = person.id === selectedExecutive?.id;
+                  const personStateKey = getQuarterStateKey(quarter, person.id);
+                  const personReportCount = filterReportsByQuarter(
+                    monthlyReports,
+                    quarter,
+                    person.id,
+                  );
                   const personConfirmed = Boolean(
-                    confirmedByExecutive[person.id],
+                    confirmedByState[personStateKey],
                   );
                   return (
                     <button
@@ -224,7 +242,7 @@ export default function ExecutiveMaintenance() {
                         <em>任期 {person.tenure}</em>
                       </span>
                       <span className={styles.personProgress}>
-                        <small>月报 {person.reportProgress}</small>
+                        <small>月报 {personReportCount.length} / 3</small>
                         <Tag color={personConfirmed ? "success" : "processing"}>
                           {personConfirmed ? "已确认" : "待确认"}
                         </Tag>
@@ -242,20 +260,18 @@ export default function ExecutiveMaintenance() {
                     <h2>{selectedExecutive?.name} · 月度履职记录</h2>
                     <p>
                       {selectedExecutive?.position} · 月报{" "}
-                      {selectedExecutive?.reportProgress}
+                      {selectedReports.length} / 3
                     </p>
                   </div>
                   <Tag className={styles.companyTag}>
-                    {maintenanceYear}年 · {maintenancePeriod}
+                    {maintenanceYear}年 · {quarterLabel}
                   </Tag>
                 </div>
 
                 {selectedReports.length ? (
                   <div className={styles.reportList}>
                     {selectedReports.map((report) => {
-                      const expanded =
-                        activeReportByExecutive[selectedExecutive.id] ===
-                        report.id;
+                      const expanded = activeReportId === report.id;
                       return (
                         <article
                           className={`${styles.reportItem} ${expanded ? styles.expanded : ""}`}
@@ -266,11 +282,9 @@ export default function ExecutiveMaintenance() {
                             type="button"
                             aria-expanded={expanded}
                             onClick={() =>
-                              setActiveReportByExecutive((current) => ({
+                              setActiveReportByState((current) => ({
                                 ...current,
-                                [selectedExecutive.id]: expanded
-                                  ? ""
-                                  : report.id,
+                                [selectedStateKey]: expanded ? "" : report.id,
                               }))
                             }
                           >
@@ -346,7 +360,7 @@ export default function ExecutiveMaintenance() {
                   </div>
                 ) : (
                   <Empty
-                    description={`${selectedExecutive?.name}暂无月度履职记录`}
+                    description={`${selectedExecutive?.name}暂无${quarterLabel}月度履职记录`}
                   />
                 )}
               </section>
@@ -359,13 +373,16 @@ export default function ExecutiveMaintenance() {
                   <div>
                     <h2>{selectedExecutive?.name} · 履职综合分析</h2>
                     <p>
-                      仅分析当前人员的月度工作完成情况与助力集团发展情况，切换人员后内容独立保存。
+                      {selectedReports.length
+                        ? `仅分析当前人员${quarterLabel}的月度工作完成情况与助力集团发展情况。`
+                        : "当前季度暂无月报，暂不能生成分析；可根据实际情况手工填写。"}
                     </p>
                   </div>
                   <Button
                     type="primary"
                     icon={<RobotOutlined />}
-                    loading={analyzingExecutiveId === selectedExecutive?.id}
+                    loading={analyzingStateKey === selectedStateKey}
+                    disabled={selectedReports.length === 0}
                     onClick={handleAnalyze}
                   >
                     {analysis ? "重新分析" : "AI智能分析"}
@@ -376,7 +393,7 @@ export default function ExecutiveMaintenance() {
                     value={analysis}
                     onChange={(event) => updateAnalysis(event.target.value)}
                     rows={7}
-                    placeholder={`点击“AI智能分析”生成${selectedExecutive?.name}的履职分析，生成后可修改。`}
+                    placeholder={`点击“AI智能分析”生成${selectedExecutive?.name}的${quarterLabel}履职分析，生成后可修改。`}
                     maxLength={500}
                   />
                   <div className={styles.editorFooter}>
@@ -422,22 +439,23 @@ export default function ExecutiveMaintenance() {
       </div>
 
       <Modal
-        title={`确认${selectedExecutive?.name}的履职维护结果？`}
+        title={`确认${selectedExecutive?.name}的${quarterLabel}履职维护结果？`}
         open={confirmOpen}
         okText="确认"
         cancelText="取消"
         onCancel={() => setConfirmOpen(false)}
         onOk={() => {
-          setConfirmedByExecutive((current) => ({
+          setConfirmedByState((current) => ({
             ...current,
-            [selectedExecutive.id]: true,
+            [selectedStateKey]: true,
           }));
           setConfirmOpen(false);
           messageApi.success(`${selectedExecutive.name}的履职维护结果已确认`);
         }}
       >
         <p>
-          确认后将保存该人员的月度履职复核记录及当前分析内容，不影响其他委派高管。
+          确认后将保存该人员{quarterLabel}
+          的月度履职复核记录及当前分析内容，不影响其他季度或委派高管。
         </p>
       </Modal>
     </ConfigProvider>

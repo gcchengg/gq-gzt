@@ -1,10 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  generatedAnalysis,
+  generatedAnalysisByQuarterAndExecutive,
+} from "./data.js";
+import {
   buildExecutiveMaintenancePath,
   buildQuarterlyMaintenanceRows,
   filterReportsByQuarter,
   getQuarterConfig,
+  getQuarterDetailContext,
   getQuarterStateKey,
   normalizeQuarter,
 } from "./quarter.js";
@@ -77,6 +82,39 @@ test("filters reports by executive and quarter", () => {
 
 test("creates isolated quarter and executive state keys", () => {
   assert.equal(getQuarterStateKey("2", "gaoying"), "2:gaoying");
+});
+
+test("creates a normalized and isolated detail context", () => {
+  const context = getQuarterDetailContext(
+    "invalid",
+    [
+      { id: "jan", executiveId: "gaoying", month: 1 },
+      { id: "apr", executiveId: "gaoying", month: 4 },
+    ],
+    "gaoying",
+  );
+
+  assert.equal(context.quarter, "1");
+  assert.equal(context.label, "第一季度");
+  assert.equal(context.stateKey, "1:gaoying");
+  assert.deepEqual(
+    context.reports.map((report) => report.id),
+    ["jan"],
+  );
+});
+
+test("provides independent generated analysis only for quarters with reports", () => {
+  assert.match(generatedAnalysisByQuarterAndExecutive["1"].gaoying, /第一季度/);
+  assert.match(generatedAnalysisByQuarterAndExecutive["2"].gaoying, /第二季度/);
+  assert.equal(generatedAnalysisByQuarterAndExecutive["3"], undefined);
+  assert.equal(generatedAnalysisByQuarterAndExecutive["4"], undefined);
+});
+
+test("retains the generated analysis export for existing consumers", () => {
+  assert.equal(
+    generatedAnalysis,
+    generatedAnalysisByQuarterAndExecutive["2"].gaoying,
+  );
 });
 
 test("builds a detail URL with quater as the only period parameter", () => {
