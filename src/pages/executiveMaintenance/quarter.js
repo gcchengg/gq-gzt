@@ -35,6 +35,27 @@ export function setQuarterStateLoading(loadingByState, stateKey, isLoading) {
   return remainingLoading;
 }
 
+export function getAnalysisInteractionState({ analyzingByState, stateKey }) {
+  const isAnalyzing = Boolean(analyzingByState[stateKey]);
+  return {
+    isAnalyzing,
+    canEdit: !isAnalyzing,
+    canConfirm: !isAnalyzing,
+  };
+}
+
+export function getAnalysisPlaceholder({
+  hasReports,
+  executiveName,
+  quarterLabel,
+}) {
+  if (!hasReports) {
+    return `${executiveName}暂无${quarterLabel}月度履职记录，请根据实际情况手工填写履职分析。`;
+  }
+
+  return `点击“AI智能分析”生成${executiveName}的${quarterLabel}履职分析，生成后可修改。`;
+}
+
 export function getQuarterDetailContext(rawQuarter, reports, executiveId) {
   const quarter = normalizeQuarter(rawQuarter);
   const config = getQuarterConfig(quarter);

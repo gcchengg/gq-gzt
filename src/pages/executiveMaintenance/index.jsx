@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCircleFilled,
   DownOutlined,
@@ -25,6 +25,8 @@ import {
 } from "./data";
 import {
   filterReportsByQuarter,
+  getAnalysisInteractionState,
+  getAnalysisPlaceholder,
   getQuarterDetailContext,
   getQuarterStateKey,
   setQuarterStateLoading,
@@ -45,6 +47,15 @@ export default function ExecutiveMaintenance() {
   const [analyzingByState, setAnalyzingByState] = useState({});
   const [confirmedByState, setConfirmedByState] = useState({});
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const analysisTimersRef = useRef(new Map());
+
+  useEffect(
+    () => () => {
+      analysisTimersRef.current.forEach((timer) => window.clearTimeout(timer));
+      analysisTimersRef.current.clear();
+    },
+    [],
+  );
 
   const selectedExecutive = useMemo(
     () =>
@@ -72,6 +83,10 @@ export default function ExecutiveMaintenance() {
     activeReportByState[selectedStateKey] ?? selectedReports[0]?.id ?? "";
   const analysis = analysisByState[selectedStateKey] || "";
   const confirmed = Boolean(confirmedByState[selectedStateKey]);
+  const analysisInteraction = getAnalysisInteractionState({
+    analyzingByState,
+    stateKey: selectedStateKey,
+  });
   const confirmedCount = executiveProfiles.filter((person) =>
     Boolean(confirmedByState[getQuarterStateKey(quarter, person.id)]),
   ).length;
@@ -97,7 +112,12 @@ export default function ExecutiveMaintenance() {
   };
 
   const handleAnalyze = () => {
-    if (!selectedReports.length) return;
+    if (
+      !selectedReports.length ||
+      analysisTimersRef.current.has(selectedStateKey)
+    ) {
+      return;
+    }
 
     const executiveId = selectedExecutive.id;
     const generatedAnalysis =
@@ -109,10 +129,15 @@ export default function ExecutiveMaintenance() {
       ...current,
       [selectedStateKey]: false,
     }));
-    window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
+      analysisTimersRef.current.delete(selectedStateKey);
       setAnalysisByState((current) => ({
         ...current,
         [selectedStateKey]: generatedAnalysis,
+      }));
+      setConfirmedByState((current) => ({
+        ...current,
+        [selectedStateKey]: false,
       }));
       setAnalyzingByState((current) =>
         setQuarterStateLoading(current, selectedStateKey, false),
@@ -121,6 +146,7 @@ export default function ExecutiveMaintenance() {
         `${selectedExecutive.name}的${quarterLabel}AI履职分析已生成，可继续修改`,
       );
     }, 650);
+    analysisTimersRef.current.set(selectedStateKey, timer);
   };
 
   const handleConfirm = () => {
@@ -386,7 +412,7 @@ export default function ExecutiveMaintenance() {
                   <Button
                     type="primary"
                     icon={<RobotOutlined />}
-                    loading={Boolean(analyzingByState[selectedStateKey])}
+                    loading={analysisInteraction.isAnalyzing}
                     disabled={selectedReports.length === 0}
                     onClick={handleAnalyze}
                   >
@@ -397,8 +423,13 @@ export default function ExecutiveMaintenance() {
                   <TextArea
                     value={analysis}
                     onChange={(event) => updateAnalysis(event.target.value)}
+                    disabled={!analysisInteraction.canEdit}
                     rows={7}
-                    placeholder={`点击“AI智能分析”生成${selectedExecutive?.name}的${quarterLabel}履职分析，生成后可修改。`}
+                    placeholder={getAnalysisPlaceholder({
+                      hasReports: selectedReports.length > 0,
+                      executiveName: selectedExecutive?.name,
+                      quarterLabel,
+                    })}
                     maxLength={500}
                   />
                   <div className={styles.editorFooter}>
@@ -432,7 +463,7 @@ export default function ExecutiveMaintenance() {
                 <Button
                   size="large"
                   type="primary"
-                  disabled={confirmed}
+                  disabled={confirmed || !analysisInteraction.canConfirm}
                   onClick={handleConfirm}
                 >
                   {confirmed ? "已确认" : `确认${selectedExecutive?.name}`}
