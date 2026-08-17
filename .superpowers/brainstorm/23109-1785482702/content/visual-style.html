@@ -1,0 +1,66 @@
+<style>
+  .style-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:24px}
+  .style-card{border:1px solid #293142;border-radius:18px;overflow:hidden;background:#111722;cursor:pointer;transition:.2s}
+  .style-card:hover{transform:translateY(-3px);border-color:#61e7a2}.style-card.selected{outline:3px solid #61e7a2}
+  .phone{aspect-ratio:9/16;margin:14px;border-radius:15px;overflow:hidden;position:relative}
+  .phone-a{background:linear-gradient(160deg,#fff7e7,#ffd8c4)}
+  .phone-b{background:radial-gradient(circle at 70% 15%,#0d7771 0,#071419 30%,#04070b 75%)}
+  .phone-c{background:linear-gradient(155deg,#08141a,#10282a 55%,#101419)}
+  .topline{position:absolute;left:8%;right:8%;top:7%;display:flex;justify-content:space-between;font:700 10px/1.2 system-ui}
+  .hero{position:absolute;left:8%;right:8%;top:15%;font:900 18px/1.15 system-ui}
+  .character{position:absolute;left:9%;bottom:18%;width:42%;height:42%;border-radius:48% 48% 38% 38%;background:#ffce75;box-shadow:inset 0 0 0 5px #4f3426}
+  .character:before{content:"";position:absolute;left:20%;right:20%;top:23%;height:12%;border-bottom:5px solid #4f3426;border-radius:50%}
+  .bubble{position:absolute;right:7%;top:35%;width:45%;padding:9px;border-radius:14px;background:white;color:#222;font:700 9px/1.4 system-ui;box-shadow:0 8px 18px #8e5c4a33}
+  .neon-card{position:absolute;left:8%;right:8%;top:27%;height:46%;border:1px solid #ff795f;border-radius:14px;background:#111820dd;box-shadow:0 0 24px #ff684c77;color:white;padding:14px}
+  .neon-card h4,.hybrid-card h4{margin:0 0 9px;font:800 13px system-ui}.neon-card p,.hybrid-card p{font:600 8px/1.5 system-ui}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}.chips i{font:700 7px system-ui;padding:4px 6px;border-radius:99px;background:#ff735d22;border:1px solid #ff735d}
+  .hybrid-char{position:absolute;left:4%;bottom:10%;width:42%;height:48%;border-radius:46% 46% 34% 34%;background:#78efba;box-shadow:inset 0 0 0 5px #0a3d38,0 0 28px #45e5af66}
+  .hybrid-char:before{content:"••";letter-spacing:13px;position:absolute;left:30%;top:22%;color:#062d2a;font-size:16px}
+  .hybrid-card{position:absolute;right:5%;top:25%;width:58%;height:42%;box-sizing:border-box;padding:13px;border:1px solid #61e7a2;border-radius:14px;background:#0a141ddd;color:#fff;box-shadow:0 0 28px #38d6a655}
+  .flow{position:absolute;right:8%;bottom:17%;display:flex;align-items:center;gap:4px;color:#baf8df;font:800 7px system-ui}.flow b{padding:5px;border-radius:5px;background:#163631}
+  .caption{padding:0 15px 16px}.caption h3{margin:0 0 6px;color:#f5f7fa}.caption p{margin:0;color:#9da7b8;font-size:13px}
+  @media(max-width:900px){.style-grid{grid-template-columns:1fr}.phone{max-width:310px;margin:14px auto}}
+</style>
+
+<h2>10 个热门 Skill 教程：选择主视觉</h2>
+<p class="subtitle">三套方案使用同一个“Skill 登场并演示用途”的镜头。点击你最想继续深化的一套。</p>
+
+<div class="style-grid">
+  <div class="style-card" data-choice="a-comic" onclick="toggleSelect(this)">
+    <div class="phone phone-a">
+      <div class="topline" style="color:#764a33"><span>SKILL 01</span><span>技能发现器</span></div>
+      <div class="hero" style="color:#44281e">想做 PPT，<br>却不知道装什么？</div>
+      <div class="character"></div>
+      <div class="bubble">“交给 Find Skills，输入任务就能匹配工具！”</div>
+    </div>
+    <div class="caption"><h3>A｜漫画故事型</h3><p>角色感最强、亲切易懂；适合小白，但科技产品感较弱。</p></div>
+  </div>
+
+  <div class="style-card" data-choice="b-neon" onclick="toggleSelect(this)">
+    <div class="phone phone-b">
+      <div class="topline" style="color:#98ffe0"><span>01 / 10</span><span>AI SKILLS</span></div>
+      <div class="hero" style="color:white">Find Skills<br><span style="color:#ff7d5f">技能发现器</span></div>
+      <div class="neon-card">
+        <h4>想做什么，自动找技能</h4>
+        <p>输入：帮我生成一套 PPT</p>
+        <div class="chips"><i>AI PPT</i><i>文档处理</i><i>内容创作</i></div>
+      </div>
+    </div>
+    <div class="caption"><h3>B｜霓虹科技卡</h3><p>延续参考视频的高级感和信息密度；统一性强，但人物记忆点较弱。</p></div>
+  </div>
+
+  <div class="style-card" data-choice="c-hybrid" onclick="toggleSelect(this)">
+    <div class="phone phone-c">
+      <div class="topline" style="color:#83f1c7"><span>SKILL QUEST</span><span>01 / 10</span></div>
+      <div class="hero" style="color:white">一句需求，<br><span style="color:#75edbd">找到正确能力</span></div>
+      <div class="hybrid-char"></div>
+      <div class="hybrid-card">
+        <h4>Find Skills</h4>
+        <p>任务拆词 → 匹配技能 → 给出安装方案</p>
+        <div class="chips"><i>自动匹配</i><i>快速安装</i></div>
+      </div>
+      <div class="flow"><b>需求</b>→<b>技能</b>→<b>结果</b></div>
+    </div>
+    <div class="caption"><h3>C｜漫画 × 科技融合</h3><p>角色负责故事和情绪，卡片负责知识与演示；最适合做连续系列。</p></div>
+  </div>
+</div>

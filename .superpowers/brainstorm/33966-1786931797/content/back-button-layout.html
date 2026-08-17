@@ -1,0 +1,72 @@
+<style>
+  .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .card-image { padding: 14px; background: #f4f7fb; min-height: 242px; }
+  .page-shell { height: 214px; padding: 10px; background: #f5f7fb; border-radius: 8px; }
+  .page-header { height: 100%; box-sizing: border-box; padding: 14px 16px; background: #fff; border: 1px solid #dfe5ee; border-top: 3px solid #193765; border-radius: 10px; box-shadow: 0 6px 18px rgba(31,42,61,.07); color: #1f2a3d; }
+  .back-link { display: inline-flex; align-items: center; gap: 5px; color: #274f9d; font-size: 10px; font-weight: 600; }
+  .title { margin-top: 10px; color: #193765; font-family: Georgia, serif; font-size: 18px; font-weight: 700; }
+  .desc { margin-top: 4px; color: #68758a; font-size: 9px; }
+  .stamp { padding: 8px 10px; background: #f3f7fd; border: 1px solid #dce6f4; border-radius: 7px; color: #193765; font-size: 9px; }
+  .stamp strong { display: block; margin-top: 2px; font-size: 11px; }
+  .content-line { height: 34px; margin-top: 14px; background: linear-gradient(90deg,#1b3a68 32%,#fff 32%); border: 1px solid #e3e8f0; border-radius: 8px; }
+  .a-toolbar { padding-bottom: 9px; border-bottom: 1px solid #edf0f5; }
+  .a-main { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
+  .b-main { display: flex; justify-content: space-between; align-items: flex-start; height: 112px; }
+  .b-left .back-link { margin-bottom: 8px; }
+  .b-left .title { margin-top: 0; }
+  .c-shell { position: relative; padding-top: 30px; }
+  .c-back { position: absolute; top: 0; left: 0; padding: 7px 10px; background: #fff; border: 1px solid #dfe5ee; border-radius: 7px; box-shadow: 0 4px 12px rgba(31,42,61,.08); }
+  .c-main { display:flex; justify-content:space-between; align-items:center; }
+  @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+</style>
+
+<h2>“返回维护列表”放在哪里更自然？</h2>
+<p class="subtitle">三种方案都保留现有页面风格，重点比较视觉层级、标题对齐和操作可发现性。</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="page-shell">
+        <div class="page-header">
+          <div class="a-toolbar"><span class="back-link">← 返回维护列表</span></div>
+          <div class="a-main">
+            <div><div class="title">外派高管履职分析</div><div class="desc">按人员复核季度履职记录，确认后归档</div></div>
+            <div class="stamp">维护周期<strong>2026年 · 第一季度</strong></div>
+          </div>
+          <div class="content-line"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body"><h3>A · 顶部工具栏</h3><p>返回入口独占一行，最清楚，但会略微增加页头高度。</p></div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="page-shell">
+        <div class="page-header">
+          <div class="b-main">
+            <div class="b-left"><span class="back-link">← 返回维护列表</span><div class="title">外派高管履职分析</div><div class="desc">按人员复核季度履职记录，确认后归档</div></div>
+            <div class="stamp">维护周期<strong>2026年 · 第一季度</strong></div>
+          </div>
+          <div class="content-line"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body"><h3>B · 标题上方轻链接（推荐）</h3><p>与标题组成同一信息组，对齐自然、紧凑，返回操作也足够醒目。</p></div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div class="page-shell c-shell">
+        <span class="back-link c-back">← 返回维护列表</span>
+        <div class="page-header">
+          <div class="c-main"><div><div class="title">外派高管履职分析</div><div class="desc">按人员复核季度履职记录，确认后归档</div></div><div class="stamp">维护周期<strong>2026年 · 第一季度</strong></div></div>
+          <div class="content-line"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body"><h3>C · 页头外悬浮按钮</h3><p>页头内部最整洁，但按钮与标题关系较弱，窄屏时占据额外空间。</p></div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:18px">点击一个方案进行选择，然后回到对话告诉我你的想法。</p>

@@ -1,0 +1,17 @@
+:root {
+  --canvas: #05090d;
+  --surface-1: #091218;
+  --surface-2: #0d1a21;
+  --line: #20343b;
+  --text: #f4f8f7;
+  --muted: #8ca0a2;
+  --accent: #61e7b5;
+  --info: #68a8ff;
+  --warning: #ff8a5b;
+  --success: #65e6a7;
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --safe-x: 72px;
+  --safe-top: 96px;
+  --safe-bottom: 210px;
+}

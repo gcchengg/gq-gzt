@@ -1,0 +1,17 @@
+{
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "durationSeconds": 335,
+  "scenes": [
+    { "id": "opening", "start": 0, "end": 20 },
+    { "id": "find-skills", "start": 20, "end": 80 },
+    { "id": "tavily-search", "start": 80, "end": 140 },
+    { "id": "summarize", "start": 140, "end": 200 },
+    { "id": "skill-creator", "start": 200, "end": 260 },
+    { "id": "document-suite", "start": 260, "end": 320 },
+    { "id": "closing", "start": 320, "end": 335 }
+  ],
+  "captions": [],
+  "audioCues": []
+}

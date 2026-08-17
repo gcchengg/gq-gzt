@@ -1,0 +1,211 @@
+@font-face {
+  font-family: "PingFang SC";
+  src: local("PingFang SC");
+}
+
+@font-face {
+  font-family: "Microsoft YaHei";
+  src: local("Microsoft YaHei");
+}
+
+@font-face {
+  font-family: "SFMono-Regular";
+  src: local("SF Mono");
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+body {
+  color: var(--text);
+  font-family: "PingFang SC", "Microsoft YaHei";
+}
+
+code,
+pre,
+.monospace {
+  font-family: "SFMono-Regular";
+}
+
+.frame {
+  position: relative;
+  width: 1080px;
+  height: 1920px;
+  overflow: hidden;
+  background: var(--canvas);
+}
+
+.clip,
+.scene-fill {
+  position: absolute;
+  inset: 0;
+}
+
+.scene-fill {
+  background: var(--canvas);
+  opacity: 0.8;
+}
+
+.skill-frame {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 28px;
+  padding: var(--safe-top) var(--safe-x) var(--safe-bottom);
+  background: linear-gradient(155deg, var(--surface-2), var(--canvas) 68%);
+}
+
+.skill-frame header {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.skill-frame h1 {
+  max-inline-size: 16ch;
+  color: var(--accent);
+  font-size: 82px;
+  line-height: 1.08;
+}
+
+.skill-frame h2 {
+  max-inline-size: 22ch;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.skill-body,
+.result-panel p,
+.warning {
+  max-inline-size: 32em;
+  color: var(--text);
+  font-size: 30px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.prompt,
+.result-panel,
+.warning {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+}
+
+.prompt {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 28px 32px;
+}
+
+.prompt > span {
+  color: var(--info);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.prompt code {
+  max-inline-size: 32em;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.cursor {
+  width: 4px;
+  height: 1.15em;
+  background: var(--accent);
+}
+
+.process-flow {
+  display: grid;
+  gap: 18px;
+  list-style: none;
+  counter-reset: process;
+}
+
+.process-flow li {
+  max-inline-size: 32em;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 84px;
+  padding: 20px 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1.35;
+  counter-increment: process;
+}
+
+.process-flow li::before {
+  content: counter(process, decimal-leading-zero);
+  color: var(--accent);
+  font-family: "SFMono-Regular";
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.result-panel {
+  padding: 30px 32px;
+}
+
+.result-panel h3 {
+  margin-bottom: 18px;
+  color: var(--success);
+  font-size: 26px;
+  letter-spacing: 0.06em;
+}
+
+.result-panel p + p {
+  margin-top: 12px;
+}
+
+.warning {
+  padding: 26px 30px;
+  border-color: color-mix(in srgb, var(--warning) 55%, var(--line));
+  color: var(--warning);
+}
+
+.caption {
+  position: absolute;
+  right: var(--safe-x);
+  bottom: 0;
+  left: var(--safe-x);
+  display: grid;
+  align-content: center;
+  min-height: var(--safe-bottom);
+  gap: 8px;
+  padding: 30px 0 46px;
+  color: var(--text);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  text-shadow: 0 2px 18px var(--canvas);
+}
+
+.caption span {
+  display: block;
+}

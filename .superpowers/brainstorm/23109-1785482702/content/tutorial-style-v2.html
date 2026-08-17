@@ -1,0 +1,78 @@
+<style>
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:24px}
+  .pick{border:1px solid #2b3444;border-radius:18px;overflow:hidden;background:#101620;cursor:pointer;transition:.2s}
+  .pick:hover{transform:translateY(-3px);border-color:#69e8bd}.pick.selected{outline:3px solid #69e8bd}
+  .frame{aspect-ratio:9/16;margin:14px;border-radius:15px;overflow:hidden;position:relative;font-family:Inter,system-ui}
+  .meta{position:absolute;top:6%;left:7%;right:7%;display:flex;justify-content:space-between;font-size:8px;font-weight:800;letter-spacing:.12em}
+  .headline{position:absolute;top:14%;left:7%;right:7%;font-size:19px;line-height:1.08;font-weight:900}
+  .panel{position:absolute;left:7%;right:7%;top:30%;bottom:13%;border-radius:13px;padding:14px;box-sizing:border-box}
+  .panel h4{font-size:12px;margin:0 0 8px}.panel p{font-size:8px;line-height:1.5;margin:0}
+  .tag{display:inline-block;margin:7px 3px 0 0;padding:4px 6px;border-radius:99px;font-size:7px;font-weight:800}
+  .flow{display:flex;align-items:center;justify-content:space-between;margin-top:18px;font-size:7px;font-weight:800}
+  .node{padding:6px;border-radius:6px;text-align:center}
+  .bar{height:5px;border-radius:5px;margin-top:9px}
+  .caption{padding:0 15px 16px}.caption h3{margin:0 0 6px;color:#f5f7fa}.caption p{margin:0;color:#9da7b8;font-size:13px}
+  .dark{background:radial-gradient(circle at 80% 10%,#124d47,#071116 34%,#05080d 80%);color:#fff}
+  .dark .meta{color:#65e6bc}.dark .headline em{font-style:normal;color:#70e9bf}
+  .dark .panel{background:#0b141bd9;border:1px solid #4fe0b0;box-shadow:0 0 30px #26d49a44}
+  .dark .tag,.dark .node{background:#17372f;color:#8cf2cf}.dark .bar{background:linear-gradient(90deg,#58e8b7 72%,#24343a 72%)}
+  .light{background:#f4f3ef;color:#15191e}.light .meta{color:#6b747c}.light .headline em{font-style:normal;color:#e95735}
+  .light .panel{background:#fff;border:1px solid #d8d9d5;box-shadow:0 18px 40px #20252b18}
+  .light .tag,.light .node{background:#f0ece2;color:#222}.light .bar{background:linear-gradient(90deg,#ef6847 72%,#e9e6df 72%)}
+  .blue{background:linear-gradient(165deg,#07152d,#0b2750 52%,#071a33);color:#fff}
+  .blue .meta{color:#83b5ff}.blue .headline em{font-style:normal;color:#66d2ff}
+  .blue .panel{background:linear-gradient(145deg,#102f5ecc,#091a35dd);border:1px solid #3e8cff;box-shadow:0 0 36px #177dff55}
+  .blue .tag,.blue .node{background:#163f72;color:#9dd8ff}.blue .bar{background:linear-gradient(90deg,#4da8ff 72%,#183653 72%)}
+  .terminal{margin-top:14px;background:#071019;border-radius:8px;padding:9px;color:#83ffc8;font:700 7px/1.6 monospace}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.frame{max-width:310px;margin:14px auto}}
+</style>
+
+<h2>高端教程类：重新选择视觉系统</h2>
+<p class="subtitle">全部取消人物与漫画元素。三套方案都用真实任务、界面卡片、数据流和前后对比来讲解 Skill。</p>
+
+<div class="grid">
+  <div class="pick" data-choice="a-dark-interface" onclick="toggleSelect(this)">
+    <div class="frame dark">
+      <div class="meta"><span>SKILL 01 / 10</span><span>AI TOOLKIT</span></div>
+      <div class="headline">Find Skills<br><em>一句需求，找到正确能力</em></div>
+      <div class="panel">
+        <h4>任务识别</h4><p>“帮我找一个能自动生成 PPT 的 Skill”</p>
+        <div class="flow"><span class="node">需求拆解</span><b>→</b><span class="node">能力匹配</span><b>→</b><span class="node">安装建议</span></div>
+        <div class="terminal">MATCH 96% · ppt-generator<br>READY TO INSTALL ✓</div>
+        <span class="tag">精准匹配</span><span class="tag">自动配置</span>
+      </div>
+    </div>
+    <div class="caption"><h3>A｜暗色界面演示</h3><p>最接近专业 AI 产品发布片；高密度、强科技感，适合流程动画和代码界面。</p></div>
+  </div>
+
+  <div class="pick" data-choice="b-editorial" onclick="toggleSelect(this)">
+    <div class="frame light">
+      <div class="meta"><span>THE SKILL INDEX</span><span>01 / 10</span></div>
+      <div class="headline">Find Skills<br><em>停止手动翻找</em></div>
+      <div class="panel">
+        <p style="letter-spacing:.13em;color:#7a7f83">HOW IT WORKS</p>
+        <h4 style="font-size:15px;margin-top:13px">描述任务，自动匹配最合适的 Skill</h4>
+        <div class="flow"><span class="node">输入</span><b>→</b><span class="node">筛选</span><b>→</b><span class="node">结果</span></div>
+        <div class="bar"></div>
+        <span class="tag">效率 +300%</span><span class="tag">减少试错</span>
+      </div>
+    </div>
+    <div class="caption"><h3>B｜杂志编辑教程</h3><p>克制、留白、高级，像商业杂志或咨询报告；阅读性最好，科技冲击稍弱。</p></div>
+  </div>
+
+  <div class="pick" data-choice="c-blueprint" onclick="toggleSelect(this)">
+    <div class="frame blue">
+      <div class="meta"><span>SKILL BLUEPRINT</span><span>MODULE 01</span></div>
+      <div class="headline">Find Skills<br><em>从任务到能力的路径</em></div>
+      <div class="panel">
+        <p style="color:#87b7e8">INPUT / PROCESS / OUTPUT</p>
+        <div class="flow"><span class="node">PPT 需求</span><b>→</b><span class="node">语义检索</span><b>→</b><span class="node">Skill 清单</span></div>
+        <div style="margin-top:22px;border-left:2px solid #57b9ff;padding-left:10px">
+          <h4>可视化工作原理</h4><p>用网格、节点、扫描线和路径高亮，把每个 Skill 的处理过程拆开讲清楚。</p>
+        </div>
+        <span class="tag">系统化</span><span class="tag">教程感</span>
+      </div>
+    </div>
+    <div class="caption"><h3>C｜蓝图原理解构</h3><p>强调“它是怎么工作的”；最有知识教程感，适合流程图、拆解和数据可视化。</p></div>
+  </div>
+</div>

@@ -1,0 +1,251 @@
+/**
+ * EoCompCompanyTaskForm
+ */
+export interface Request {
+    companyId?: string;
+    /**
+     * 公司列表
+     */
+    companyList?: EoCompCompanyForm[];
+    /**
+     * 公司名称
+     */
+    companyName?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    currentPage?: number;
+    dutyUserId?: string;
+    dutyUserName?: string;
+    /**
+     * 本公司附件列表
+     */
+    fileList?: EoCompCompanyFileForm[];
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 所属行业
+     */
+    industry?: string;
+    /**
+     * 是否提交
+     */
+    isSubmit?: string;
+    /**
+     * 是否上市
+     */
+    listFlag?: string;
+    pageSize?: number;
+    /**
+     * 报告期
+     */
+    rptDate?: string;
+    /**
+     * 状态0 1 维护中 2 维护完成
+     */
+    status?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    year?: number;
+    [property: string]: any;
+}
+
+/**
+ * <p>
+ *
+ * </p>
+ *
+ * EoCompCompanyForm
+ */
+export interface EoCompCompanyForm {
+    /**
+     * 分类上市，非上市
+     */
+    companyCategory?: string;
+    /**
+     * 公司名称
+     */
+    companyName?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 附件
+     */
+    fileList?: EoCompCompanyFileForm[];
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 上市市场
+     */
+    listingMarket?: string;
+    /**
+     * 公司简称
+     */
+    shortForm?: string;
+    /**
+     * 任务id
+     */
+    taskId?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 股票代码
+     */
+    ticker?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 是否有效
+     */
+    validFlag?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    [property: string]: any;
+}
+
+/**
+ * <p>
+ *
+ * </p>
+ *
+ * EoCompCompanyFileForm
+ */
+export interface EoCompCompanyFileForm {
+    /**
+     * 公司id
+     */
+    companyId?: string;
+    compCompanyId?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 文件数据
+     */
+    file?: EoMgmtFile;
+    fileId?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    noticeDate?: string;
+    rptDate?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    [property: string]: any;
+}
+
+/**
+ * 文件数据
+ *
+ * EoMgmtFile
+ */
+export interface EoMgmtFile {
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 文件分类
+     */
+    fileCategory?: string;
+    /**
+     * 文件名称
+     */
+    fileName?: string;
+    /**
+     * 文件类型
+     */
+    fileType?: string;
+    /**
+     * 文件地址
+     */
+    fileUrl?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * object key
+     */
+    objectKey?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    [property: string]: any;
+}

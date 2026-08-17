@@ -10,6 +10,8 @@
 
 ## Global Constraints
 
+- Execution override approved by the user: do not run Git commands, create branches, create worktrees, stage files, or commit changes during implementation.
+- Voice direction selected by the user: restrained professional male Mandarin voice; generate a short audition before full narration.
 - Source of truth: `skill-video/top-5-skills-video-script-v3.md`.
 - Output: 1080×1920, 30fps, approximately 5 minutes 35 seconds.
 - Language: Simplified Chinese with tutorial-paced Mandarin narration.

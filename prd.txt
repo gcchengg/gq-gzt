@@ -1,2 +1,29 @@
-/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/companyList/index.jsx
-使用 later: "需要后续补充",的地方标记红色
+把/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/companyMaintenance中的代码
+合并到
+/Users/guocc/Documents/guquan/github/gq-0207_app_002_uwone/src/modules
+项目中
+
+gq-gzt项目中/companyMaintenanceList路径下有任务和列表
+前提：
+gq-0207_app_002_uwone项目中新增接口如下：
+// 可比公司维护列表
+export const findList = (params) =>
+  axios.post(`${SERVER.API}/uwone-ei/eoCompCompanyTask/findList`, params);
+// 保存 /eoCompCompanyTask/save
+export const taskSave = (params) =>
+  axios.post(`${SERVER.API}/uwone-ei/eoCompCompanyTask/save`, params);
+// 详情数据查询
+export const getById = (id) =>
+  axios.get(`${SERVER.API}/uwone-ei/eoCompCompanyTask/getById/${id}`, {});
+// 删除可比公司
+export const deleteCompanyById = (id) =>
+  axios.get(`${SERVER.API}/uwone-ei/eoCompCompanyTask/deleteCompanyById/${id}`, {});
+
+接口定义分别存储于以下文件，请根据接口名称自行对比
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/companyMaintenance/接口定义/deleteCompanyById.txt
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/companyMaintenance/接口定义/getById.txt
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/companyMaintenance/接口定义/findList.txt
+/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/companyMaintenance/接口定义/taskSave.txt
+
+从任务进入此页面的时候
+通过url上bizId当作详情的id，年份等从详情获取
