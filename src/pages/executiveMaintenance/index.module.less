@@ -22,9 +22,9 @@
 .pageHeader {
   position: relative;
   display: grid;
-  grid-template-columns: 150px 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  min-height: 96px;
+  min-height: 112px;
   padding: 18px 22px;
   overflow: hidden;
   color: @ink;
@@ -35,9 +35,8 @@
   box-shadow: 0 8px 24px rgba(31,42,61,.055);
 }
 
-.backButton { z-index: 1; padding: 7px 10px; color: @blue; background: #f2f6fc; border: 1px solid #dfe7f3; border-radius: 8px; cursor: pointer; text-align: left; }
-.backButton:hover { color: @navy; background: #eaf1fb; }
-.backButton span { margin-right: 6px; }
+.backButton { display: inline-flex; align-items: center; gap: 5px; margin: 0 0 8px; padding: 0; color: @blue; background: transparent; border: 0; cursor: pointer; font-size: 12px; font-weight: 600; }
+.backButton:hover { color: @navy; text-decoration: underline; }
 .titleBlock { z-index: 1; }
 .titleBlock h1 { margin: 0 0 4px; color: @navy; font-family: "STSong", "SimSun", serif; font-size: 27px; letter-spacing: 1px; }
 .titleBlock p { margin: 0; color: @muted; font-size: 13px; }
@@ -144,9 +143,8 @@
 
 @media (max-width: 1000px) {
   .page { padding: 18px; }
-  .pageHeader { grid-template-columns: 1fr; gap: 16px; }
-  .backButton { align-self: auto; }
-  .taskStamp { display: none; }
+  .pageHeader { grid-template-columns: 1fr; gap: 14px; }
+  .taskStamp { display: grid; justify-self: stretch; }
   .overviewCard { grid-template-columns: 1fr; }
   .overviewFacts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workspaceGrid { grid-template-columns: 1fr; }

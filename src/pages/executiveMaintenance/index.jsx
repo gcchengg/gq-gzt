@@ -146,16 +146,16 @@ export default function ExecutiveMaintenance() {
       <div className={styles.page}>
         <div className={styles.content}>
           <header className={styles.pageHeader}>
-            <button
-              className={styles.backButton}
-              type="button"
-              onClick={() => navigate("/executiveMaintenanceList")}
-            >
-              <span>←</span> 返回维护列表
-            </button>
             <div className={styles.titleBlock}>
+              <button
+                className={styles.backButton}
+                type="button"
+                onClick={() => navigate("/executiveMaintenanceList")}
+              >
+                <span>←</span> 返回维护列表
+              </button>
               <h1>外派高管履职分析</h1>
-              <p>按人员复核月度履职记录，分别形成履职分析并确认归档</p>
+              <p>按人员复核季度履职记录，分别形成履职分析并确认归档</p>
             </div>
             <div className={styles.taskStamp}>
               <SafetyCertificateOutlined />
