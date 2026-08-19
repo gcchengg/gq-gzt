@@ -1,0 +1,16 @@
+{
+  "code": 200,
+  "data": {
+    "id": "new-sanhui-001",
+    "companyId": "company-001",
+    "companyName": "一汽股权投资（天津）有限公司",
+    "companyCreditCode": "91120118MA06A8FAW1",
+    "mgmtNo": "GQ-SH-2026-031",
+    "topicName": "关于推进基金退出事项的议案",
+    "meetingName": "2026年第4次董事会",
+    "progStatus": "15000",
+    "stepCode": "15100",
+    "isTzCompany": "1"
+  },
+  "message": "success"
+}

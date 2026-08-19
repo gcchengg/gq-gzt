@@ -1,0 +1,27 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "id": "joint-001",
+      "deptName": "财务管理部",
+      "reviewer": "李娜",
+      "opinion": "测算假设与预算口径一致，建议通过。",
+      "status": "confirmed"
+    },
+    {
+      "id": "joint-002",
+      "deptName": "法律合规部",
+      "reviewer": "赵鹏",
+      "opinion": "需补充交易对手合规审查结论。",
+      "status": "waiting"
+    },
+    {
+      "id": "joint-003",
+      "deptName": "审计风控部",
+      "reviewer": "周静",
+      "opinion": "风险提示已纳入议案附件。",
+      "status": "confirmed"
+    }
+  ],
+  "message": "success"
+}

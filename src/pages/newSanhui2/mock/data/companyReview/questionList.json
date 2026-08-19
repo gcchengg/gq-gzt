@@ -1,0 +1,61 @@
+{
+  "code": 200,
+  "data": {
+    "list": [
+      {
+        "id": "qa-001",
+        "topicName": "关于推进基金退出事项的议案",
+        "orgName": "法律合规部",
+        "userFullName": "赵鹏",
+        "updated": "2026-04-25 16:30:00",
+        "state": "0",
+        "question": "请补充交易对手合规审查结论。",
+        "messages": [
+          {
+            "id": "msg-001",
+            "type": "question",
+            "userName": "赵鹏",
+            "content": "请补充交易对手合规审查结论。",
+            "time": "2026-04-25 16:30"
+          },
+          {
+            "id": "msg-002",
+            "type": "answer",
+            "userName": "王明",
+            "content": "已联系法务顾问补充审查意见，预计明日上传。",
+            "time": "2026-04-25 17:20"
+          }
+        ]
+      },
+      {
+        "id": "qa-002",
+        "topicName": "关于补充外部董事意见采纳情况的议案",
+        "orgName": "财务管理部",
+        "userFullName": "李娜",
+        "updated": "2026-04-26 10:08:00",
+        "state": "1",
+        "question": "请说明测算假设是否与预算口径一致。",
+        "messages": [
+          {
+            "id": "msg-003",
+            "type": "question",
+            "userName": "李娜",
+            "content": "请说明测算假设是否与预算口径一致。",
+            "time": "2026-04-26 10:08"
+          },
+          {
+            "id": "msg-004",
+            "type": "answer",
+            "userName": "张华",
+            "content": "测算口径已按财务预算模型更新，详见附件第 3 页。",
+            "time": "2026-04-26 11:12"
+          }
+        ]
+      }
+    ],
+    "total": 2,
+    "pageNum": 1,
+    "pageSize": 10
+  },
+  "message": "success"
+}

@@ -1,0 +1,33 @@
+{
+  "code": 200,
+  "data": [
+    {
+      "id": "approval-001",
+      "nodeName": "部门负责人审核",
+      "deptName": "股权运营部",
+      "userName": "陈晨",
+      "result": "approved",
+      "opinion": "材料完整，建议提交联审。",
+      "updated": "2026-04-27 09:20"
+    },
+    {
+      "id": "approval-002",
+      "nodeName": "法律合规复核",
+      "deptName": "法律合规部",
+      "userName": "赵鹏",
+      "result": "pending",
+      "opinion": "等待补充交易对手合规审查结论。",
+      "updated": "2026-04-27 11:05"
+    },
+    {
+      "id": "approval-003",
+      "nodeName": "分管领导审批",
+      "deptName": "公司领导",
+      "userName": "刘洋",
+      "result": "pending",
+      "opinion": "-",
+      "updated": "-"
+    }
+  ],
+  "message": "success"
+}

@@ -1,0 +1,24 @@
+.new-sanhui-step-info {
+  width: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.new-sanhui-step-name {
+  width: 100%;
+  overflow: hidden;
+  color: #7a8496;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.new-sanhui-step-info.active .new-sanhui-step-name {
+  font-weight: 600;
+  color: #1f3fb8;
+}

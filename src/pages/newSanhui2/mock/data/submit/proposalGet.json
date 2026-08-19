@@ -1,0 +1,100 @@
+{
+  "code": 200,
+  "data": {
+    "supervisorNotifyList": [
+      {
+        "id": "person-001",
+        "positionCategory": "董事",
+        "positionCode": "外部董事",
+        "shDelFlag": "否",
+        "userName": "王明",
+        "attendeeVos100": true,
+        "attendeeVos200": false,
+        "attendeeVos300": true,
+        "topicNotifyFlag": "是",
+        "hasConvey": true
+      },
+      {
+        "id": "person-002",
+        "positionCategory": "监事",
+        "positionCode": "监事会主席",
+        "shDelFlag": "否",
+        "userName": "李娜",
+        "attendeeVos100": false,
+        "attendeeVos200": true,
+        "attendeeVos300": false,
+        "topicNotifyFlag": "否",
+        "hasConvey": true
+      },
+      {
+        "id": "person-003",
+        "positionCategory": "股东代表",
+        "positionCode": "股东代表",
+        "shDelFlag": "是",
+        "userName": "赵鹏",
+        "attendeeVos100": false,
+        "attendeeVos200": false,
+        "attendeeVos300": true,
+        "topicNotifyFlag": "是",
+        "hasConvey": true
+      }
+    ],
+    "reviewerNotifyList": [
+      {
+        "id": "reviewer-001",
+        "orgName": "财务管理部",
+        "hasJoin": true,
+        "isDisabled": false,
+        "userList": [
+          {
+            "fullName": "王明",
+            "loginId": "wangming"
+          },
+          {
+            "fullName": "李娜",
+            "loginId": "lina"
+          }
+        ]
+      },
+      {
+        "id": "reviewer-002",
+        "orgName": "法律合规部",
+        "hasJoin": true,
+        "isDisabled": false,
+        "userList": [
+          {
+            "fullName": "赵鹏",
+            "loginId": "zhaopeng"
+          }
+        ]
+      },
+      {
+        "id": "reviewer-003",
+        "orgName": "战略投资部",
+        "hasJoin": false,
+        "isDisabled": false,
+        "userList": []
+      },
+      {
+        "id": "reviewer-004",
+        "orgName": "审计风控部",
+        "hasJoin": true,
+        "isDisabled": false,
+        "userList": [
+          {
+            "fullName": "周静",
+            "loginId": "zhoujing"
+          }
+        ]
+      },
+      {
+        "id": "reviewer-005",
+        "orgName": "运营管理部",
+        "hasJoin": false,
+        "isDisabled": true,
+        "userList": []
+      }
+    ]
+  },
+  "message": "success"
+}

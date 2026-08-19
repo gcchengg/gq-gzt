@@ -1,0 +1,196 @@
+{
+  "code": 200,
+  "data": {
+    "companyId": "company-001",
+    "voteId": "vote-main-001",
+    "sanhuiVote": {
+      "id": "vote-main-001",
+      "sanhuiMgmtId": "assign-001",
+      "status": "0"
+    },
+    "sanhuiScheduleVoList": [
+      {
+        "id": "schedule-001",
+        "meetingType": "100",
+        "meetingName": "2026年第4次董事会",
+        "launchFlag": true
+      },
+      {
+        "id": "schedule-002",
+        "meetingType": "200",
+        "meetingName": "2026年第2次监事会",
+        "launchFlag": true
+      },
+      {
+        "id": "schedule-003",
+        "meetingType": "300",
+        "meetingName": "2026年第2次股东会",
+        "launchFlag": true
+      }
+    ],
+    "sanhuiVoteFileList": [
+      {
+        "id": "vote-file-001",
+        "voteId": "vote-main-001",
+        "sanhuiFile": {
+          "id": "file-bod-001",
+          "fileName": "董事会会议决议-我方发出版.pdf",
+          "fileUrl": "/mock-files/bod-resolution-our.pdf",
+          "fileCategory": "董事会会议决议-我方发出版",
+          "objectKey": "mock/bod-resolution-our.pdf"
+        }
+      },
+      {
+        "id": "vote-file-002",
+        "voteId": "vote-main-001",
+        "sanhuiFile": {
+          "id": "file-bod-002",
+          "fileName": "董事会会议决议-会议完整版.pdf",
+          "fileUrl": "/mock-files/bod-resolution-full.pdf",
+          "fileCategory": "董事会会议决议-会议完整版",
+          "objectKey": "mock/bod-resolution-full.pdf"
+        }
+      },
+      {
+        "id": "vote-file-003",
+        "voteId": "vote-main-001",
+        "sanhuiFile": {
+          "id": "file-shs-001",
+          "fileName": "股东会会议决议-我方发出版.pdf",
+          "fileUrl": "/mock-files/shs-resolution-our.pdf",
+          "fileCategory": "股东会会议决议-我方发出版",
+          "objectKey": "mock/shs-resolution-our.pdf"
+        }
+      }
+    ],
+    "sanhuiVoteTopicList": [
+      {
+        "id": "vote-topic-001",
+        "voteId": "vote-main-001",
+        "topicId": "topic-001",
+        "resolutionDate": "2026-04-20",
+        "resolutionMatter": "",
+        "timelineFlag": "0",
+        "bodPassFlag": "1",
+        "bosPassFlag": "1",
+        "shPassFlag": "1",
+        "eoSanhuiTopic": {
+          "id": "topic-001",
+          "toipcName": "同意决策两富新兴业务领域设立合资公司",
+          "bodFlag": "1",
+          "bosFlag": "1",
+          "shsFlag": "1",
+          "propRegisterFlag": "1",
+          "propRegType": "100",
+          "registerPropStatus": "500"
+        }
+      },
+      {
+        "id": "vote-topic-002",
+        "voteId": "vote-main-001",
+        "topicId": "topic-002",
+        "resolutionDate": "2026-05-29",
+        "resolutionMatter": "",
+        "timelineFlag": "0",
+        "bodPassFlag": "2",
+        "bosPassFlag": "",
+        "shPassFlag": "2",
+        "eoSanhuiTopic": {
+          "id": "topic-002",
+          "toipcName": "收到富维公司2025年分红款1100万元",
+          "bodFlag": "1",
+          "bosFlag": "0",
+          "shsFlag": "1",
+          "propRegisterFlag": "0",
+          "propRegType": "",
+          "registerPropStatus": ""
+        }
+      },
+      {
+        "id": "vote-topic-003",
+        "voteId": "vote-main-001",
+        "topicId": "topic-003",
+        "resolutionDate": "2026-04-21",
+        "resolutionMatter": "",
+        "timelineFlag": "0",
+        "bodPassFlag": "0",
+        "bosPassFlag": "",
+        "shPassFlag": "",
+        "eoSanhuiTopic": {
+          "id": "topic-003",
+          "toipcName": "同意高级管理人员2025年度年薪兑现方案",
+          "bodFlag": "1",
+          "bosFlag": "0",
+          "shsFlag": "0",
+          "propRegisterFlag": "0",
+          "propRegType": "",
+          "registerPropStatus": ""
+        }
+      },
+      {
+        "id": "vote-topic-004",
+        "voteId": "vote-main-004",
+        "topicId": "topic-004",
+        "resolutionDate": "2026-02-10",
+        "resolutionMatter": "",
+        "timelineFlag": "0",
+        "bodPassFlag": "0",
+        "bosPassFlag": "",
+        "shPassFlag": "",
+        "eoSanhuiTopic": {
+          "id": "topic-004",
+          "toipcName": "同意向一汽旗翼（深圳）科技有限公司增资",
+          "bodFlag": "1",
+          "bosFlag": "0",
+          "shsFlag": "0",
+          "propRegisterFlag": "0",
+          "propRegType": "",
+          "registerPropStatus": ""
+        }
+      },
+      {
+        "id": "vote-topic-005",
+        "voteId": "vote-main-001",
+        "topicId": "topic-005",
+        "resolutionDate": "2025-12-29",
+        "resolutionMatter": "",
+        "timelineFlag": "0",
+        "bodPassFlag": "0",
+        "bosPassFlag": "",
+        "shPassFlag": "",
+        "eoSanhuiTopic": {
+          "id": "topic-003",
+          "toipcName": "同意公司2026年度财务预算",
+          "bodFlag": "1",
+          "bosFlag": "0",
+          "shsFlag": "0",
+          "propRegisterFlag": "0",
+          "propRegType": "",
+          "registerPropStatus": ""
+        }
+      },
+      {
+        "id": "vote-topic-006",
+        "voteId": "vote-main-001",
+        "topicId": "topic-006",
+        "resolutionDate": "2025-12-29",
+        "resolutionMatter": "",
+        "timelineFlag": "0",
+        "bodPassFlag": "0",
+        "bosPassFlag": "",
+        "shPassFlag": "",
+        "eoSanhuiTopic": {
+          "id": "topic-003",
+          "toipcName": "同意公司2026年度投资计划",
+          "bodFlag": "1",
+          "bosFlag": "0",
+          "shsFlag": "0",
+          "propRegisterFlag": "0",
+          "propRegType": "",
+          "registerPropStatus": ""
+        }
+      }
+    ]
+  },
+  "message": "success"
+}

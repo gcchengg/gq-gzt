@@ -1,0 +1,26 @@
+{
+  "code": 200,
+  "data": {
+    "messageDlvyId": "message-dlvy-001",
+    "matName": "关于一汽股权投资事项专题汇报材料",
+    "matType": "1",
+    "confidentialType": "0",
+    "sealFlag": "1",
+    "sealType": "0",
+    "recvOrg": "0",
+    "recvUserId": "1",
+    "recvUserName": "刘亦功",
+    "applOrgId": "股权运营部",
+    "matDesc": "拟就基金退出路径、参股公司预算调整及后续执行安排向集团领导专题汇报，请领导阅示。",
+    "oaReqId": "oa-approval-001",
+    "uploadFileList": [
+      {
+        "id": "file-001",
+        "fileName": "专题汇报材料.pdf",
+        "fileUrl": "/mock-files/topic-report.pdf",
+        "fileType": "application/pdf"
+      }
+    ]
+  },
+  "message": "success"
+}

@@ -1,0 +1,85 @@
+{
+  "code": 200,
+  "data": {
+    "id": "oa-save-001",
+    "oaReqId": "oa-req-001",
+    "status": "0",
+    "topicType": "0",
+    "topic": "关于推进基金退出事项的议案",
+    "officeTopic": "关于推进基金退出事项的总办会议案",
+    "investmentTopic": "关于推进基金退出事项的股权投委会议案",
+    "investmentScopeFlag": "1",
+    "investmentAgendaItem": "5.2.7公司投资事业部、公司股权运营部负责管理的参股企业拟提交股东会、董事会、监事会的部分议题（议题清单见附录1）；-----本次工作台只涉及这一项下的11类议题修改",
+    "applUserName": "赵鹏",
+    "applOrgName": "股权运营部",
+    "applDate": "2026-05-08",
+    "supervisingLeader": "u001,u002",
+    "oaMeetingAttendeeList": [
+      {
+        "userId": "u003",
+        "userName": "王明"
+      },
+      {
+        "userId": "u004",
+        "userName": "李娜"
+      }
+    ],
+    "presUserName": "赵鹏",
+    "fwlsName": "法务合规部",
+    "jhgllsName": "综合管理部",
+    "cwlsName": "财务管理部",
+    "tzlsName": "投资管理部",
+    "dqlsName": "党群工作部",
+    "investDeptTwo": "投资部二总监",
+    "thImptLargeFlag": "0",
+    "thImptLargeType": "重大经营管理事项",
+    "planMinute": 20,
+    "planStartDate": "2026-05-18 09:00:00",
+    "planEndDate": "2026-05-18 09:20:00",
+    "investmentPlanStartDate": "2026-05-17 14:00:00",
+    "investmentPlanEndDate": "2026-05-17 14:20:00",
+    "topicSummary": "本议题拟提请审议基金退出路径、交易对手沟通安排及资金回收计划。",
+    "reviewMapFileList": {
+      "1000": [],
+      "2000": [
+        {
+          "uid": "review-2000",
+          "name": "分管领导审批议题材料.pdf",
+          "fileName": "分管领导审批议题材料.pdf",
+          "url": "/mock-pdf/review-vp.pdf",
+          "fileUrl": "/mock-pdf/review-vp.pdf"
+        }
+      ],
+      "3000": [
+        {
+          "uid": "review-3000",
+          "name": "总办会审批议题材料.pdf",
+          "fileName": "总办会审批议题材料.pdf",
+          "url": "/mock-pdf/review-office.pdf",
+          "fileUrl": "/mock-pdf/review-office.pdf"
+        }
+      ],
+      "4000": [
+        {
+          "uid": "review-4000",
+          "name": "股权投委会审批议题材料.pdf",
+          "fileName": "股权投委会审批议题材料.pdf",
+          "url": "/mock-pdf/review-investment.pdf",
+          "fileUrl": "/mock-pdf/review-investment.pdf"
+        }
+      ]
+    },
+    "applDecisionItem": "提请审议并同意一汽富华高级管理人员任免建议方案的议案内容",
+    "decisionRequestScreenshotFile": [
+      {
+        "uid": "decision-img-001",
+        "name": "提请决策事项截图.png",
+        "fileName": "提请决策事项截图.png",
+        "url": "/mock-images/decision-request.png",
+        "fileUrl": "/mock-images/decision-request.png"
+      }
+    ],
+    "expectTarget": "通过",
+    "comment": "请各审批节点重点关注交易对手合规审查结论和资金回收安排。"
+  }
+}
