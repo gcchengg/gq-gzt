@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { experts, tasks } from "./data";
 
-const KEY = "expert-talent-pc-v2";
+const KEY = "expert-talent-pc-v3";
 export const demoNotice =
   "本地前端演示：数据仅保存在当前浏览器；短信、审批及小程序同步均未接真实服务。";
 
@@ -29,6 +29,54 @@ export const people = [
     company: "汽车软件公司（演示）",
     title: "技术总监",
     source: "被投企业推荐",
+  },
+  {
+    id: "P4",
+    name: "陈书远",
+    phone: "13800005211",
+    company: "智能网联研究中心",
+    title: "主任",
+    source: "项目推荐",
+  },
+  {
+    id: "P5",
+    name: "高成宇",
+    phone: "13800005213",
+    company: "海外市场研究院（演示）",
+    title: "研究员",
+    source: "专家自荐",
+  },
+  {
+    id: "P6",
+    name: "邹雨桐",
+    phone: "13800005214",
+    company: "绿色发展研究中心",
+    title: "副主任",
+    source: "部门推荐",
+  },
+  {
+    id: "P7",
+    name: "何启航",
+    phone: "13800005215",
+    company: "动力电池创新中心",
+    title: "首席工程师",
+    source: "项目推荐",
+  },
+  {
+    id: "P8",
+    name: "沈若溪",
+    phone: "13800005216",
+    company: "汽车电子联合实验室",
+    title: "技术总监",
+    source: "研究院推荐",
+  },
+  {
+    id: "P9",
+    name: "马知远",
+    phone: "13800005217",
+    company: "产业投资咨询公司",
+    title: "合伙人",
+    source: "业务部门推荐",
   },
 ];
 const profile = {
@@ -94,6 +142,47 @@ const recommendation = {
   field: "机器人",
   reason: "具备产业研究和重大项目评审经验",
 };
+function makeProfile(overrides = {}) {
+  return { ...profile, ...overrides };
+}
+function makeApplication(overrides = {}) {
+  return {
+    project: "示例咨询项目",
+    necessity: "该领域专家储备不足，需补充外部专业判断能力。",
+    abilityEvaluation: "具备相关产业研究与项目评审经验，可承担咨询和尽调角色。",
+    suggestedCategory: "产业研究专家",
+    suggestedLevel: "高级专家",
+    suggestedRole: "技术咨询、项目评审",
+    leaderOpinion: "同意推荐入库。",
+    ...overrides,
+  };
+}
+function confirmedChecks() {
+  return checks.map((item) => ({
+    ...item,
+    confirmed: true,
+    confirmedAt: "2026-09-05 10:20:00",
+  }));
+}
+function makeAppointment(overrides = {}) {
+  return {
+    number: "PS-2026-001",
+    termStart: "2026-09-08",
+    termEnd: "2029-09-07",
+    years: 3,
+    signingDeadline: "2026-09-23",
+    attachment: "专家聘书-待签署.pdf",
+    status: "待专家签署",
+    sentAt: "2026-09-07 14:20:00",
+    signPlatform: "E签宝（演示）",
+    ageLimit: 65,
+    ageLimitDate: "2043-03-16",
+    ...overrides,
+  };
+}
+function invitationHistory(entries) {
+  return entries.map(([at, actor, text]) => ({ at, actor, text }));
+}
 const seed = {
   experts,
   candidates: [
@@ -116,7 +205,8 @@ const seed = {
       project: "智能驾驶产业链研究",
       field: "智能驾驶",
       reason: "拥有智能驾驶产业与技术研判经验",
-      status: "待邀请",
+      status: "已转邀请",
+      invitationId: "INV-DEMO-4",
     },
     {
       id: "CAND-003",
@@ -133,6 +223,192 @@ const seed = {
       reason: "熟悉并购估值和上市公司财务审计",
       status: "待邀请",
     },
+    {
+      id: "CAND-010",
+      batch: "2026年储备名单",
+      name: "江衡",
+      company: "智能制造产业联盟",
+      title: "秘书长",
+      phone: "13800005218",
+      source: "部门推荐",
+      department: "投资二部",
+      recommender: "周经理",
+      project: "智能工厂改造评估",
+      field: "智能制造",
+      reason: "熟悉数字孪生、工业机器人和产线改造路径",
+      status: "待邀请",
+    },
+    {
+      id: "CAND-011",
+      batch: "2026年储备名单",
+      name: "陆青禾",
+      company: "供应链研究中心",
+      title: "主任研究员",
+      phone: "13800005219",
+      source: "项目推荐",
+      department: "综合管理部",
+      recommender: "赵主管",
+      project: "商用车供应链韧性评估",
+      field: "供应链",
+      reason: "长期研究汽车零部件供应安全和成本结构",
+      status: "待邀请",
+    },
+    {
+      id: "CAND-012",
+      batch: "2026年补充名单",
+      name: "曹予安",
+      company: "国际汽车合规中心",
+      title: "资深顾问",
+      phone: "13800005220",
+      source: "研究院推荐",
+      department: "战略投资部",
+      recommender: "李经理",
+      project: "出口数据合规尽调",
+      field: "海外合规",
+      reason: "具备出口管制、数据跨境和海外投资合规经验",
+      status: "待邀请",
+    },
+    {
+      id: "CAND-013",
+      batch: "2026年补充名单",
+      name: "裴南星",
+      company: "新能源材料研究中心",
+      title: "研究员",
+      phone: "13800005221",
+      source: "被投企业推荐",
+      department: "投资一部",
+      recommender: "王经理",
+      project: "固态电池材料体系评估",
+      field: "新能源材料",
+      reason: "熟悉固态电池材料路线和失效分析",
+      status: "待邀请",
+    },
+    {
+      id: "CAND-014",
+      batch: "2026年储备名单",
+      name: "尹昭宁",
+      company: "华信会计师事务所",
+      title: "合伙人",
+      phone: "13800005222",
+      source: "业务部门推荐",
+      department: "财务管理部",
+      recommender: "赵主管",
+      project: "并购标的财务尽调",
+      field: "财务审计",
+      reason: "熟悉并购审计、估值复核和内控诊断",
+      status: "待邀请",
+    },
+    {
+      id: "CAND-015",
+      batch: "2026年补充名单",
+      name: "韩沐川",
+      company: "商用车技术研究院",
+      title: "副总工程师",
+      phone: "13800005223",
+      source: "项目推荐",
+      department: "投资二部",
+      recommender: "周经理",
+      project: "商用车节能技术评审",
+      field: "商用车",
+      reason: "具备整车开发、可靠性和节能技术评审经验",
+      status: "待邀请",
+    },
+    {
+      id: "CAND-004",
+      batch: "2026年首批推荐名单",
+      name: "唐欣然",
+      company: "汽车软件公司（演示）",
+      title: "技术总监",
+      phone: "13800005210",
+      source: "被投企业推荐",
+      department: "投资二部",
+      recommender: "周经理",
+      project: "汽车软件架构评估",
+      field: "汽车软件",
+      reason: "熟悉域控制器与基础软件架构",
+      status: "已转邀请",
+      invitationId: "INV-DEMO-3",
+    },
+    {
+      id: "CAND-005",
+      batch: "2026年补充名单",
+      name: "高成宇",
+      company: "海外市场研究院（演示）",
+      title: "研究员",
+      phone: "13800005213",
+      source: "专家自荐",
+      department: "战略投资部",
+      recommender: "李经理",
+      project: "海外市场准入研究",
+      field: "海外市场",
+      reason: "具备出口与海外投资研究经验",
+      status: "已转邀请",
+      invitationId: "INV-DEMO-5",
+    },
+    {
+      id: "CAND-006",
+      batch: "2026年补充名单",
+      name: "邹雨桐",
+      company: "绿色发展研究中心",
+      title: "副主任",
+      phone: "13800005214",
+      source: "部门推荐",
+      department: "战略投资部",
+      recommender: "孙主管",
+      project: "ESG与双碳专题",
+      field: "ESG与双碳",
+      reason: "长期从事碳核算与绿色金融研究",
+      status: "已转邀请",
+      invitationId: "INV-DEMO-6",
+    },
+    {
+      id: "CAND-007",
+      batch: "2026年补充名单",
+      name: "何启航",
+      company: "动力电池创新中心",
+      title: "首席工程师",
+      phone: "13800005215",
+      source: "项目推荐",
+      department: "投资一部",
+      recommender: "王经理",
+      project: "动力电池标的技术尽调",
+      field: "新能源动力",
+      reason: "熟悉电芯、热管理与量产工艺",
+      status: "已转邀请",
+      invitationId: "INV-DEMO-7",
+    },
+    {
+      id: "CAND-008",
+      batch: "2026年补充名单",
+      name: "沈若溪",
+      company: "汽车电子联合实验室",
+      title: "技术总监",
+      phone: "13800005216",
+      source: "研究院推荐",
+      department: "战略投资部",
+      recommender: "李经理",
+      project: "汽车芯片国产化研判",
+      field: "汽车电子",
+      reason: "具备芯片与域控制器技术评审经验",
+      status: "已转邀请",
+      invitationId: "INV-DEMO-8",
+    },
+    {
+      id: "CAND-009",
+      batch: "2026年补充名单",
+      name: "马知远",
+      company: "产业投资咨询公司",
+      title: "合伙人",
+      phone: "13800005217",
+      source: "业务部门推荐",
+      department: "综合管理部",
+      recommender: "赵主管",
+      project: "参股企业治理机制优化",
+      field: "公司治理",
+      reason: "熟悉国企治理与三会运作",
+      status: "已转邀请",
+      invitationId: "INV-DEMO-9",
+    },
   ],
   invitations: [
     {
@@ -140,6 +416,8 @@ const seed = {
       id: "INV-DEMO-1",
       personId: "P1",
       field: "动力电池",
+      project: "动力电池技术咨询",
+      department: "投资一部",
       reason: "邀请参与技术咨询",
       letterNo: "YQH-2026-001",
       letterTemplate: "专家合作邀请函（标准版）",
@@ -147,7 +425,13 @@ const seed = {
       stage: "待确认",
       agreed: false,
       submitted: false,
-      history: [],
+      history: invitationHistory([
+        [
+          "2026-09-01 09:12:00",
+          "股权运营部（演示）",
+          "发送《专家合作邀请函（标准版）》YQH-2026-001；短信仅作小程序查看通知",
+        ],
+      ]),
     },
     {
       ...people[1],
@@ -165,87 +449,435 @@ const seed = {
       profile,
       application: null,
       checks,
-      history: [
-        {
-          at: "2026-09-04",
-          actor: "演示专家·许文博",
-          text: "同意合作邀请，填写完整履历并正式提交",
-        },
-      ],
+      history: invitationHistory([
+        [
+          "2026-09-02 10:00:00",
+          "股权运营部（演示）",
+          "发送《专家合作邀请函（标准版）》YQH-2026-002",
+        ],
+        [
+          "2026-09-04 16:20:00",
+          "演示专家·许文博",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+      ]),
+    },
+    {
+      ...people[2],
+      id: "INV-DEMO-3",
+      personId: "P3",
+      field: "汽车软件",
+      project: "汽车软件架构评估",
+      department: "投资二部",
+      reason: "熟悉域控制器与基础软件架构",
+      letterNo: "YQH-2026-003",
+      letterTemplate: "专家合作邀请函（标准版）",
+      expiry: "2026-09-30",
+      stage: "待补充资料",
+      agreed: true,
+      submitted: false,
+      profile: makeProfile({
+        name: "唐欣然",
+        birth: "1982-07-21",
+        email: "tangxinran@example.com",
+        company: "汽车软件公司（演示）",
+        position: "技术总监",
+        category: "技术研发专家",
+        domain: "汽车软件 / 基础软件",
+        keywords: "域控制器、AUTOSAR、软件架构",
+        years: "16",
+      }),
+      application: makeApplication({
+        project: "汽车软件架构评估",
+        suggestedCategory: "技术研发专家",
+        suggestedRole: "技术尽调、架构评审",
+      }),
+      checks,
+      history: invitationHistory([
+        [
+          "2026-09-03 11:00:00",
+          "演示专家·唐欣然",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+        [
+          "2026-09-05 09:40:00",
+          "股权运营部（演示）",
+          "退回专家补充资料：代表项目佐证材料不完整，请补充后重新提交",
+        ],
+      ]),
+    },
+    {
+      ...people[3],
+      id: "INV-DEMO-4",
+      personId: "P4",
+      field: "智能驾驶",
+      project: "智能驾驶产业链研究",
+      department: "投资一部",
+      reason: "拥有智能驾驶产业与技术研判经验",
+      letterNo: "YQH-2026-004",
+      letterTemplate: "专家合作邀请函（标准版）",
+      expiry: "2026-09-30",
+      stage: "核对完成",
+      agreed: true,
+      submitted: true,
+      profile: makeProfile({
+        name: "陈书远",
+        birth: "1976-11-02",
+        email: "chenshuyuan@example.com",
+        company: "智能网联研究中心",
+        position: "主任",
+        category: "产业研究专家",
+        domain: "智能网联 / 智能驾驶",
+        keywords: "智能驾驶、车路云、测试评价",
+        years: "20",
+      }),
+      application: makeApplication({
+        project: "智能驾驶产业链研究",
+        suggestedRole: "产业研究、项目评审",
+      }),
+      checks: confirmedChecks(),
+      history: invitationHistory([
+        [
+          "2026-09-03 14:10:00",
+          "演示专家·陈书远",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+        [
+          "2026-09-06 10:05:00",
+          "需求部门（演示）",
+          "填写并提交正式《专家入库申请表》",
+        ],
+        [
+          "2026-09-06 15:30:00",
+          "股权运营部（演示）",
+          "完成入库资料与人工校验核对：资料齐全，准入条件满足",
+        ],
+      ]),
+    },
+    {
+      ...people[4],
+      id: "INV-DEMO-5",
+      personId: "P5",
+      field: "海外市场",
+      project: "海外市场准入研究",
+      department: "战略投资部",
+      reason: "具备出口与海外投资研究经验",
+      letterNo: "YQH-2026-005",
+      letterTemplate: "专家合作邀请函（标准版）",
+      expiry: "2026-09-30",
+      stage: "领导审批中",
+      agreed: true,
+      submitted: true,
+      flowId: "FLOW-2026-005",
+      profile: makeProfile({
+        name: "高成宇",
+        birth: "1980-04-18",
+        email: "gaochengyu@example.com",
+        company: "海外市场研究院（演示）",
+        position: "研究员",
+        category: "产业研究专家",
+        domain: "海外市场 / 出口合规",
+        keywords: "海外投资、出口管制、区域市场",
+        years: "15",
+      }),
+      application: makeApplication({
+        project: "海外市场准入研究",
+        suggestedRole: "海外合规咨询、市场研判",
+      }),
+      checks: confirmedChecks(),
+      history: invitationHistory([
+        [
+          "2026-09-04 09:20:00",
+          "演示专家·高成宇",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+        [
+          "2026-09-06 11:00:00",
+          "需求部门（演示）",
+          "填写并提交正式《专家入库申请表》",
+        ],
+        [
+          "2026-09-07 09:15:00",
+          "股权运营部（演示）",
+          "完成入库资料与人工校验核对：可发起审批",
+        ],
+        [
+          "2026-09-07 14:40:00",
+          "股权运营部（演示）",
+          "发起分管领导线上审批：海外业务专家储备紧缺，建议通过",
+        ],
+      ]),
+    },
+    {
+      ...people[5],
+      id: "INV-DEMO-6",
+      personId: "P6",
+      field: "ESG与双碳",
+      project: "ESG与双碳专题",
+      department: "战略投资部",
+      reason: "长期从事碳核算与绿色金融研究",
+      letterNo: "YQH-2026-006",
+      letterTemplate: "专家合作邀请函（标准版）",
+      expiry: "2026-09-30",
+      stage: "审批退回",
+      agreed: true,
+      submitted: true,
+      profile: makeProfile({
+        name: "邹雨桐",
+        birth: "1979-08-09",
+        email: "zouyutong@example.com",
+        company: "绿色发展研究中心",
+        position: "副主任",
+        category: "产业研究专家",
+        domain: "ESG与双碳",
+        keywords: "碳核算、绿色金融、ESG",
+        years: "17",
+      }),
+      application: makeApplication({
+        project: "ESG与双碳专题",
+        suggestedRole: "专题咨询、尽调评审",
+      }),
+      checks: confirmedChecks(),
+      history: invitationHistory([
+        [
+          "2026-09-04 16:00:00",
+          "演示专家·邹雨桐",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+        [
+          "2026-09-06 16:40:00",
+          "需求部门（演示）",
+          "填写并提交正式《专家入库申请表》",
+        ],
+        [
+          "2026-09-07 10:10:00",
+          "股权运营部（演示）",
+          "完成入库资料与人工校验核对：资料完整",
+        ],
+        [
+          "2026-09-07 15:00:00",
+          "股权运营部（演示）",
+          "发起分管领导线上审批：拟补充双碳领域专家",
+        ],
+        [
+          "2026-09-08 09:30:00",
+          "分管领导（线上审批演示）",
+          "审批退回：请补充近三年代表性项目及利益关联说明后重新提交",
+        ],
+      ]),
+    },
+    {
+      ...people[6],
+      id: "INV-DEMO-7",
+      personId: "P7",
+      field: "新能源动力",
+      project: "动力电池标的技术尽调",
+      department: "投资一部",
+      reason: "熟悉电芯、热管理与量产工艺",
+      letterNo: "YQH-2026-007",
+      letterTemplate: "专家合作邀请函（标准版）",
+      expiry: "2026-09-30",
+      stage: "待签发聘书",
+      agreed: true,
+      submitted: true,
+      flowId: "FLOW-2026-007",
+      profile: makeProfile({
+        name: "何启航",
+        birth: "1974-01-25",
+        email: "heqihang@example.com",
+        company: "动力电池创新中心",
+        position: "首席工程师",
+        category: "技术研发专家",
+        domain: "新能源动力 / 动力电池",
+        keywords: "动力电池、热管理、量产工艺",
+        years: "21",
+      }),
+      application: makeApplication({
+        project: "动力电池标的技术尽调",
+        suggestedCategory: "技术研发专家",
+        suggestedLevel: "资深专家",
+        suggestedRole: "技术尽调、量产评估",
+      }),
+      checks: confirmedChecks(),
+      history: invitationHistory([
+        [
+          "2026-09-02 13:20:00",
+          "演示专家·何启航",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+        [
+          "2026-09-05 11:20:00",
+          "需求部门（演示）",
+          "填写并提交正式《专家入库申请表》",
+        ],
+        [
+          "2026-09-06 09:50:00",
+          "股权运营部（演示）",
+          "完成入库资料与人工校验核对：准入条件满足",
+        ],
+        [
+          "2026-09-06 16:10:00",
+          "股权运营部（演示）",
+          "发起分管领导线上审批：动力电池领域急需补充专家",
+        ],
+        [
+          "2026-09-08 10:05:00",
+          "分管领导（线上审批演示）",
+          "审批通过，进入待签发聘书",
+        ],
+      ]),
+    },
+    {
+      ...people[7],
+      id: "INV-DEMO-8",
+      personId: "P8",
+      field: "汽车电子",
+      project: "汽车芯片国产化研判",
+      department: "战略投资部",
+      reason: "具备芯片与域控制器技术评审经验",
+      letterNo: "YQH-2026-008",
+      letterTemplate: "专家合作邀请函（标准版）",
+      expiry: "2026-09-30",
+      stage: "待专家签署",
+      agreed: true,
+      submitted: true,
+      flowId: "FLOW-2026-008",
+      profile: makeProfile({
+        name: "沈若溪",
+        birth: "1977-06-14",
+        email: "shenruoxi@example.com",
+        company: "汽车电子联合实验室",
+        position: "技术总监",
+        category: "技术研发专家",
+        domain: "汽车电子 / 芯片",
+        keywords: "汽车芯片、域控制器、国产化",
+        years: "18",
+      }),
+      application: makeApplication({
+        project: "汽车芯片国产化研判",
+        suggestedCategory: "技术研发专家",
+        suggestedLevel: "资深专家",
+        suggestedRole: "技术评审、产业研判",
+      }),
+      checks: confirmedChecks(),
+      appointment: makeAppointment({
+        number: "PS-2026-008",
+        attachment: "专家聘书-沈若溪-待签署.pdf",
+      }),
+      history: invitationHistory([
+        [
+          "2026-09-03 10:40:00",
+          "演示专家·沈若溪",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+        [
+          "2026-09-05 15:10:00",
+          "需求部门（演示）",
+          "填写并提交正式《专家入库申请表》",
+        ],
+        [
+          "2026-09-06 11:25:00",
+          "股权运营部（演示）",
+          "完成入库资料与人工校验核对：资料齐全",
+        ],
+        [
+          "2026-09-06 17:00:00",
+          "股权运营部（演示）",
+          "发起分管领导线上审批：芯片领域专家紧缺",
+        ],
+        [
+          "2026-09-08 09:10:00",
+          "分管领导（线上审批演示）",
+          "审批通过，进入待签发聘书",
+        ],
+        [
+          "2026-09-08 11:30:00",
+          "股权运营部（演示）",
+          "向专家发送聘书：PS-2026-008，聘期2026-09-08至2029-09-07，签署截止2026-09-23，通过E签宝签署",
+        ],
+      ]),
+    },
+    {
+      ...people[8],
+      id: "INV-DEMO-9",
+      personId: "P9",
+      field: "公司治理",
+      project: "参股企业治理机制优化",
+      department: "综合管理部",
+      reason: "熟悉国企治理与三会运作",
+      letterNo: "YQH-2026-009",
+      letterTemplate: "专家合作邀请函（标准版）",
+      expiry: "2026-09-30",
+      stage: "已正式入库",
+      agreed: true,
+      submitted: true,
+      flowId: "FLOW-2026-009",
+      profile: makeProfile({
+        name: "马知远",
+        birth: "1971-12-03",
+        email: "mazhiyuan@example.com",
+        company: "产业投资咨询公司",
+        position: "合伙人",
+        category: "财务法务专家",
+        domain: "公司治理 / 合规风控",
+        keywords: "国企治理、三会管理、合规风控",
+        years: "24",
+      }),
+      application: makeApplication({
+        project: "参股企业治理机制优化",
+        suggestedCategory: "财务法务专家",
+        suggestedLevel: "资深专家",
+        suggestedRole: "治理诊断、合规咨询",
+      }),
+      checks: confirmedChecks(),
+      appointment: makeAppointment({
+        number: "PS-2026-009",
+        status: "已签署",
+        signedAt: "2026-09-08",
+        completedAt: "2026-09-08 16:18:00",
+        attachment: "专家聘书-马知远.pdf",
+      }),
+      history: invitationHistory([
+        [
+          "2026-09-01 15:00:00",
+          "演示专家·马知远",
+          "同意合作邀请，填写完整履历并正式提交",
+        ],
+        [
+          "2026-09-03 10:00:00",
+          "需求部门（演示）",
+          "填写并提交正式《专家入库申请表》",
+        ],
+        [
+          "2026-09-04 09:40:00",
+          "股权运营部（演示）",
+          "完成入库资料与人工校验核对：资料完整",
+        ],
+        [
+          "2026-09-04 14:20:00",
+          "股权运营部（演示）",
+          "发起分管领导线上审批：治理类专家匹配当前项目",
+        ],
+        [
+          "2026-09-06 11:00:00",
+          "分管领导（线上审批演示）",
+          "审批通过，进入待签发聘书",
+        ],
+        [
+          "2026-09-07 09:50:00",
+          "股权运营部（演示）",
+          "向专家发送聘书：PS-2026-009，聘期2026-09-08至2029-09-07，通过E签宝签署",
+        ],
+        [
+          "2026-09-08 16:18:00",
+          "E签宝（签署回调演示）",
+          "专家完成聘书PS-2026-009签署，公司与专家签订完成，正式入库",
+        ],
+      ]),
     },
   ],
   sms: [],
-  tasks: tasks.map((task, index) => {
-    const signed = ["服务中", "待验收", "待评价"].includes(task.stage);
-    const consultationRecord = signed
-      ? {
-          consultDate:
-            ["2026-09-05", "2026-09-03", "2026-08-29"][index] || "2026-09-02",
-          minutes: [120, 180, 90][index] || 120,
-          purpose: `${task.project}项目关键问题咨询，辅助需求部门形成投资与业务判断。`,
-          questions:
-            "1. 当前技术或业务方案的成熟度如何？\n专家答复：核心方案已经完成验证，但规模化应用仍需关注供应链和成本。\n2. 项目主要风险是什么？\n专家答复：需重点核查量产能力、客户验证进度及关键资源保障。",
-          facts:
-            "行业处于规模化应用前期，头部企业已开展示范项目，核心环节仍存在成本和产能约束。",
-          judgment:
-            "项目方向具备中长期价值，短期商业化节奏应保持审慎，建议分阶段验证。",
-          basis:
-            "判断依据包括行业增速、客户验证情况、技术成熟度、竞争格局及供应链稳定性。",
-          risks:
-            "量产进度不及预期、核心零部件依赖、成本下降速度和客户订单兑现风险。",
-          suggestions:
-            "补充客户访谈，核验产线与订单，设置阶段性投资条件并持续跟踪关键指标。",
-          attachment: `咨询记录-${task.id}.pdf（演示）`,
-          archiveNo: `ZXJL-2026-${String(index + 1).padStart(3, "0")}`,
-          remark: "E签宝声明签署完成后形成的演示咨询记录。",
-        }
-      : null;
-    return {
-      ...task,
-      background: "产业投资项目技术研究（演示）",
-      problem: "技术成熟度及商业化风险",
-      serviceTime: "2026-09-08 14:00",
-      serviceMode: "会议形式",
-      applicant: "郑华峰",
-      delivery: "书面报告及风险清单",
-      materials: "项目摘要（模拟材料）",
-      permission: "仅受邀且完成承诺的专家可查看",
-      commitment: signed
-        ? {
-            id: `ESIGN-CALL-DEMO-${String(index + 1).padStart(3, "0")}`,
-            platform: "E签宝",
-            status: "已签署",
-            createdAt: "2026-09-01 09:30:00",
-            callbackAt: "2026-09-01 10:06:18",
-            signedAt: "2026-09-01 10:06:18",
-            expiresAt: "2026-09-15",
-            conflict: "不存在",
-          }
-        : null,
-      consultationRecord,
-      versions:
-        task.stage === "待验收"
-          ? [
-              {
-                number: 1,
-                at: "2026-09-03",
-                content: consultationRecord?.judgment,
-                attachment: consultationRecord?.attachment,
-              },
-            ]
-          : [],
-      history: signed
-        ? [
-            {
-              at: "2026-09-01 10:06:18",
-              actor: "E签宝回调（演示）",
-              text: "专家声明已签署，成果与验收已解锁",
-            },
-          ]
-        : [],
-      acceptance: [],
-    };
-  }),
+  tasks: tasks.map(enrichDemoTask),
 };
 function normalize(saved) {
   if (
@@ -299,12 +931,27 @@ function normalize(saved) {
       migrated.profile = { ...profile, ...(migrated.profile || {}) };
     return migrated;
   });
+  seed.invitations.forEach((item) => {
+    if (!next.invitations.some((entry) => entry.id === item.id)) {
+      next.invitations.push(structuredClone(item));
+    }
+  });
+  seed.candidates.forEach((item) => {
+    if (!next.candidates.some((entry) => entry.id === item.id)) {
+      next.candidates.push(structuredClone(item));
+    }
+  });
   next.tasks = next.tasks.map((task) => {
     const demo = seed.tasks.find((item) => item.id === task.id);
     if (!demo) return task;
-    const shouldShowSignedDemo = ["服务中", "待验收", "待评价"].includes(
-      task.stage,
-    );
+    const shouldShowSignedDemo = [
+      "服务中",
+      "履约中",
+      "待补充",
+      "待验收",
+      "待评价",
+      "已完成",
+    ].includes(task.stage);
     if (!shouldShowSignedDemo || task.commitment) return task;
     return {
       ...task,
@@ -318,6 +965,11 @@ function normalize(saved) {
         : structuredClone(demo.versions),
       history: [...(task.history || []), ...structuredClone(demo.history)],
     };
+  });
+  seed.tasks.forEach((item) => {
+    if (!next.tasks.some((entry) => entry.id === item.id)) {
+      next.tasks.push(structuredClone(item));
+    }
   });
   return next;
 }
@@ -421,3 +1073,399 @@ export const checksConfirmed = (record) =>
   Array.isArray(record?.checks) &&
   record.checks.length === 3 &&
   record.checks.every((item) => item.confirmed && item.result !== "不通过");
+function taskHistory(entries) {
+  return entries.map(([at, actor, text]) => ({ at, actor, text }));
+}
+function consultationRecord(task, extras = {}) {
+  return {
+    consultDate: extras.consultDate || "2026-09-05",
+    minutes: extras.minutes || 120,
+    purpose: `${task.project}项目关键问题咨询，辅助需求部门形成投资与业务判断。`,
+    questions:
+      "1. 当前技术或业务方案的成熟度如何？\n专家答复：核心方案已经完成验证，但规模化应用仍需关注供应链和成本。\n2. 项目主要风险是什么？\n专家答复：需重点核查量产能力、客户验证进度及关键资源保障。",
+    facts:
+      "行业处于规模化应用前期，头部企业已开展示范项目，核心环节仍存在成本和产能约束。",
+    judgment:
+      extras.judgment ||
+      "项目方向具备中长期价值，短期商业化节奏应保持审慎，建议分阶段验证。",
+    basis:
+      "判断依据包括行业增速、客户验证情况、技术成熟度、竞争格局及供应链稳定性。",
+    risks: "量产进度不及预期、核心零部件依赖、成本下降速度和客户订单兑现风险。",
+    suggestions:
+      extras.suggestions ||
+      "补充客户访谈，核验产线与订单，设置阶段性投资条件并持续跟踪关键指标。",
+    attachment: extras.attachment || `咨询记录-${task.id}.pdf（演示）`,
+    archiveNo: extras.archiveNo || `ZXJL-2026-${String(task.id).slice(-3)}`,
+    remark: extras.remark || "E签宝声明签署完成后形成的演示咨询记录。",
+    savedAt: extras.savedAt,
+  };
+}
+function signedCommitment(id, extras = {}) {
+  return {
+    id,
+    platform: "E签宝",
+    status: extras.status || "已签署",
+    createdAt: extras.createdAt || "2026-09-01 09:30:00",
+    callbackAt: extras.callbackAt ?? null,
+    signedAt: extras.signedAt ?? null,
+    expiresAt: extras.expiresAt || "2026-09-15",
+    conflict: extras.conflict || "待申报",
+  };
+}
+function enrichDemoTask(task) {
+  const base = {
+    ...task,
+    background: "产业投资项目技术研究（演示）",
+    problem: "技术成熟度及商业化风险",
+    serviceTime: "2026-09-08 14:00",
+    serviceMode: "会议形式",
+    applicant: "郑华峰",
+    contact: "138****5208 / zhenghf@example.com",
+    delivery: "书面报告及风险清单",
+    materials: "项目摘要（模拟材料）",
+    permission: "仅受邀且完成承诺的专家可查看",
+    versions: [],
+    history: [],
+    acceptance: [],
+    commitment: null,
+    consultationRecord: null,
+  };
+  const record = consultationRecord(task);
+  if (task.stage === "草稿") {
+    return {
+      ...base,
+      history: taskHistory([
+        ["2026-09-07 09:12:00", "PC需求部门（演示）", "保存调用申请草稿"],
+      ]),
+    };
+  }
+  if (task.stage === "调用受理中") {
+    return {
+      ...base,
+      history: taskHistory([
+        [
+          "2026-09-07 10:20:00",
+          "PC需求部门（演示）",
+          "提交专家调用申请，等待股权运营部受理",
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "匹配中") {
+    return {
+      ...base,
+      history: taskHistory([
+        [
+          "2026-09-06 11:08:00",
+          "PC需求部门（演示）",
+          "提交专家调用申请，等待股权运营部受理",
+        ],
+        [
+          "2026-09-06 14:32:00",
+          "股权运营部（演示）",
+          "受理专家调用申请，进入推荐匹配与排期",
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "待运营排期") {
+    return {
+      ...base,
+      matchReason: "产业投资与投后管理经验匹配本次并购咨询诉求",
+      matchScore: 96,
+      matchAdjusted: false,
+      departmentConfirmed: true,
+      history: taskHistory([
+        [
+          "2026-09-05 09:40:00",
+          "PC需求部门（演示）",
+          "提交专家调用申请，等待股权运营部受理",
+        ],
+        [
+          "2026-09-05 11:16:00",
+          "股权运营部（演示）",
+          "受理专家调用申请，进入推荐匹配与排期",
+        ],
+        [
+          "2026-09-05 16:08:00",
+          "PC需求部门（演示）",
+          `确认专家${task.expert}，等待运营锁定服务时间`,
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "待专家签署声明") {
+    return {
+      ...base,
+      lockedSchedule: "2026-09-12 14:00",
+      supportNote: "已与专家确认周五下午线上会议，材料提前一天发送。",
+      commitment: signedCommitment("ESIGN-CALL-DEMO-PEND-001", {
+        status: "待签署",
+        createdAt: "2026-09-06 15:20:00",
+        expiresAt: "2026-09-16",
+      }),
+      history: taskHistory([
+        [
+          "2026-09-06 15:20:00",
+          "股权运营部（演示）",
+          "锁定排期 2026-09-12 14:00；生成专家邀约及E签宝声明签署任务",
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "声明拒签") {
+    return {
+      ...base,
+      lockedSchedule: "2026-09-11 09:30",
+      supportNote: "已锁定排期并发送声明签署任务。",
+      commitment: signedCommitment("ESIGN-CALL-DEMO-REJECT-001", {
+        status: "拒绝签署",
+        createdAt: "2026-09-04 10:12:00",
+        callbackAt: "2026-09-05 09:06:18",
+        expiresAt: "2026-09-14",
+      }),
+      history: taskHistory([
+        [
+          "2026-09-04 10:12:00",
+          "股权运营部（演示）",
+          "锁定排期并生成E签宝声明签署任务",
+        ],
+        [
+          "2026-09-05 09:06:18",
+          "E签宝回调（演示）",
+          "专家声明拒绝签署，任务暂不可履约",
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "声明失效") {
+    return {
+      ...base,
+      lockedSchedule: "2026-09-09 14:00",
+      supportNote: "已锁定排期并发送声明签署任务。",
+      commitment: signedCommitment("ESIGN-CALL-DEMO-EXPIRED-001", {
+        status: "已失效",
+        createdAt: "2026-09-02 11:30:00",
+        callbackAt: "2026-09-08 18:00:00",
+        expiresAt: "2026-09-08",
+      }),
+      history: taskHistory([
+        [
+          "2026-09-02 11:30:00",
+          "股权运营部（演示）",
+          "锁定排期并生成E签宝声明签署任务",
+        ],
+        [
+          "2026-09-08 18:00:00",
+          "E签宝回调（演示）",
+          "专家声明已失效，任务暂不可履约",
+        ],
+      ]),
+    };
+  }
+  const signedBase = {
+    ...base,
+    lockedSchedule: task.serviceTime || "2026-09-08 14:00",
+    supportNote: "排期已锁定，专家声明签署完成。",
+    commitment: signedCommitment(
+      `ESIGN-CALL-DEMO-${String(task.id).slice(-3)}`,
+      {
+        status: "已签署",
+        createdAt: "2026-09-01 09:30:00",
+        callbackAt: "2026-09-01 10:06:18",
+        signedAt: "2026-09-01 10:06:18",
+        conflict: "不存在",
+      },
+    ),
+    consultationRecord: record,
+  };
+  if (task.stage === "服务中" || task.stage === "履约中") {
+    return {
+      ...signedBase,
+      history: taskHistory([
+        [
+          "2026-09-01 10:06:18",
+          "E签宝回调（演示）",
+          "专家声明已签署，成果与验收已解锁",
+        ],
+        ["2026-09-05 16:40:00", "专家/经办人（演示）", "保存咨询记录草稿"],
+      ]),
+    };
+  }
+  if (task.stage === "待补充") {
+    const version = {
+      number: 1,
+      at: "2026-09-04 16:20:00",
+      content: record.judgment,
+      attachment: record.attachment,
+    };
+    return {
+      ...signedBase,
+      revisionDeadline: "2026-09-18",
+      versions: [version],
+      acceptance: [
+        {
+          at: "2026-09-05 11:08:00",
+          actor: "PC需求部门（演示）",
+          text: "退回补充：请补充客户验证与量产进度的量化依据",
+          version: 1,
+          deadline: "2026-09-18",
+        },
+      ],
+      history: taskHistory([
+        [
+          "2026-09-01 10:06:18",
+          "E签宝回调（演示）",
+          "专家声明已签署，成果与验收已解锁",
+        ],
+        [
+          "2026-09-04 16:20:00",
+          "专家/经办人（演示）",
+          "正式提交咨询记录 v1，等待需求部门验收",
+        ],
+        [
+          "2026-09-05 11:08:00",
+          "PC需求部门（演示）",
+          "退回补充：请补充客户验证与量产进度的量化依据",
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "待验收") {
+    return {
+      ...signedBase,
+      consultationRecord: consultationRecord(task, {
+        consultDate: "2026-09-03",
+        minutes: 180,
+        savedAt: "2026-09-03 17:10:00",
+      }),
+      versions: [
+        {
+          number: 1,
+          at: "2026-09-03 17:10:00",
+          content: record.judgment,
+          attachment: record.attachment,
+        },
+      ],
+      history: taskHistory([
+        [
+          "2026-09-01 10:06:18",
+          "E签宝回调（演示）",
+          "专家声明已签署，成果与验收已解锁",
+        ],
+        [
+          "2026-09-03 17:10:00",
+          "专家/经办人（演示）",
+          "正式提交咨询记录 v1，等待需求部门验收",
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "待评价") {
+    return {
+      ...signedBase,
+      consultationRecord: consultationRecord(task, {
+        consultDate: "2026-08-29",
+        minutes: 90,
+        savedAt: "2026-08-29 16:40:00",
+      }),
+      versions: [
+        {
+          number: 1,
+          at: "2026-08-29 16:40:00",
+          content: record.judgment,
+          attachment: record.attachment,
+        },
+      ],
+      acceptance: [
+        {
+          at: "2026-09-02 10:18:00",
+          actor: "PC需求部门（演示）",
+          text: "咨询成果确认通过：结论可用于投资判断",
+          version: 1,
+          deadline: null,
+        },
+      ],
+      history: taskHistory([
+        [
+          "2026-09-01 10:06:18",
+          "E签宝回调（演示）",
+          "专家声明已签署，成果与验收已解锁",
+        ],
+        [
+          "2026-08-29 16:40:00",
+          "专家/经办人（演示）",
+          "正式提交咨询记录 v1，等待需求部门验收",
+        ],
+        [
+          "2026-09-02 10:18:00",
+          "PC需求部门（演示）",
+          "咨询成果确认通过：结论可用于投资判断",
+        ],
+      ]),
+    };
+  }
+  if (task.stage === "已完成") {
+    return {
+      ...signedBase,
+      consultationRecord: consultationRecord(task, {
+        consultDate: "2026-08-22",
+        minutes: 150,
+        savedAt: "2026-08-22 15:30:00",
+      }),
+      versions: [
+        {
+          number: 1,
+          at: "2026-08-22 15:30:00",
+          content: record.judgment,
+          attachment: record.attachment,
+        },
+      ],
+      acceptance: [
+        {
+          at: "2026-08-25 09:40:00",
+          actor: "PC需求部门（演示）",
+          text: "咨询成果确认通过：建议已转化为整改清单",
+          version: 1,
+          deadline: null,
+        },
+      ],
+      evaluation: {
+        delivery: 46,
+        response: 28,
+        attitude: 18,
+        total: 92,
+        result: "优秀",
+        submittedAt: "2026-08-28 17:20:00",
+        evaluator: "PC需求部门（演示）",
+        retrospective: "待回溯",
+        tags: ["专业判断清晰", "建议可执行"],
+        comment: "专家对治理机制问题判断清晰，建议已转化为整改清单。",
+        anonymousToExpert: false,
+      },
+      history: taskHistory([
+        [
+          "2026-08-20 10:06:18",
+          "E签宝回调（演示）",
+          "专家声明已签署，成果与验收已解锁",
+        ],
+        [
+          "2026-08-22 15:30:00",
+          "专家/经办人（演示）",
+          "正式提交咨询记录 v1，等待需求部门验收",
+        ],
+        [
+          "2026-08-25 09:40:00",
+          "PC需求部门（演示）",
+          "咨询成果确认通过：建议已转化为整改清单",
+        ],
+        [
+          "2026-08-28 17:20:00",
+          "PC需求部门（演示）",
+          "提交专家履约评价：92分，优秀",
+        ],
+      ]),
+    };
+  }
+  return base;
+}

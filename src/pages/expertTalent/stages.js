@@ -49,7 +49,10 @@ export const stageMeta = {
 export const stageStrip = [
   "待确认",
   "待资料核对",
+  "待补充资料",
+  "核对完成",
   "领导审批中",
+  "审批退回",
   "待签发聘书",
   "待专家签署",
   "已正式入库",
@@ -120,14 +123,18 @@ export const taskStageMeta = {
 };
 
 export const taskStageStrip = [
+  "草稿",
   "调用受理中",
   "匹配中",
   "待运营排期",
   "待专家签署声明",
   "服务中",
+  "待补充",
   "待验收",
   "待评价",
   "已完成",
+  "声明拒签",
+  "声明失效",
 ];
 export const taskStageColor = (stage) =>
   taskStageMeta[stage]?.color || "default";
