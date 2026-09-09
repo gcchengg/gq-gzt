@@ -1,0 +1,146 @@
+.summary {
+  margin-top: 8px;
+
+  :global(.ant-descriptions-item-label) {
+    width: 112px;
+    color: #5b6478;
+    background: #f7f9fc;
+  }
+}
+
+.approvalSection {
+  margin-top: 24px;
+}
+
+.statusHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #2f3643;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 32px;
+}
+
+.timeline::before {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 10px;
+  width: 2px;
+  background: #2d66ee;
+  opacity: 0.8;
+  content: "";
+}
+
+.timelineItem {
+  position: relative;
+  min-height: 92px;
+  padding: 16px 18px;
+  color: #5b6478;
+  font-size: 14px;
+  background: #fff;
+  border: 1px solid rgba(228, 233, 241, 0.96);
+  border-radius: 6px;
+}
+
+.timelineItem::before {
+  position: absolute;
+  top: 20px;
+  left: -29px;
+  width: 14px;
+  height: 14px;
+  background: #2d66ee;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px #fff;
+  content: "";
+}
+
+.applicant::before {
+  background: #ff7a1a;
+}
+
+.completed::before {
+  background: #09b640;
+}
+
+.pending {
+  border-color: rgba(45, 102, 238, 0.4);
+  box-shadow: 0 5px 16px rgba(45, 102, 238, 0.08);
+}
+
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nodeHeader strong {
+  color: #2f3643;
+}
+
+.nodeTime {
+  margin-top: 12px;
+  color: #7b8496;
+}
+
+.nodeDescription {
+  margin: 8px 0 0;
+  color: #5b6478;
+}
+
+.badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 28px;
+  padding: 0 12px;
+  font-size: 13px;
+  border-radius: 999px;
+}
+
+.initiatedBadge {
+  color: #d9630b;
+  background: #fff1e6;
+}
+
+.passedBadge {
+  color: #22a843;
+  background: #e6f8e9;
+}
+
+.pendingBadge {
+  color: #bd6b00;
+  background: #fff4dc;
+}
+
+@media (max-width: 640px) {
+  .summary {
+    :global(.ant-descriptions-item-label) {
+      width: auto;
+    }
+  }
+
+  .timeline {
+    padding-left: 26px;
+  }
+
+  .timelineItem::before {
+    left: -23px;
+  }
+}

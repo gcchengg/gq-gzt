@@ -1,0 +1,51 @@
+/**
+ * EoCompanySpDutyAlaForm
+ */
+export interface Request {
+    /**
+     * ai分析结果
+     */
+    aiAlaRst?: string;
+    /**
+     * 确认结果
+     */
+    cfmAlaRst?: string;
+    /**
+     * 董监高id
+     */
+    coSupervisorId?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 是否提交
+     */
+    isSubmit?: string;
+    taskId?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    [property: string]: any;
+}

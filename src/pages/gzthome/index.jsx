@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
   Link,
   useLocation,
@@ -6,6 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import "./index.css";
+const ApprovalTasks = lazy(() => import("../expertTalent/ApprovalTasks"));
 const taskKeyMap = {
   topicApproval: "议题审批",
   meetingVote: "三会表决",
@@ -30,7 +31,14 @@ const taskTabs = [
   "任务闭环",
   "任务管理",
 ];
-const djgTaskTabs = ["下发推荐函", "可比公司维护", "外派高管履职分析"];
+const djgTaskTabs = [
+  "下发推荐函",
+  "可比公司维护",
+  "外派高管履职分析",
+  "专家人才库",
+  "专家入库审批",
+  "专家调用申请受理",
+];
 const metrics = [
   { label: "总待办数", value: "4450" },
   { label: "总逾期数", value: "0", tone: "red" },
@@ -131,6 +139,11 @@ const taskCopyByCard = {
     title: "2026年度外派高管履职分析",
     description: "复核长春一东外派高管月度履职情况并确认年度分析",
     href: "/executiveMaintenance?company=长春一东&year=2026",
+  },
+  专家人才库: {
+    title: "专家人才库",
+    description: "统一管理专家入库、智能匹配、调用履约与评价回溯",
+    href: "/expertTalentPool",
   },
   任务管理: {
     title: "任务管理",
@@ -409,6 +422,10 @@ function TaskPanel() {
   const availableTaskTabs = isDjgHome ? djgTaskTabs : taskTabs;
   const taskFromUrl = useMemo(() => {
     if (isDjgHome) {
+      if (searchParams.get("task") === "expertEnrollmentApproval")
+        return "专家入库审批";
+      if (searchParams.get("task") === "expertCallApproval")
+        return "专家调用申请受理";
       return "下发推荐函";
     }
     const mappedTask = taskKeyMap[searchParams.get("task")];
@@ -498,36 +515,45 @@ function TaskPanel() {
         ))}
       </section>
 
-      <section className={panelClassName} aria-label="基金退出列表">
-        <div className="list-title-row">
-          <div className="list-title-left">
-            <div className="list-title">{activeTab}</div>
-            <div className="summary">
-              <span className="chip">
-                待办 <b>946</b>
-              </span>
-              <span className="overdue">逾期&nbsp;&nbsp;0</span>
+      {isDjgHome && ["专家入库审批", "专家调用申请受理"].includes(activeTab) ? (
+        <Suspense fallback={<p>正在加载专家业务任务…</p>}>
+          <ApprovalTasks
+            key={activeTab}
+            kind={activeTab === "专家入库审批" ? "enrollment" : "call"}
+          />
+        </Suspense>
+      ) : (
+        <section className={panelClassName} aria-label="基金退出列表">
+          <div className="list-title-row">
+            <div className="list-title-left">
+              <div className="list-title">{activeTab}</div>
+              <div className="summary">
+                <span className="chip">
+                  待办 <b>946</b>
+                </span>
+                <span className="overdue">逾期&nbsp;&nbsp;0</span>
+              </div>
             </div>
+            <button className="manual-link" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>手动创建</span>
+            </button>
           </div>
-          <button className="manual-link" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            <span>手动创建</span>
-          </button>
-        </div>
 
-        <div className={rowsClassName}>
-          {taskRows.map((task, index) => (
-            <TaskRow
-              key={task.href}
-              task={task}
-              secondary={index > 0 || task.secondary}
-              onDescriptionClick={openDescription}
-            />
-          ))}
-        </div>
-      </section>
+          <div className={rowsClassName}>
+            {taskRows.map((task, index) => (
+              <TaskRow
+                key={task.href}
+                task={task}
+                secondary={index > 0 || task.secondary}
+                onDescriptionClick={openDescription}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <div
         className={["description-popover", popover.visible ? "show" : ""].join(
@@ -543,11 +569,6 @@ function TaskPanel() {
   );
 }
 export default function GztHome() {
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    window.localStorage.clear();
-  }, []);
-
   return (
     <div className="page">
       <Topbar />

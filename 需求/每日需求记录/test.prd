@@ -1,0 +1,293 @@
+            "治理行权_三会议题管理": {
+                "census": {
+                    "commentNum": 3,
+                    "failNum": 0,
+                    "sum": 48,
+                    "passNum": 48
+                },
+                "list": [
+                    {
+                        "sanhui_mgmt_id": "9548a64974d4a50c11e643952549b88b",
+                        "vote_advice": "1",
+                        "id": "ccd9a7bc3461b31ce461ab7b7bf7af2b",
+                        "toipc_name": "关于推荐闵海涛为公司第九届董事会独立董事候选人的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "cc4728f876a56bd7d0bcaba7913e3da0",
+                        "vote_advice": "1",
+                        "id": "53ab80cbc9c8179db6fd4e510a81896a",
+                        "toipc_name": "关于补选董事会专门委员会的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "a8e7fc19ec3dbd619e58216da3cf164a",
+                        "toipc_name": "2026年度全面预算报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "mgmt_comment": "",
+                        "id": "2e010fe7446ca53a868e034200f47ff2",
+                        "toipc_name": "关于调整2026年投资计划的议案."
+                    },
+                    {
+                        "sanhui_mgmt_id": "e9cebe8dae20bf5f40dddf64cee11833",
+                        "vote_advice": "1",
+                        "id": "c1e4dd51a965f166d9e365c8923c578e",
+                        "toipc_name": "关于聘任赵德良为公司总经理的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "9548a64974d4a50c11e643952549b88b",
+                        "vote_advice": "1",
+                        "id": "13e951b99f3ecce4e5322b9c53f571d1",
+                        "toipc_name": "关于推荐刘红艳为公司董事的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "52e2ce4a5fe16acd58c37812f30ed860",
+                        "toipc_name": "关于2025年度利润分配方案的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "id": "e1a78015192a0ad0222b675f45c2e719",
+                        "toipc_name": "关于选举公司副董事长的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "e9cebe8dae20bf5f40dddf64cee11833",
+                        "vote_advice": "1",
+                        "id": "579c02214b6a51f989c58d6233d224f8",
+                        "toipc_name": "关于推荐赵德良为公司董事会董事候选人的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "9548a64974d4a50c11e643952549b88b",
+                        "vote_advice": "1",
+                        "id": "9c173a6f755b4c7a4e2c00731cd381fc",
+                        "toipc_name": "关于接受控股股东以委托贷款方式拨付国有资本经营预算资金暨关联交易的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "21ac686555cf8788c005712eae61cb9c",
+                        "toipc_name": "关于2026年度投资计划的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "id": "35b21be83c2956d778756a967703868f",
+                        "toipc_name": "关于补选董事会专门委员会委员的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "e9cebe8dae20bf5f40dddf64cee11833",
+                        "vote_advice": "1",
+                        "id": "a929647b1494ee47827ffbbbf178e03f",
+                        "toipc_name": "关于召开2026年第一次临时股东会的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "9548a64974d4a50c11e643952549b88b",
+                        "vote_advice": "1",
+                        "id": "e66fea1b5f7e38c730895e59002c7dcd",
+                        "toipc_name": "关于召开2026年第二次临时股东会的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "id": "eb1bdc46912ff786cd789cd954ba6cac",
+                        "toipc_name": "2026年半年度报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "9842d0618d1c1e728d1b79e56d37b967",
+                        "toipc_name": "关于公司未来三年股东回报规划（2026年-2028年）的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "f401e344a34b0eaea2d9a3ba7f2b9e37",
+                        "toipc_name": "2025年度财务决算报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "mgmt_comment": "请公司经管层关注日常关联交易预计额度使用情况，及时依规履行披露义务，增强公司合规性",
+                        "id": "c0c8b7bec05f19ce51c41568f40df559",
+                        "toipc_name": "关于追加2026年度日常关联交易预计的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "4ca251984b3c7095e508fba08e870d43",
+                        "toipc_name": "关于向商业银行申请授信额度的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "id": "b904135e8f367fb1203ecd0f75c84c24",
+                        "toipc_name": "关于公司组织机构及部门职能调整的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "mgmt_comment": "1.要加强存货管理。①认真落实盘点机制，动态管理库存；②加强采购、生产、销售联动，制定科学的生产计划、采购计划与销售计划，优化产销协同机制，对滞销产品及时处理，降低损失。 2.针对上汽红岩、东风朝阳动力等大额应收账款，要通过加大清收力度，通过协商、积极参与破产程序保障债权人权益等多种手段进行清收，争取超出本年度预算目标。",
+                        "id": "0a2d75b858bd121029aee35bb7d151e5",
+                        "toipc_name": "关于计提2025年度资产减值准备的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "id": "db515a9352d19f59ea77fac236a2d18b",
+                        "toipc_name": "关于2026年半年度计提资产减值准备的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "dfdee78becf2112796f899a13a0722f8",
+                        "vote_advice": "1",
+                        "id": "beaed379dbede3f600bf2e75dae30024",
+                        "toipc_name": "长春一东与兵工财务有限责任公司2026年半年度风险持续评估报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "8a1c8b27006293aa9e710f0a09b62308",
+                        "toipc_name": "2025年年度报告及摘要"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "d8c3d4773baccecae4cd96acfefdb9f8",
+                        "toipc_name": "2026年第一季度报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "4b264ab5b3e1279e22deaca06ba567c3",
+                        "toipc_name": "关于公司2025年度“提质增效重回报”行动方案的评估报告暨2026年度“提质增效重回报”行动方案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "a2467cef3703e8e4065e497018a99cef",
+                        "toipc_name": "2025年度总经理工作报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "362cd2856788fab4c32cc40a13cda567",
+                        "toipc_name": "关于与兵工财务有限责任公司2025年度风险持续评估报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "367ff00654bb1d8ef6c7b7df0b9427e5",
+                        "toipc_name": "关于2025年度会计师事务所履职情况评估报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "a01d53d465f1e79b1d120ee272d2d7a4",
+                        "toipc_name": "审计委员会关于2025年度会计师事务所履行监督职责情况的报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "d2257bc60a83bc4362fa5e76c76e30a6",
+                        "toipc_name": "2025年度审计委员会履职报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "13a0ee467a0444fd80b8aa26a93e53e4",
+                        "toipc_name": "2025年度独立董事述职报告（贾新宇、马鸿佳、于旭）"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "74015fdc580d201ba8a81a044c769821",
+                        "toipc_name": "董事会关于独立董事独立性情况的专项报告的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "588c561aef2ad80e95effa1b9e80e36a",
+                        "toipc_name": "2025年内部控制评价报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "0861b35c52fb2425dc5eaa85373a4a11",
+                        "toipc_name": "2025年度董事会工作报告"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "6cfc965013c5b28ab8005c55f746ad04",
+                        "toipc_name": "关于公司及子公司2025年度社会责任报告暨ESG报告的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "a52adaf491a685ed12d4c292906e0664",
+                        "toipc_name": "关于制定《公司董事、高级管理人员薪酬管理制度》的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "b78023b204f2b6755055deccee7633a6",
+                        "toipc_name": "关于修订《工资总额管理办法》的议案"
+                    },
+                    {
+                        "sanhui_mgmt_id": "46b92d7e772b9812fa0b5d0f6e8184c8",
+                        "vote_advice": "1",
+                        "id": "ef54bf248cae354cf25d23a012909a6c",
+                        "toipc_name": "关于召开2025年年度股东会的议案"
+                    }
+                ]
+            },
+
+
+/Users/guocc/Documents/guquan/github/gq-0207_app_015_uwone-mc/src/modules/companyList/index.jsx页面中下方代码，应该使用getData接口中【治理行权_三会议题管理】的数据
+              <Sub id="governance-1" title="2. 三会议题管理" checked={checked}>
+                <p>
+                  <S source={source.topic}>
+                    截至2026年6月，共审核{displayName}
+                    三会议题31项，其中同意31项、反对0项，发表管理建议1条
+                  </S>
+                  。
+                </p>
+                <div className={styles.topicList}>
+                  {topicDemos.map((topic, index) => (
+                    <div className={styles.topic} key={topic.title}>
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                      <div>
+                        <b>{topic.title}</b>
+                        <Tag color="success" icon={<CheckOutlined />}>
+                          {topic.result}
+                        </Tag>
+                        {topic.advice ? (
+                          <p>
+                            <strong>管理建议：</strong>
+                            {topic.advice}
+                          </p>
+                        ) : null}
+                        {topic.follow ? (
+                          <p>
+                            <strong>落实情况：</strong>
+                            {topic.follow}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Sub>
+
+修改点1:
+                "census": {
+                    "commentNum": 3, // 发表管理建议条数
+                    "failNum": 0,//反对条数
+                    "sum": 48,
+                    "passNum": 48 //同意条数
+                },
+                数组内容使用list的内容

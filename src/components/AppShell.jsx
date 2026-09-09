@@ -101,6 +101,12 @@ export default function AppShell() {
     "/executivemaintenancelist",
     "/executivemaintenance",
     "/projectexam",
+    "/experttalentpool",
+    "/experttalentlist",
+    "/experttalentapplications",
+    "/experttalenttasks",
+    "/experttalentevaluation",
+    "/experttalentoperations",
   ].includes(normalizedPathname);
   const activeMenus = useMemo(
     () =>
@@ -121,6 +127,36 @@ export default function AppShell() {
               id: "project-exam-only",
               title: "勋章管家",
               key: "/projectExam",
+            },
+            {
+              id: "expert-pool",
+              title: "专家库看板",
+              key: "/expertTalentPool",
+            },
+            {
+              id: "expert-list",
+              title: "专家人才库",
+              key: "/expertTalentList",
+            },
+            {
+              id: "expert-applications",
+              title: "入库管理",
+              key: "/expertTalentApplications",
+            },
+            {
+              id: "expert-tasks",
+              title: "调用管理",
+              key: "/expertTalentTasks",
+            },
+            {
+              id: "expert-evaluation",
+              title: "评价与回溯",
+              key: "/expertTalentEvaluation",
+            },
+            {
+              id: "expert-operations",
+              title: "运营管理",
+              key: "/expertTalentOperations",
             },
           ]
         : isRecommendationArea

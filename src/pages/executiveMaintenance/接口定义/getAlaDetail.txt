@@ -1,0 +1,591 @@
+/**
+ * ResultEoCompanySpDutyAlaVo
+ */
+export interface Response {
+    /**
+     * 状态码
+     */
+    code?: number;
+    /**
+     * 返回值
+     */
+    data?: EoCompanySpDutyAlaVo;
+    /**
+     * 错误码
+     */
+    errCode?: string;
+    /**
+     * 异常详细信息
+     */
+    errMsg?: string;
+    /**
+     * 错误类型
+     */
+    errType?: string;
+    /**
+     * 提示信息
+     */
+    message?: string;
+    /**
+     * 消息类型
+     */
+    msgType?: string;
+    /**
+     * 成功
+     */
+    success?: boolean;
+    [property: string]: any;
+}
+
+/**
+ * 返回值
+ *
+ * EoCompanySpDutyAlaVo
+ */
+export interface EoCompanySpDutyAlaVo {
+    /**
+     * ai分析结果
+     */
+    aiAlaRst?: string;
+    /**
+     * 确认结果
+     */
+    cfmAlaRst?: string;
+    /**
+     * 董监高id
+     */
+    coSupervisorId?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 外派高管履职报告数据
+     */
+    formList?: SupervisorDeputyFormVo[];
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 职务
+     */
+    positionCategory?: string;
+    /**
+     * 职位
+     */
+    positionCode?: string;
+    taskId?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 任期结束
+     */
+    tenureEndDate?: string;
+    /**
+     * 任期起始
+     */
+    tenureStartDate?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 用户名
+     */
+    userId?: string;
+    /**
+     * 用户名
+     */
+    userName?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    [property: string]: any;
+}
+
+/**
+ * <p>
+ * 董监高-董监高履职提报与评价
+ * </p>
+ *
+ * SupervisorDeputyFormVo
+ */
+export interface SupervisorDeputyFormVo {
+    /**
+     * 评估分数
+     */
+    assessScore?: number;
+    /**
+     * 挂职单位基本情况
+     */
+    basicInfo?: string;
+    companyDutyUserId?: string;
+    companyDutyUserName?: string;
+    /**
+     * 公司名
+     */
+    companyName?: string;
+    /**
+     * 项目ID
+     */
+    companyProjectId?: string;
+    /**
+     * 对接人
+     */
+    contactPerson?: string;
+    /**
+     * 董监高id
+     */
+    coSupervisorId?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 逾期审批流ID
+     */
+    delayProcessInstanceId?: string;
+    /**
+     * 逾期状态 0 未预期， 1 已逾期 ， 2 逾期申请提交， 3 逾期申请完成 -1 逾期申请驳回
+     */
+    delayStatus?: string;
+    /**
+     * 股权运营经理 login id
+     */
+    dutyUserId?: string;
+    dutyYearMonth?: string;
+    /**
+     * 补充材料
+     */
+    fileList?: ProjectFilesVo[];
+    /**
+     * 填报类型    1:月度    2:上半年    3:全年
+     */
+    formType?: string;
+    /**
+     * 是否HR半年、年度评价，1是，0否
+     */
+    hrFlag?: string;
+    /**
+     * 人力资源履职报告状态    hr_supervisor_assess_state
+     */
+    hrState?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 是否外高管提交履职评价，1是，0否
+     */
+    isSubmit?: string;
+    launchDate?: string;
+    /**
+     * 工作中存在的问题
+     */
+    mainProblem?: string;
+    /**
+     * 专项管理建议
+     */
+    mgmtAdviceList?: SupervisorDeputyFormMgmtAdviceVo[];
+    /**
+     * 月
+     */
+    month?: number;
+    /**
+     * 下月工作计划
+     */
+    nextPlan?: string;
+    /**
+     * 其他需报告事项
+     */
+    otherReport?: string;
+    /**
+     * 综合评价
+     */
+    overallOpn?: string;
+    /**
+     * 逾期原因
+     */
+    overdueReason?: string;
+    /**
+     * 绩效等级 ABCDE
+     */
+    perfRate?: string;
+    /**
+     * 职位代码
+     */
+    positionCode?: string;
+    /**
+     * 审批流ID
+     */
+    processInstanceId?: string;
+    /**
+     * 项目id
+     */
+    projectId?: string;
+    /**
+     * 公司简称
+     */
+    shortForm?: string;
+    /**
+     * 履职报告状态    supervisor_assess_state
+     */
+    state?: string;
+    /**
+     * 状态 0,1,2
+     */
+    status?: string;
+    supervisorDeputyAssessFactorItems?: SupervisorDeputyAssessFactorVo[];
+    supervisorDeputyFormItems?: SupervisorDeputyFormItemVo[];
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 任期结束
+     */
+    tenureEndDate?: string;
+    /**
+     * 任期起始
+     */
+    tenureStartDate?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 统一社会信用代码
+     */
+    usciCode?: string;
+    /**
+     * 姓名
+     */
+    userName?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    /**
+     * 年
+     */
+    year?: number;
+    [property: string]: any;
+}
+
+/**
+ * ProjectFilesVo
+ */
+export interface ProjectFilesVo {
+    /**
+     * 备注
+     */
+    comment?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 创建人姓名
+     */
+    createName?: string;
+    /**
+     * 实体id
+     */
+    entityId?: string;
+    /**
+     * 文件分类
+     */
+    fileCategory?: string;
+    /**
+     * 文件名
+     */
+    fileName?: string;
+    /**
+     * 文件名称分类
+     */
+    fileNameType?: string;
+    /**
+     * 文件路径
+     */
+    fileUrl?: string;
+    /**
+     * id
+     */
+    id?: string;
+    /**
+     * 项目id
+     */
+    projectId?: string;
+    /**
+     * 阶段代码
+     */
+    stageCode?: string;
+    /**
+     * 业务单元code
+     */
+    unitCode?: string;
+    [property: string]: any;
+}
+
+/**
+ * <p>
+ * 外派高管履职报告管理建议
+ * </p>
+ *
+ * SupervisorDeputyFormMgmtAdviceVo
+ */
+export interface SupervisorDeputyFormMgmtAdviceVo {
+    /**
+     * 建议
+     */
+    advice?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    formId?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 标题
+     */
+    title?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    [property: string]: any;
+}
+
+/**
+ * <p>
+ * 董监高-董监高月度履职评价-要素
+ * </p>
+ *
+ * SupervisorDeputyAssessFactorVo
+ */
+export interface SupervisorDeputyAssessFactorVo {
+    /**
+     * 得分
+     */
+    assessScore?: number;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 负向影响偏差度，超过30%，红灯(red)；超过20%黄灯(yellow)；超过10%蓝灯(blue)；无负面偏差绿灯(green)
+     */
+    deviation?: string;
+    /**
+     * 执行情况
+     */
+    execInput?: string;
+    /**
+     * 指标分类:    1: 月度指标    2:年度指标
+     */
+    factorCategory?: string;
+    /**
+     * 评价要素
+     */
+    factorDesc?: string;
+    /**
+     * 模型评价ID
+     */
+    factorId?: string;
+    /**
+     * 级别
+     */
+    factorLevel?: number;
+    /**
+     * 要素名称
+     */
+    factorName?: string;
+    /**
+     * 一级要素名称
+     */
+    factorNameLeveOne?: string;
+    /**
+     * 评分规则
+     */
+    factorRule?: string;
+    /**
+     * 分值
+     */
+    factorScore?: number;
+    /**
+     * 评分标准
+     */
+    factorStandard?: string;
+    /**
+     * 报告ID
+     */
+    formId?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 1 可填，0 只读
+     */
+    inputFlag?: string;
+    /**
+     * 排序
+     */
+    orderNo?: number;
+    /**
+     * 父id
+     */
+    parentId?: string;
+    supervisorDeputyAssessFactorVo?: SupervisorDeputyAssessFactorVo[];
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    /**
+     * 权重
+     */
+    weight?: number;
+    [property: string]: any;
+}
+
+/**
+ * <p>
+ * 董监高履职填报-详细
+ * </p>
+ *
+ * SupervisorDeputyFormItemVo
+ */
+export interface SupervisorDeputyFormItemVo {
+    /**
+     * 年度目标,半年/年度评价需要
+     */
+    annalTarget?: string;
+    /**
+     * 得分
+     */
+    assessScore?: number;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    /**
+     * 指标:半年/年度填报需要
+     */
+    factorName?: string;
+    /**
+     * 评估id
+     */
+    formId?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    /**
+     * 工作内容与成果/当前工作进展
+     */
+    itemContent?: string;
+    /**
+     * 个人作用发挥情况
+     */
+    itemContribution?: string;
+    /**
+     * 主题。月度填报需要
+     */
+    itemSubject?: string;
+    /**
+     * 序号
+     */
+    no?: number;
+    /**
+     * 序号
+     */
+    orderNo?: number;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    /**
+     * 权重
+     */
+    weight?: number;
+    /**
+     * 类型    1:挂职单位工作完成情况（Top3）    2: 助力集团公司发展情况（Top3）
+     */
+    workCategory?: string;
+    [property: string]: any;
+}

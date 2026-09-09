@@ -1,0 +1,52 @@
+/**
+ * EoCompanySpDutyAlaTaskForm
+ */
+export interface Request {
+    /**
+     * 年度 半年度
+     */
+    alaCycle?: string;
+    companyId?: string;
+    companyName?: string;
+    /**
+     * 创建时间
+     */
+    created?: string;
+    /**
+     * 创建人
+     */
+    createdBy?: string;
+    currentPage?: number;
+    dutyUserId?: string;
+    dutyUserName?: string;
+    /**
+     * 主键ID
+     */
+    id?: string;
+    pageSize?: number;
+    /**
+     * 状态 0 1 维护中 2 维护完成
+     */
+    status?: string;
+    /**
+     * 租户ID
+     */
+    tenantId?: string;
+    /**
+     * 修改时间
+     */
+    updated?: string;
+    /**
+     * 修改人
+     */
+    updatedBy?: string;
+    /**
+     * 版本
+     */
+    version?: number;
+    /**
+     * 年度
+     */
+    year?: number;
+    [property: string]: any;
+}

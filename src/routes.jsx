@@ -23,6 +23,7 @@ const AssignFollowTask = lazy(() => import("@/pages/assignFollowTask"));
 const ManagerTasks = lazy(() => import("@/pages/managerTasks"));
 const AiPricing = lazy(() => import("@/pages/aiPricing"));
 const CompanyList = lazy(() => import("@/pages/companyList"));
+const ExpertTalent = lazy(() => import("@/pages/expertTalent"));
 const CompanyMaintenance = lazy(() => import("@/pages/companyMaintenance"));
 const CompanyMaintenanceList = lazy(
   () => import("@/pages/companyMaintenance/list"),
@@ -34,6 +35,21 @@ const ExecutiveMaintenanceList = lazy(
 const ProjectExam = lazy(() => import("@/modules/projectExam/pages"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
+  ...[
+    "expertTalentPool",
+    "expertTalentList",
+    "expertTalentApplications",
+    "expertTalentTasks",
+    "expertTalentEvaluation",
+    "expertTalentOperations",
+  ].map((path) => ({
+    path,
+    element: (
+      <Suspense>
+        <ExpertTalent />
+      </Suspense>
+    ),
+  })),
   {
     path: "projectExam",
     element: (
