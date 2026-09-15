@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { applicationFieldLabels } from "./enrollmentForms";
 import {
   applicationComplete,
   checksConfirmed,
@@ -153,7 +154,8 @@ export default function ApprovalTasks({ kind }) {
           </div>
           <Link
             className="manual-link"
-            to={enrollment ? "/expertTalentApplications" : "/expertTalentTasks"}
+            to={enrollment ? "/expertTalentList" : "/expertTalentTasks"}
+            state={{ expertManagementTab: "enrollment" }}
           >
             前往业务页面
           </Link>
@@ -313,7 +315,8 @@ export default function ApprovalTasks({ kind }) {
                           gender: "性别",
                           birth: "出生日期",
                           idType: "证件类型",
-                          idNo: "证件号码（演示）",
+                          idNo: "证件号码",
+                          phone: "联系电话",
                           email: "邮箱",
                           company: "工作单位",
                           position: "职务 / 职称",
@@ -347,23 +350,14 @@ export default function ApprovalTasks({ kind }) {
                     }),
                   )}
                 />
-                <h3>需求部门入库申请</h3>
+                <h3>专家入库申请表</h3>
                 <Descriptions
                   bordered
                   column={1}
                   items={Object.entries(record.application || {}).map(
                     ([key, value]) => ({
                       key,
-                      label:
-                        {
-                          necessity: "入库必要性",
-                          abilityEvaluation: "能力评价",
-                          suggestedCategory: "建议类别",
-                          suggestedLevel: "建议等级",
-                          suggestedRole: "建议角色",
-                          leaderOpinion: "部门负责人意见",
-                          project: "关联项目",
-                        }[key] || key,
+                      label: applicationFieldLabels[key] || key,
                       children: value,
                     }),
                   )}

@@ -105,7 +105,6 @@ export default function AppShell() {
     "/experttalentlist",
     "/experttalentapplications",
     "/experttalenttasks",
-    "/experttalentevaluation",
     "/experttalentoperations",
   ].includes(normalizedPathname);
   const activeMenus = useMemo(
@@ -135,23 +134,13 @@ export default function AppShell() {
             },
             {
               id: "expert-list",
-              title: "专家人才库",
+              title: "专家管理",
               key: "/expertTalentList",
-            },
-            {
-              id: "expert-applications",
-              title: "入库管理",
-              key: "/expertTalentApplications",
             },
             {
               id: "expert-tasks",
               title: "调用管理",
               key: "/expertTalentTasks",
-            },
-            {
-              id: "expert-evaluation",
-              title: "评价与回溯",
-              key: "/expertTalentEvaluation",
             },
             {
               id: "expert-operations",
@@ -180,6 +169,9 @@ export default function AppShell() {
   const selectedKey = useMemo(() => {
     if (normalizedPathname === "/executivemaintenance") {
       return "/executiveMaintenanceList";
+    }
+    if (normalizedPathname === "/experttalentapplications") {
+      return "/expertTalentList";
     }
     const matched = leafMenus.find(
       (item) => getPathOnly(item.key) === pathname,

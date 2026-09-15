@@ -1,7 +1,12 @@
 import { useSyncExternalStore } from "react";
 import { experts, tasks } from "./data";
+import {
+  applicationFormComplete,
+  applicationFromProfile,
+  profileRequiredComplete,
+} from "./enrollmentForms";
 
-const KEY = "expert-talent-pc-v3";
+const KEY = "expert-talent-pc-v6";
 export const demoNotice =
   "本地前端演示：数据仅保存在当前浏览器；短信、审批及小程序同步均未接真实服务。";
 
@@ -9,74 +14,83 @@ export const people = [
   {
     id: "P1",
     name: "张明",
+    gender: "男",
     phone: "13800005208",
     company: "示例研究机构",
     title: "首席研究员",
-    source: "研究院推荐",
+    source: "外部",
   },
   {
     id: "P2",
     name: "许文博",
+    gender: "男",
     phone: "13800005209",
     company: "机器人研究院（演示）",
     title: "副院长",
-    source: "部门推荐",
+    source: "内部",
   },
   {
     id: "P3",
     name: "唐欣然",
+    gender: "女",
     phone: "13800005210",
     company: "汽车软件公司（演示）",
     title: "技术总监",
-    source: "被投企业推荐",
+    source: "参股企业",
   },
   {
     id: "P4",
     name: "陈书远",
+    gender: "男",
     phone: "13800005211",
     company: "智能网联研究中心",
     title: "主任",
-    source: "项目推荐",
+    source: "内部",
   },
   {
     id: "P5",
     name: "高成宇",
+    gender: "男",
     phone: "13800005213",
     company: "海外市场研究院（演示）",
     title: "研究员",
-    source: "专家自荐",
+    source: "外部",
   },
   {
     id: "P6",
     name: "邹雨桐",
+    gender: "女",
     phone: "13800005214",
     company: "绿色发展研究中心",
     title: "副主任",
-    source: "部门推荐",
+    source: "内部",
   },
   {
     id: "P7",
     name: "何启航",
+    gender: "男",
     phone: "13800005215",
     company: "动力电池创新中心",
     title: "首席工程师",
-    source: "项目推荐",
+    source: "内部",
   },
   {
     id: "P8",
     name: "沈若溪",
+    gender: "女",
     phone: "13800005216",
     company: "汽车电子联合实验室",
     title: "技术总监",
-    source: "研究院推荐",
+    source: "外部",
   },
   {
     id: "P9",
     name: "马知远",
+    gender: "男",
     phone: "13800005217",
     company: "产业投资咨询公司",
     title: "合伙人",
-    source: "业务部门推荐",
+    source: "内部",
   },
 ];
 const profile = {
@@ -84,7 +98,8 @@ const profile = {
   gender: "男",
   birth: "1978-03-16",
   idType: "身份证",
-  idNo: "演示号码（非真实证件）",
+  idNo: "22010219780316001X",
+  phone: "13800005209",
   email: "xuwenbo@example.com",
   company: "机器人研究院（演示）",
   position: "副院长",
@@ -112,30 +127,31 @@ const checks = [
     name: "资料完整性",
     result: "通过",
     detail: "必填资料、履历及证明材料齐全",
-    confirmed: false,
+    confirmed: true,
   },
   {
     key: "admission",
     name: "准入条件",
     result: "通过",
     detail: "从业年限、专业经历满足演示准入规则",
-    confirmed: false,
+    confirmed: true,
   },
   {
     key: "compliance",
     name: "关联与合规",
-    result: "需人工核实",
-    detail: "未发现明确冲突，仍需经办人核实关联关系",
-    confirmed: false,
+    result: "通过",
+    detail: "未发现明确冲突",
+    confirmed: true,
   },
 ];
 const recommendation = {
   batch: "2026年首批推荐名单",
   name: "许文博",
+  gender: "男",
   company: "机器人研究院（演示）",
   title: "副院长",
   phone: "13800005209",
-  source: "需求部门推荐",
+  source: "内部",
   department: "战略投资部",
   recommender: "李经理",
   project: "具身智能产业研究",
@@ -143,18 +159,41 @@ const recommendation = {
   reason: "具备产业研究和重大项目评审经验",
 };
 function makeProfile(overrides = {}) {
-  return { ...profile, ...overrides };
-}
-function makeApplication(overrides = {}) {
+  const person =
+    people.find((item) => item.name === (overrides.name || profile.name)) ||
+    people[1];
+  const birth = overrides.birth || profile.birth;
   return {
-    project: "示例咨询项目",
-    necessity: "该领域专家储备不足，需补充外部专业判断能力。",
-    abilityEvaluation: "具备相关产业研究与项目评审经验，可承担咨询和尽调角色。",
-    suggestedCategory: "产业研究专家",
-    suggestedLevel: "高级专家",
-    suggestedRole: "技术咨询、项目评审",
-    leaderOpinion: "同意推荐入库。",
+    ...profile,
+    name: person.name,
+    gender: person.gender,
+    phone: person.phone,
+    company: person.company,
+    position: person.title,
+    idNo: `220102${String(birth).replaceAll("-", "")}001X`,
     ...overrides,
+  };
+}
+function dossier(profileOverrides = {}) {
+  const nextProfile = makeProfile(profileOverrides);
+  const person = people.find((item) => item.name === nextProfile.name) || {};
+  return {
+    profile: nextProfile,
+    application: applicationFromProfile({ ...person, profile: nextProfile }),
+  };
+}
+const femaleNames = new Set([
+  "唐欣然",
+  "邹雨桐",
+  "沈若溪",
+  "林若岚",
+  "陆青禾",
+  "裴南星",
+]);
+function withGender(item) {
+  return {
+    ...item,
+    gender: item.gender || (femaleNames.has(item.name) ? "女" : "男"),
   };
 }
 function confirmedChecks() {
@@ -172,9 +211,8 @@ function makeAppointment(overrides = {}) {
     years: 3,
     signingDeadline: "2026-09-23",
     attachment: "专家聘书-待签署.pdf",
-    status: "待专家签署",
+    status: "已生效",
     sentAt: "2026-09-07 14:20:00",
-    signPlatform: "E签宝（演示）",
     ageLimit: 65,
     ageLimitDate: "2043-03-16",
     ...overrides,
@@ -199,7 +237,7 @@ const seed = {
       company: "智能网联研究中心",
       title: "主任",
       phone: "13800005211",
-      source: "项目推荐",
+      source: "内部",
       department: "投资一部",
       recommender: "王经理",
       project: "智能驾驶产业链研究",
@@ -215,7 +253,7 @@ const seed = {
       company: "某会计师事务所",
       title: "合伙人",
       phone: "13800005212",
-      source: "业务部门推荐",
+      source: "内部",
       department: "财务管理部",
       recommender: "赵主管",
       project: "并购估值复核",
@@ -230,7 +268,7 @@ const seed = {
       company: "智能制造产业联盟",
       title: "秘书长",
       phone: "13800005218",
-      source: "部门推荐",
+      source: "内部",
       department: "投资二部",
       recommender: "周经理",
       project: "智能工厂改造评估",
@@ -245,7 +283,7 @@ const seed = {
       company: "供应链研究中心",
       title: "主任研究员",
       phone: "13800005219",
-      source: "项目推荐",
+      source: "内部",
       department: "综合管理部",
       recommender: "赵主管",
       project: "商用车供应链韧性评估",
@@ -260,7 +298,7 @@ const seed = {
       company: "国际汽车合规中心",
       title: "资深顾问",
       phone: "13800005220",
-      source: "研究院推荐",
+      source: "外部",
       department: "战略投资部",
       recommender: "李经理",
       project: "出口数据合规尽调",
@@ -275,7 +313,7 @@ const seed = {
       company: "新能源材料研究中心",
       title: "研究员",
       phone: "13800005221",
-      source: "被投企业推荐",
+      source: "参股企业",
       department: "投资一部",
       recommender: "王经理",
       project: "固态电池材料体系评估",
@@ -290,7 +328,7 @@ const seed = {
       company: "华信会计师事务所",
       title: "合伙人",
       phone: "13800005222",
-      source: "业务部门推荐",
+      source: "内部",
       department: "财务管理部",
       recommender: "赵主管",
       project: "并购标的财务尽调",
@@ -305,7 +343,7 @@ const seed = {
       company: "商用车技术研究院",
       title: "副总工程师",
       phone: "13800005223",
-      source: "项目推荐",
+      source: "内部",
       department: "投资二部",
       recommender: "周经理",
       project: "商用车节能技术评审",
@@ -320,7 +358,7 @@ const seed = {
       company: "汽车软件公司（演示）",
       title: "技术总监",
       phone: "13800005210",
-      source: "被投企业推荐",
+      source: "参股企业",
       department: "投资二部",
       recommender: "周经理",
       project: "汽车软件架构评估",
@@ -336,7 +374,7 @@ const seed = {
       company: "海外市场研究院（演示）",
       title: "研究员",
       phone: "13800005213",
-      source: "专家自荐",
+      source: "外部",
       department: "战略投资部",
       recommender: "李经理",
       project: "海外市场准入研究",
@@ -352,7 +390,7 @@ const seed = {
       company: "绿色发展研究中心",
       title: "副主任",
       phone: "13800005214",
-      source: "部门推荐",
+      source: "内部",
       department: "战略投资部",
       recommender: "孙主管",
       project: "ESG与双碳专题",
@@ -368,7 +406,7 @@ const seed = {
       company: "动力电池创新中心",
       title: "首席工程师",
       phone: "13800005215",
-      source: "项目推荐",
+      source: "内部",
       department: "投资一部",
       recommender: "王经理",
       project: "动力电池标的技术尽调",
@@ -384,7 +422,7 @@ const seed = {
       company: "汽车电子联合实验室",
       title: "技术总监",
       phone: "13800005216",
-      source: "研究院推荐",
+      source: "外部",
       department: "战略投资部",
       recommender: "李经理",
       project: "汽车芯片国产化研判",
@@ -400,7 +438,7 @@ const seed = {
       company: "产业投资咨询公司",
       title: "合伙人",
       phone: "13800005217",
-      source: "业务部门推荐",
+      source: "内部",
       department: "综合管理部",
       recommender: "赵主管",
       project: "参股企业治理机制优化",
@@ -409,7 +447,7 @@ const seed = {
       status: "已转邀请",
       invitationId: "INV-DEMO-9",
     },
-  ],
+  ].map(withGender),
   invitations: [
     {
       ...people[0],
@@ -473,10 +511,10 @@ const seed = {
       letterNo: "YQH-2026-003",
       letterTemplate: "专家合作邀请函（标准版）",
       expiry: "2026-09-30",
-      stage: "待补充资料",
+      stage: "待资料核对",
       agreed: true,
-      submitted: false,
-      profile: makeProfile({
+      submitted: true,
+      ...dossier({
         name: "唐欣然",
         birth: "1982-07-21",
         email: "tangxinran@example.com",
@@ -487,23 +525,10 @@ const seed = {
         keywords: "域控制器、AUTOSAR、软件架构",
         years: "16",
       }),
-      application: makeApplication({
-        project: "汽车软件架构评估",
-        suggestedCategory: "技术研发专家",
-        suggestedRole: "技术尽调、架构评审",
-      }),
       checks,
       history: invitationHistory([
-        [
-          "2026-09-03 11:00:00",
-          "演示专家·唐欣然",
-          "同意合作邀请，填写完整履历并正式提交",
-        ],
-        [
-          "2026-09-05 09:40:00",
-          "股权运营部（演示）",
-          "退回专家补充资料：代表项目佐证材料不完整，请补充后重新提交",
-        ],
+        ["2026-09-03 11:00:00", "演示专家·唐欣然", "同意合作邀请"],
+        ["2026-09-05 09:40:00", "股权运营部（演示）", "填写并保存专家履历资料"],
       ]),
     },
     {
@@ -520,7 +545,7 @@ const seed = {
       stage: "核对完成",
       agreed: true,
       submitted: true,
-      profile: makeProfile({
+      ...dossier({
         name: "陈书远",
         birth: "1976-11-02",
         email: "chenshuyuan@example.com",
@@ -530,10 +555,6 @@ const seed = {
         domain: "智能网联 / 智能驾驶",
         keywords: "智能驾驶、车路云、测试评价",
         years: "20",
-      }),
-      application: makeApplication({
-        project: "智能驾驶产业链研究",
-        suggestedRole: "产业研究、项目评审",
       }),
       checks: confirmedChecks(),
       history: invitationHistory([
@@ -569,7 +590,7 @@ const seed = {
       agreed: true,
       submitted: true,
       flowId: "FLOW-2026-005",
-      profile: makeProfile({
+      ...dossier({
         name: "高成宇",
         birth: "1980-04-18",
         email: "gaochengyu@example.com",
@@ -579,10 +600,6 @@ const seed = {
         domain: "海外市场 / 出口合规",
         keywords: "海外投资、出口管制、区域市场",
         years: "15",
-      }),
-      application: makeApplication({
-        project: "海外市场准入研究",
-        suggestedRole: "海外合规咨询、市场研判",
       }),
       checks: confirmedChecks(),
       history: invitationHistory([
@@ -622,7 +639,7 @@ const seed = {
       stage: "审批退回",
       agreed: true,
       submitted: true,
-      profile: makeProfile({
+      ...dossier({
         name: "邹雨桐",
         birth: "1979-08-09",
         email: "zouyutong@example.com",
@@ -632,10 +649,6 @@ const seed = {
         domain: "ESG与双碳",
         keywords: "碳核算、绿色金融、ESG",
         years: "17",
-      }),
-      application: makeApplication({
-        project: "ESG与双碳专题",
-        suggestedRole: "专题咨询、尽调评审",
       }),
       checks: confirmedChecks(),
       history: invitationHistory([
@@ -681,7 +694,7 @@ const seed = {
       agreed: true,
       submitted: true,
       flowId: "FLOW-2026-007",
-      profile: makeProfile({
+      ...dossier({
         name: "何启航",
         birth: "1974-01-25",
         email: "heqihang@example.com",
@@ -691,12 +704,6 @@ const seed = {
         domain: "新能源动力 / 动力电池",
         keywords: "动力电池、热管理、量产工艺",
         years: "21",
-      }),
-      application: makeApplication({
-        project: "动力电池标的技术尽调",
-        suggestedCategory: "技术研发专家",
-        suggestedLevel: "资深专家",
-        suggestedRole: "技术尽调、量产评估",
       }),
       checks: confirmedChecks(),
       history: invitationHistory([
@@ -738,11 +745,11 @@ const seed = {
       letterNo: "YQH-2026-008",
       letterTemplate: "专家合作邀请函（标准版）",
       expiry: "2026-09-30",
-      stage: "待专家签署",
+      stage: "已正式入库",
       agreed: true,
       submitted: true,
       flowId: "FLOW-2026-008",
-      profile: makeProfile({
+      ...dossier({
         name: "沈若溪",
         birth: "1977-06-14",
         email: "shenruoxi@example.com",
@@ -752,12 +759,6 @@ const seed = {
         domain: "汽车电子 / 芯片",
         keywords: "汽车芯片、域控制器、国产化",
         years: "18",
-      }),
-      application: makeApplication({
-        project: "汽车芯片国产化研判",
-        suggestedCategory: "技术研发专家",
-        suggestedLevel: "资深专家",
-        suggestedRole: "技术评审、产业研判",
       }),
       checks: confirmedChecks(),
       appointment: makeAppointment({
@@ -793,7 +794,7 @@ const seed = {
         [
           "2026-09-08 11:30:00",
           "股权运营部（演示）",
-          "向专家发送聘书：PS-2026-008，聘期2026-09-08至2029-09-07，签署截止2026-09-23，通过E签宝签署",
+          "向专家发送聘书：PS-2026-008，聘期2026-09-08至2029-09-07，专家正式入库",
         ],
       ]),
     },
@@ -812,7 +813,7 @@ const seed = {
       agreed: true,
       submitted: true,
       flowId: "FLOW-2026-009",
-      profile: makeProfile({
+      ...dossier({
         name: "马知远",
         birth: "1971-12-03",
         email: "mazhiyuan@example.com",
@@ -823,16 +824,10 @@ const seed = {
         keywords: "国企治理、三会管理、合规风控",
         years: "24",
       }),
-      application: makeApplication({
-        project: "参股企业治理机制优化",
-        suggestedCategory: "财务法务专家",
-        suggestedLevel: "资深专家",
-        suggestedRole: "治理诊断、合规咨询",
-      }),
       checks: confirmedChecks(),
       appointment: makeAppointment({
         number: "PS-2026-009",
-        status: "已签署",
+        status: "已生效",
         signedAt: "2026-09-08",
         completedAt: "2026-09-08 16:18:00",
         attachment: "专家聘书-马知远.pdf",
@@ -925,6 +920,7 @@ function normalize(saved) {
     if (migrated.stage === "待总办会审议") migrated.stage = "领导审批中";
     if (migrated.stage === "总办会通过·待聘任") migrated.stage = "待签发聘书";
     if (migrated.stage === "总办会未通过") migrated.stage = "审批退回";
+    if (migrated.stage === "待补充资料") migrated.stage = "待资料核对";
     delete migrated.meeting;
     migrated.history = Array.isArray(migrated.history) ? migrated.history : [];
     if (migrated.id === "INV-DEMO-2")
@@ -1012,67 +1008,18 @@ export const log = (actor, text) => ({
   actor,
   text,
 });
-export const complete = (record) => {
-  if (record?.agreed !== true || record?.submitted !== true) return false;
-  const fullMobileProfile =
-    [
-      "name",
-      "gender",
-      "birth",
-      "idType",
-      "idNo",
-      "email",
-      "company",
-      "position",
-      "education",
-      "educationPeriod",
-      "experience",
-      "years",
-      "category",
-      "domain",
-      "keywords",
-      "projects",
-      "roles",
-      "certificates",
-      "results",
-      "city",
-      "service",
-      "travel",
-    ].every(
-      (key) =>
-        typeof record.profile?.[key] === "string" && record.profile[key].trim(),
-    ) && record.profile?.consent === true;
-  const legacyProfile =
-    [
-      "education",
-      "experience",
-      "capability",
-      "achievements",
-      "willingness",
-    ].every(
-      (key) =>
-        typeof record.profile?.[key] === "string" && record.profile[key].trim(),
-    ) && record.profile?.declaration === true;
-  return fullMobileProfile || legacyProfile;
-};
+export const complete = (record) =>
+  record?.agreed === true &&
+  record?.submitted === true &&
+  profileRequiredComplete({
+    phone: record.phone,
+    ...record.profile,
+  });
 export const applicationComplete = (record) =>
-  [
-    "project",
-    "necessity",
-    "abilityEvaluation",
-    "suggestedCategory",
-    "suggestedLevel",
-    "suggestedRole",
-    "leaderOpinion",
-  ].every(
-    (key) =>
-      typeof record?.application?.[key] === "string" &&
-      record.application[key].trim(),
-  );
+  applicationFormComplete(applicationFromProfile(record));
 export const checksConfirmed = (record) =>
-  Array.isArray(record?.checks) &&
-  record.checks.length === 3 &&
-  record.checks.every((item) => item.confirmed && item.result !== "不通过");
+  !Array.isArray(record?.checks) ||
+  record.checks.every((item) => item.result !== "不通过");
 function taskHistory(entries) {
   return entries.map(([at, actor, text]) => ({ at, actor, text }));
 }

@@ -9,11 +9,6 @@ export const stageMeta = {
     tone: "#1677ff",
     hint: "需经办人核对履历与入库申请表",
   },
-  待补充资料: {
-    color: "warning",
-    tone: "#d48806",
-    hint: "已退回，等待专家补充后重新提交",
-  },
   核对完成: {
     color: "geekblue",
     tone: "#2f54eb",
@@ -34,27 +29,20 @@ export const stageMeta = {
     tone: "#d48806",
     hint: "审批已通过，需配置3年聘期并发送聘书",
   },
-  待专家签署: {
-    color: "purple",
-    tone: "#722ed1",
-    hint: "聘书已发送，等待E签宝签署回调",
-  },
   已正式入库: {
     color: "success",
     tone: "#389e0d",
-    hint: "双方签订完成，已生成可调用档案",
+    hint: "聘书已发送，已生成可调用档案",
   },
 };
 
 export const stageStrip = [
   "待确认",
   "待资料核对",
-  "待补充资料",
   "核对完成",
   "领导审批中",
   "审批退回",
   "待签发聘书",
-  "待专家签署",
   "已正式入库",
 ];
 

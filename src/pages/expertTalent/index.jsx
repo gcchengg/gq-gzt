@@ -1,8 +1,6 @@
 import {
-  BarChartOutlined,
   BellOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined,
   DatabaseOutlined,
   FileSearchOutlined,
   PlusOutlined,
@@ -30,15 +28,22 @@ import {
   Timeline,
   message,
 } from "antd";
-import { useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { activity, applications, evaluations, tasks } from "./data";
+import { useEffect, useMemo, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { activity, evaluations } from "./data";
 import styles from "./index.module.less";
 import wb from "./workbench.module.less";
 import PageHelp from "./components/PageHelp";
+import EvaluationAnalytics from "./components/EvaluationAnalytics";
+import EvaluationRecordsDrawer from "./components/EvaluationRecordsDrawer";
 import Enrollment from "./Enrollment";
 import Calls from "./Calls";
 import { log, uid, updateStore, useExpertStore } from "./store";
+import {
+  compareAverageScore,
+  filterByRange,
+  normalizeEvaluationRecords,
+} from "./evaluationAnalytics";
 import {
   expertStatusColor,
   expertStatusHint,
@@ -156,6 +161,29 @@ function StatCard({ label, value, delta, icon: Icon, tone = "blue" }) {
 
 function Dashboard() {
   const navigate = useNavigate();
+  const { tasks: taskRecords } = useExpertStore();
+  const [evaluationRange, setEvaluationRange] = useState("12m");
+  const [evaluationDrawerOpen, setEvaluationDrawerOpen] = useState(false);
+  const [evaluationRetry, setEvaluationRetry] = useState(0);
+  const evaluationBundle = useMemo(() => {
+    try {
+      return {
+        records: normalizeEvaluationRecords(taskRecords, evaluations),
+        error: false,
+      };
+    } catch {
+      return { records: [], error: true };
+    }
+  }, [evaluationRetry, taskRecords]);
+  const evaluationRecords = evaluationBundle.records;
+  const visibleEvaluationRecords = useMemo(
+    () => filterByRange(evaluationRecords, evaluationRange),
+    [evaluationRange, evaluationRecords],
+  );
+  const evaluationAverageDelta = useMemo(
+    () => compareAverageScore(evaluationRecords, evaluationRange),
+    [evaluationRange, evaluationRecords],
+  );
   return (
     <Shell
       title="专家库看板"
@@ -171,7 +199,11 @@ function Dashboard() {
           <Space>
             <Button
               type="primary"
-              onClick={() => navigate("/expertTalentApplications")}
+              onClick={() =>
+                navigate("/expertTalentList", {
+                  state: { expertManagementTab: "enrollment" },
+                })
+              }
             >
               处理待办
             </Button>
@@ -213,13 +245,22 @@ function Dashboard() {
           tone="orange"
         />
         <StatCard
-          label="综合评分"
-          value="92.6"
-          delta="优秀率 81%"
-          icon={BarChartOutlined}
+          label="任务完成率"
+          value="94%"
+          delta="按期完成 32 项"
+          icon={CheckCircleOutlined}
           tone="red"
         />
       </section>
+      <EvaluationAnalytics
+        records={visibleEvaluationRecords}
+        range={evaluationRange}
+        averageDelta={evaluationAverageDelta}
+        onRangeChange={setEvaluationRange}
+        onOpenRecords={() => setEvaluationDrawerOpen(true)}
+        error={evaluationBundle.error}
+        onRetry={() => setEvaluationRetry((count) => count + 1)}
+      />
       <div className={styles.dashboardGrid}>
         <section className={styles.panel}>
           <div className={styles.panelHead}>
@@ -229,7 +270,11 @@ function Dashboard() {
             </div>
             <Button
               type="link"
-              onClick={() => navigate("/expertTalentApplications")}
+              onClick={() =>
+                navigate("/expertTalentList", {
+                  state: { expertManagementTab: "enrollment" },
+                })
+              }
             >
               查看全部
             </Button>
@@ -244,11 +289,11 @@ function Dashboard() {
               <button
                 key={text}
                 onClick={() =>
-                  navigate(
-                    type === "入库审核"
-                      ? "/expertTalentApplications"
-                      : "/expertTalentTasks",
-                  )
+                  type === "入库审核"
+                    ? navigate("/expertTalentList", {
+                        state: { expertManagementTab: "enrollment" },
+                      })
+                    : navigate("/expertTalentTasks")
                 }
               >
                 <i className={styles[tone]}>{type.slice(0, 1)}</i>
@@ -315,6 +360,11 @@ function Dashboard() {
           />
         </section>
       </div>
+      <EvaluationRecordsDrawer
+        open={evaluationDrawerOpen}
+        onClose={() => setEvaluationDrawerOpen(false)}
+        records={visibleEvaluationRecords}
+      />
     </Shell>
   );
 }
@@ -851,7 +901,7 @@ function ExpertDrawer({ expert, open, onClose }) {
   );
 }
 
-function ExpertList() {
+function ExpertList({ embedded = false }) {
   const { experts } = useExpertStore();
   const [keyword, setKeyword] = useState("");
   const [field, setField] = useState();
@@ -940,27 +990,25 @@ function ExpertList() {
     },
   ];
   return (
-    <div className={wb.page}>
-      <div className={wb.content}>
-        <div className={wb.pageHead}>
-          <div>
-            <h1>
-              专家人才库
-              <PageHelp page="专家人才库" />
-            </h1>
-            <p>一人一档，统一检索专家能力、履历、服务与合规信息</p>
+    <div className={embedded ? undefined : wb.page}>
+      <div className={embedded ? undefined : wb.content}>
+        {embedded ? null : (
+          <div className={wb.pageHead}>
+            <div>
+              <h1>
+                专家人才库
+                <PageHelp page="专家人才库" />
+              </h1>
+              <p>一人一档，统一检索专家能力、履历、服务与合规信息</p>
+            </div>
+            <div className={wb.headActions}>
+              <Button>导出</Button>
+              <Button type="primary" icon={<PlusOutlined />}>
+                邀请专家
+              </Button>
+            </div>
           </div>
-          <div className={wb.headActions}>
-            <Button>导出</Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => message.info("已进入专家邀请流程")}
-            >
-              邀请专家
-            </Button>
-          </div>
-        </div>
+        )}
         <div className={wb.stageStrip}>
           <button
             type="button"
@@ -972,12 +1020,12 @@ function ExpertList() {
               全部专家
             </span>
             <b>{experts.length}</b>
-            <small>不按状态筛选，展示全部在库档案</small>
           </button>
           {expertStatusStrip.map((item) => (
             <button
               type="button"
               key={item}
+              title={expertStatusHint(item)}
               className={`${wb.stageItem} ${status === item ? wb.active : ""}`}
               onClick={() => setStatus(status === item ? undefined : item)}
             >
@@ -986,55 +1034,51 @@ function ExpertList() {
                 {item}
               </span>
               <b>{statusCounts[item] || 0}</b>
-              <small>{expertStatusHint(item)}</small>
             </button>
           ))}
         </div>
-        <section className={wb.filter}>
-          <Input
-            className={wb.filterSearch}
-            allowClear
-            prefix={<SearchOutlined />}
-            placeholder="搜索姓名、单位、专家编号或技术关键词"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-          <Select
-            allowClear
-            placeholder="主领域"
-            style={{ width: 180 }}
-            value={field}
-            onChange={setField}
-            options={[...new Set(experts.map((x) => x.field))].map((v) => ({
-              label: v,
-              value: v,
-            }))}
-          />
-          <Button
-            onClick={() => {
-              setKeyword("");
-              setField();
-              setStatus();
-            }}
-          >
-            重置
-          </Button>
-        </section>
         <Card className={wb.card}>
-          <div className={wb.tableTop}>
-            <strong>专家列表</strong>
-            <div className={wb.tableTools}>
-              {status ? (
-                <span className={wb.filterChip}>
-                  已按「{status}」筛选
-                  <Button type="link" size="small" onClick={() => setStatus()}>
-                    清除
-                  </Button>
-                </span>
-              ) : null}
-              <span>共 {rows.length} 位 · 数据更新于 2026-09-04 10:32</span>
+          <section className={wb.filter}>
+            <Input
+              className={wb.filterSearch}
+              allowClear
+              prefix={<SearchOutlined />}
+              placeholder="搜索姓名、单位、专家编号或技术关键词"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+            <Select
+              allowClear
+              placeholder="主领域"
+              style={{ width: 180 }}
+              value={field}
+              onChange={setField}
+              options={[...new Set(experts.map((x) => x.field))].map((v) => ({
+                label: v,
+                value: v,
+              }))}
+            />
+            <Button
+              onClick={() => {
+                setKeyword("");
+                setField();
+                setStatus();
+              }}
+            >
+              重置
+            </Button>
+            <span className={wb.filterMeta}>共 {rows.length} 位</span>
+          </section>
+          {status ? (
+            <div className={wb.tableTop}>
+              <span className={wb.filterChip}>
+                已按「{status}」筛选
+                <Button type="link" size="small" onClick={() => setStatus()}>
+                  清除
+                </Button>
+              </span>
             </div>
-          </div>
+          ) : null}
           <Table
             rowKey="id"
             columns={columns}
@@ -1059,162 +1103,6 @@ function ExpertList() {
 
 function Tasks() {
   return <Calls />;
-}
-
-function Evaluation() {
-  const { tasks: taskRecords } = useExpertStore();
-  const submittedEvaluations = taskRecords
-    .filter((task) => task.evaluation)
-    .map((task) => ({
-      project: task.project,
-      expert: task.expert,
-      delivery: task.evaluation.delivery,
-      response: task.evaluation.response,
-      attitude: task.evaluation.attitude,
-      result: task.evaluation.result,
-      retrospective: task.evaluation.retrospective || "待回溯",
-      date: task.evaluation.submittedAt,
-      comment: task.evaluation.comment,
-    }));
-  const rows = [
-    ...submittedEvaluations,
-    ...evaluations.filter(
-      (item) =>
-        !submittedEvaluations.some(
-          (submitted) => submitted.project === item.project,
-        ),
-    ),
-  ];
-  const columns = [
-    { title: "项目", dataIndex: "project", render: (v) => <b>{v}</b> },
-    { title: "专家", dataIndex: "expert" },
-    { title: "交付性 50%", dataIndex: "delivery" },
-    { title: "响应效率 30%", dataIndex: "response" },
-    { title: "服务态度 20%", dataIndex: "attitude" },
-    {
-      title: "结果",
-      dataIndex: "result",
-      render: (v) => <Tag color={v === "优秀" ? "success" : "blue"}>{v}</Tag>,
-    },
-    {
-      title: "观点回溯",
-      dataIndex: "retrospective",
-      render: (v) => (
-        <Tag
-          color={v === "命中" ? "success" : v === "偏离" ? "error" : "warning"}
-        >
-          {v}
-        </Tag>
-      ),
-    },
-    { title: "评价日期", dataIndex: "date" },
-  ];
-  return (
-    <div className={wb.page}>
-      <div className={wb.content}>
-        <div className={wb.pageHead}>
-          <div>
-            <h1>
-              评价与回溯
-              <PageHelp page="评价与回溯" />
-            </h1>
-            <p>履约评价与观点准确度分开记录，持续校准专家画像</p>
-          </div>
-        </div>
-        <section className={wb.stats}>
-          <article className={wb.stat}>
-            <div>
-              <span>平均履约评分</span>
-              <strong>92.6</strong>
-              <small>较上季度 +2.1</small>
-            </div>
-            <i>
-              <BarChartOutlined />
-            </i>
-          </article>
-          <article className={`${wb.stat} ${wb.green}`}>
-            <div>
-              <span>优秀率</span>
-              <strong>81%</strong>
-              <small>优秀 43 人次</small>
-            </div>
-            <i>
-              <CheckCircleOutlined />
-            </i>
-          </article>
-          <article className={`${wb.stat} ${wb.orange}`}>
-            <div>
-              <span>待回溯项目</span>
-              <strong>8</strong>
-              <small>3 项已临期</small>
-            </div>
-            <i>
-              <ClockCircleOutlined />
-            </i>
-          </article>
-          <article className={`${wb.stat} ${wb.red}`}>
-            <div>
-              <span>观点命中率</span>
-              <strong>72%</strong>
-              <small>已回溯 64 条</small>
-            </div>
-            <i>
-              <FileSearchOutlined />
-            </i>
-          </article>
-        </section>
-        <div className={wb.evaluationGrid}>
-          <Card className={wb.card}>
-            <div className={wb.tableTop}>
-              <strong>最近评价记录</strong>
-              <span>共 {rows.length} 条</span>
-            </div>
-            <Table
-              rowKey={(record) => `${record.project}-${record.date}`}
-              columns={columns}
-              dataSource={rows}
-              pagination={false}
-              expandable={{
-                expandedRowRender: (record) => (
-                  <p style={{ margin: 0, color: "#64748b" }}>
-                    评价说明：{record.comment || "历史演示评价暂无文字说明"}
-                  </p>
-                ),
-              }}
-            />
-          </Card>
-          <section className={wb.panel}>
-            <div className={wb.panelHead}>
-              <div>
-                <h3>评价分布</h3>
-                <p>近 12 个月</p>
-              </div>
-            </div>
-            <div className={wb.donut}>
-              <div>
-                <strong>92.6</strong>
-                <span>平均分</span>
-              </div>
-            </div>
-            <div className={wb.legend}>
-              <span>
-                <i className={wb.green} />
-                优秀 81%
-              </span>
-              <span>
-                <i className={wb.blue} />
-                良好 16%
-              </span>
-              <span>
-                <i className={wb.red} />
-                一般 3%
-              </span>
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 function Operations() {
@@ -1741,12 +1629,95 @@ function Operations() {
   );
 }
 
+function ExpertManagement() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { invitations } = useExpertStore();
+  const [panel, setPanel] = useState(() =>
+    location.state?.expertManagementTab === "enrollment"
+      ? "enrollment"
+      : "experts",
+  );
+  const [innerTab, setInnerTab] = useState("pool");
+  const [inviteTick, setInviteTick] = useState(0);
+
+  useEffect(() => {
+    if (location.state?.expertManagementTab !== "enrollment") return;
+    setPanel("enrollment");
+    navigate("/expertTalentList", { replace: true, state: {} });
+  }, [location.state, navigate]);
+
+  return (
+    <div className={wb.page}>
+      <div className={wb.content}>
+        <Tabs
+          className={wb.workspaceTabs}
+          activeKey={panel}
+          onChange={setPanel}
+          tabBarExtraContent={
+            <div className={wb.headActions}>
+              <PageHelp page="专家管理" compact />
+              {panel === "experts" ? (
+                <>
+                  <Button>导出</Button>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => {
+                      setPanel("enrollment");
+                      setInnerTab("pool");
+                    }}
+                  >
+                    邀请专家
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={() => setInviteTick((count) => count + 1)}
+                >
+                  发起合作邀请
+                </Button>
+              )}
+            </div>
+          }
+          items={[
+            { key: "experts", label: "在库专家" },
+            {
+              key: "enrollment",
+              label: `入库办理（${invitations.length}）`,
+            },
+          ]}
+        />
+        <div className={panel === "experts" ? undefined : wb.hiddenPanel}>
+          <ExpertList embedded />
+        </div>
+        <div className={panel === "enrollment" ? undefined : wb.hiddenPanel}>
+          <Enrollment
+            embedded
+            innerTab={innerTab}
+            onInnerTabChange={setInnerTab}
+            inviteTick={inviteTick}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ExpertTalent() {
   const { pathname } = useLocation();
-  if (pathname === "/expertTalentList") return <ExpertList />;
-  if (pathname === "/expertTalentApplications") return <Enrollment />;
+  if (pathname === "/expertTalentList") return <ExpertManagement />;
+  if (pathname === "/expertTalentApplications")
+    return (
+      <Navigate
+        replace
+        to="/expertTalentList"
+        state={{ expertManagementTab: "enrollment" }}
+      />
+    );
   if (pathname === "/expertTalentTasks") return <Tasks />;
-  if (pathname === "/expertTalentEvaluation") return <Evaluation />;
   if (pathname === "/expertTalentOperations") return <Operations />;
   return <Dashboard />;
 }

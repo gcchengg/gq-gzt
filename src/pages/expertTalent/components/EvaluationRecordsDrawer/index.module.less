@@ -1,0 +1,52 @@
+.drawerRoot :global(.ant-drawer-content-wrapper) {
+  min-width: min(720px, 100vw);
+}
+
+.drawer {
+  color: #43596b;
+}
+
+.summary {
+  margin-bottom: 12px;
+  color: #516879;
+  font-size: 12px;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 150px 150px 240px auto;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.projectName {
+  display: block;
+  overflow: hidden;
+  color: #294961;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comment {
+  margin: 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .drawerRoot :global(.ant-drawer-content-wrapper) {
+    width: calc(100vw - 16px) !important;
+    min-width: 0 !important;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+}

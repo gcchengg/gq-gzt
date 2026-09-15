@@ -1,0 +1,89 @@
+<h2>评价与回溯如何并入专家库看板？</h2>
+<p class="subtitle">三种布局都删除侧边栏菜单和原独立页面；点击评价区域后查看最近评价记录。请选择更符合日常使用习惯的一种。</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f5f7fb">
+      <div style="font-size:12px;font-weight:700;margin-bottom:10px">专家库看板</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px">
+        <div style="background:white;padding:9px;border-radius:7px;font-size:9px">在库专家<br><b style="font-size:17px">286</b></div>
+        <div style="background:white;padding:9px;border-radius:7px;font-size:9px">当前可用<br><b style="font-size:17px">219</b></div>
+        <div style="background:white;padding:9px;border-radius:7px;font-size:9px">本月调用<br><b style="font-size:17px">34</b></div>
+        <div style="background:#fff5f5;padding:9px;border:1px solid #fecaca;border-radius:7px;font-size:9px">综合评分<br><b style="font-size:17px;color:#dc2626">92.6</b></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:8px">
+        <div style="background:white;border-radius:7px;padding:10px;height:105px">
+          <b style="font-size:10px">我的待办</b>
+          <div style="margin-top:8px;font-size:8px;line-height:20px;color:#475569">入库审核　4项<br>候选确认　2项<br><span style="color:#dc2626">专家评价　1项 ›</span></div>
+        </div>
+        <div style="background:white;border-radius:7px;padding:10px;height:105px;cursor:pointer">
+          <div style="display:flex;justify-content:space-between"><b style="font-size:10px">评价质量</b><span style="font-size:8px;color:#2563eb">查看记录 ›</span></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
+            <div style="width:52px;height:52px;border-radius:50%;border:8px solid #22c55e;border-right-color:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:9px"><b>81%</b></div>
+            <div style="font-size:8px;line-height:17px">优秀率 81%<br>观点命中率 72%<br><span style="color:#ea580c">待回溯 8</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A · 轻量摘要卡（推荐）</h3>
+      <p>保留原看板主结构，新增一张“评价质量”卡；点击卡片或综合评分打开右侧抽屉。信息层级清晰、改动最小。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f5f7fb">
+      <div style="font-size:12px;font-weight:700;margin-bottom:10px">专家库看板</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:9px">
+        <div style="background:white;padding:8px;border-radius:7px;font-size:8px">平均评分<br><b style="font-size:16px">92.6</b></div>
+        <div style="background:white;padding:8px;border-radius:7px;font-size:8px">优秀率<br><b style="font-size:16px">81%</b></div>
+        <div style="background:white;padding:8px;border-radius:7px;font-size:8px">待回溯<br><b style="font-size:16px">8</b></div>
+        <div style="background:white;padding:8px;border-radius:7px;font-size:8px">命中率<br><b style="font-size:16px">72%</b></div>
+      </div>
+      <div style="background:white;border-radius:7px;padding:10px;height:118px">
+        <div style="display:flex;justify-content:space-between"><b style="font-size:10px">评价与回溯趋势</b><span style="font-size:8px;color:#2563eb">最近评价记录 ›</span></div>
+        <svg viewBox="0 0 260 75" style="width:100%;height:75px;margin-top:5px">
+          <polyline fill="none" stroke="#2563eb" stroke-width="3" points="5,55 45,42 85,48 125,29 165,35 205,18 250,22"/>
+          <polyline fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 3" points="5,62 45,57 85,52 125,50 165,39 205,43 250,31"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B · 独立分析区</h3>
+      <p>在看板增加完整趋势区和四项评价指标；数据表达最强，但会明显拉长首页，并与原四张经营指标形成竞争。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f5f7fb">
+      <div style="font-size:12px;font-weight:700;margin-bottom:10px">专家库看板</div>
+      <div style="display:grid;grid-template-columns:1.35fr .9fr;gap:8px">
+        <div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-bottom:7px">
+            <div style="background:white;padding:9px;border-radius:7px;font-size:8px">在库专家 <b style="font-size:15px">286</b></div>
+            <div style="background:white;padding:9px;border-radius:7px;font-size:8px">本月调用 <b style="font-size:15px">34</b></div>
+          </div>
+          <div style="background:white;padding:10px;border-radius:7px;height:90px;font-size:9px"><b>领域覆盖</b><div style="margin-top:12px;height:7px;background:#dbeafe;border-radius:4px"><i style="display:block;width:82%;height:100%;background:#2563eb;border-radius:4px"></i></div><div style="margin-top:13px;height:7px;background:#dcfce7;border-radius:4px"><i style="display:block;width:68%;height:100%;background:#22c55e;border-radius:4px"></i></div></div>
+        </div>
+        <div style="background:#132238;color:white;padding:11px;border-radius:9px;height:142px">
+          <b style="font-size:10px">质量雷达</b>
+          <div style="font-size:8px;color:#cbd5e1;margin-top:5px">专家服务健康度</div>
+          <svg viewBox="0 0 120 85" style="width:100%;height:86px">
+            <polygon points="60,8 106,38 89,77 31,77 14,38" fill="none" stroke="#64748b"/>
+            <polygon points="60,18 94,41 82,67 35,70 23,40" fill="#38bdf855" stroke="#38bdf8" stroke-width="2"/>
+          </svg>
+          <div style="font-size:8px;text-align:center;color:#7dd3fc">点击查看评价明细</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C · 质量驾驶舱</h3>
+      <p>将评价提升为专家库核心健康度模块，用雷达图统一呈现交付、响应、态度、命中率；视觉突出，但学习成本和解释成本更高。</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:22px">
+  <div class="label">共同交互约束</div>
+  <p style="margin-top:6px">点击评价区域后，建议使用右侧 Drawer（约 70% 页面宽度）展示“最近评价记录”表格；Drawer 比居中 Modal 更适合宽表格，也能保留看板上下文。</p>
+</div>

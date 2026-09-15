@@ -1,12 +1,14 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Table, Tag, message } from "antd";
+import { Button, Form, Input, Modal, Select, Table, Tag, message } from "antd";
 import { useMemo, useState } from "react";
 import { uid, updateStore, useExpertStore } from "../../store";
 import styles from "./index.module.less";
 
+const sourceOptions = ["内部", "外部", "参股企业"];
+const genderOptions = ["男", "女"];
 const fields = [
-  ["batch", "名单批次"],
   ["name", "姓名"],
+  ["gender", "性别"],
   ["company", "单位"],
   ["title", "职务"],
   ["phone", "手机号"],
@@ -17,44 +19,31 @@ const fields = [
   ["field", "拟服务领域"],
   ["reason", "推荐理由"],
 ];
-const requiredFields = ["batch", "name", "company", "phone", "field"];
-const csvHeader = fields.map(([, label]) => label).join(",");
+const requiredFields = ["name", "gender", "phone"];
 const dash = (value) => value || "--";
-
-function parseCsv(text) {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-  if (lines.length < 2) throw new Error("请至少粘贴表头和一行候选人员数据");
-  const rows = lines
-    .slice(1)
-    .map((line) => line.split(/[,，\t]/).map((cell) => cell.trim()));
-  return rows.map((cells, index) => {
-    if (!cells[1] || !cells[2] || !cells[4])
-      throw new Error(`第 ${index + 2} 行缺少姓名、单位或手机号`);
-    return Object.fromEntries(
-      fields.map(([key], position) => [key, cells[position] || ""]),
-    );
-  });
-}
 
 export default function CandidatePool({ onInvite }) {
   const state = useExpertStore();
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [keyword, setKeyword] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [editing, setEditing] = useState(false);
-  const [importing, setImporting] = useState(false);
-  const [csv, setCsv] = useState(
-    `${csvHeader}\n2026年补充名单,示例专家,示例单位,技术总监,13800009999,部门推荐,投资一部,王经理,示例项目,智能制造,具备相关项目经验`,
-  );
   const [form] = Form.useForm();
+  const statusCounts = useMemo(() => {
+    const counts = { 待邀请: 0, 已转邀请: 0 };
+    state.candidates.forEach((item) => {
+      if (counts[item.status] != null) counts[item.status] += 1;
+    });
+    return counts;
+  }, [state.candidates]);
   const rows = useMemo(
     () =>
       state.candidates.filter(
-        (item) => !keyword || Object.values(item).join(" ").includes(keyword),
+        (item) =>
+          (!statusFilter || item.status === statusFilter) &&
+          (!keyword || Object.values(item).join(" ").includes(keyword)),
       ),
-    [keyword, state.candidates],
+    [keyword, state.candidates, statusFilter],
   );
   const eligible = selectedKeys.filter(
     (id) =>
@@ -75,32 +64,13 @@ export default function CandidatePool({ onInvite }) {
       message.success("候选人员已加入初始推荐名单");
     });
   }
-  function importCsv() {
-    try {
-      const imported = parseCsv(csv);
-      updateStore((store) =>
-        imported.forEach((item) =>
-          store.candidates.push({ id: uid("CAND"), ...item, status: "待邀请" }),
-        ),
-      );
-      setImporting(false);
-      message.success(`已导入 ${imported.length} 位候选人员（演示）`);
-    } catch (error) {
-      message.error(error.message);
-    }
-  }
 
   const columns = [
     {
-      title: "名单批次 / 来源",
-      key: "batch",
-      width: 160,
-      render: (_, row) => (
-        <div className={styles.personCell}>
-          <strong>{dash(row.batch)}</strong>
-          <span>{dash(row.source)}</span>
-        </div>
-      ),
+      title: "人员来源",
+      dataIndex: "source",
+      width: 120,
+      render: dash,
     },
     {
       title: "姓名",
@@ -113,7 +83,19 @@ export default function CandidatePool({ onInvite }) {
         </div>
       ),
     },
-    { title: "单位", dataIndex: "company", minWidth: 160, ellipsis: true },
+    {
+      title: "性别",
+      dataIndex: "gender",
+      width: 80,
+      render: dash,
+    },
+    {
+      title: "单位",
+      dataIndex: "company",
+      minWidth: 160,
+      ellipsis: true,
+      render: dash,
+    },
     { title: "手机号", dataIndex: "phone", width: 120 },
     {
       title: "推荐部门 / 推荐人",
@@ -133,7 +115,7 @@ export default function CandidatePool({ onInvite }) {
       ellipsis: true,
       render: dash,
     },
-    { title: "拟服务领域", dataIndex: "field", width: 110 },
+    { title: "拟服务领域", dataIndex: "field", width: 110, render: dash },
     {
       title: "推荐理由",
       dataIndex: "reason",
@@ -153,6 +135,45 @@ export default function CandidatePool({ onInvite }) {
 
   return (
     <div className={styles.page}>
+      <div className={styles.stageStrip}>
+        <button
+          type="button"
+          className={`${styles.stageItem} ${statusFilter ? "" : styles.active}`}
+          onClick={() => setStatusFilter("")}
+        >
+          <span>
+            <i style={{ background: "#2563eb" }} />
+            全部名单
+          </span>
+          <b>{state.candidates.length}</b>
+        </button>
+        <button
+          type="button"
+          className={`${styles.stageItem} ${statusFilter === "待邀请" ? styles.active : ""}`}
+          onClick={() =>
+            setStatusFilter(statusFilter === "待邀请" ? "" : "待邀请")
+          }
+        >
+          <span>
+            <i style={{ background: "#1677ff" }} />
+            待邀请
+          </span>
+          <b>{statusCounts["待邀请"] || 0}</b>
+        </button>
+        <button
+          type="button"
+          className={`${styles.stageItem} ${statusFilter === "已转邀请" ? styles.active : ""}`}
+          onClick={() =>
+            setStatusFilter(statusFilter === "已转邀请" ? "" : "已转邀请")
+          }
+        >
+          <span>
+            <i style={{ background: "#389e0d" }} />
+            已转邀请
+          </span>
+          <b>{statusCounts["已转邀请"] || 0}</b>
+        </button>
+      </div>
       <div className={styles.tableTop}>
         <strong>初始推荐名单</strong>
         <span>
@@ -163,13 +184,12 @@ export default function CandidatePool({ onInvite }) {
       <div className={styles.toolbar}>
         <Input.Search
           allowClear
-          placeholder="搜索姓名、单位、批次、项目或领域"
+          placeholder="搜索姓名、单位、来源、项目或领域"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
           className={styles.search}
         />
         <div className={styles.tools}>
-          <Button onClick={() => setImporting(true)}>CSV文本导入</Button>
           <Button icon={<PlusOutlined />} onClick={() => setEditing(true)}>
             新增候选人
           </Button>
@@ -202,6 +222,7 @@ export default function CandidatePool({ onInvite }) {
         onOk={addCandidate}
         width={760}
         okText="保存"
+        cancelText="取消"
       >
         <Form form={form} layout="vertical" className={styles.formGrid}>
           {fields.map(([key, label]) => (
@@ -209,37 +230,32 @@ export default function CandidatePool({ onInvite }) {
               key={key}
               name={key}
               label={label}
-              rules={[
-                { required: requiredFields.includes(key), whitespace: true },
-              ]}
+              rules={
+                requiredFields.includes(key)
+                  ? [{ required: true, whitespace: true }]
+                  : []
+              }
             >
-              <Input.TextArea
-                autoSize={
-                  key === "reason"
-                    ? { minRows: 2, maxRows: 3 }
-                    : { minRows: 1, maxRows: 1 }
-                }
-              />
+              {key === "source" || key === "gender" ? (
+                <Select
+                  options={(key === "gender"
+                    ? genderOptions
+                    : sourceOptions
+                  ).map((value) => ({ value }))}
+                  placeholder="请选择"
+                />
+              ) : (
+                <Input.TextArea
+                  autoSize={
+                    key === "reason"
+                      ? { minRows: 2, maxRows: 3 }
+                      : { minRows: 1, maxRows: 1 }
+                  }
+                />
+              )}
             </Form.Item>
           ))}
         </Form>
-      </Modal>
-      <Modal
-        title="CSV文本导入（演示）"
-        open={importing}
-        onCancel={() => setImporting(false)}
-        onOk={importCsv}
-        width={900}
-        okText="导入名单"
-      >
-        <div className={styles.tip}>
-          不设置“7类/5类”或固定人数。首行按下列表头粘贴，逗号、中文逗号或制表符均可分隔。
-        </div>
-        <Input.TextArea
-          rows={10}
-          value={csv}
-          onChange={(event) => setCsv(event.target.value)}
-        />
       </Modal>
     </div>
   );

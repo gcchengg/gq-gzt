@@ -40,7 +40,6 @@ export const routes = [
     "expertTalentList",
     "expertTalentApplications",
     "expertTalentTasks",
-    "expertTalentEvaluation",
     "expertTalentOperations",
   ].map((path) => ({
     path,
