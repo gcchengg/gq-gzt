@@ -76,6 +76,10 @@ const directorHandlerRoles = {
   "D-04": ["集团董办", "综合管理部-办公室"],
   "D-05": ["集团董办", "综合管理部-人力"],
   "D-06": ["集团董办", "综合管理部-董办", "董事本人"],
+  "D-07": ["集团董办", "综合管理部-董办"],
+  "D-08": ["集团董办", "综合管理部-办公室", "董事本人"],
+  "D-09": ["集团董办", "综合管理部-董办", "董事本人"],
+  "D-10": ["集团董办", "综合管理部-董办"],
 };
 
 const appointmentRoleKeys = {
@@ -454,6 +458,7 @@ function DirectorLifecycleDrawer({
               {stage === "preparation" ? (
                 <PreparationWorkspace
                   compact
+                  embedded
                   materials={materials}
                   dutyPlans={dutyPlans}
                   onCreateDutyPlan={onCreateDutyPlan}
@@ -694,6 +699,7 @@ function ManagementDrawerPanel({
 
 function PreparationWorkspace({
   compact = false,
+  embedded = false,
   materials,
   dutyPlans,
   onCreateDutyPlan,
@@ -713,7 +719,11 @@ function PreparationWorkspace({
   );
   const annualPlanGenerated = generatedDirectorNames.includes(director.name);
   return (
-    <div className={styles.stageWorkspace}>
+    <div
+      className={`${styles.stageWorkspace} ${
+        embedded ? styles.embeddedPreparation : ""
+      }`}
+    >
       {!compact ? (
         <section
           className={styles.directorSelector}
@@ -772,37 +782,59 @@ function PreparationWorkspace({
           title="董事履职手册"
           extra={<Button>定期发起资料更新</Button>}
         >
-          <DataTable
-            rows={materials}
-            columns={[
-              { title: "资料类别", dataIndex: "category", width: 110 },
-              { title: "资料名称", dataIndex: "material", width: 320 },
-              { title: "责任部门", dataIndex: "department", width: 180 },
-              { title: "责任人", dataIndex: "responsiblePerson", width: 130 },
-              { title: "更新频次", dataIndex: "frequency", width: 100 },
-              {
-                title: "状态",
-                dataIndex: "status",
-                width: 100,
-                render: (value) => <StatusPill>{value}</StatusPill>,
-              },
-              {
-                title: "操作",
-                width: 100,
-                render: (_, row) => (
-                  <Button
-                    type="link"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setHistoryMaterial(row);
-                    }}
-                  >
-                    查看详情
+          {embedded ? (
+            <div className={styles.materialCards}>
+              {materials.map((item) => (
+                <article key={item.id} className={styles.materialCard}>
+                  <div className={styles.materialCardHead}>
+                    <span>{item.category}</span>
+                    <StatusPill>{item.status}</StatusPill>
+                  </div>
+                  <strong>{item.material}</strong>
+                  <div className={styles.materialMeta}>
+                    <span>责任部门：{item.department}</span>
+                    <span>责任人：{item.responsiblePerson}</span>
+                    <span>更新频次：{item.frequency}</span>
+                  </div>
+                  <Button type="link" onClick={() => setHistoryMaterial(item)}>
+                    查看资料详情
                   </Button>
-                ),
-              },
-            ]}
-          />
+                </article>
+              ))}
+            </div>
+          ) : (
+            <DataTable
+              rows={materials}
+              columns={[
+                { title: "资料类别", dataIndex: "category", width: 110 },
+                { title: "资料名称", dataIndex: "material", width: 320 },
+                { title: "责任部门", dataIndex: "department", width: 180 },
+                { title: "责任人", dataIndex: "responsiblePerson", width: 130 },
+                { title: "更新频次", dataIndex: "frequency", width: 100 },
+                {
+                  title: "状态",
+                  dataIndex: "status",
+                  width: 100,
+                  render: (value) => <StatusPill>{value}</StatusPill>,
+                },
+                {
+                  title: "操作",
+                  width: 100,
+                  render: (_, row) => (
+                    <Button
+                      type="link"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setHistoryMaterial(row);
+                      }}
+                    >
+                      查看详情
+                    </Button>
+                  ),
+                },
+              ]}
+            />
+          )}
           <div className={styles.cardFooter}>
             <span>
               已提交 {submittedCount} / {materials.length}{" "}
@@ -851,6 +883,7 @@ function PreparationWorkspace({
         </SectionCard>
       </div>
       <DutyPlanWorkspace
+        embedded={embedded}
         createOpen={planComposerOpen}
         onCreateOpenChange={setPlanComposerOpen}
         plans={directorPlans}

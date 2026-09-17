@@ -75,6 +75,7 @@ function casesForDirector(director) {
     待上传董事简历: { status: "待上传董事简历", currentStep: 5 },
     待配置系统权限: { status: "待配置系统权限", currentStep: 6 },
     待选举变更: { status: "待选举变更", currentStep: 8 },
+    待完成工商变更: { status: "待完成工商变更", currentStep: 9 },
     已完成: { status: "已完成", currentStep: 10 },
   };
   return [

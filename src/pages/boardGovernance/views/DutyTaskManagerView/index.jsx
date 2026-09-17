@@ -31,6 +31,7 @@ const { Dragger } = Upload;
 
 export default function DutyTaskManagerView({
   plans,
+  materials,
   onComplete,
   suggestionTasks,
   onSaveSuggestion,
@@ -38,8 +39,12 @@ export default function DutyTaskManagerView({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const bizId = searchParams.get("bizId");
-  const activeTaskType =
-    searchParams.get("taskType") === "suggestion" ? "suggestion" : "duty";
+  const requestedTaskType = searchParams.get("taskType");
+  const activeTaskType = ["duty", "suggestion", "material"].includes(
+    requestedTaskType,
+  )
+    ? requestedTaskType
+    : "duty";
   const [form] = Form.useForm();
   const [suggestionForm] = Form.useForm();
   const [files, setFiles] = useState([]);
@@ -131,10 +136,46 @@ export default function DutyTaskManagerView({
   const suggestionPendingCount = suggestionTasks.filter(
     (item) => item.status !== "已完成",
   ).length;
+  const materialTasks = useMemo(() => {
+    const byDepartment = materials.reduce((groups, item) => {
+      groups[item.department] = [...(groups[item.department] || []), item];
+      return groups;
+    }, {});
+    return Object.entries(byDepartment).map(([department, departmentItems]) => {
+      const submittedCount = departmentItems.filter(
+        (item) => item.status === "已提交",
+      ).length;
+      const total = departmentItems.length;
+      const completed = submittedCount === total;
+      return {
+        id: department,
+        department,
+        responsiblePeople: [
+          ...new Set(departmentItems.map((item) => item.responsiblePerson)),
+        ].join("、"),
+        total,
+        submittedCount,
+        pendingCount: total - submittedCount,
+        progress: Math.round((submittedCount / total) * 100),
+        status: completed ? "已完成" : "待提交",
+      };
+    });
+  }, [materials]);
+  const materialPendingCount = materialTasks.filter(
+    (item) => item.status !== "已完成",
+  ).length;
   const currentTotal =
-    activeTaskType === "suggestion" ? suggestionTasks.length : tasks.length;
+    activeTaskType === "suggestion"
+      ? suggestionTasks.length
+      : activeTaskType === "material"
+        ? materialTasks.length
+        : tasks.length;
   const currentPending =
-    activeTaskType === "suggestion" ? suggestionPendingCount : pendingCount;
+    activeTaskType === "suggestion"
+      ? suggestionPendingCount
+      : activeTaskType === "material"
+        ? materialPendingCount
+        : pendingCount;
 
   return (
     <div className={styles.page}>
@@ -180,6 +221,10 @@ export default function DutyTaskManagerView({
             {
               key: "suggestion",
               label: `意见建议落实 ${suggestionTasks.length}`,
+            },
+            {
+              key: "material",
+              label: `履职手册资料 ${materialTasks.length}`,
             },
           ]}
         />
@@ -238,6 +283,55 @@ export default function DutyTaskManagerView({
                 render: (_, row) => (
                   <Button type="link" onClick={() => openSuggestion(row)}>
                     {row.status === "已完成" ? "查看/修改" : "去办理"}
+                  </Button>
+                ),
+              },
+            ]}
+          />
+        ) : null}
+        {activeTaskType === "material" ? (
+          <DataTable
+            rows={materialTasks}
+            columns={[
+              { title: "责任部门", dataIndex: "department", width: 210 },
+              { title: "责任人", dataIndex: "responsiblePeople", width: 220 },
+              {
+                title: "需更新资料",
+                dataIndex: "total",
+                width: 110,
+                render: (value) => `${value} 项`,
+              },
+              {
+                title: "已提交资料",
+                dataIndex: "submittedCount",
+                width: 120,
+                render: (value) => `${value} 项`,
+              },
+              {
+                title: "完成进度",
+                dataIndex: "progress",
+                width: 180,
+                render: (value) => <Progress percent={value} size="small" />,
+              },
+              {
+                title: "任务状态",
+                dataIndex: "status",
+                width: 110,
+                render: (value) => <StatusPill>{value}</StatusPill>,
+              },
+              {
+                title: "操作",
+                width: 130,
+                render: (_, row) => (
+                  <Button
+                    type="link"
+                    onClick={() =>
+                      navigate(
+                        `/boardGovernance/material-task?department=${encodeURIComponent(row.department)}`,
+                      )
+                    }
+                  >
+                    {row.status === "已完成" ? "查看任务" : "去提交"}
                   </Button>
                 ),
               },

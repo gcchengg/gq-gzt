@@ -742,6 +742,53 @@
 .drawerStageBody :global(.ant-table-container) {
   max-width: 100%;
 }
+.embeddedPreparation .prepGrid {
+  grid-template-columns: 1fr;
+}
+.embeddedPreparation .stageIntro {
+  padding: 18px 20px;
+}
+.materialCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.materialCard {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #e1e8f1;
+  border-radius: 10px;
+  background: #f9fbfd;
+}
+.materialCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.materialCardHead > span {
+  color: #2f6bff;
+  font-size: 11px;
+}
+.materialCard > strong {
+  color: #24364f;
+  overflow-wrap: anywhere;
+}
+.materialMeta {
+  display: grid;
+  gap: 4px;
+  color: #738095;
+  font-size: 11px;
+}
+.materialMeta span {
+  overflow-wrap: anywhere;
+}
+.materialCard :global(.ant-btn) {
+  justify-self: start;
+  padding-left: 0;
+}
 .compactLayout {
   grid-template-columns: 1fr;
 }
@@ -791,6 +838,9 @@
   }
   .drawerStats {
     width: 100%;
+  }
+  .materialCards {
+    grid-template-columns: 1fr;
   }
 }
 @media (max-width: 700px) {

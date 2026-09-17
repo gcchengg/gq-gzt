@@ -45,6 +45,7 @@ const workCategories = [
 ];
 
 export default function DutyPlanWorkspace({
+  embedded = false,
   createOpen,
   onCreateOpenChange,
   plans,
@@ -145,6 +146,7 @@ export default function DutyPlanWorkspace({
     <>
       <SectionCard
         title="年度履职计划编排"
+        className={embedded ? styles.embeddedPlanCard : ""}
         extra={
           <Space wrap>
             <span className={styles.typeHint}>
@@ -159,7 +161,52 @@ export default function DutyPlanWorkspace({
           </Space>
         }
       >
-        <DataTable rows={plans} columns={columns} />
+        {embedded ? (
+          <div className={styles.planCards}>
+            {plans.length ? (
+              plans.map((plan) => (
+                <article key={plan.id} className={styles.planCard}>
+                  <div className={styles.planCardHead}>
+                    <span>
+                      {plan.type} · {plan.workCategory}
+                    </span>
+                    <StatusPill>{plan.status}</StatusPill>
+                  </div>
+                  <strong>{plan.content}</strong>
+                  <div className={styles.planCardMeta}>
+                    <span>
+                      {plan.directorName} · {plan.servingCompany}
+                    </span>
+                    <span>
+                      {plan.dutyYear} · {plan.dutyQuarter} · {plan.date}
+                    </span>
+                    <span>
+                      责任部门：{plan.owner} · 确认责任人：{plan.confirmOwner}
+                    </span>
+                    <span>预期成果：{plan.target}</span>
+                  </div>
+                  {plan.status === "已完成" ? (
+                    <Button type="link" onClick={() => setResultPlan(plan)}>
+                      查看结果
+                    </Button>
+                  ) : (
+                    <Link
+                      to={`/boardGovernance/plan-confirm-task?planId=${plan.id}`}
+                    >
+                      查看任务
+                    </Link>
+                  )}
+                </article>
+              ))
+            ) : (
+              <p className={styles.emptyPlan}>
+                当前董事暂未建立履职计划，可点击“新增计划”发起编排。
+              </p>
+            )}
+          </div>
+        ) : (
+          <DataTable rows={plans} columns={columns} />
+        )}
         <div className={styles.planFooter}>
           <div>
             <strong>
@@ -199,7 +246,9 @@ export default function DutyPlanWorkspace({
             </Button>
           )}
         </div>
-        <div className={styles.flowNote}>
+        <div
+          className={`${styles.flowNote} ${embedded ? styles.embeddedFlow : ""}`}
+        >
           {[
             "计划制定与任务下发",
             "确认责任人提交",

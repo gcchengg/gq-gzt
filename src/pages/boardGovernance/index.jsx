@@ -288,6 +288,7 @@ export default function BoardGovernancePage() {
     "duty-tasks": (
       <DutyTaskManagerView
         plans={dutyPlans}
+        materials={handbookMaterials}
         onComplete={completeDutyTask}
         suggestionTasks={suggestionTasks}
         onSaveSuggestion={saveSuggestionTask}
