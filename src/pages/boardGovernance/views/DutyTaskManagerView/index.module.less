@@ -1,0 +1,18 @@
+.page { display: grid; gap: 16px; min-width: 0; }
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.metrics article { display: grid; gap: 6px; padding: 18px 20px; border: 1px solid #e1e7f0; border-radius: 13px; background: #fff; box-shadow: 0 8px 24px rgba(31, 53, 86, 0.06); }
+.metrics span, .hint { color: #748197; font-size: 12px; }
+.metrics strong { color: #17365d; font-size: 28px; }
+.drawerContent { display: grid; gap: 18px; }
+.taskHero { display: flex; gap: 14px; align-items: flex-start; padding: 18px; border-radius: 13px; background: linear-gradient(120deg, #edf5ff, #f8fbff); }
+.taskHero > svg { padding: 10px; border-radius: 50%; background: #245fca; color: #fff; font-size: 22px; }
+.taskHero span { color: #2f6bff; font-size: 12px; }
+.taskHero h3 { margin: 5px 0; color: #17365d; }
+.taskHero p { margin: 0; color: #68778c; }
+.formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.actionBar { display: flex; justify-content: flex-end; gap: 10px; padding-top: 14px; border-top: 1px solid #e8edf4; }
+.drawerContent :global(.ant-upload-wrapper .ant-upload-drag) { padding: 12px; background: #f8fbff; }
+.drawerContent :global(.ant-upload-drag-icon) { margin-bottom: 6px !important; }
+@media (max-width: 800px) {
+  .metrics, .formGrid { grid-template-columns: 1fr; }
+}

@@ -33,6 +33,7 @@ const ExecutiveMaintenanceList = lazy(
   () => import("@/pages/executiveMaintenance/list"),
 );
 const ProjectExam = lazy(() => import("@/modules/projectExam/pages"));
+const BoardGovernance = lazy(() => import("@/pages/boardGovernance"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
   ...[
@@ -286,6 +287,14 @@ export const routes = [
     element: (
       <Suspense>
         <AiPricing />
+      </Suspense>
+    ),
+  },
+  {
+    path: "boardGovernance/*",
+    element: (
+      <Suspense>
+        <BoardGovernance />
       </Suspense>
     ),
   },

@@ -1,0 +1,390 @@
+.page {
+  width: 100%;
+  min-width: 0;
+  margin: 0 auto;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.twoCol {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.threeCol {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 0.85fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.taskList {
+  display: grid;
+}
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+.task:last-child {
+  border-bottom: 0;
+}
+.taskIcon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #edf4ff;
+  color: #245fca;
+}
+.taskIcon.danger {
+  background: #fff0f1;
+  color: #cf343e;
+}
+.taskIcon.warning,
+.taskIcon.urgent {
+  background: #fff5e2;
+  color: #c57400;
+}
+.task div:nth-child(2) {
+  flex: 1;
+}
+.task strong {
+  font-size: 13px;
+}
+.task p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: #8992a1;
+}
+.taskEnd {
+  text-align: right;
+}
+.taskEnd :global(.ant-btn) {
+  margin-top: 7px;
+}
+.taskSummary {
+  font-size: 12px;
+  color: #798596;
+}
+.taskSummary b {
+  color: #245fca;
+}
+.taskIcon.success {
+  background: #eaf8f1;
+  color: #178758;
+}
+.taskEnd small {
+  display: block;
+  margin-top: 5px;
+  color: #8992a1;
+}
+.schedule > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+}
+.schedule b {
+  color: #245fca;
+}
+.schedule i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2f6bff;
+}
+.schedule section {
+  flex: 1;
+}
+.schedule strong,
+.schedule span {
+  display: block;
+}
+.schedule span {
+  color: #7c8696;
+  font-size: 11px;
+  margin-top: 4px;
+}
+.helper {
+  font-size: 11px;
+  color: #8490a2;
+}
+.readiness {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+.readiness strong,
+.readiness span {
+  display: block;
+}
+.readiness span {
+  font-size: 11px;
+  color: #7e8999;
+  margin-top: 4px;
+}
+.notice {
+  margin-top: 12px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: #fff5df;
+  color: #a76100;
+  font-size: 12px;
+}
+.ringRow {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+.ring {
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #fff 56%, transparent 58%),
+    conic-gradient(#2f6bff 0 92%, #e5ebf4 92%);
+}
+.ring strong,
+.ring span {
+  grid-area: 1/1;
+}
+.ring strong {
+  margin-top: -15px;
+  font-size: 23px;
+}
+.ring span {
+  margin-top: 27px;
+  font-size: 10px;
+  color: #7e8795;
+}
+.ringRow ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.ringRow li {
+  display: flex;
+  gap: 9px;
+  align-items: baseline;
+}
+.ringRow li b {
+  font-size: 17px;
+}
+.ringRow li span {
+  font-size: 11px;
+  color: #7e8795;
+}
+.risks {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0 20px;
+}
+.risks p {
+  text-align: center;
+  margin: 0;
+}
+.risks b,
+.risks span {
+  display: block;
+}
+.risks b {
+  font-size: 25px;
+}
+.risks span {
+  font-size: 10px;
+  color: #7f8999;
+}
+.red {
+  color: #d9363e;
+}
+.orange {
+  color: #d98300;
+}
+.blue {
+  color: #245fca;
+}
+.deviation {
+  display: grid;
+  grid-template-columns: 140px 90px 1fr;
+  gap: 10px;
+  padding: 13px;
+  border-bottom: 1px solid #edf0f5;
+}
+.deviation strong {
+  color: #c8323b;
+}
+.deviation small {
+  color: #778295;
+}
+.resource {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+}
+.resource > :global(.anticon) {
+  font-size: 20px;
+  color: #2f6bff;
+}
+.resource div {
+  flex: 1;
+}
+.resource strong,
+.resource span {
+  display: block;
+}
+.resource span {
+  font-size: 11px;
+  color: #7a8494;
+  margin-top: 4px;
+}
+.directorGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.wide {
+  grid-column: span 2;
+}
+.nextMeeting > :global(.anticon) {
+  font-size: 28px;
+  color: #2f6bff;
+}
+.nextMeeting > span {
+  float: right;
+  color: #d98300;
+}
+.nextMeeting h3 {
+  margin: 15px 0 6px;
+}
+.nextMeeting p {
+  color: #778295;
+}
+.nextMeeting div {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+.quick {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.quick button {
+  border: 1px solid #e4e9f1;
+  background: #f9fbfe;
+  border-radius: 12px;
+  padding: 16px 8px;
+  color: #526078;
+}
+.quick button > :global(.anticon),
+.quick button b,
+.quick button span {
+  display: block;
+}
+.quick button > :global(.anticon) {
+  font-size: 22px;
+  color: #2f6bff;
+}
+.quick button b {
+  font-size: 22px;
+  margin: 8px;
+}
+.quick button span {
+  font-size: 11px;
+}
+.planSummary > strong,
+.days > strong {
+  font-size: 34px;
+  color: #17365d;
+}
+.planSummary > span,
+.days > span {
+  margin-left: 8px;
+  color: #758092;
+}
+.planSummary p,
+.days p {
+  color: #758092;
+  font-size: 12px;
+}
+.directorSchedule {
+  display: grid;
+  grid-template-columns: 55px 1fr 160px;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+.directorSchedule b {
+  color: #2f6bff;
+}
+.directorSchedule small {
+  color: #7d8797;
+}
+.suggestion {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0f5;
+}
+.suggestion span:last-child {
+  color: #7c8798;
+  font-size: 12px;
+}
+@media (max-width: 1200px) {
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .threeCol {
+    grid-template-columns: 1fr;
+  }
+  .directorGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  .metrics,
+  .twoCol,
+  .threeCol,
+  .directorGrid {
+    grid-template-columns: 1fr;
+  }
+  .wide {
+    grid-column: auto;
+  }
+  .task {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .taskEnd {
+    width: 100%;
+    padding-left: 46px;
+    text-align: left;
+  }
+  .deviation,
+  .directorSchedule,
+  .suggestion {
+    grid-template-columns: 1fr;
+  }
+  .ringRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .nextMeeting div {
+    flex-wrap: wrap;
+  }
+}

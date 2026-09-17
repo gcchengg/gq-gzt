@@ -1,0 +1,610 @@
+import { useEffect, useMemo, useState } from "react";
+import {
+  Alert,
+  Button,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Steps,
+  Tabs,
+  Timeline,
+  message,
+} from "antd";
+import {
+  BellOutlined,
+  CheckCircleFilled,
+  DingdingOutlined,
+  FileDoneOutlined,
+  SendOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
+import {
+  DataTable,
+  SectionCard,
+  StatusPill,
+} from "../../../../components/PageKit";
+import AppointmentActionPanel from "../AppointmentActionPanel";
+import styles from "./index.module.less";
+
+const initialCases = [
+  {
+    id: "AP-2026-007",
+    director: "赵启明",
+    company: "一汽能源科技",
+    position: "外部董事",
+    letter: "一汽股董推〔2026〕17号",
+    owner: "综合管理部-办公室 / 阮迪",
+    recipient: "综合管理部-人力 / 周航",
+    deadline: "09-17 17:00",
+    status: "待上传董事简历",
+    currentStep: 5,
+  },
+  {
+    id: "AP-2026-006",
+    director: "陈思远",
+    company: "旗新动力科技",
+    position: "专职外部董事",
+    letter: "一汽股董推〔2026〕16号",
+    owner: "综合管理部-人力 / 周航",
+    recipient: "综合管理部-人力 / 周航",
+    deadline: "09-16 12:00",
+    status: "待权限配置",
+    currentStep: 6,
+  },
+  {
+    id: "AP-2026-005",
+    director: "林舒然",
+    company: "红旗私募基金",
+    position: "外部董事",
+    letter: "一汽股董推〔2026〕15号",
+    owner: "综合管理部-人力 / 周航",
+    recipient: "综合管理部-董办 / 王珂",
+    deadline: "09-20 17:00",
+    status: "待选举变更",
+    currentStep: 8,
+  },
+];
+
+const processSteps = [
+  ["董事会职数核定", "集团体系数字化部", "形成职数核定结果"],
+  ["人选选聘、资格遴选", "集团人力部", "确认候选人及任职资格"],
+  ["形成董事推荐函", "集团人力部", "形成正式推荐材料"],
+  ["下发董事推荐函", "集团董办", "线上下发并创建交接任务"],
+  ["接收董事推荐函", "综合管理部-办公室", "钉钉提醒指定经办人接收"],
+  ["上传董事简历", "综合管理部-办公室", "上传简历并完成材料校验"],
+  ["配置系统权限", "综合管理部-人力", "按董事身份开通工作台权限"],
+  ["纳入组织架构", "综合管理部-人力", "同步人员、岗位与任期信息"],
+  ["人员选举 / 专委会委员变更", "综合管理部-董办", "完成后更新聘任事项状态"],
+  ["工商变更", "审计风控与法务部", "确认完成后归档聘任事项"],
+];
+
+const handoffs = [
+  {
+    icon: <SendOutlined />,
+    role: "集团董办",
+    title: "下发董事推荐函",
+    detail: "选择综合管理部-办公室的具体经办人，下发函件后自动创建钉钉待办。",
+    evidence: "推荐函正文、附件、发送记录、签收回执",
+  },
+  {
+    icon: <FileDoneOutlined />,
+    role: "综合管理部-办公室",
+    title: "接收并上传董事简历",
+    detail:
+      "校验推荐函与人员信息，上传董事简历；完成后通知人力科室具体经办人。",
+    evidence: "董事简历、材料校验结果、转办记录",
+  },
+  {
+    icon: <TeamOutlined />,
+    role: "综合管理部-人力",
+    title: "配置权限并纳入组织架构",
+    detail: "开通系统身份与数据权限，维护任职企业、董事类型、任期和组织关系。",
+    evidence: "账号权限清单、组织架构同步结果",
+  },
+];
+
+const initialAuditMessages = [
+  {
+    id: "MSG-20260915-003",
+    time: "14:21",
+    caseId: "AP-2026-007",
+    director: "赵启明",
+    recipient: "综合管理部-办公室 / 阮迪",
+    deadline: "09-17 17:00",
+    title: "董事推荐函已下发",
+    detail: "请在 09-17 17:00 前上传董事简历，完成后转交人力科室办理。",
+  },
+  {
+    id: "MSG-20260915-002",
+    time: "11:06",
+    caseId: "AP-2026-006",
+    director: "陈思远",
+    recipient: "综合管理部-办公室 / 胡欣悦",
+    deadline: "09-16 12:00",
+    title: "董事推荐函已下发",
+    detail: "请在 09-16 12:00 前上传董事简历，完成后转交人力科室办理。",
+  },
+  {
+    id: "MSG-20260914-001",
+    time: "09-14 16:42",
+    caseId: "AP-2026-005",
+    director: "林舒然",
+    recipient: "综合管理部-办公室 / 王玥",
+    deadline: "09-20 17:00",
+    title: "董事推荐函已下发",
+    detail: "推荐函、办理要求和董事简历上传任务已送达。",
+  },
+];
+
+const appointmentRoles = [
+  { value: "groupOffice", label: "集团董办", action: "下发董事推荐函" },
+  { value: "adminOffice", label: "综合管理部-办公室", action: "查看聘任事项" },
+  { value: "adminHr", label: "综合管理部-人力", action: "上传董事简历" },
+  { value: "adminDigital", label: "综合管理部-数字化", action: "配置系统权限" },
+  { value: "adminBoard", label: "综合管理部-董办", action: "完成变更" },
+];
+
+const roleActionSteps = {
+  groupOffice: ["issue"],
+  adminHr: ["resume"],
+  adminDigital: ["permission"],
+  adminBoard: ["change"],
+};
+
+export default function AppointmentFlow() {
+  const [cases, setCases] = useState(initialCases);
+  const [selected, setSelected] = useState(initialCases[0]);
+  const [open, setOpen] = useState(false);
+  const [auditMessages, setAuditMessages] = useState(initialAuditMessages);
+  const [activeAuditId, setActiveAuditId] = useState(
+    initialAuditMessages[0].id,
+  );
+  const [role, setRole] = useState("groupOffice");
+  const [keyword, setKeyword] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [ownerFilter, setOwnerFilter] = useState("all");
+  const [form] = Form.useForm();
+  const [messageApi, contextHolder] = message.useMessage();
+  const selectedAuditMessages = auditMessages.filter(
+    (item) => item.caseId === selected.id,
+  );
+  const roleMeta =
+    appointmentRoles.find((item) => item.value === role) || appointmentRoles[0];
+  const ownerOptions = useMemo(
+    () => [...new Set(cases.map((item) => item.owner))],
+    [cases],
+  );
+  const statusOptions = useMemo(
+    () => [...new Set(cases.map((item) => item.status))],
+    [cases],
+  );
+  const filteredCases = useMemo(() => {
+    const normalizedKeyword = keyword.trim().toLowerCase();
+    return cases.filter((item) => {
+      const matchesKeyword =
+        !normalizedKeyword ||
+        [item.id, item.director, item.company].some((value) =>
+          value.toLowerCase().includes(normalizedKeyword),
+        );
+      const matchesStatus =
+        statusFilter === "all" || item.status === statusFilter;
+      const matchesOwner = ownerFilter === "all" || item.owner === ownerFilter;
+      return matchesKeyword && matchesStatus && matchesOwner;
+    });
+  }, [cases, keyword, ownerFilter, statusFilter]);
+
+  const selectCase = (nextCase) => {
+    setSelected(nextCase);
+    const nextAudit = auditMessages.find((item) => item.caseId === nextCase.id);
+    setActiveAuditId(nextAudit?.id);
+  };
+
+  useEffect(() => {
+    if (
+      filteredCases.length &&
+      !filteredCases.some((item) => item.id === selected.id)
+    ) {
+      selectCase(filteredCases[0]);
+    }
+  }, [filteredCases, selected.id]);
+
+  const updateSelected = (patch, successMessage) => {
+    const next = { ...selected, ...patch };
+    setSelected(next);
+    setCases((current) =>
+      current.map((item) => (item.id === selected.id ? next : item)),
+    );
+    messageApi.success(successMessage);
+  };
+
+  const issueLetter = async () => {
+    const values = await form.validateFields();
+    const nextCase = {
+      id: `AP-2026-${String(cases.length + 8).padStart(3, "0")}`,
+      director: values.director,
+      company: values.company,
+      position: values.position,
+      letter: values.letter,
+      owner: `综合管理部-办公室 / ${values.recipient}`,
+      recipient: "综合管理部-人力 / 周航",
+      deadline: values.deadline,
+      status: "待上传董事简历",
+      currentStep: 5,
+    };
+    setCases((current) => [nextCase, ...current]);
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    const auditId = `MSG-${Date.now()}`;
+    setAuditMessages((current) => [
+      {
+        id: auditId,
+        time,
+        caseId: nextCase.id,
+        director: nextCase.director,
+        recipient: nextCase.owner,
+        deadline: nextCase.deadline,
+        title: "董事推荐函已下发",
+        detail: `请在 ${nextCase.deadline} 前上传董事简历，完成后转交人力科室办理。`,
+      },
+      ...current,
+    ]);
+    setActiveAuditId(auditId);
+    setSelected(nextCase);
+    setOpen(false);
+    form.resetFields();
+    messageApi.success("推荐函已下发，钉钉消息与待办已送达指定经办人");
+  };
+
+  return (
+    <div className={styles.workspace}>
+      {contextHolder}
+      <section className={styles.command}>
+        <div>
+          <span className={styles.role}>当前角色 · {roleMeta.label}</span>
+          <h2>董事聘任工作台</h2>
+          <p>
+            全量查看聘任事项，按当前角色办理职责范围内的节点，所有操作自动保留完整交接证据。
+          </p>
+        </div>
+        <div className={styles.roleControl}>
+          <span>切换办理角色</span>
+          <Select
+            value={role}
+            options={appointmentRoles.map(({ value, label }) => ({
+              value,
+              label,
+            }))}
+            onChange={setRole}
+          />
+          {role === "groupOffice" ? (
+            <Button
+              type="primary"
+              size="large"
+              icon={<SendOutlined />}
+              onClick={() => setOpen(true)}
+            >
+              下发董事推荐函
+            </Button>
+          ) : null}
+        </div>
+      </section>
+
+      <div className={styles.metrics}>
+        {[
+          ["待下发推荐函", "3", "集团董办"],
+          ["待上传董事简历", "2", "综合管理部-办公室"],
+          ["待配置系统权限", "1", "综合管理部-人力"],
+          ["待选举 / 工商变更", "4", "董办 / 法务"],
+        ].map(([label, value, owner]) => (
+          <article key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
+            <small>{owner}</small>
+          </article>
+        ))}
+      </div>
+
+      <SectionCard
+        title="聘任事项台账"
+        extra={
+          <span className={styles.hint}>
+            共 {filteredCases.length} / {cases.length} 项 ·
+            点击事项查看流程定位和交接记录
+          </span>
+        }
+      >
+        <div className={styles.filters}>
+          <Input
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            placeholder="搜索事项编号、董事或任职企业"
+            allowClear
+          />
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={[
+              { value: "all", label: "全部状态" },
+              ...statusOptions.map((value) => ({ value, label: value })),
+            ]}
+          />
+          <Select
+            value={ownerFilter}
+            onChange={setOwnerFilter}
+            options={[
+              { value: "all", label: "全部当前责任人" },
+              ...ownerOptions.map((value) => ({ value, label: value })),
+            ]}
+          />
+          <Button
+            onClick={() => {
+              setKeyword("");
+              setStatusFilter("all");
+              setOwnerFilter("all");
+            }}
+          >
+            重置
+          </Button>
+        </div>
+        <DataTable
+          rows={filteredCases}
+          selectedRowKey={selected.id}
+          onRowClick={selectCase}
+          columns={[
+            { title: "事项编号", dataIndex: "id" },
+            { title: "拟任董事", dataIndex: "director" },
+            {
+              title: "任职企业 / 职务",
+              render: (_, row) => (
+                <>
+                  <b>{row.company}</b>
+                  <small className={styles.cellSub}>{row.position}</small>
+                </>
+              ),
+            },
+            { title: "推荐函", dataIndex: "letter", width: 210 },
+            { title: "当前责任人", dataIndex: "owner", width: 210 },
+            { title: "下一接收人", dataIndex: "recipient", width: 220 },
+            { title: "办理时限", dataIndex: "deadline" },
+            {
+              title: "状态",
+              dataIndex: "status",
+              render: (value) => <StatusPill>{value}</StatusPill>,
+            },
+          ]}
+        />
+      </SectionCard>
+
+      <AppointmentActionPanel
+        key={`${selected.id}-${selected.currentStep}`}
+        item={selected}
+        roleLabel={roleMeta.label}
+        allowedActions={roleActionSteps[role] || []}
+        onUpdate={updateSelected}
+      />
+
+      <SectionCard
+        title={`${selected.director} · 全流程定位`}
+        extra={<StatusPill>{selected.status}</StatusPill>}
+      >
+        <Steps
+          current={selected.currentStep}
+          size="small"
+          responsive={false}
+          items={processSteps.map(([title, owner]) => ({
+            title,
+            description: owner,
+          }))}
+        />
+        <div className={styles.laneDetail}>
+          {processSteps.map(([title, owner, detail], index) => (
+            <article
+              key={title}
+              className={
+                index === selected.currentStep ? styles.activeStep : ""
+              }
+            >
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <b>{title}</b>
+                <small>{owner}</small>
+                <p>{detail}</p>
+              </div>
+              {index < selected.currentStep ? <CheckCircleFilled /> : null}
+            </article>
+          ))}
+        </div>
+      </SectionCard>
+
+      <div className={styles.bottomGrid}>
+        <SectionCard title="跨部门交接规则">
+          <div className={styles.handoffs}>
+            {handoffs.map((item, index) => (
+              <article key={item.role}>
+                <div className={styles.handoffIcon}>{item.icon}</div>
+                <span>
+                  第 {index + 1} 棒 · {item.role}
+                </span>
+                <h3>{item.title}</h3>
+                <p>{item.detail}</p>
+                <small>归档证据：{item.evidence}</small>
+              </article>
+            ))}
+          </div>
+        </SectionCard>
+        <SectionCard
+          title="消息与审计轨迹"
+          extra={
+            <span className={styles.auditCount}>
+              <BellOutlined /> 共 {selectedAuditMessages.length} 条
+            </span>
+          }
+        >
+          <Tabs
+            className={styles.auditTabs}
+            activeKey={activeAuditId}
+            onChange={setActiveAuditId}
+            items={selectedAuditMessages.map((item) => ({
+              key: item.id,
+              label: (
+                <span className={styles.auditTabLabel}>
+                  <b>{item.director}</b>
+                  <small>{item.time}</small>
+                </span>
+              ),
+              children: (
+                <div className={styles.auditTimeline}>
+                  <div className={styles.auditSummary}>
+                    <strong>{item.caseId}</strong>
+                    <span>接收人：{item.recipient}</span>
+                  </div>
+                  <Timeline
+                    items={[
+                      {
+                        color: "green",
+                        children: (
+                          <>
+                            <b>{item.time} 推荐函下发</b>
+                            <p>集团董办 / 刘颖 · {item.caseId}</p>
+                          </>
+                        ),
+                      },
+                      {
+                        color: "blue",
+                        children: (
+                          <>
+                            <b>{item.time} 发送钉钉消息</b>
+                            <p>送达 {item.recipient}</p>
+                          </>
+                        ),
+                      },
+                      {
+                        color: "blue",
+                        children: (
+                          <>
+                            <b>{item.time} 创建办理待办</b>
+                            <p>要求上传董事简历，截止 {item.deadline}</p>
+                          </>
+                        ),
+                      },
+                      {
+                        color: "gray",
+                        children: (
+                          <>
+                            <b>待上传董事简历</b>
+                            <p>超时前 24 小时自动提醒，逾期升级至部门负责人</p>
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
+                </div>
+              ),
+            }))}
+          />
+        </SectionCard>
+      </div>
+
+      <Modal
+        open={open}
+        width={720}
+        title="下发董事推荐函"
+        okText="下发并发送钉钉消息"
+        cancelText="暂存草稿"
+        okButtonProps={{ icon: <DingdingOutlined /> }}
+        onOk={issueLetter}
+        onCancel={() => setOpen(false)}
+      >
+        <Alert
+          type="info"
+          showIcon
+          message="下发后将自动通知综合管理部-办公室经办人"
+          description="办公室上传董事简历后，系统继续通知综合管理部-人力经办人配置系统权限、纳入组织架构。"
+        />
+        <Form
+          form={form}
+          layout="vertical"
+          className={styles.issueForm}
+          initialValues={{
+            company: "一汽能源科技",
+            position: "外部董事",
+            recipient: "阮迪",
+            deadline: "2026-09-17 17:00",
+          }}
+        >
+          <div className={styles.formGrid}>
+            <Form.Item
+              label="推荐函编号"
+              name="letter"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="如：一汽股董推〔2026〕18号" />
+            </Form.Item>
+            <Form.Item
+              label="拟任董事"
+              name="director"
+              rules={[{ required: true }]}
+            >
+              <Input prefix={<UserAddOutlined />} placeholder="请输入姓名" />
+            </Form.Item>
+            <Form.Item
+              label="任职企业"
+              name="company"
+              rules={[{ required: true }]}
+            >
+              <Select
+                options={[
+                  "一汽股权",
+                  "一汽能源科技",
+                  "旗新动力科技",
+                  "红旗私募基金",
+                ].map((value) => ({ value }))}
+              />
+            </Form.Item>
+            <Form.Item
+              label="董事类型"
+              name="position"
+              rules={[{ required: true }]}
+            >
+              <Select
+                options={["外部董事", "专职外部董事", "职工董事"].map(
+                  (value) => ({ value }),
+                )}
+              />
+            </Form.Item>
+            <Form.Item label="接收部门">
+              <Input value="综合管理部-办公室" disabled />
+            </Form.Item>
+            <Form.Item
+              label="接收人"
+              name="recipient"
+              rules={[{ required: true }]}
+            >
+              <Select
+                options={["阮迪", "胡欣悦", "王玥"].map((value) => ({ value }))}
+              />
+            </Form.Item>
+            <Form.Item
+              label="办理时限"
+              name="deadline"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="YYYY-MM-DD HH:mm" />
+            </Form.Item>
+          </div>
+          <div className={styles.messagePreview}>
+            <DingdingOutlined />
+            <div>
+              <b>钉钉消息预览</b>
+              <p>
+                【董事聘任任务】集团董办已下发董事推荐函，请在办理时限前接收并上传董事简历。完成后系统将通知人力科室配置系统权限并纳入组织架构。
+              </p>
+            </div>
+          </div>
+        </Form>
+      </Modal>
+    </div>
+  );
+}

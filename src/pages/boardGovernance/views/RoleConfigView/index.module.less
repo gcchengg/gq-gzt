@@ -1,0 +1,227 @@
+.page {
+  min-height: 100%;
+}
+
+.pageTitle {
+  margin: 0 0 16px;
+  color: #1d2129;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.content {
+  display: flex;
+  gap: 16px;
+}
+
+.panel {
+  padding: 20px 24px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sectionTitle {
+  margin: 16px 0 10px;
+  color: #4e5969;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.subSectionTitle {
+  display: block;
+  width: 100%;
+  margin: 12px 0 8px;
+  padding: 0;
+  color: #86909c;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.roleDirectory {
+  width: 300px;
+  flex: 0 0 300px;
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+}
+
+.personnelPanel {
+  min-width: 0;
+  flex: 1;
+}
+
+.directoryTitle {
+  margin: 0 0 20px;
+  color: #1d2129;
+  font-size: 18px;
+}
+
+.groupTitle {
+  margin: 0 0 10px;
+  color: #86909c;
+  font-size: 13px;
+}
+
+.department {
+  margin-top: 24px;
+}
+
+.roleCard {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  overflow: hidden;
+  border: 1px solid #d9e3ee;
+  border-radius: 12px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.roleCard:hover {
+  border-color: #9ebada;
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.08);
+}
+
+.active {
+  color: #0d47a1;
+  border-color: #84aede;
+  background: #f1f7fe;
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.1);
+}
+
+.global {
+  border-left: 4px solid #0d47a1;
+}
+
+.roleName {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #1d2129;
+  font-weight: 600;
+}
+
+.roleName :global(.anticon) {
+  margin-right: 6px;
+  color: #0d47a1;
+}
+
+.roleScope,
+.roleCount {
+  margin-top: 7px;
+  color: #86909c;
+  font-size: 13px;
+}
+
+.roleScope {
+  padding-right: 42px;
+}
+
+.roleCount {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.panelTitleLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panelTitleLine h2 {
+  margin: 0;
+  color: #1d2129;
+  font-size: 18px;
+}
+
+.scopeDesc {
+  margin: 7px 0 0;
+  color: #4e5969;
+}
+
+.filterBar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.filterBar :global(.ant-input-affix-wrapper) {
+  max-width: 360px;
+}
+
+.personnelTable {
+  margin-bottom: 20px;
+}
+
+.personnelTable :global(.ant-table-thead > tr > th) {
+  color: #1d2129;
+  font-weight: 500;
+  background: #f5f7fa;
+}
+
+.personCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.personName {
+  color: #1d2129;
+  font-weight: 500;
+}
+
+.personId {
+  margin-top: 3px;
+  color: #86909c;
+  font-size: 12px;
+}
+
+.footerBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.selectedCount {
+  color: #4e5969;
+}
+
+.saveBtn {
+  background: #0d47a1;
+  border-color: #0d47a1;
+}
+
+.saveBtn:hover,
+.saveBtn:focus {
+  background: #1565c0 !important;
+  border-color: #1565c0 !important;
+}
+
+@media (max-width: 900px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .roleDirectory {
+    width: 100%;
+    flex-basis: auto;
+  }
+}

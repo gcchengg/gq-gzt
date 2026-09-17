@@ -1,0 +1,29 @@
+.workspace { display: grid; gap: 16px; }
+.hero { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 24px; border: 1px solid #dce7f5; border-radius: 16px; background: linear-gradient(120deg, #f7fbff, #edf5ff); }
+.hero span { color: #2f6bff; font-size: 12px; font-weight: 700; }
+.hero h2 { margin: 6px 0; color: #17365d; }
+.hero p { margin: 0; color: #66758a; }
+.heroActions { display: flex; gap: 10px; flex-wrap: wrap; }
+.summaryGrid { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 24px; align-items: center; margin-top: 22px; }
+.scoreRing { display: grid; justify-items: center; gap: 8px; color: #68778c; font-size: 12px; }
+.evidenceGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.evidenceGrid article { display: grid; gap: 4px; padding: 14px; border-radius: 11px; background: #f6f9fd; }
+.evidenceGrid b { color: #245fca; font-size: 24px; }
+.evidenceGrid span { color: #68778c; font-size: 12px; }
+.resultPanel { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 18px; align-items: center; margin-top: 14px; }
+.resultPanel > div { display: grid; justify-items: center; gap: 6px; padding: 18px; border-radius: 12px; background: #f6f9fd; }
+.resultPanel strong { color: #17365d; font-size: 40px; }
+.resultPanel aside { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; }
+.configForm { margin-top: 16px; }
+.scoreDrawer { display: grid; gap: 18px; }
+.scoreFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.scoreFields :global(.ant-input-number-group-wrapper) { width: 100%; }
+.actionBar { display: flex; justify-content: flex-end; gap: 10px; padding-top: 14px; border-top: 1px solid #e8edf4; }
+@media (max-width: 800px) {
+  .hero { align-items: flex-start; flex-direction: column; }
+  .summaryGrid, .resultPanel { grid-template-columns: 1fr; }
+  .evidenceGrid, .scoreFields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .evidenceGrid, .scoreFields { grid-template-columns: 1fr; }
+}

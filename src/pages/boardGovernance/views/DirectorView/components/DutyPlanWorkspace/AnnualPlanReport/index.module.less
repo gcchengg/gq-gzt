@@ -1,0 +1,141 @@
+.stack {
+  display: grid;
+  gap: 24px;
+}
+
+.paper {
+  min-width: 920px;
+  padding: 28px 32px 24px;
+  border: 1px solid #d7c7a6;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, 0.88), #fff 28%),
+    #fffdf8;
+  color: #1c1915;
+  box-shadow: 0 18px 40px rgba(92, 64, 28, 0.08);
+}
+
+.paper h1 {
+  margin: 0 0 18px;
+  color: #7a1d1d;
+  font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-align: center;
+}
+
+.sheet {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+.sheet th,
+.sheet td {
+  border: 1px solid #1f1f1f;
+  padding: 8px 10px;
+  vertical-align: middle;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.metaRow th {
+  width: 11%;
+  background: #f4eee3;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.metaRow td {
+  text-align: center;
+}
+
+.sectionTitle {
+  background: #f7f1e6;
+  color: #7a1d1d;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+}
+
+.headRow th {
+  background: #f4eee3;
+  font-weight: 700;
+  text-align: center;
+}
+
+.colCategory {
+  width: 14%;
+}
+
+.colSeq {
+  width: 7%;
+}
+
+.colContent {
+  width: 43%;
+}
+
+.colDate {
+  width: 14%;
+}
+
+.colTarget {
+  width: 22%;
+}
+
+.categoryCell {
+  background: #fbf7ef;
+  font-weight: 700;
+  text-align: center;
+}
+
+.seqCell,
+.dateCell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.notes {
+  min-height: 84px;
+  background: #fffdf8;
+  color: #4a4338;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 900px) {
+  .paper {
+    min-width: 0;
+    padding: 18px 14px;
+  }
+
+  .paper h1 {
+    font-size: 20px;
+    letter-spacing: 0.08em;
+  }
+
+  .sheet th,
+  .sheet td {
+    font-size: 12px;
+  }
+}
+
+@media print {
+  .paper {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    box-shadow: none;
+  }
+
+  .paper + .paper {
+    break-before: page;
+    page-break-before: always;
+  }
+}

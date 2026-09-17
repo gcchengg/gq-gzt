@@ -26,8 +26,13 @@ const normalizePath = (path = "") => {
 };
 
 const getPathOnly = (path = "") => path.split("?")[0];
-const isShelllessPath = (path = "") =>
-  ["/ai-pricing", "/companyreportshare"].includes(path.toLowerCase());
+const isShelllessPath = (path = "") => {
+  const normalized = path.toLowerCase();
+  return (
+    ["/ai-pricing", "/companyreportshare"].includes(normalized) ||
+    normalized.startsWith("/boardgovernance")
+  );
+};
 
 const flattenMenus = (menus = []) =>
   menus.flatMap((item) => {

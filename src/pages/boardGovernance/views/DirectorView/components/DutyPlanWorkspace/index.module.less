@@ -1,0 +1,203 @@
+.typeHint {
+  font-size: 11px;
+  color: #7d8797;
+}
+
+.planFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border: 1px solid #d9e5f5;
+  border-radius: 10px;
+  background: #f4f8ff;
+}
+
+.planFooter strong,
+.planFooter span {
+  display: block;
+}
+
+.planFooter strong {
+  color: #17365d;
+}
+
+.planFooter span {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #718097;
+}
+
+.footerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.reportPreview {
+  max-height: min(72vh, 820px);
+  overflow: auto;
+  padding: 4px 2px 8px;
+}
+
+.flowNote {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f6f8fb;
+}
+
+.flowNote > div {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 28px 8px 10px;
+  border: 1px solid #e2e7ef;
+  border-radius: 8px;
+  background: #fff;
+  color: #718097;
+}
+
+.flowNote span {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  background: #e9edf3;
+  font-size: 11px;
+}
+
+.flowNote b {
+  font-size: 12px;
+}
+
+.flowNote i {
+  position: absolute;
+  right: -14px;
+  z-index: 1;
+  color: #9aabc0;
+  font-style: normal;
+}
+
+.flowNote .done {
+  border-color: #bfd4f5;
+  background: #edf5ff;
+  color: #205da7;
+}
+
+.flowNote .done span {
+  background: #2f6bff;
+  color: #fff;
+}
+
+.modalTip {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f1f6fd;
+  color: #61728a;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formSectionTitle {
+  margin: 4px 0 14px;
+  padding-left: 10px;
+  border-left: 3px solid #2f6bff;
+  color: #17365d;
+}
+
+.formGrid + .formSectionTitle {
+  margin-top: 2px;
+}
+
+.taskDetail {
+  display: grid;
+  gap: 24px;
+}
+
+.taskHero {
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #eef5ff, #f8fbff);
+}
+
+.taskHero > svg {
+  margin-top: 3px;
+  font-size: 28px;
+  color: #2f6bff;
+}
+
+.taskHero span,
+.taskHero h3 {
+  display: block;
+}
+
+.taskHero > div > span:first-child {
+  font-size: 11px;
+  color: #6680a2;
+}
+
+.taskHero h3 {
+  margin: 4px 0 10px;
+  color: #17365d;
+}
+
+.taskActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .flowNote {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .flowNote i {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .planFooter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .footerActions,
+  .footerActions a,
+  .footerActions button {
+    width: 100%;
+  }
+
+  .flowNote,
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .taskActions {
+    justify-content: stretch;
+  }
+
+  .taskActions button {
+    flex: 1;
+  }
+}

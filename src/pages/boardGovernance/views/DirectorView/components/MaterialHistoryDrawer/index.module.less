@@ -1,0 +1,72 @@
+.drawerTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.drawerTitle strong {
+  color: #1e2b40;
+  font-size: 17px;
+}
+.drawerTitle span {
+  color: #768397;
+  font-size: 12px;
+  font-weight: 400;
+}
+.summary {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid #e3e9f2;
+  border-radius: 10px;
+  background: #f7f9fc;
+}
+.filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #edf0f5;
+}
+.filters > div {
+  display: grid;
+  gap: 6px;
+}
+.filters label {
+  color: #69768a;
+  font-size: 12px;
+}
+.filters :global(.ant-select) {
+  width: 150px;
+}
+.filters > span {
+  margin-left: auto;
+  padding-bottom: 7px;
+  color: #7c8796;
+  font-size: 12px;
+}
+.drawer :global(.ant-table-cell .ant-btn-link) {
+  max-width: 280px;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .drawer :global(.ant-drawer-content-wrapper) {
+    width: 100% !important;
+  }
+  .summary :global(.ant-descriptions-view table) {
+    display: block;
+  }
+  .filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .filters > div,
+  .filters :global(.ant-select) {
+    width: 100%;
+  }
+  .filters > span {
+    margin-left: 0;
+  }
+}

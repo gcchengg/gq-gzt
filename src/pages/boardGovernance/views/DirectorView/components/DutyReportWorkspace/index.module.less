@@ -1,0 +1,15 @@
+.workspace { display: grid; gap: 16px; }
+.reportList { display: grid; gap: 10px; margin-top: 14px; }
+.reportList article { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 15px; border: 1px solid #e3e9f1; border-radius: 12px; background: #fff; }
+.reportList article > svg { padding: 10px; border-radius: 10px; background: #edf5ff; color: #245fca; font-size: 22px; }
+.reportList span, .reportList p { color: #758196; font-size: 12px; }
+.reportList h3 { margin: 4px 0; color: #24364f; }
+.reportList p { margin: 0; }
+.reportList aside { display: flex; align-items: center; gap: 8px; }
+.reportEditor { display: grid; gap: 18px; }
+.reportEditor :global(.ant-upload-wrapper .ant-upload-drag) { padding: 12px; background: #f8fbff; }
+.actionBar { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding-top: 14px; border-top: 1px solid #e8edf4; }
+@media (max-width: 700px) {
+  .reportList article { grid-template-columns: auto minmax(0, 1fr); }
+  .reportList aside { grid-column: 1 / -1; justify-content: flex-end; }
+}
