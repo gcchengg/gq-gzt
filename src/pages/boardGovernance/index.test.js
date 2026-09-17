@@ -156,13 +156,14 @@ test("keeps every board-governance workspace responsive", async () => {
 });
 
 test("provides an operable three-type duty plan lifecycle", async () => {
-  const [director, plan] = await Promise.all([
+  const [director, plan, planOptions] = await Promise.all([
     read("./views/DirectorView/index.jsx"),
     read("./views/DirectorView/components/DutyPlanWorkspace/index.jsx"),
+    read("./dutyPlanOptions.js"),
   ]);
   assert.match(director, /发起年度履职计划/);
   for (const label of ["会议计划", "培训计划", "调研计划"]) {
-    assert.match(plan, new RegExp(label));
+    assert.match(`${plan}${planOptions}`, new RegExp(label));
   }
   for (const category of [
     "参加董事会",
@@ -173,7 +174,7 @@ test("provides an operable three-type duty plan lifecycle", async () => {
     "督导子企业落实工作",
     "解决子企业发展问题",
   ]) {
-    assert.match(plan, new RegExp(category));
+    assert.match(`${plan}${planOptions}`, new RegExp(category));
   }
   assert.match(plan, /label="工作类别"/);
   assert.match(plan, /dataIndex: "workCategory"/);

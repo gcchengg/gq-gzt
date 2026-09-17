@@ -25,6 +25,8 @@ import {
   SectionCard,
   StatusPill,
 } from "../../components/PageKit";
+import MaterialTaskView from "../MaterialTaskView";
+import PlanConfirmTaskView from "../PlanConfirmTaskView";
 import styles from "./index.module.less";
 
 const { Dragger } = Upload;
@@ -33,16 +35,23 @@ export default function DutyTaskManagerView({
   plans,
   materials,
   onComplete,
+  onSubmitMaterial,
+  onSavePlan,
   suggestionTasks,
   onSaveSuggestion,
 }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const bizId = searchParams.get("bizId");
+  const department = searchParams.get("department");
+  const planId = searchParams.get("planId");
   const requestedTaskType = searchParams.get("taskType");
-  const activeTaskType = ["duty", "suggestion", "material"].includes(
-    requestedTaskType,
-  )
+  const activeTaskType = [
+    "duty",
+    "suggestion",
+    "material",
+    "confirmation",
+  ].includes(requestedTaskType)
     ? requestedTaskType
     : "duty";
   const [form] = Form.useForm();
@@ -54,6 +63,10 @@ export default function DutyTaskManagerView({
   const selectedSuggestion =
     activeTaskType === "suggestion"
       ? suggestionTasks.find((item) => item.id === bizId)
+      : null;
+  const selectedPlan =
+    activeTaskType === "confirmation"
+      ? plans.find((item) => item.id === planId)
       : null;
 
   useEffect(() => {
@@ -100,8 +113,26 @@ export default function DutyTaskManagerView({
     );
   };
 
+  const openMaterialTask = (task) => {
+    navigate(
+      `/boardGovernance/duty-tasks?taskType=material&department=${encodeURIComponent(task.department)}`,
+    );
+  };
+
+  const openPlanConfirmation = (plan) => {
+    navigate(
+      `/boardGovernance/duty-tasks?taskType=confirmation&planId=${plan.id}`,
+    );
+  };
+
   const closeTask = () => {
-    navigate("/boardGovernance/duty-tasks");
+    navigate(
+      activeTaskType === "material"
+        ? "/boardGovernance/duty-tasks?taskType=material"
+        : activeTaskType === "confirmation"
+          ? "/boardGovernance/duty-tasks?taskType=confirmation"
+          : "/boardGovernance/duty-tasks",
+    );
     form.resetFields();
     suggestionForm.resetFields();
     setFiles([]);
@@ -164,18 +195,29 @@ export default function DutyTaskManagerView({
   const materialPendingCount = materialTasks.filter(
     (item) => item.status !== "已完成",
   ).length;
+  const confirmationPendingCount = plans.filter(
+    (item) => item.status !== "已完成",
+  ).length;
+  const selectedMaterial =
+    activeTaskType === "material" && department
+      ? materialTasks.find((item) => item.department === department)
+      : null;
   const currentTotal =
     activeTaskType === "suggestion"
       ? suggestionTasks.length
       : activeTaskType === "material"
         ? materialTasks.length
-        : tasks.length;
+        : activeTaskType === "confirmation"
+          ? plans.length
+          : tasks.length;
   const currentPending =
     activeTaskType === "suggestion"
       ? suggestionPendingCount
       : activeTaskType === "material"
         ? materialPendingCount
-        : pendingCount;
+        : activeTaskType === "confirmation"
+          ? confirmationPendingCount
+          : pendingCount;
 
   return (
     <div className={styles.page}>
@@ -225,6 +267,10 @@ export default function DutyTaskManagerView({
             {
               key: "material",
               label: `履职手册资料 ${materialTasks.length}`,
+            },
+            {
+              key: "confirmation",
+              label: `年度履职计划确认 ${plans.length}`,
             },
           ]}
         />
@@ -323,15 +369,36 @@ export default function DutyTaskManagerView({
                 title: "操作",
                 width: 130,
                 render: (_, row) => (
-                  <Button
-                    type="link"
-                    onClick={() =>
-                      navigate(
-                        `/boardGovernance/material-task?department=${encodeURIComponent(row.department)}`,
-                      )
-                    }
-                  >
+                  <Button type="link" onClick={() => openMaterialTask(row)}>
                     {row.status === "已完成" ? "查看任务" : "去提交"}
+                  </Button>
+                ),
+              },
+            ]}
+          />
+        ) : null}
+        {activeTaskType === "confirmation" ? (
+          <DataTable
+            rows={plans}
+            columns={[
+              { title: "计划内容", dataIndex: "content", width: 260 },
+              { title: "董事", dataIndex: "directorName", width: 100 },
+              { title: "任职企业", dataIndex: "servingCompany", width: 180 },
+              { title: "责任部门", dataIndex: "owner", width: 170 },
+              { title: "确认责任人", dataIndex: "confirmOwner", width: 110 },
+              { title: "计划时间", dataIndex: "date", width: 120 },
+              {
+                title: "确认状态",
+                dataIndex: "status",
+                width: 110,
+                render: (value) => <StatusPill>{value}</StatusPill>,
+              },
+              {
+                title: "操作",
+                width: 110,
+                render: (_, row) => (
+                  <Button type="link" onClick={() => openPlanConfirmation(row)}>
+                    {row.status === "已完成" ? "查看/修改" : "去确认"}
                   </Button>
                 ),
               },
@@ -349,14 +416,20 @@ export default function DutyTaskManagerView({
       </SectionCard>
 
       <Drawer
-        open={Boolean(bizId)}
+        open={
+          Boolean(bizId) || Boolean(selectedMaterial) || Boolean(selectedPlan)
+        }
         width={720}
         title={
           selectedTask
             ? `${selectedTask.content} · 履职任务执行详情`
             : selectedSuggestion
               ? `${selectedSuggestion.content} · 意见建议落实办理`
-              : "任务不存在"
+              : selectedMaterial
+                ? `${selectedMaterial.department} · 履职手册资料更新`
+                : selectedPlan
+                  ? `${selectedPlan.content} · 年度履职计划确认`
+                  : "任务不存在"
         }
         onClose={closeTask}
         extra={
@@ -364,6 +437,10 @@ export default function DutyTaskManagerView({
             <StatusPill>{selectedTask.taskStatus}</StatusPill>
           ) : selectedSuggestion ? (
             <StatusPill>{selectedSuggestion.status}</StatusPill>
+          ) : selectedMaterial ? (
+            <StatusPill>{selectedMaterial.status}</StatusPill>
+          ) : selectedPlan ? (
+            <StatusPill>{selectedPlan.status}</StatusPill>
           ) : null
         }
       >
@@ -596,6 +673,20 @@ export default function DutyTaskManagerView({
               </Button>
             </div>
           </div>
+        ) : selectedMaterial ? (
+          <MaterialTaskView
+            embedded
+            materials={materials}
+            onSubmit={onSubmitMaterial}
+            onClose={closeTask}
+          />
+        ) : selectedPlan ? (
+          <PlanConfirmTaskView
+            embedded
+            plans={plans}
+            onSave={onSavePlan}
+            onClose={closeTask}
+          />
         ) : (
           <Alert
             showIcon

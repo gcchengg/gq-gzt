@@ -20,6 +20,12 @@ import {
 import { Link } from "react-router-dom";
 import { confirmationOwners } from "../../../../dutyPlanData";
 import {
+  dutyQuarters,
+  dutyYears,
+  planTypes,
+  workCategories,
+} from "../../../../dutyPlanOptions";
+import {
   DataTable,
   SectionCard,
   StatusPill,
@@ -30,19 +36,6 @@ import {
   printAnnualPlanReport,
 } from "./annualPlanReport.js";
 import styles from "./index.module.less";
-
-const planTypes = ["会议计划", "培训计划", "调研计划"];
-const dutyYears = ["2026年", "2027年", "2028年"];
-const dutyQuarters = ["一季度", "二季度", "三季度", "四季度"];
-const workCategories = [
-  "参加董事会",
-  "参加调研",
-  "参加子企业重要会议",
-  "参加能力培训",
-  "开展专项交流",
-  "督导子企业落实工作",
-  "解决子企业发展问题",
-];
 
 export default function DutyPlanWorkspace({
   embedded = false,
@@ -327,28 +320,28 @@ export default function DutyPlanWorkspace({
             <Form.Item
               name="type"
               label="计划类型"
-              rules={[{ required: true, message: "请选择计划类型" }]}
+              // rules={[{ required: true, message: "请选择计划类型" }]}
             >
               <Select options={planTypes.map((value) => ({ value }))} />
             </Form.Item>
             <Form.Item
               name="workCategory"
               label="工作类别"
-              rules={[{ required: true, message: "请选择工作类别" }]}
+              // rules={[{ required: true, message: "请选择工作类别" }]}
             >
               <Select options={workCategories.map((value) => ({ value }))} />
             </Form.Item>
             <Form.Item
               name="owner"
               label="责任部门"
-              rules={[{ required: true, message: "请填写责任部门" }]}
+              // rules={[{ required: true, message: "请填写责任部门" }]}
             >
               <Input placeholder="请输入责任部门" />
             </Form.Item>
             <Form.Item
               name="confirmOwner"
               label="确认责任人"
-              rules={[{ required: true, message: "请选择确认责任人" }]}
+              // rules={[{ required: true, message: "请选择确认责任人" }]}
             >
               <Select
                 placeholder="请选择接收确认任务的责任人"
@@ -358,7 +351,7 @@ export default function DutyPlanWorkspace({
             <Form.Item
               name="date"
               label="计划时间"
-              rules={[{ required: true, message: "请填写计划时间" }]}
+              // rules={[{ required: true, message: "请填写计划时间" }]}
             >
               <Input placeholder="例如：2026-11-20" />
             </Form.Item>
@@ -366,14 +359,14 @@ export default function DutyPlanWorkspace({
           <Form.Item
             name="content"
             label="计划内容"
-            rules={[{ required: true, message: "请填写计划内容" }]}
+            // rules={[{ required: true, message: "请填写计划内容" }]}
           >
             <Input placeholder="请输入计划名称或主题" />
           </Form.Item>
           <Form.Item
             name="target"
             label="预期成果"
-            rules={[{ required: true, message: "请填写预期成果" }]}
+            // rules={[{ required: true, message: "请填写预期成果" }]}
           >
             <Input.TextArea rows={3} placeholder="请输入计划应形成的成果" />
           </Form.Item>

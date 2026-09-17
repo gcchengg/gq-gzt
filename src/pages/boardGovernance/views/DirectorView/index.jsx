@@ -146,7 +146,7 @@ export default function DirectorView({
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
-        <Select
+        {/* <Select
           value={roleFilter}
           onChange={setRoleFilter}
           options={[
@@ -158,8 +158,8 @@ export default function DirectorView({
             { value: "综合管理部-数字化", label: "综合管理部-数字化" },
             { value: "综合管理部-董办", label: "综合管理部-董办" },
           ]}
-        />
-        <span className={styles.toolbarHint}>当前身份：{currentRole}</span>
+        /> */}
+        {/* <span className={styles.toolbarHint}>当前身份：{currentRole}</span> */}
         <Button
           type="primary"
           icon={<SendOutlined />}

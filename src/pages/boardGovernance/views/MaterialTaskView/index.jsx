@@ -12,7 +12,12 @@ import styles from "./index.module.less";
 
 const { Dragger } = Upload;
 
-export default function MaterialTaskView({ materials, onSubmit }) {
+export default function MaterialTaskView({
+  materials,
+  onSubmit,
+  embedded = false,
+  onClose,
+}) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const department = searchParams.get("department") || "综合管理部-办公室";
@@ -52,45 +57,61 @@ export default function MaterialTaskView({ materials, onSubmit }) {
     }
     onSubmit(fileLists);
     message.success(`${department}资料已提交，履职手册状态已更新`);
+    if (embedded) {
+      onClose?.();
+      return;
+    }
     navigate("/boardGovernance/directors?stage=preparation");
   };
 
   if (departmentMaterials.length === 0) {
     return (
-      <div className={styles.page}>
+      <div className={`${styles.page} ${embedded ? styles.embedded : ""}`}>
         <Alert
           type="warning"
           showIcon
           message="未找到该部门的履职手册更新任务"
-          action={<Link to="/boardGovernance/home">返回工作台首页</Link>}
+          action={
+            embedded ? (
+              <Button type="link" onClick={onClose}>
+                返回任务列表
+              </Button>
+            ) : (
+              <Link to="/boardGovernance/home">返回工作台首页</Link>
+            )
+          }
         />
       </div>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <Breadcrumb
-        className={styles.breadcrumb}
-        items={[
-          { title: <Link to="/boardGovernance/home">工作台首页</Link> },
-          { title: "任务执行" },
-          { title: department },
-        ]}
-      />
-      <PageHeader
-        eyebrow="TASK EXECUTION"
-        title="更新董事履职手册资料"
-        subtitle={`${department} · 请逐项上传本次更新文件，全部准备完成后统一提交`}
-        actions={
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate("/boardGovernance/home")}
-          >
-            返回工作台
-          </Button>
-        }
-      />
+    <div className={`${styles.page} ${embedded ? styles.embedded : ""}`}>
+      {!embedded ? (
+        <>
+          <Breadcrumb
+            className={styles.breadcrumb}
+            items={[
+              { title: <Link to="/boardGovernance/home">工作台首页</Link> },
+              { title: "任务执行" },
+              { title: department },
+            ]}
+          />
+          <PageHeader
+            eyebrow="TASK EXECUTION"
+            title="更新董事履职手册资料"
+            subtitle={`${department} · 请逐项上传本次更新文件，全部准备完成后统一提交`}
+            actions={
+              <Button
+                icon={<ArrowLeftOutlined />}
+                onClick={() => navigate("/boardGovernance/home")}
+              >
+                返回工作台
+              </Button>
+            }
+          />
+        </>
+      ) : null}
       <div className={styles.summary}>
         <div>
           <FileTextOutlined />
@@ -172,7 +193,11 @@ export default function MaterialTaskView({ materials, onSubmit }) {
           已完成 {readyCount} / {departmentMaterials.length} 项资料上传
         </span>
         <div>
-          <Button onClick={() => navigate("/boardGovernance/home")}>
+          <Button
+            onClick={() =>
+              embedded ? onClose?.() : navigate("/boardGovernance/home")
+            }
+          >
             取消
           </Button>
           <Button type="primary" disabled={!canSubmit} onClick={handleSubmit}>

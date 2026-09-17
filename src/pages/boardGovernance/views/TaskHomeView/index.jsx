@@ -85,6 +85,25 @@ function MetricCard({ label, value, tone }) {
   );
 }
 
+function buildDepartmentGroups(items, isComplete) {
+  const groups = new Map();
+  items.forEach((item) => {
+    const department = item.owner || item.department || "未分配部门";
+    const records = groups.get(department) || [];
+    records.push(item);
+    groups.set(department, records);
+  });
+  return [...groups.entries()].map(([department, records]) => {
+    const completed = records.filter(isComplete).length;
+    return {
+      department,
+      records,
+      completed,
+      pending: records.length - completed,
+    };
+  });
+}
+
 export default function TaskHomeView({
   handbookMaterials,
   dutyPlans,
@@ -109,13 +128,8 @@ export default function TaskHomeView({
       }),
     [handbookMaterials],
   );
-  const [activeDepartment, setActiveDepartment] = useState(
-    taskGroups.find((item) => !item.complete)?.department ||
-      taskGroups[0].department,
-  );
-  const activeTask =
-    taskGroups.find((item) => item.department === activeDepartment) ||
-    taskGroups[0];
+  const [activeCategory, setActiveCategory] = useState("material");
+  const [activeDepartment, setActiveDepartment] = useState("");
   const materialPendingCount = taskGroups.filter(
     (item) => !item.complete,
   ).length;
@@ -131,6 +145,54 @@ export default function TaskHomeView({
   const suggestionPendingCount = suggestionTasks.filter(
     (item) => item.status !== "已完成",
   ).length;
+  const taskCategories = useMemo(
+    () => [
+      {
+        key: "material",
+        label: "董事履职手册资料",
+        groups: taskGroups.map((item) => ({
+          department: item.department,
+          records: item.materials,
+          completed: item.submitted,
+          pending: item.materials.length - item.submitted,
+        })),
+      },
+      {
+        key: "suggestion",
+        label: "意见建议落实任务",
+        groups: buildDepartmentGroups(
+          suggestionTasks,
+          (item) => item.status === "已完成",
+        ),
+      },
+      {
+        key: "duty",
+        label: "已创建履职任务",
+        groups: buildDepartmentGroups(
+          generatedPlans,
+          (item) => item.taskStatus === "已完成",
+        ),
+      },
+      {
+        key: "confirmation",
+        label: "年度履职计划确认",
+        groups: buildDepartmentGroups(
+          dutyPlans,
+          (item) => item.status === "已完成",
+        ),
+      },
+    ],
+    [dutyPlans, generatedPlans, suggestionTasks, taskGroups],
+  );
+  const currentCategory =
+    taskCategories.find((item) => item.key === activeCategory) ||
+    taskCategories[0];
+  const currentGroup =
+    currentCategory.groups.find(
+      (item) => item.department === activeDepartment,
+    ) ||
+    currentCategory.groups.find((item) => item.pending > 0) ||
+    currentCategory.groups[0];
   const pendingCount =
     materialPendingCount +
     confirmationPendingCount +
@@ -139,8 +201,12 @@ export default function TaskHomeView({
   const completedCount =
     taskGroups.length -
     materialPendingCount +
-    dutyPlans.filter((item) => item.status === "已完成").length;
-  const taskHref = `/boardGovernance/material-task?department=${encodeURIComponent(activeTask.department)}`;
+    dutyPlans.filter((item) => item.status === "已完成").length +
+    generatedPlans.filter((item) => item.taskStatus === "已完成").length +
+    suggestionTasks.filter((item) => item.status === "已完成").length;
+  const taskHref = currentGroup
+    ? `/boardGovernance/duty-tasks?taskType=material&department=${encodeURIComponent(currentGroup.department)}`
+    : "/boardGovernance/duty-tasks?taskType=material";
 
   return (
     <div className={styles.page}>
@@ -174,155 +240,158 @@ export default function TaskHomeView({
             </button>
           </div>
         </section>
-        <section className={`${styles.listPanel} ${styles.planTaskPanel}`}>
-          <header>
-            <div>
-              <h2>年度履职计划确认</h2>
-              <span className={styles.chip}>
-                待办 <b>{confirmationPendingCount}</b>
-              </span>
-              <span className={styles.completedLabel}>
-                已完成　{dutyPlans.length - confirmationPendingCount}
-              </span>
-            </div>
-          </header>
-          {dutyPlans.map((plan) => {
-            const confirmHref = `/boardGovernance/plan-confirm-task?planId=${plan.id}`;
+        <section className={styles.categoryStrip} aria-label="任务大类">
+          {taskCategories.map((category) => {
+            const pending = category.groups.reduce(
+              (total, item) => total + item.pending,
+              0,
+            );
             return (
-              <article className={styles.taskRow} key={plan.id}>
-                <div>
-                  <h3>
-                    {plan.dutyYear}
-                    {plan.dutyQuarter} · {plan.content}
-                  </h3>
-                  <p>
-                    确认责任人：{plan.confirmOwner}　　任职企业：
-                    {plan.servingCompany}　　工作类别：{plan.workCategory}
-                    　　状态：{plan.status}
-                  </p>
-                </div>
-                <aside>
-                  <StatusPill>{plan.status}</StatusPill>
-                  <Link to={confirmHref}>编辑</Link>
-                </aside>
-              </article>
+              <button
+                className={
+                  currentCategory.key === category.key
+                    ? styles.activeCategory
+                    : ""
+                }
+                type="button"
+                key={category.key}
+                onClick={() => {
+                  setActiveCategory(category.key);
+                  setActiveDepartment("");
+                }}
+              >
+                <span>{category.label}</span>
+                <small>{pending ? `待办 ${pending}` : "全部完成"}</small>
+              </button>
             );
           })}
         </section>
-        {generatedPlans.length > 0 ? (
-          <section className={`${styles.listPanel} ${styles.planTaskPanel}`}>
-            <header>
-              <div>
-                <h2>已创建履职任务</h2>
-                <span className={styles.chip}>
-                  待执行 <b>{generatedTaskCount}</b>
-                </span>
-              </div>
-              <Link to="/boardGovernance/duty-tasks">进入负责人任务管理</Link>
-            </header>
-            {generatedPlans.map((plan) => (
-              <article className={styles.taskRow} key={`duty-${plan.id}`}>
-                <div>
-                  <h3>{plan.content}履职任务</h3>
-                  <p>
-                    董事：{plan.directorName}　　任务类型：{plan.type}
-                    　　执行部门：{plan.owner}
-                    　　计划时间：{plan.date}　　预期成果：{plan.target}
-                  </p>
-                </div>
-                <aside>
-                  <StatusPill>{plan.taskStatus}</StatusPill>
-                  <Link to={`/boardGovernance/duty-tasks?bizId=${plan.id}`}>
-                    {plan.taskStatus === "已完成" ? "查看/修改" : "去执行"}
-                  </Link>
-                </aside>
-              </article>
-            ))}
-          </section>
-        ) : null}
-        <section className={`${styles.listPanel} ${styles.planTaskPanel}`}>
-          <header>
-            <div>
-              <h2>意见建议落实任务</h2>
-              <span className={styles.chip}>
-                待办 <b>{suggestionPendingCount}</b>
-              </span>
-              <span className={styles.completedLabel}>
-                已完成　{suggestionTasks.length - suggestionPendingCount}
-              </span>
-            </div>
-            <Link to="/boardGovernance/duty-tasks?taskType=suggestion">
-              进入意见建议任务管理
-            </Link>
-          </header>
-          {suggestionTasks.slice(0, 3).map((task) => (
-            <article className={styles.taskRow} key={task.id}>
-              <div>
-                <h3>{task.content}</h3>
-                <p>
-                  来源：{task.source}　　责任部门：{task.owner}　　负责人：
-                  {task.assignee}　　完成期限：{task.deadline}
-                </p>
-              </div>
-              <aside>
-                <StatusPill>{task.status}</StatusPill>
-                <Link
-                  to={`/boardGovernance/duty-tasks?taskType=suggestion&bizId=${task.id}`}
-                >
-                  {task.status === "已完成" ? "查看结果" : "去办理"}
-                </Link>
-              </aside>
-            </article>
-          ))}
-        </section>
-        <section className={styles.tabStrip} aria-label="任务分类">
-          {taskGroups.map((item) => (
+        <section className={styles.tabStrip} aria-label="责任部门">
+          {currentCategory.groups.map((item) => (
             <button
               className={
-                activeDepartment === item.department ? styles.activeTab : ""
+                currentGroup?.department === item.department
+                  ? styles.activeTab
+                  : ""
               }
               type="button"
               key={item.department}
               onClick={() => setActiveDepartment(item.department)}
             >
               <span>{item.department}</span>
-              <small>
-                {item.complete
-                  ? "已提交"
-                  : `${item.materials.length - item.submitted} 项待办`}
-              </small>
+              <small>{item.pending ? `待办 ${item.pending}` : "已完成"}</small>
             </button>
           ))}
         </section>
-        <section className={styles.listPanel}>
+        <section className={`${styles.listPanel} ${styles.planTaskPanel}`}>
           <header>
             <div>
-              <h2>董事履职手册资料更新</h2>
+              <h2>{currentCategory.label}</h2>
               <span className={styles.chip}>
-                待办 <b>{activeTask.complete ? 0 : 1}</b>
+                待办 <b>{currentGroup?.pending || 0}</b>
               </span>
-              <span className={styles.overdue}>逾期　0</span>
+              <span className={styles.completedLabel}>
+                已完成　{currentGroup?.completed || 0}
+              </span>
             </div>
-            <button type="button">＋　手动创建</button>
-          </header>
-          <article className={styles.taskRow}>
-            <div>
-              <h3>2026年度董事履职手册资料更新</h3>
-              <p>
-                任务下达时间：2026-09-15 09:00:00　　截止时间：2026-09-30
-                17:00:00　　发送人：公司董办　　计划耗时：8.00小时　　描述：
-                {activeTask.department}提交{activeTask.materials.length}
-                项履职手册资料
-              </p>
-            </div>
-            <aside>
-              <Link to={taskHref}>
-                {activeTask.complete ? "重新提交" : "去执行"}
+            {activeCategory === "material" ? (
+              <button type="button">＋　手动创建</button>
+            ) : null}
+            {activeCategory === "duty" ? (
+              <Link to="/boardGovernance/duty-tasks">进入负责人任务管理</Link>
+            ) : null}
+            {activeCategory === "suggestion" ? (
+              <Link to="/boardGovernance/duty-tasks?taskType=suggestion">
+                进入意见建议任务管理
               </Link>
-              <i />
-              <Link to={taskHref}>查看详情</Link>
-            </aside>
-          </article>
+            ) : null}
+          </header>
+          {activeCategory === "material" && currentGroup ? (
+            <article className={styles.taskRow}>
+              <div>
+                <h3>2026年度董事履职手册资料更新</h3>
+                <p>
+                  任务下达时间：2026-09-15 09:00:00　　截止时间：2026-09-30
+                  17:00:00　　发送人：公司董办　　计划耗时：8.00小时　　描述：
+                  {currentGroup.department}提交{currentGroup.records.length}
+                  项履职手册资料
+                </p>
+              </div>
+              <aside>
+                <Link to={taskHref}>
+                  {currentGroup.pending ? "去执行" : "重新提交"}
+                </Link>
+                <i />
+                <Link to={taskHref}>查看详情</Link>
+              </aside>
+            </article>
+          ) : null}
+          {activeCategory === "confirmation"
+            ? currentGroup?.records.map((plan) => (
+                <article className={styles.taskRow} key={plan.id}>
+                  <div>
+                    <h3>
+                      {plan.dutyYear}
+                      {plan.dutyQuarter} · {plan.content}
+                    </h3>
+                    <p>
+                      确认责任人：{plan.confirmOwner}　　任职企业：
+                      {plan.servingCompany}　　工作类别：{plan.workCategory}
+                      　　状态：{plan.status}
+                    </p>
+                  </div>
+                  <aside>
+                    <StatusPill>{plan.status}</StatusPill>
+                    <Link
+                      to={`/boardGovernance/duty-tasks?taskType=confirmation&planId=${plan.id}`}
+                    >
+                      编辑
+                    </Link>
+                  </aside>
+                </article>
+              ))
+            : null}
+          {activeCategory === "duty"
+            ? currentGroup?.records.map((plan) => (
+                <article className={styles.taskRow} key={`duty-${plan.id}`}>
+                  <div>
+                    <h3>{plan.content}履职任务</h3>
+                    <p>
+                      董事：{plan.directorName}　　任务类型：{plan.type}
+                      　　执行部门：{plan.owner}
+                      　　计划时间：{plan.date}　　预期成果：{plan.target}
+                    </p>
+                  </div>
+                  <aside>
+                    <StatusPill>{plan.taskStatus}</StatusPill>
+                    <Link to={`/boardGovernance/duty-tasks?bizId=${plan.id}`}>
+                      {plan.taskStatus === "已完成" ? "查看/修改" : "去执行"}
+                    </Link>
+                  </aside>
+                </article>
+              ))
+            : null}
+          {activeCategory === "suggestion"
+            ? currentGroup?.records.map((task) => (
+                <article className={styles.taskRow} key={task.id}>
+                  <div>
+                    <h3>{task.content}</h3>
+                    <p>
+                      来源：{task.source}　　责任部门：{task.owner}　　负责人：
+                      {task.assignee}　　完成期限：{task.deadline}
+                    </p>
+                  </div>
+                  <aside>
+                    <StatusPill>{task.status}</StatusPill>
+                    <Link
+                      to={`/boardGovernance/duty-tasks?taskType=suggestion&bizId=${task.id}`}
+                    >
+                      {task.status === "已完成" ? "查看结果" : "去办理"}
+                    </Link>
+                  </aside>
+                </article>
+              ))
+            : null}
         </section>
       </main>
     </div>

@@ -290,6 +290,8 @@ export default function BoardGovernancePage() {
         plans={dutyPlans}
         materials={handbookMaterials}
         onComplete={completeDutyTask}
+        onSubmitMaterial={submitMaterials}
+        onSavePlan={saveDutyPlanConfirmation}
         suggestionTasks={suggestionTasks}
         onSaveSuggestion={saveSuggestionTask}
       />
