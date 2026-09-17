@@ -69,6 +69,7 @@ const scoreFields = [
 ];
 
 export default function DutyEvaluationWorkspace({
+  embedded = false,
   director,
   plans,
   reports,
@@ -193,7 +194,9 @@ export default function DutyEvaluationWorkspace({
     }[evaluation.status] ?? 1;
 
   return (
-    <div className={styles.workspace}>
+    <div
+      className={`${styles.workspace} ${embedded ? styles.embeddedWorkspace : ""}`}
+    >
       <div className={styles.hero}>
         <div>
           <span>当前阶段 · 履职评价</span>
@@ -283,18 +286,26 @@ export default function DutyEvaluationWorkspace({
         <DataTable
           rows={evaluators}
           columns={[
-            { title: "评价角色", dataIndex: "role", width: 130 },
+            {
+              title: "评价角色",
+              dataIndex: "role",
+              width: embedded ? 105 : 130,
+            },
             {
               title: "评价人员",
               dataIndex: "names",
-              width: 180,
+              width: embedded ? 130 : 180,
               render: (value) => value.join("、"),
             },
-            { title: "评价内容", dataIndex: "scope", width: 310 },
+            {
+              title: "评价内容",
+              dataIndex: "scope",
+              width: embedded ? 210 : 310,
+            },
             {
               title: "完成进度",
               dataIndex: "progress",
-              width: 170,
+              width: embedded ? 130 : 170,
               render: (value) => <ProgressCell value={value} />,
             },
             {

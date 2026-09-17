@@ -1,13 +1,27 @@
 import { useState } from "react";
-import { Avatar, Button, Descriptions, Progress, Tabs } from "antd";
+import {
+  Avatar,
+  Button,
+  Descriptions,
+  Input,
+  Progress,
+  Select,
+  Space,
+  Tabs,
+} from "antd";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   AuditOutlined,
   CalendarOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
+  EditOutlined,
+  EyeOutlined,
+  FilterOutlined,
   FileAddOutlined,
   FileTextOutlined,
   PlusOutlined,
+  SendOutlined,
   SolutionOutlined,
   TeamOutlined,
   UserOutlined,
@@ -55,7 +69,26 @@ const lifecycleStages = [
   },
 ];
 
+const directorHandlerRoles = {
+  "D-01": ["集团董办", "综合管理部-办公室", "董事本人"],
+  "D-02": ["集团董办", "综合管理部-人力", "综合管理部-数字化"],
+  "D-03": ["集团董办", "综合管理部-董办", "董事本人"],
+  "D-04": ["集团董办", "综合管理部-办公室"],
+  "D-05": ["集团董办", "综合管理部-人力"],
+  "D-06": ["集团董办", "综合管理部-董办", "董事本人"],
+};
+
+const appointmentRoleKeys = {
+  集团董办: "groupOffice",
+  "综合管理部-办公室": "adminOffice",
+  "综合管理部-人力": "adminHr",
+  "综合管理部-数字化": "adminDigital",
+  "综合管理部-董办": "adminBoard",
+  董事本人: "adminBoard",
+};
+
 export default function DirectorView({
+  role = "office",
   materials,
   dutyPlans,
   onCreateDutyPlan,
@@ -68,142 +101,599 @@ export default function DirectorView({
   suggestionTasks,
 }) {
   const [searchParams] = useSearchParams();
-  const requestedStage = searchParams.get("stage");
-  const [stage, setStage] = useState(
-    lifecycleStages.some((item) => item.key === requestedStage)
-      ? requestedStage
-      : "appointment",
+  const [keyword, setKeyword] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [selectedDirector, setSelectedDirector] = useState(null);
+  const [openIssueLetter, setOpenIssueLetter] = useState(false);
+  const [drawerStage, setDrawerStage] = useState(
+    lifecycleStages.some((item) => item.key === searchParams.get("stage"))
+      ? searchParams.get("stage")
+      : "management",
   );
-  const [director, setDirector] = useState(directors[0]);
-  const [tab, setTab] = useState("overview");
-  const [event, setEvent] = useState(null);
+  const currentRole = role === "director" ? "董事本人" : "集团董办";
+  const filteredDirectors = directors.filter((item) => {
+    const normalized = keyword.trim().toLowerCase();
+    const matchesKeyword =
+      !normalized ||
+      [item.id, item.name, item.role, item.company].some((value) =>
+        value.toLowerCase().includes(normalized),
+      );
+    const matchesRole =
+      roleFilter === "all" ||
+      directorHandlerRoles[item.id]?.includes(roleFilter);
+    return matchesKeyword && matchesRole;
+  });
+  const openDirector = (director, stage = getDirectorStage(director)) => {
+    setSelectedDirector(director);
+    setDrawerStage(stage);
+  };
   return (
     <div className={styles.page}>
       <PageHeader
         eyebrow="DIRECTOR LIFECYCLE"
         title="董事履职"
         subtitle="董事聘任、履职准备、履职管理、履职评价全周期协同与证据留痕"
-        actions={
-          stage === "management" ? (
-            <>
-              <Button
-                icon={<FileAddOutlined />}
-                onClick={() => setTab("reports")}
-              >
-                生成履职报告
-              </Button>
-              <Button type="primary" icon={<PlusOutlined />}>
-                新增履职记录
-              </Button>
-            </>
-          ) : null
-        }
       />
-      <nav className={styles.lifecycle} aria-label="董事履职生命周期">
-        {lifecycleStages.map((item, index) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.key}
-              className={stage === item.key ? styles.activeStage : ""}
-              onClick={() => setStage(item.key)}
-            >
-              <span className={styles.stageNo}>
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <Icon />
-              <div>
-                <strong>{item.label}</strong>
-                <small>{item.description}</small>
-              </div>
-              {index < lifecycleStages.length - 1 ? <i>→</i> : null}
-            </button>
-          );
-        })}
-      </nav>
-      {stage === "appointment" ? <AppointmentFlow /> : null}
-      {stage === "preparation" ? (
-        <PreparationWorkspace
-          materials={materials}
-          dutyPlans={dutyPlans}
-          onCreateDutyPlan={onCreateDutyPlan}
-          onGenerateDutyTasks={onGenerateDutyTasks}
-          generatedDirectorNames={generatedDirectorNames}
-          director={director}
-          setDirector={setDirector}
+      <div className={styles.directorToolbar}>
+        <Input
+          allowClear
+          prefix={<FilterOutlined />}
+          placeholder="搜索董事姓名、编号、企业或董事类型"
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
         />
-      ) : null}
-      {stage === "management" ? (
-        <DutyManagement
-          director={director}
-          setDirector={setDirector}
-          tab={tab}
-          setTab={setTab}
-          onEvent={setEvent}
-          dutyPlans={dutyPlans}
-          materials={materials}
-          dutyReports={dutyReports}
-          onGenerateDutyReport={onGenerateDutyReport}
-          onSaveDutyReport={onSaveDutyReport}
-          onReceiveDutyReport={onReceiveDutyReport}
-          suggestionTasks={suggestionTasks.filter(
-            (item) => item.directorName === director.name,
-          )}
+        <Select
+          value={roleFilter}
+          onChange={setRoleFilter}
+          options={[
+            { value: "all", label: "全部办理角色" },
+            { value: "集团董办", label: "集团董办" },
+            { value: "董事本人", label: "董事本人" },
+            { value: "综合管理部-办公室", label: "综合管理部-办公室" },
+            { value: "综合管理部-人力", label: "综合管理部-人力" },
+            { value: "综合管理部-数字化", label: "综合管理部-数字化" },
+            { value: "综合管理部-董办", label: "综合管理部-董办" },
+          ]}
         />
-      ) : null}
-      {stage === "evaluation" ? (
-        <DutyEvaluationWorkspace
-          director={director}
-          plans={dutyPlans.filter(
-            (item) => item.directorName === director.name,
-          )}
-          reports={dutyReports.filter(
-            (item) => item.directorName === director.name,
-          )}
-          suggestionTasks={suggestionTasks.filter(
-            (item) => item.directorName === director.name,
-          )}
-        />
-      ) : null}
-      <GovernanceDrawer
-        open={!!event}
-        onClose={() => setEvent(null)}
-        title={event?.title}
-        subtitle={`${event?.date} · ${event?.source}`}
+        <span className={styles.toolbarHint}>当前身份：{currentRole}</span>
+        <Button
+          type="primary"
+          icon={<SendOutlined />}
+          onClick={() => {
+            const appointmentDirector =
+              directors.find((item) => item.lifecycleStage === "appointment") ||
+              directors[0];
+            setOpenIssueLetter(true);
+            openDirector(appointmentDirector, "appointment");
+          }}
+        >
+          下发董事推荐函
+        </Button>
+      </div>
+      <SectionCard
+        title="董事列表"
+        extra={
+          <span className={styles.tableMeta}>
+            {filteredDirectors.length} 位董事
+          </span>
+        }
       >
+        <DataTable
+          rowKey="id"
+          rows={filteredDirectors}
+          onRowClick={openDirector}
+          columns={directorColumns({
+            openDirector,
+            dutyPlans,
+            dutyReports,
+            suggestionTasks,
+          })}
+        />
+      </SectionCard>
+      <DirectorLifecycleDrawer
+        director={selectedDirector}
+        stage={drawerStage}
+        onStageChange={setDrawerStage}
+        onClose={() => setSelectedDirector(null)}
+        materials={materials}
+        dutyPlans={dutyPlans}
+        onCreateDutyPlan={onCreateDutyPlan}
+        onGenerateDutyTasks={onGenerateDutyTasks}
+        generatedDirectorNames={generatedDirectorNames}
+        dutyReports={dutyReports}
+        onGenerateDutyReport={onGenerateDutyReport}
+        onSaveDutyReport={onSaveDutyReport}
+        onReceiveDutyReport={onReceiveDutyReport}
+        suggestionTasks={suggestionTasks}
+        currentRole={currentRole}
+        appointmentRoleKey={
+          appointmentRoleKeys[
+            roleFilter === "all" ? currentRole : roleFilter
+          ] || "groupOffice"
+        }
+        openIssueLetter={openIssueLetter}
+        onIssueLetterOpened={() => setOpenIssueLetter(false)}
+      />
+    </div>
+  );
+}
+
+function getDirectorStage(director) {
+  if (!director) return "management";
+  return lifecycleStages.some((item) => item.key === director.lifecycleStage)
+    ? director.lifecycleStage
+    : "management";
+}
+
+function directorColumns({
+  openDirector,
+  dutyPlans,
+  dutyReports,
+  suggestionTasks,
+}) {
+  return [
+    {
+      title: "董事信息",
+      key: "director",
+      fixed: "left",
+      width: 190,
+      render: (_, record) => (
+        <div className={styles.directorCell}>
+          <Avatar icon={<UserOutlined />} />
+          <span>
+            <strong>{record.name}</strong>
+            <small>
+              {record.id} · {record.role}
+            </small>
+          </span>
+        </div>
+      ),
+    },
+    { title: "任职企业", dataIndex: "company", width: 130 },
+    { title: "任期", dataIndex: "term", width: 210 },
+    {
+      title: "当前阶段",
+      key: "stage",
+      width: 130,
+      render: (_, record) => (
+        <div className={styles.stageCell}>
+          <StatusPill>{getDirectorStageLabel(record)}</StatusPill>
+          <small>{record[`${record.lifecycleStage}Status`] || "待办理"}</small>
+        </div>
+      ),
+    },
+    {
+      title: "董事聘任",
+      key: "appointment",
+      width: 150,
+      render: (_, record) => (
+        <StageStatus
+          icon={<SolutionOutlined />}
+          label={record.appointmentStatus}
+          tone={record.appointmentStatus === "已完成" ? "success" : "warning"}
+        />
+      ),
+    },
+    {
+      title: "履职准备",
+      key: "preparation",
+      width: 130,
+      render: (_, record) => (
+        <StageStatus
+          icon={<CheckCircleOutlined />}
+          label={record.preparationStatus}
+          tone={record.preparationStatus === "已完成" ? "success" : "warning"}
+        />
+      ),
+    },
+    {
+      title: "履职管理",
+      key: "management",
+      width: 150,
+      render: (_, record) => (
+        <div className={styles.managementCell}>
+          <span>
+            {record.days} 天 · {record.completion}%完成
+          </span>
+          <small>{record.managementStatus}</small>
+        </div>
+      ),
+    },
+    {
+      title: "履职评价",
+      key: "evaluation",
+      width: 130,
+      render: (_, record) => (
+        <StageStatus
+          icon={<ClockCircleOutlined />}
+          label={record.evaluationStatus}
+          tone={record.evaluationStatus === "已完成" ? "success" : "warning"}
+        />
+      ),
+    },
+    {
+      title: "风险状态",
+      dataIndex: "risk",
+      width: 110,
+      render: (value) => <StatusPill>{value}</StatusPill>,
+    },
+    {
+      title: "操作",
+      key: "action",
+      fixed: "right",
+      width: 145,
+      render: (_, record) => (
+        <Space size={4}>
+          <Button
+            type="link"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={(event) => {
+              event.stopPropagation();
+              openDirector(record);
+            }}
+          >
+            查看
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={(event) => {
+              event.stopPropagation();
+              openDirector(record);
+            }}
+          >
+            办理
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+}
+
+function getDirectorStageLabel(director) {
+  return (
+    lifecycleStages.find((item) => item.key === director?.lifecycleStage)
+      ?.label || "履职管理"
+  );
+}
+
+function StageStatus({ icon, label, tone }) {
+  return (
+    <span className={`${styles.stageStatus} ${styles[tone]}`}>
+      {icon}
+      {label}
+    </span>
+  );
+}
+
+function DirectorLifecycleDrawer({
+  director,
+  stage,
+  onStageChange,
+  onClose,
+  materials,
+  dutyPlans,
+  onCreateDutyPlan,
+  onGenerateDutyTasks,
+  generatedDirectorNames,
+  dutyReports,
+  onGenerateDutyReport,
+  onSaveDutyReport,
+  onReceiveDutyReport,
+  suggestionTasks,
+  currentRole,
+  appointmentRoleKey,
+  openIssueLetter,
+  onIssueLetterOpened,
+}) {
+  const [managementTab, setManagementTab] = useState("overview");
+  const [event, setEvent] = useState(null);
+  const visiblePlans = dutyPlans.filter(
+    (item) => item.directorName === director?.name,
+  );
+  const visibleReports = dutyReports.filter(
+    (item) => item.directorName === director?.name,
+  );
+  const visibleSuggestions = suggestionTasks.filter(
+    (item) => item.directorName === director?.name,
+  );
+  return (
+    <>
+      <GovernanceDrawer
+        open={!!director}
+        onClose={onClose}
+        width="min(1040px, 100vw)"
+        title={director ? `${director.name} · 董事履职档案` : ""}
+        subtitle={
+          director
+            ? `${director.company} · ${director.role} · 当前办理角色：${currentRole}`
+            : ""
+        }
+      >
+        {director ? (
+          <>
+            <div className={styles.drawerProfile}>
+              <Avatar size={58} icon={<UserOutlined />} />
+              <div>
+                <span>{director.id}</span>
+                <h2>{director.name}</h2>
+                <p>
+                  {director.company} · {director.committee} · 任期{" "}
+                  {director.term}
+                </p>
+              </div>
+              <div className={styles.drawerStats}>
+                <strong>{director.days}</strong>
+                <small>年度履职天数</small>
+                <strong>{director.completion}%</strong>
+                <small>计划完成率</small>
+                <StatusPill>{director.risk}</StatusPill>
+              </div>
+            </div>
+            <Tabs
+              activeKey={stage}
+              onChange={onStageChange}
+              items={lifecycleStages.map((item) => ({
+                key: item.key,
+                label: item.label,
+              }))}
+            />
+            <div className={styles.drawerStageBody}>
+              {stage === "appointment" ? (
+                <AppointmentFlow
+                  key={director.id}
+                  director={director}
+                  handlerRole={appointmentRoleKey}
+                  autoOpenIssue={openIssueLetter}
+                  onIssueLetterOpened={onIssueLetterOpened}
+                  embedded
+                />
+              ) : null}
+              {stage === "preparation" ? (
+                <PreparationWorkspace
+                  compact
+                  materials={materials}
+                  dutyPlans={dutyPlans}
+                  onCreateDutyPlan={onCreateDutyPlan}
+                  onGenerateDutyTasks={onGenerateDutyTasks}
+                  generatedDirectorNames={generatedDirectorNames}
+                  director={director}
+                  setDirector={() => {}}
+                />
+              ) : null}
+              {stage === "management" ? (
+                <DutyManagement
+                  compact
+                  director={director}
+                  setDirector={() => {}}
+                  tab={managementTab}
+                  setTab={setManagementTab}
+                  onEvent={setEvent}
+                  dutyPlans={dutyPlans}
+                  materials={materials}
+                  dutyReports={dutyReports}
+                  onGenerateDutyReport={onGenerateDutyReport}
+                  onSaveDutyReport={onSaveDutyReport}
+                  onReceiveDutyReport={onReceiveDutyReport}
+                  suggestionTasks={visibleSuggestions}
+                />
+              ) : null}
+              {stage === "evaluation" ? (
+                <DutyEvaluationWorkspace
+                  embedded
+                  director={director}
+                  plans={visiblePlans}
+                  reports={visibleReports}
+                  suggestionTasks={visibleSuggestions}
+                />
+              ) : null}
+            </div>
+          </>
+        ) : null}
+      </GovernanceDrawer>
+      <EventDetailDrawer event={event} onClose={() => setEvent(null)} />
+    </>
+  );
+}
+
+function EventDetailDrawer({ event, onClose }) {
+  return (
+    <GovernanceDrawer
+      open={!!event}
+      onClose={onClose}
+      title={event?.title}
+      subtitle={`${event?.date} · ${event?.source}`}
+    >
+      <Descriptions
+        column={2}
+        items={[
+          { key: 1, label: "履职类型", children: event?.type },
+          {
+            key: 2,
+            label: "确认状态",
+            children: <StatusPill>{event?.status}</StatusPill>,
+          },
+          { key: 3, label: "数据来源", children: event?.source },
+          { key: 4, label: "履职天数", children: `${event?.days} 天` },
+        ]}
+      />
+      <h3>事实与证据</h3>
+      <p>{event?.evidence}</p>
+      <h3>计算明细</h3>
+      <div className={styles.calc}>
+        <span>基础活动时间</span>
+        <b>{event?.days} 天</b>
+        <span>报告附加时间</span>
+        <b>0 天</b>
+        <strong>最终结果</strong>
+        <strong>{event?.days} 天</strong>
+      </div>
+      <p className={styles.source}>
+        系统同步数据仅允许补充说明，不允许修改会议、出席和表决等权威事实。
+      </p>
+    </GovernanceDrawer>
+  );
+}
+
+function AppointmentDrawerPanel({ director }) {
+  return (
+    <div className={styles.drawerGrid}>
+      <SectionCard title="聘任办理状态" extra={<StatusPill>办理中</StatusPill>}>
         <Descriptions
           column={2}
           items={[
-            { key: 1, label: "履职类型", children: event?.type },
-            {
-              key: 2,
-              label: "确认状态",
-              children: <StatusPill>{event?.status}</StatusPill>,
-            },
-            { key: 3, label: "数据来源", children: event?.source },
-            { key: 4, label: "履职天数", children: `${event?.days} 天` },
+            { key: 1, label: "董事人选", children: director.name },
+            { key: 2, label: "任职企业", children: director.company },
+            { key: 3, label: "董事类型", children: director.role },
+            { key: 4, label: "专委会职务", children: director.committee },
           ]}
         />
-        <h3>事实与证据</h3>
-        <p>{event?.evidence}</p>
-        <h3>计算明细</h3>
-        <div className={styles.calc}>
-          <span>基础活动时间</span>
-          <b>{event?.days} 天</b>
-          <span>报告附加时间</span>
-          <b>0 天</b>
-          <strong>最终结果</strong>
-          <strong>{event?.days} 天</strong>
+        <div className={styles.drawerActions}>
+          <Button type="primary" icon={<SendOutlined />}>
+            下发董事推荐函
+          </Button>
+          <Button>查看推荐函</Button>
         </div>
-        <p className={styles.source}>
-          系统同步数据仅允许补充说明，不允许修改会议、出席和表决等权威事实。
+      </SectionCard>
+      <SectionCard title="聘任流程">
+        {[
+          "董事推荐函",
+          "接收推荐函",
+          "上传董事简历",
+          "配置系统权限",
+          "纳入组织架构",
+          "聘任事项归档",
+        ].map((item, index) => (
+          <div className={styles.drawerTimeline} key={item}>
+            <span className={index < 3 ? styles.doneDot : ""}>
+              {index < 3 ? <CheckCircleOutlined /> : index + 1}
+            </span>
+            <div>
+              <strong>{item}</strong>
+              <small>{index < 3 ? "已完成 · 系统留痕" : "待办理"}</small>
+            </div>
+          </div>
+        ))}
+      </SectionCard>
+    </div>
+  );
+}
+
+function PreparationDrawerPanel({
+  director,
+  materials,
+  dutyPlans,
+  onCreateDutyPlan,
+  onGenerateDutyTasks,
+  generatedDirectorNames,
+}) {
+  return (
+    <div className={styles.drawerGrid}>
+      <SectionCard
+        title="履职手册"
+        extra={
+          <StatusPill>
+            {materials.every((item) => item.status === "已提交")
+              ? "已完成"
+              : "更新中"}
+          </StatusPill>
+        }
+      >
+        <p className={styles.drawerDescription}>
+          围绕任职企业、董事职责、制度依据和重点风险，为 {director.name}{" "}
+          建立专属履职资料包。
         </p>
-      </GovernanceDrawer>
+        <Button icon={<FileTextOutlined />}>查看履职手册</Button>
+      </SectionCard>
+      <SectionCard
+        title="年度履职计划"
+        extra={
+          <StatusPill>{dutyPlans.length ? "已建立" : "待建立"}</StatusPill>
+        }
+      >
+        <p className={styles.drawerDescription}>
+          当前董事已有 {dutyPlans.length}{" "}
+          项履职计划，支持继续编辑、确认并生成履职任务。
+        </p>
+        <DutyPlanWorkspace
+          plans={dutyPlans}
+          activeDirector={director}
+          createOpen={false}
+          onCreateOpenChange={() => {}}
+          onCreatePlan={onCreateDutyPlan}
+          onGenerateTasks={() => onGenerateDutyTasks(director.name)}
+          annualGenerated={generatedDirectorNames.includes(director.name)}
+        />
+      </SectionCard>
+    </div>
+  );
+}
+
+function ManagementDrawerPanel({
+  director,
+  reports,
+  suggestions,
+  onGenerateDutyReport,
+  onSaveDutyReport,
+  onReceiveDutyReport,
+}) {
+  return (
+    <div className={styles.drawerGrid}>
+      <SectionCard title="履职概览">
+        <div className={styles.drawerMetrics}>
+          <div>
+            <strong>{director.days}</strong>
+            <span>年度履职天数</span>
+          </div>
+          <div>
+            <strong>{director.completion}%</strong>
+            <span>计划完成率</span>
+          </div>
+          <div>
+            <strong>{suggestions.length}</strong>
+            <span>意见建议</span>
+          </div>
+          <div>
+            <strong>{reports.length}</strong>
+            <span>成果报告</span>
+          </div>
+        </div>
+      </SectionCard>
+      <SectionCard title="履职事实与成果">
+        <p className={styles.drawerDescription}>
+          会议出席、调研培训、专项交流及意见建议均按董事维度归集，可继续补充证据并形成履职报告。
+        </p>
+        <div className={styles.drawerActions}>
+          <Button type="primary" icon={<PlusOutlined />}>
+            新增履职记录
+          </Button>
+          <Button icon={<FileAddOutlined />}>生成履职报告</Button>
+        </div>
+      </SectionCard>
+      <SectionCard title="近期办理事项">
+        <div className={styles.drawerList}>
+          <div>
+            <span>季度履职报告</span>
+            <StatusPill>{director.report}</StatusPill>
+          </div>
+          <div>
+            <span>意见建议跟踪</span>
+            <StatusPill>{suggestions.length ? "办理中" : "暂无"}</StatusPill>
+          </div>
+          <div>
+            <span>履职事实确认</span>
+            <StatusPill>待检查</StatusPill>
+          </div>
+        </div>
+      </SectionCard>
     </div>
   );
 }
 
 function PreparationWorkspace({
+  compact = false,
   materials,
   dutyPlans,
   onCreateDutyPlan,
@@ -224,41 +714,43 @@ function PreparationWorkspace({
   const annualPlanGenerated = generatedDirectorNames.includes(director.name);
   return (
     <div className={styles.stageWorkspace}>
-      <section
-        className={styles.directorSelector}
-        aria-label="履职准备董事选择"
-      >
-        <div className={styles.directorSelectorTitle}>
-          <span>当前办理董事</span>
-          <strong>请选择董事查看对应履职手册与年度计划</strong>
-        </div>
-        <div className={styles.directorOptions}>
-          {directors.map((item) => {
-            const planCount = dutyPlans.filter(
-              (plan) => plan.directorName === item.name,
-            ).length;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={
-                  director.id === item.id ? styles.selectedDirector : ""
-                }
-                onClick={() => setDirector(item)}
-              >
-                <Avatar icon={<UserOutlined />} />
-                <span>
-                  <b>{item.name}</b>
-                  <small>
-                    {item.role} · {item.company}
-                  </small>
-                </span>
-                <em>{planCount} 项计划</em>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      {!compact ? (
+        <section
+          className={styles.directorSelector}
+          aria-label="履职准备董事选择"
+        >
+          <div className={styles.directorSelectorTitle}>
+            <span>当前办理董事</span>
+            <strong>请选择董事查看对应履职手册与年度计划</strong>
+          </div>
+          <div className={styles.directorOptions}>
+            {directors.map((item) => {
+              const planCount = dutyPlans.filter(
+                (plan) => plan.directorName === item.name,
+              ).length;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={
+                    director.id === item.id ? styles.selectedDirector : ""
+                  }
+                  onClick={() => setDirector(item)}
+                >
+                  <Avatar icon={<UserOutlined />} />
+                  <span>
+                    <b>{item.name}</b>
+                    <small>
+                      {item.role} · {item.company}
+                    </small>
+                  </span>
+                  <em>{planCount} 项计划</em>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
       <div className={styles.stageIntro}>
         <div>
           <span>当前阶段 · {director.name} · 履职准备</span>
@@ -377,6 +869,7 @@ function PreparationWorkspace({
 }
 
 function DutyManagement({
+  compact = false,
   director,
   setDirector,
   tab,
@@ -391,26 +884,28 @@ function DutyManagement({
   suggestionTasks,
 }) {
   return (
-    <div className={styles.layout}>
-      <aside className={styles.directory}>
-        <h3>董事档案</h3>
-        <p>一汽股权 · 在任董事 {directors.length} 人</p>
-        {directors.map((item) => (
-          <button
-            key={item.id}
-            className={director.id === item.id ? styles.selected : ""}
-            onClick={() => setDirector(item)}
-          >
-            <Avatar icon={<UserOutlined />} />
-            <div>
-              <strong>{item.name}</strong>
-              <span>{item.role}</span>
-              <small>{item.committee}</small>
-            </div>
-            <StatusPill>{item.risk}</StatusPill>
-          </button>
-        ))}
-      </aside>
+    <div className={`${styles.layout} ${compact ? styles.compactLayout : ""}`}>
+      {!compact ? (
+        <aside className={styles.directory}>
+          <h3>董事档案</h3>
+          <p>一汽股权 · 在任董事 {directors.length} 人</p>
+          {directors.map((item) => (
+            <button
+              key={item.id}
+              className={director.id === item.id ? styles.selected : ""}
+              onClick={() => setDirector(item)}
+            >
+              <Avatar icon={<UserOutlined />} />
+              <div>
+                <strong>{item.name}</strong>
+                <span>{item.role}</span>
+                <small>{item.committee}</small>
+              </div>
+              <StatusPill>{item.risk}</StatusPill>
+            </button>
+          ))}
+        </aside>
+      ) : null}
       <section className={styles.profile}>
         <div className={styles.hero}>
           <Avatar size={64} icon={<UserOutlined />} />

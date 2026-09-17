@@ -549,6 +549,205 @@
   color: #778295;
   text-align: center;
 }
+.directorToolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid #dce4ef;
+  border-radius: 12px;
+  background: #fff;
+}
+.directorToolbar :global(.ant-input-affix-wrapper) {
+  width: min(440px, 100%);
+}
+.directorToolbar :global(.ant-select) {
+  min-width: 190px;
+}
+.toolbarHint,
+.tableMeta {
+  font-size: 12px;
+  color: #7d8797;
+}
+.directorToolbar > :global(.ant-btn) {
+  margin-left: auto;
+}
+.directorCell {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.directorCell > span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.directorCell strong,
+.directorCell small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.directorCell small {
+  color: #7d8797;
+  font-size: 10px;
+}
+.stageCell,
+.managementCell {
+  display: grid;
+  gap: 4px;
+}
+.stageCell small,
+.managementCell small {
+  color: #8290a4;
+  font-size: 10px;
+}
+.stageStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.stageStatus svg {
+  font-size: 13px;
+}
+.stageStatus.success { color: #21835a; }
+.stageStatus.warning { color: #b26a00; }
+.drawerProfile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #dbe5f2;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #f6faff, #fff);
+}
+.drawerProfile > div:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.drawerProfile span {
+  color: #2f6bff;
+  font-size: 11px;
+}
+.drawerProfile h2 {
+  margin: 3px 0;
+  color: #183b68;
+}
+.drawerProfile p,
+.drawerDescription {
+  margin: 0;
+  color: #738095;
+  font-size: 12px;
+}
+.drawerStats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.drawerStats strong {
+  margin-left: 10px;
+  color: #1d559e;
+  font-size: 19px;
+}
+.drawerStats small {
+  color: #8290a4;
+}
+.drawerGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.drawerGrid > :global(.ant-card):first-child:last-child,
+.drawerGrid > :global(.ant-card):last-child {
+  grid-column: 1 / -1;
+}
+.drawerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.drawerTimeline {
+  display: flex;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid #eef1f5;
+}
+.drawerTimeline > span {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eef2f7;
+  color: #8b98aa;
+  font-size: 11px;
+}
+.drawerTimeline .doneDot {
+  background: #e5f6ed;
+  color: #21835a;
+}
+.drawerTimeline div {
+  display: grid;
+  gap: 2px;
+}
+.drawerTimeline small {
+  color: #8290a4;
+}
+.drawerMetrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.drawerMetrics div {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 9px;
+  background: #f5f8fc;
+}
+.drawerMetrics strong {
+  color: #1d559e;
+  font-size: 20px;
+}
+.drawerMetrics span {
+  color: #8290a4;
+  font-size: 11px;
+}
+.drawerList {
+  display: grid;
+  gap: 9px;
+}
+.drawerList > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #eef1f5;
+}
+.drawerStageBody :global(.ant-card-head) {
+  min-height: 48px;
+}
+.drawerStageBody {
+  min-width: 0;
+  max-width: 100%;
+}
+.drawerStageBody > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.drawerStageBody :global(.ant-table-container) {
+  max-width: 100%;
+}
+.compactLayout {
+  grid-template-columns: 1fr;
+}
+.compactLayout .profile {
+  min-width: 0;
+}
 @media (max-width: 1100px) {
   .lifecycle {
     grid-template-columns: repeat(2, 1fr);
@@ -583,6 +782,16 @@
   .directorSelector {
     grid-template-columns: 1fr;
   }
+  .drawerGrid {
+    grid-template-columns: 1fr;
+  }
+  .drawerProfile {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .drawerStats {
+    width: 100%;
+  }
 }
 @media (max-width: 700px) {
   .lifecycle {
@@ -612,5 +821,20 @@
   }
   .evidenceList {
     grid-template-columns: 1fr;
+  }
+  .directorToolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .directorToolbar :global(.ant-input-affix-wrapper),
+  .directorToolbar :global(.ant-select) {
+    width: 100%;
+  }
+  .directorToolbar > :global(.ant-btn) {
+    width: 100%;
+    margin-left: 0;
+  }
+  .drawerMetrics {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

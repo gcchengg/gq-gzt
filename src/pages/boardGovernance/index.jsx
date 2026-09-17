@@ -298,6 +298,7 @@ export default function BoardGovernancePage() {
     meetings: <PlanningMeetingView mode="meetings" />,
     directors: (
       <DirectorView
+        role={role}
         materials={handbookMaterials}
         dutyPlans={dutyPlans}
         onCreateDutyPlan={createDutyPlan}

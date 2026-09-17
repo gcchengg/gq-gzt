@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Button,
+  Descriptions,
   Form,
   Input,
   Modal,
@@ -66,6 +67,30 @@ const initialCases = [
     currentStep: 8,
   },
 ];
+
+function casesForDirector(director) {
+  if (!director) return initialCases;
+  const appointmentState = {
+    待下发董事推荐函: { status: "待下发董事推荐函", currentStep: 3 },
+    待上传董事简历: { status: "待上传董事简历", currentStep: 5 },
+    待配置系统权限: { status: "待配置系统权限", currentStep: 6 },
+    待选举变更: { status: "待选举变更", currentStep: 8 },
+    已完成: { status: "已完成", currentStep: 10 },
+  };
+  return [
+    {
+      ...initialCases[0],
+      id: `AP-${director.id}`,
+      director: director.name,
+      company: director.company,
+      position: director.role,
+      ...(appointmentState[director.appointmentStatus] || {
+        status: "待接收推荐函",
+        currentStep: 4,
+      }),
+    },
+  ];
+}
 
 const processSteps = [
   ["董事会职数核定", "集团体系数字化部", "形成职数核定结果"],
@@ -153,25 +178,64 @@ const roleActionSteps = {
   adminBoard: ["change"],
 };
 
-export default function AppointmentFlow() {
-  const [cases, setCases] = useState(initialCases);
-  const [selected, setSelected] = useState(initialCases[0]);
+export default function AppointmentFlow({
+  director,
+  handlerRole = "groupOffice",
+  autoOpenIssue = false,
+  onIssueLetterOpened,
+  embedded = false,
+}) {
+  const directorCases = casesForDirector(director);
+  const [cases, setCases] = useState(directorCases);
+  const [selected, setSelected] = useState(directorCases[0]);
   const [open, setOpen] = useState(false);
   const [auditMessages, setAuditMessages] = useState(initialAuditMessages);
   const [activeAuditId, setActiveAuditId] = useState(
     initialAuditMessages[0].id,
   );
-  const [role, setRole] = useState("groupOffice");
+  const role = handlerRole;
   const [keyword, setKeyword] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [ownerFilter, setOwnerFilter] = useState("all");
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const selectedAuditMessages = auditMessages.filter(
-    (item) => item.caseId === selected.id,
+  const selectedAuditMessages = useMemo(
+    () => auditMessages.filter((item) => item.caseId === selected.id),
+    [auditMessages, selected.id],
+  );
+  const visibleAuditMessages = useMemo(
+    () =>
+      selectedAuditMessages.length
+        ? selectedAuditMessages
+        : [
+            {
+              id: `MSG-${selected.id}`,
+              time: "09:30",
+              caseId: selected.id,
+              director: selected.director,
+              recipient: selected.owner,
+              deadline: selected.deadline,
+              title: "聘任事项已创建",
+              detail: `事项已进入${selected.status}阶段，当前由${selected.owner}办理。`,
+            },
+          ],
+    [selected, selectedAuditMessages],
   );
   const roleMeta =
     appointmentRoles.find((item) => item.value === role) || appointmentRoles[0];
+
+  useEffect(() => {
+    if (autoOpenIssue) {
+      setOpen(true);
+      onIssueLetterOpened?.();
+    }
+  }, [autoOpenIssue, onIssueLetterOpened]);
+
+  useEffect(() => {
+    if (!visibleAuditMessages.some((item) => item.id === activeAuditId)) {
+      setActiveAuditId(visibleAuditMessages[0]?.id);
+    }
+  }, [activeAuditId, selected.id, visibleAuditMessages]);
   const ownerOptions = useMemo(
     () => [...new Set(cases.map((item) => item.owner))],
     [cases],
@@ -258,46 +322,50 @@ export default function AppointmentFlow() {
   };
 
   return (
-    <div className={styles.workspace}>
+    <div
+      className={`${styles.workspace} ${embedded ? styles.embeddedWorkspace : ""}`}
+    >
       {contextHolder}
       <section className={styles.command}>
         <div>
           <span className={styles.role}>当前角色 · {roleMeta.label}</span>
           <h2>董事聘任工作台</h2>
           <p>
-            全量查看聘任事项，按当前角色办理职责范围内的节点，所有操作自动保留完整交接证据。
+            {embedded
+              ? `聚焦 ${selected.director} 的聘任事项，完整展示办理信息、流程节点、交接规则与审计记录。`
+              : "全量查看聘任事项，按当前角色办理职责范围内的节点，所有操作自动保留完整交接证据。"}
           </p>
         </div>
-        <div className={styles.roleControl}>
-          <span>切换办理角色</span>
-          <Select
-            value={role}
-            options={appointmentRoles.map(({ value, label }) => ({
-              value,
-              label,
-            }))}
-            onChange={setRole}
-          />
-          {role === "groupOffice" ? (
-            <Button
-              type="primary"
-              size="large"
-              icon={<SendOutlined />}
-              onClick={() => setOpen(true)}
-            >
-              下发董事推荐函
-            </Button>
-          ) : null}
+        <div className={styles.commandMeta}>
+          <span>当前聘任状态</span>
+          <strong>{selected.status}</strong>
+          <small>当前责任人：{selected.owner}</small>
         </div>
       </section>
 
       <div className={styles.metrics}>
-        {[
-          ["待下发推荐函", "3", "集团董办"],
-          ["待上传董事简历", "2", "综合管理部-办公室"],
-          ["待配置系统权限", "1", "综合管理部-人力"],
-          ["待选举 / 工商变更", "4", "董办 / 法务"],
-        ].map(([label, value, owner]) => (
+        {(embedded
+          ? [
+              [
+                "流程进度",
+                `${Math.min(selected.currentStep + 1, processSteps.length)} / ${processSteps.length}`,
+                "已完成节点 / 全部节点",
+              ],
+              ["当前状态", selected.status, roleMeta.label],
+              ["办理时限", selected.deadline, "超时前自动提醒"],
+              [
+                "交接记录",
+                `${visibleAuditMessages.length} 条`,
+                "消息与审计轨迹",
+              ],
+            ]
+          : [
+              ["待下发推荐函", "3", "集团董办"],
+              ["待上传董事简历", "2", "综合管理部-办公室"],
+              ["待配置系统权限", "1", "综合管理部-人力"],
+              ["待选举 / 工商变更", "4", "董办 / 法务"],
+            ]
+        ).map(([label, value, owner]) => (
           <article key={label}>
             <span>{label}</span>
             <strong>{value}</strong>
@@ -306,82 +374,121 @@ export default function AppointmentFlow() {
         ))}
       </div>
 
-      <SectionCard
-        title="聘任事项台账"
-        extra={
-          <span className={styles.hint}>
-            共 {filteredCases.length} / {cases.length} 项 ·
-            点击事项查看流程定位和交接记录
-          </span>
-        }
-      >
-        <div className={styles.filters}>
-          <Input
-            value={keyword}
-            onChange={(event) => setKeyword(event.target.value)}
-            placeholder="搜索事项编号、董事或任职企业"
-            allowClear
-          />
-          <Select
-            value={statusFilter}
-            onChange={setStatusFilter}
-            options={[
-              { value: "all", label: "全部状态" },
-              ...statusOptions.map((value) => ({ value, label: value })),
+      {embedded ? (
+        <SectionCard
+          title={`${selected.director} · 聘任事项详情`}
+          extra={<StatusPill>{selected.status}</StatusPill>}
+        >
+          <div className={styles.caseOverview}>
+            <div className={styles.caseIdentity}>
+              <span>事项编号</span>
+              <strong>{selected.id}</strong>
+              <p>
+                {selected.company} · {selected.position}
+              </p>
+            </div>
+            <Descriptions
+              size="small"
+              column={{ xs: 1, sm: 1, md: 2, lg: 2, xl: 2, xxl: 2 }}
+              items={[
+                {
+                  key: "letter",
+                  label: "推荐函",
+                  children: selected.letter || "待生成",
+                },
+                {
+                  key: "deadline",
+                  label: "办理时限",
+                  children: selected.deadline,
+                },
+                { key: "owner", label: "当前责任人", children: selected.owner },
+                {
+                  key: "recipient",
+                  label: "下一接收人",
+                  children: selected.recipient,
+                },
+              ]}
+            />
+          </div>
+        </SectionCard>
+      ) : (
+        <SectionCard
+          title="聘任事项台账"
+          extra={
+            <span className={styles.hint}>
+              共 {filteredCases.length} / {cases.length} 项 ·
+              点击事项查看流程定位和交接记录
+            </span>
+          }
+        >
+          <div className={styles.filters}>
+            <Input
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
+              placeholder="搜索事项编号、董事或任职企业"
+              allowClear
+            />
+            <Select
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={[
+                { value: "all", label: "全部状态" },
+                ...statusOptions.map((value) => ({ value, label: value })),
+              ]}
+            />
+            <Select
+              value={ownerFilter}
+              onChange={setOwnerFilter}
+              options={[
+                { value: "all", label: "全部当前责任人" },
+                ...ownerOptions.map((value) => ({ value, label: value })),
+              ]}
+            />
+            <Button
+              onClick={() => {
+                setKeyword("");
+                setStatusFilter("all");
+                setOwnerFilter("all");
+              }}
+            >
+              重置
+            </Button>
+          </div>
+          <DataTable
+            rows={filteredCases}
+            selectedRowKey={selected.id}
+            onRowClick={selectCase}
+            columns={[
+              { title: "事项编号", dataIndex: "id" },
+              { title: "拟任董事", dataIndex: "director" },
+              {
+                title: "任职企业 / 职务",
+                render: (_, row) => (
+                  <>
+                    <b>{row.company}</b>
+                    <small className={styles.cellSub}>{row.position}</small>
+                  </>
+                ),
+              },
+              { title: "推荐函", dataIndex: "letter", width: 210 },
+              { title: "当前责任人", dataIndex: "owner", width: 210 },
+              { title: "下一接收人", dataIndex: "recipient", width: 220 },
+              { title: "办理时限", dataIndex: "deadline" },
+              {
+                title: "状态",
+                dataIndex: "status",
+                render: (value) => <StatusPill>{value}</StatusPill>,
+              },
             ]}
           />
-          <Select
-            value={ownerFilter}
-            onChange={setOwnerFilter}
-            options={[
-              { value: "all", label: "全部当前责任人" },
-              ...ownerOptions.map((value) => ({ value, label: value })),
-            ]}
-          />
-          <Button
-            onClick={() => {
-              setKeyword("");
-              setStatusFilter("all");
-              setOwnerFilter("all");
-            }}
-          >
-            重置
-          </Button>
-        </div>
-        <DataTable
-          rows={filteredCases}
-          selectedRowKey={selected.id}
-          onRowClick={selectCase}
-          columns={[
-            { title: "事项编号", dataIndex: "id" },
-            { title: "拟任董事", dataIndex: "director" },
-            {
-              title: "任职企业 / 职务",
-              render: (_, row) => (
-                <>
-                  <b>{row.company}</b>
-                  <small className={styles.cellSub}>{row.position}</small>
-                </>
-              ),
-            },
-            { title: "推荐函", dataIndex: "letter", width: 210 },
-            { title: "当前责任人", dataIndex: "owner", width: 210 },
-            { title: "下一接收人", dataIndex: "recipient", width: 220 },
-            { title: "办理时限", dataIndex: "deadline" },
-            {
-              title: "状态",
-              dataIndex: "status",
-              render: (value) => <StatusPill>{value}</StatusPill>,
-            },
-          ]}
-        />
-      </SectionCard>
+        </SectionCard>
+      )}
 
       <AppointmentActionPanel
         key={`${selected.id}-${selected.currentStep}`}
         item={selected}
         roleLabel={roleMeta.label}
-        allowedActions={roleActionSteps[role] || []}
+        allowedActions={Object.values(roleActionSteps).flat()}
         onUpdate={updateSelected}
       />
 
@@ -389,22 +496,22 @@ export default function AppointmentFlow() {
         title={`${selected.director} · 全流程定位`}
         extra={<StatusPill>{selected.status}</StatusPill>}
       >
-        <Steps
-          current={selected.currentStep}
-          size="small"
-          responsive={false}
-          items={processSteps.map(([title, owner]) => ({
-            title,
-            description: owner,
-          }))}
-        />
-        <div className={styles.laneDetail}>
+        {!embedded ? (
+          <Steps
+            current={selected.currentStep}
+            size="small"
+            responsive={false}
+            items={processSteps.map(([title, owner]) => ({
+              title,
+              description: owner,
+            }))}
+          />
+        ) : null}
+        <div className={embedded ? styles.embeddedProcess : styles.laneDetail}>
           {processSteps.map(([title, owner, detail], index) => (
             <article
               key={title}
-              className={
-                index === selected.currentStep ? styles.activeStep : ""
-              }
+              className={`${index === selected.currentStep ? styles.activeStep : ""} ${index < selected.currentStep ? styles.completedStep : ""}`}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
               <div>
@@ -412,6 +519,13 @@ export default function AppointmentFlow() {
                 <small>{owner}</small>
                 <p>{detail}</p>
               </div>
+              <em>
+                {index < selected.currentStep
+                  ? "已完成"
+                  : index === selected.currentStep
+                    ? "办理中"
+                    : "待办理"}
+              </em>
               {index < selected.currentStep ? <CheckCircleFilled /> : null}
             </article>
           ))}
@@ -438,7 +552,7 @@ export default function AppointmentFlow() {
           title="消息与审计轨迹"
           extra={
             <span className={styles.auditCount}>
-              <BellOutlined /> 共 {selectedAuditMessages.length} 条
+              <BellOutlined /> 共 {visibleAuditMessages.length} 条
             </span>
           }
         >
@@ -446,7 +560,7 @@ export default function AppointmentFlow() {
             className={styles.auditTabs}
             activeKey={activeAuditId}
             onChange={setActiveAuditId}
-            items={selectedAuditMessages.map((item) => ({
+            items={visibleAuditMessages.map((item) => ({
               key: item.id,
               label: (
                 <span className={styles.auditTabLabel}>

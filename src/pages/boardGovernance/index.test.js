@@ -124,7 +124,7 @@ test("covers the four-stage director lifecycle and appointment handoff", async (
     assert.match(actions, new RegExp(label));
   }
   assert.match(appointment, /setAuditMessages/);
-  assert.match(appointment, /selectedAuditMessages\.map/);
+  assert.match(appointment, /visibleAuditMessages\.map/);
   assert.match(appointment, /item\.caseId === selected\.id/);
   assert.match(appointment, /selectedRowKey=\{selected\.id\}/);
   assert.match(appointment, /activeAuditId/);

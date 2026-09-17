@@ -19,10 +19,22 @@
 .scoreFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .scoreFields :global(.ant-input-number-group-wrapper) { width: 100%; }
 .actionBar { display: flex; justify-content: flex-end; gap: 10px; padding-top: 14px; border-top: 1px solid #e8edf4; }
+.embeddedWorkspace { min-width: 0; overflow-x: hidden; gap: 12px; }
+.embeddedWorkspace > * { min-width: 0; max-width: 100%; }
+.embeddedWorkspace .hero { padding: 16px 18px; border-radius: 11px; }
+.embeddedWorkspace .hero h2 { font-size: 20px; }
+.embeddedWorkspace .summaryGrid,
+.embeddedWorkspace .resultPanel { grid-template-columns: 125px minmax(0, 1fr); gap: 14px; }
+.embeddedWorkspace .evidenceGrid { gap: 8px; }
+.embeddedWorkspace :global(.ant-steps) { max-width: 100%; overflow: hidden; }
+.embeddedWorkspace :global(.ant-steps-item-title) { white-space: normal; }
+.embeddedWorkspace :global(.ant-table-wrapper) { max-width: 100%; overflow-x: hidden; }
+.embeddedWorkspace :global(.ant-table-cell) { white-space: normal; word-break: break-word; }
 @media (max-width: 800px) {
   .hero { align-items: flex-start; flex-direction: column; }
   .summaryGrid, .resultPanel { grid-template-columns: 1fr; }
   .evidenceGrid, .scoreFields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .embeddedWorkspace .summaryGrid, .embeddedWorkspace .resultPanel { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
   .evidenceGrid, .scoreFields { grid-template-columns: 1fr; }
