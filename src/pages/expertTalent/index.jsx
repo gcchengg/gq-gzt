@@ -1356,7 +1356,7 @@ function Operations() {
       icon: FileSearchOutlined,
     },
     {
-      title: "通知与审计",
+      title: "通知与日志",
       desc: "消息触达、权限范围及关键操作日志",
       count: "4 项通知",
       icon: BellOutlined,

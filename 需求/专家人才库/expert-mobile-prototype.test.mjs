@@ -44,3 +44,28 @@ test("defines expert identity and task state contracts", () => {
   assert.match(html, /"invited"[\s\S]*"delivery_pending"[\s\S]*"completed"/);
   assert.match(html, /const expertState/);
 });
+
+test("expert personal center is limited to decisions and records", () => {
+  const center =
+    html.match(/function renderUserCenter\(\)\{([\s\S]*?)\n  \}/)?.[1] ?? "";
+  assert.match(center, /处理入库邀请/);
+  assert.match(center, /处理调用申请/);
+  assert.match(center, /查看入库与调用记录/);
+  assert.match(html, /acceptCall/);
+  assert.match(html, /rejectCall/);
+  assert.doesNotMatch(center, /绑定邀请 \/ 完善资料/);
+  assert.doesNotMatch(center, /继续填写教育经历、专业能力等资料/);
+  assert.doesNotMatch(center, /我的专家档案/);
+  assert.doesNotMatch(center, /可服务时间/);
+});
+
+test("mobile enrollment invitation exposes only the final business states", () => {
+  assert.match(
+    html,
+    /const labels=\{pending:'待处理',accepted:'已接受，待完成入库',rejected:'已拒绝',completed:'已完成入库'\}/,
+  );
+  assert.match(html, /mobileInviteStatus/);
+  assert.doesNotMatch(html, /资料审核中/);
+  assert.doesNotMatch(html, /待签署聘书/);
+  assert.doesNotMatch(html, /继续填写教育经历、专业能力等资料/);
+});
