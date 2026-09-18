@@ -1323,6 +1323,30 @@ function Operations() {
   const [notices, setNotices] = useState(
     saved.notices || { sms: true, mini: true, todo: true, expiry: true },
   );
+  const defaultFees = [
+    ["外聘", "两院院士", 2500, "税后"],
+    ["外聘", "高级专家", 2000, "税后"],
+    ["外聘", "正高级职称 / 教授", 1500, "税后"],
+    ["外聘", "副高级职称 / 副教授", 1000, "税后"],
+    ["外聘", "中级职称", 800, "税后"],
+    ["外聘", "其他人员", 500, "税后"],
+    ["内部", "首席科学家", 2000, "业余 / 税前（工作时间1500）"],
+    ["内部", "专家、总师、正高级", 1500, "业余 / 税前（工作时间1000）"],
+    ["内部", "主任级、副高级", 800, "业余 / 税前（工作时间500）"],
+    ["内部", "主管级、中级", 600, "业余 / 税前（工作时间400）"],
+    ["内部", "其他人员", 400, "业余 / 税前（工作时间250）"],
+  ];
+  const [fees, setFees] = useState(
+    saved.fees ||
+      defaultFees.map(([source, level, amount, note], index) => ({
+        key: index,
+        source,
+        level,
+        amount,
+        note,
+        status: "启用",
+      })),
+  );
   const [templatePreview, setTemplatePreview] = useState(null);
   const configs = [
     {
@@ -1346,7 +1370,7 @@ function Operations() {
     {
       title: "费用标准",
       desc: "按来源、职级、形式、时长匹配费用标准",
-      count: "11 条标准",
+      count: `${fees.length} 条标准`,
       icon: DatabaseOutlined,
     },
     {
@@ -1362,26 +1386,6 @@ function Operations() {
       icon: BellOutlined,
     },
   ];
-  const fees = [
-    ["外聘", "两院院士", 2500, "税后"],
-    ["外聘", "高级专家", 2000, "税后"],
-    ["外聘", "正高级职称 / 教授", 1500, "税后"],
-    ["外聘", "副高级职称 / 副教授", 1000, "税后"],
-    ["外聘", "中级职称", 800, "税后"],
-    ["外聘", "其他人员", 500, "税后"],
-    ["内部", "首席科学家", 2000, "业余 / 税前（工作时间1500）"],
-    ["内部", "专家、总师、正高级", 1500, "业余 / 税前（工作时间1000）"],
-    ["内部", "主任级、副高级", 800, "业余 / 税前（工作时间500）"],
-    ["内部", "主管级、中级", 600, "业余 / 税前（工作时间400）"],
-    ["内部", "其他人员", 400, "业余 / 税前（工作时间250）"],
-  ].map(([source, level, amount, note], index) => ({
-    key: index,
-    source,
-    level,
-    amount,
-    note,
-    status: "启用",
-  }));
   const templates = [
     ["专家合作邀请函", "入库邀请", "V1.2"],
     ["专家聘书", "聘书签署", "V1.1"],
@@ -1425,9 +1429,31 @@ function Operations() {
     if (total !== 100) return message.error("匹配权重合计必须为100%");
     localStorage.setItem(
       "expert-operations-config-v1",
-      JSON.stringify({ weights, categories, domains, rules, notices }),
+      JSON.stringify({ weights, categories, domains, rules, notices, fees }),
     );
     message.success("运营配置已保存到当前浏览器，并生成演示版本 V2.4");
+  }
+  function updateFee(key, field, value) {
+    setFees((current) =>
+      current.map((fee) =>
+        fee.key === key
+          ? { ...fee, [field]: field === "amount" ? Number(value) : value }
+          : fee,
+      ),
+    );
+  }
+  function addFee() {
+    setFees((current) => [
+      ...current,
+      {
+        key: `fee-${Date.now()}`,
+        source: "外聘",
+        level: "新费用标准",
+        amount: 0,
+        note: "待补充",
+        status: "启用",
+      },
+    ]);
   }
   function content() {
     if (selected === "标签与分类")
@@ -1576,9 +1602,16 @@ function Operations() {
           <div className={styles.panelHead}>
             <div>
               <h3>专家咨询费用标准</h3>
-              <p>依据方案第14页，实际支付仍以财务审批为准</p>
+              <p>
+                可编辑来源、职级、半天标准和计税说明；实际支付仍以财务审批为准
+              </p>
             </div>
-            <Tag color="green">当前生效</Tag>
+            <Space>
+              <Button onClick={addFee}>新增标准</Button>
+              <Button type="primary" onClick={saveConfig}>
+                保存费用标准
+              </Button>
+            </Space>
           </div>
           <Table
             size="small"
@@ -1589,17 +1622,70 @@ function Operations() {
               {
                 title: "来源",
                 dataIndex: "source",
-                render: (v) => (
-                  <Tag color={v === "外聘" ? "blue" : "purple"}>{v}</Tag>
+                render: (v, record) => (
+                  <Select
+                    value={v}
+                    style={{ width: 100 }}
+                    options={["外聘", "内部"].map((value) => ({
+                      value,
+                      label: value,
+                    }))}
+                    onChange={(value) => updateFee(record.key, "source", value)}
+                  />
                 ),
               },
-              { title: "职级 / 职称", dataIndex: "level" },
-              { title: "元/人/半天", dataIndex: "amount" },
-              { title: "计税及时间说明", dataIndex: "note" },
+              {
+                title: "职级 / 职称",
+                dataIndex: "level",
+                render: (v, record) => (
+                  <Input
+                    value={v}
+                    onChange={(e) =>
+                      updateFee(record.key, "level", e.target.value)
+                    }
+                  />
+                ),
+              },
+              {
+                title: "元/人/半天",
+                dataIndex: "amount",
+                render: (v, record) => (
+                  <Input
+                    type="number"
+                    min={0}
+                    value={v}
+                    onChange={(e) =>
+                      updateFee(record.key, "amount", e.target.value)
+                    }
+                  />
+                ),
+              },
+              {
+                title: "计税及时间说明",
+                dataIndex: "note",
+                render: (v, record) => (
+                  <Input
+                    value={v}
+                    onChange={(e) =>
+                      updateFee(record.key, "note", e.target.value)
+                    }
+                  />
+                ),
+              },
               {
                 title: "状态",
                 dataIndex: "status",
-                render: (v) => <Tag color="success">{v}</Tag>,
+                render: (v, record) => (
+                  <Select
+                    value={v}
+                    style={{ width: 90 }}
+                    options={["启用", "停用"].map((value) => ({
+                      value,
+                      label: value,
+                    }))}
+                    onChange={(value) => updateFee(record.key, "status", value)}
+                  />
+                ),
               },
             ]}
           />
