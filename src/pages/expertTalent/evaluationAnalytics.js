@@ -51,16 +51,21 @@ function normalizeRecord(record) {
 }
 
 export function normalizeEvaluationRecords(taskRecords, fallbackRecords) {
-  const submitted = taskRecords
-    .filter((task) => task.evaluation)
-    .map((task) =>
+  const submitted = taskRecords.flatMap((task) => {
+    const records = Array.isArray(task.evaluations)
+      ? task.evaluations
+      : task.evaluation
+        ? [task.evaluation]
+        : [];
+    return records.map((evaluation) =>
       normalizeRecord({
         project: task.project,
         expert: task.expert,
-        ...task.evaluation,
-        date: task.evaluation.submittedAt,
+        ...evaluation,
+        date: evaluation.submittedAt,
       }),
     );
+  });
   const submittedProjects = new Set(submitted.map((record) => record.project));
   return [
     ...submitted,

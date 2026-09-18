@@ -938,6 +938,19 @@ function normalize(saved) {
     }
   });
   next.tasks = next.tasks.map((task) => {
+    const migratedTask = { ...task };
+    if (["待专家签署声明", "声明拒签", "声明失效"].includes(migratedTask.stage))
+      migratedTask.stage = "待专家确认";
+    if (migratedTask.stage === "已完成") migratedTask.stage = "已评价完成";
+    delete migratedTask.commitment;
+    migratedTask.evaluations = Array.isArray(migratedTask.evaluations)
+      ? migratedTask.evaluations
+      : migratedTask.evaluation
+        ? [migratedTask.evaluation]
+        : [];
+    if (migratedTask.evaluations.length)
+      migratedTask.evaluation = migratedTask.evaluations.at(-1);
+    task = migratedTask;
     const demo = seed.tasks.find((item) => item.id === task.id);
     if (!demo) return task;
     const shouldShowSignedDemo = [
@@ -946,16 +959,23 @@ function normalize(saved) {
       "待补充",
       "待验收",
       "待评价",
+      "已评价完成",
       "已完成",
     ].includes(task.stage);
-    if (!shouldShowSignedDemo || task.commitment) return task;
+    if (!shouldShowSignedDemo) return task;
     return {
       ...task,
       serviceMode: task.serviceMode || demo.serviceMode,
       applicant: task.applicant || demo.applicant,
-      commitment: structuredClone(demo.commitment),
       consultationRecord:
         task.consultationRecord || structuredClone(demo.consultationRecord),
+      evaluations: task.evaluations?.length
+        ? task.evaluations
+        : structuredClone(demo.evaluations || []),
+      evaluation:
+        task.evaluations?.at(-1) ||
+        task.evaluation ||
+        structuredClone(demo.evaluations?.at(-1)),
       versions: task.versions?.length
         ? task.versions
         : structuredClone(demo.versions),
@@ -1043,23 +1063,68 @@ function consultationRecord(task, extras = {}) {
       "补充客户访谈，核验产线与订单，设置阶段性投资条件并持续跟踪关键指标。",
     attachment: extras.attachment || `咨询记录-${task.id}.pdf（演示）`,
     archiveNo: extras.archiveNo || `ZXJL-2026-${String(task.id).slice(-3)}`,
-    remark: extras.remark || "E签宝声明签署完成后形成的演示咨询记录。",
+    remark: extras.remark || "专家确认合作后形成的演示咨询记录。",
     savedAt: extras.savedAt,
   };
 }
-function signedCommitment(id, extras = {}) {
-  return {
-    id,
-    platform: "E签宝",
-    status: extras.status || "已签署",
-    createdAt: extras.createdAt || "2026-09-01 09:30:00",
-    callbackAt: extras.callbackAt ?? null,
-    signedAt: extras.signedAt ?? null,
-    expiresAt: extras.expiresAt || "2026-09-15",
-    conflict: extras.conflict || "待申报",
-  };
-}
 function enrichDemoTask(task) {
+  const demoEvaluations =
+    {
+      EX20260018: [
+        {
+          delivery: 44,
+          response: 27,
+          attitude: 19,
+          total: 90,
+          result: "优秀",
+          submittedAt: "2026-08-28 17:20:00",
+          evaluator: "PC需求部门（演示）",
+          retrospective: "待回溯",
+          tags: ["专业判断清晰", "建议可执行"],
+          comment: "研究结论清晰，能够支撑投资机会筛选。",
+        },
+        {
+          delivery: 46,
+          response: 29,
+          attitude: 20,
+          total: 95,
+          result: "优秀",
+          submittedAt: "2026-09-10 16:40:00",
+          evaluator: "战略投资部（演示）",
+          retrospective: "命中",
+          tags: ["交付完整", "响应及时"],
+          comment: "复评显示前期判断与实际产业进展基本一致。",
+        },
+      ],
+      EX20260063: [
+        {
+          delivery: 28,
+          response: 17,
+          attitude: 14,
+          total: 59,
+          result: "一般",
+          submittedAt: "2026-09-02 14:30:00",
+          evaluator: "战略投资部（演示）",
+          retrospective: "待回溯",
+          tags: ["依据需加强", "交付延期"],
+          comment: "报告完成度尚可，但关键数据依据和交付时效需要改进。",
+        },
+      ],
+      EX20260042: [
+        {
+          delivery: 46,
+          response: 28,
+          attitude: 18,
+          total: 92,
+          result: "优秀",
+          submittedAt: "2026-08-28 17:20:00",
+          evaluator: "PC需求部门（演示）",
+          retrospective: "待回溯",
+          tags: ["专业判断清晰", "建议可执行"],
+          comment: "专家对治理机制问题判断清晰，建议已转化为整改清单。",
+        },
+      ],
+    }[task.expertId] || [];
   const base = {
     ...task,
     background: "产业投资项目技术研究（演示）",
@@ -1070,12 +1135,13 @@ function enrichDemoTask(task) {
     contact: "138****5208 / zhenghf@example.com",
     delivery: "书面报告及风险清单",
     materials: "项目摘要（模拟材料）",
-    permission: "仅受邀且完成承诺的专家可查看",
+    permission: "仅受邀且确认合作的专家可查看",
     versions: [],
     history: [],
     acceptance: [],
-    commitment: null,
     consultationRecord: null,
+    evaluations: structuredClone(demoEvaluations),
+    evaluation: structuredClone(demoEvaluations.at(-1)),
   };
   const record = consultationRecord(task);
   if (task.stage === "草稿") {
@@ -1141,71 +1207,16 @@ function enrichDemoTask(task) {
       ]),
     };
   }
-  if (task.stage === "待专家签署声明") {
+  if (task.stage === "待专家确认") {
     return {
       ...base,
-      lockedSchedule: "2026-09-12 14:00",
+      lockedSchedule: "2026-09-12 14:00 至 2026-09-12 16:00",
       supportNote: "已与专家确认周五下午线上会议，材料提前一天发送。",
-      commitment: signedCommitment("ESIGN-CALL-DEMO-PEND-001", {
-        status: "待签署",
-        createdAt: "2026-09-06 15:20:00",
-        expiresAt: "2026-09-16",
-      }),
       history: taskHistory([
         [
           "2026-09-06 15:20:00",
           "股权运营部（演示）",
-          "锁定排期 2026-09-12 14:00；生成专家邀约及E签宝声明签署任务",
-        ],
-      ]),
-    };
-  }
-  if (task.stage === "声明拒签") {
-    return {
-      ...base,
-      lockedSchedule: "2026-09-11 09:30",
-      supportNote: "已锁定排期并发送声明签署任务。",
-      commitment: signedCommitment("ESIGN-CALL-DEMO-REJECT-001", {
-        status: "拒绝签署",
-        createdAt: "2026-09-04 10:12:00",
-        callbackAt: "2026-09-05 09:06:18",
-        expiresAt: "2026-09-14",
-      }),
-      history: taskHistory([
-        [
-          "2026-09-04 10:12:00",
-          "股权运营部（演示）",
-          "锁定排期并生成E签宝声明签署任务",
-        ],
-        [
-          "2026-09-05 09:06:18",
-          "E签宝回调（演示）",
-          "专家声明拒绝签署，任务暂不可履约",
-        ],
-      ]),
-    };
-  }
-  if (task.stage === "声明失效") {
-    return {
-      ...base,
-      lockedSchedule: "2026-09-09 14:00",
-      supportNote: "已锁定排期并发送声明签署任务。",
-      commitment: signedCommitment("ESIGN-CALL-DEMO-EXPIRED-001", {
-        status: "已失效",
-        createdAt: "2026-09-02 11:30:00",
-        callbackAt: "2026-09-08 18:00:00",
-        expiresAt: "2026-09-08",
-      }),
-      history: taskHistory([
-        [
-          "2026-09-02 11:30:00",
-          "股权运营部（演示）",
-          "锁定排期并生成E签宝声明签署任务",
-        ],
-        [
-          "2026-09-08 18:00:00",
-          "E签宝回调（演示）",
-          "专家声明已失效，任务暂不可履约",
+          "锁定排期 2026-09-12 14:00 至 2026-09-12 16:00；已发送专家确认邀请",
         ],
       ]),
     };
@@ -1213,17 +1224,7 @@ function enrichDemoTask(task) {
   const signedBase = {
     ...base,
     lockedSchedule: task.serviceTime || "2026-09-08 14:00",
-    supportNote: "排期已锁定，专家声明签署完成。",
-    commitment: signedCommitment(
-      `ESIGN-CALL-DEMO-${String(task.id).slice(-3)}`,
-      {
-        status: "已签署",
-        createdAt: "2026-09-01 09:30:00",
-        callbackAt: "2026-09-01 10:06:18",
-        signedAt: "2026-09-01 10:06:18",
-        conflict: "不存在",
-      },
-    ),
+    supportNote: "排期已锁定，专家已确认合作。",
     consultationRecord: record,
   };
   if (task.stage === "服务中" || task.stage === "履约中") {
@@ -1232,8 +1233,8 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-09-01 10:06:18",
-          "E签宝回调（演示）",
-          "专家声明已签署，成果与验收已解锁",
+          "专家确认（演示）",
+          "专家已确认合作，成果与验收已解锁",
         ],
         ["2026-09-05 16:40:00", "专家/经办人（演示）", "保存咨询记录草稿"],
       ]),
@@ -1262,8 +1263,8 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-09-01 10:06:18",
-          "E签宝回调（演示）",
-          "专家声明已签署，成果与验收已解锁",
+          "专家确认（演示）",
+          "专家已确认合作，成果与验收已解锁",
         ],
         [
           "2026-09-04 16:20:00",
@@ -1297,8 +1298,8 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-09-01 10:06:18",
-          "E签宝回调（演示）",
-          "专家声明已签署，成果与验收已解锁",
+          "专家确认（演示）",
+          "专家已确认合作，成果与验收已解锁",
         ],
         [
           "2026-09-03 17:10:00",
@@ -1336,8 +1337,8 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-09-01 10:06:18",
-          "E签宝回调（演示）",
-          "专家声明已签署，成果与验收已解锁",
+          "专家确认（演示）",
+          "专家已确认合作，成果与验收已解锁",
         ],
         [
           "2026-08-29 16:40:00",
@@ -1352,7 +1353,7 @@ function enrichDemoTask(task) {
       ]),
     };
   }
-  if (task.stage === "已完成") {
+  if (task.stage === "已完成" || task.stage === "已评价完成") {
     return {
       ...signedBase,
       consultationRecord: consultationRecord(task, {
@@ -1390,11 +1391,26 @@ function enrichDemoTask(task) {
         comment: "专家对治理机制问题判断清晰，建议已转化为整改清单。",
         anonymousToExpert: false,
       },
+      evaluations: [
+        {
+          delivery: 46,
+          response: 28,
+          attitude: 18,
+          total: 92,
+          result: "优秀",
+          submittedAt: "2026-08-28 17:20:00",
+          evaluator: "PC需求部门（演示）",
+          retrospective: "待回溯",
+          tags: ["专业判断清晰", "建议可执行"],
+          comment: "专家对治理机制问题判断清晰，建议已转化为整改清单。",
+          anonymousToExpert: false,
+        },
+      ],
       history: taskHistory([
         [
           "2026-08-20 10:06:18",
-          "E签宝回调（演示）",
-          "专家声明已签署，成果与验收已解锁",
+          "专家确认（演示）",
+          "专家已确认合作，成果与验收已解锁",
         ],
         [
           "2026-08-22 15:30:00",

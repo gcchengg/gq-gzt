@@ -113,7 +113,8 @@ export default function Calls() {
   const [matchReason, setMatchReason] = useState("");
   const [adjusted, setAdjusted] = useState(false);
   const [departmentConfirmed, setDepartmentConfirmed] = useState(false);
-  const [schedule, setSchedule] = useState("");
+  const [scheduleStart, setScheduleStart] = useState("");
+  const [scheduleEnd, setScheduleEnd] = useState("");
   const [supportNote, setSupportNote] = useState("");
   const [opinion, setOpinion] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -124,6 +125,11 @@ export default function Calls() {
   const feeStandard = Form.useWatch("feeStandard", form);
   const serviceHours = Form.useWatch("serviceHours", form);
   const record = state.tasks.find((task) => task.id === selected);
+  const recordEvaluations = record?.evaluations?.length
+    ? record.evaluations
+    : record?.evaluation
+      ? [record.evaluation]
+      : [];
   const recommendations = useMemo(
     () =>
       record
@@ -225,7 +231,7 @@ export default function Calls() {
         : {
             applicant: "郑华峰",
             contact: "138****5208 / zhenghf@example.com",
-            permission: "仅受邀且签署声明的专家可查看",
+            permission: "仅受邀且确认合作的专家可查看",
             expertId: chosen?.id,
             expert: chosen?.name,
             field: chosen?.field,
@@ -241,6 +247,12 @@ export default function Calls() {
     edit(null, preset);
     setSearchParams({}, { replace: true });
   }, [searchParams, setSearchParams]);
+  useEffect(() => {
+    const taskId = searchParams.get("taskId");
+    if (!taskId) return;
+    const task = state.tasks.find((item) => item.id === taskId);
+    if (task) openTask(task);
+  }, [searchParams, state.tasks]);
   async function save(submit) {
     const values = submit ? await form.validateFields() : form.getFieldsValue();
     if (
@@ -345,63 +357,47 @@ export default function Calls() {
     if (
       !record ||
       record.stage !== "待运营排期" ||
-      !schedule ||
+      !scheduleStart ||
+      !scheduleEnd ||
       !supportNote.trim()
     )
-      return message.warning("请填写最终服务时间和协调说明");
+      return message.warning("请填写完整服务时间段和协调说明");
+    if (new Date(scheduleEnd).getTime() <= new Date(scheduleStart).getTime())
+      return message.warning("服务结束时间必须晚于开始时间");
+    const schedule = `${scheduleStart} 至 ${scheduleEnd}`;
     persist((store) => {
       const task = store.tasks.find((item) => item.id === selected);
       task.lockedSchedule = schedule;
       task.supportNote = supportNote;
-      task.stage = "待专家签署声明";
+      task.stage = "待专家确认";
       task.progress = 35;
-      task.commitment = {
-        id: uid("ESIGN-CALL"),
-        platform: "E签宝",
-        status: "待签署",
-        createdAt: new Date().toLocaleString("zh-CN"),
-        expiresAt: task.due,
-        signedAt: null,
-        conflict: "待申报",
-      };
       task.history.push(
         log(
           "股权运营部（演示）",
-          `锁定排期 ${schedule}；协调说明：${supportNote}；生成专家邀约及E签宝声明签署任务${task.commitment.id}`,
+          `锁定排期 ${schedule}；协调说明：${supportNote}；已发送专家确认邀请`,
         ),
       );
-    }, "排期已锁定，声明已发送至专家小程序");
+    }, "排期已锁定，已发送专家确认邀请");
   }
-  function declarationCallback(status) {
-    if (!record?.commitment || record.stage !== "待专家签署声明") return;
+  function confirmExpertParticipation() {
+    if (!record || record.stage !== "待专家确认") return;
     Modal.confirm({
-      title: `确认模拟E签宝回调“${status}”？`,
-      content: "该操作用于原型演示，将更新任务状态并记录业务轨迹。",
-      okText: "确认回调",
+      title: "确认专家已确认合作？",
+      content: "确认后将进入履约中，并解锁咨询记录填写。",
+      okText: "确认",
       cancelText: "取消",
       onOk: () =>
         persist((store) => {
           const task = store.tasks.find((item) => item.id === selected);
-          task.commitment.status = status;
-          task.commitment.callbackAt = new Date().toLocaleString("zh-CN");
-          if (status === "已签署") {
-            task.commitment.signedAt = task.commitment.callbackAt;
-            task.commitment.conflict = "不存在";
-            task.stage = "履约中";
-            task.progress = 50;
-          } else task.stage = status === "拒绝签署" ? "声明拒签" : "声明失效";
-          task.history.push(
-            log(
-              "E签宝回调（演示）",
-              `专家声明${status}${status === "已签署" ? "，成果与验收已解锁" : "，任务暂不可履约"}`,
-            ),
-          );
-        }, `声明状态已更新为${status}`),
+          task.stage = "履约中";
+          task.progress = 50;
+          task.history.push(log("专家（演示）", "已确认合作，任务进入履约中"));
+        }, "专家已确认合作，咨询记录已解锁"),
     });
   }
   async function saveConsultation(submit) {
-    if (record?.commitment?.status !== "已签署")
-      return message.warning("专家完成E签宝声明签署后，才能填写咨询记录");
+    if (!canEditConsultation)
+      return message.warning("专家确认合作后，才能填写咨询记录");
     const values = submit
       ? await consultationForm.validateFields()
       : consultationForm.getFieldsValue();
@@ -442,8 +438,8 @@ export default function Calls() {
       consultationForm.setFieldsValue(values);
   }
   async function submitEvaluation() {
-    if (record?.stage !== "待评价")
-      return message.warning("当前任务不在待评价状态");
+    if (!["待评价", "已评价完成"].includes(record?.stage))
+      return message.warning("当前任务不可进行评价");
     const values = await evaluationForm.validateFields();
     const total =
       Number(values.delivery) +
@@ -451,13 +447,13 @@ export default function Calls() {
       Number(values.attitude);
     Modal.confirm({
       title: "确认提交专家履约评价？",
-      content: `本次综合得分为 ${total} 分。提交后评价将归入专家档案，任务状态变为“已完成”。`,
+      content: `本次综合得分为 ${total} 分。提交后将新增一条评价记录，原有评价不会被覆盖。`,
       okText: "确认提交",
       cancelText: "取消",
       onOk: () =>
         persist((store) => {
           const task = store.tasks.find((item) => item.id === selected);
-          task.evaluation = {
+          const evaluation = {
             ...values,
             total,
             result: total >= 90 ? "优秀" : total >= 75 ? "良好" : "一般",
@@ -465,7 +461,14 @@ export default function Calls() {
             evaluator: "PC需求部门（演示）",
             retrospective: "待回溯",
           };
-          task.stage = "已完成";
+          const previousEvaluations = Array.isArray(task.evaluations)
+            ? task.evaluations
+            : task.evaluation
+              ? [task.evaluation]
+              : [];
+          task.evaluations = [...previousEvaluations, evaluation];
+          task.evaluation = evaluation;
+          task.stage = "已评价完成";
           task.progress = 100;
           task.history.push(
             log(
@@ -473,7 +476,7 @@ export default function Calls() {
               `提交专家履约评价：${total}分，${task.evaluation.result}；${values.comment}`,
             ),
           );
-        }, "评价已提交，任务已完成"),
+        }, "评价已提交，任务已评价完成，可继续复评"),
     });
   }
   function accept(passed) {
@@ -513,7 +516,11 @@ export default function Calls() {
     setMatchReason("");
     setAdjusted(false);
     setDepartmentConfirmed(false);
-    setSchedule(task.lockedSchedule || "");
+    const [start = "", end = ""] = String(task.lockedSchedule || "")
+      .split(" 至 ")
+      .map((value) => value.trim());
+    setScheduleStart(start);
+    setScheduleEnd(end);
     setSupportNote(task.supportNote || "");
     setOpinion("");
     setDeadline("");
@@ -1098,11 +1105,22 @@ export default function Calls() {
                         <Space align="start" wrap>
                           <Input
                             type="datetime-local"
-                            value={schedule}
+                            value={scheduleStart}
                             onChange={(event) =>
-                              setSchedule(event.target.value)
+                              setScheduleStart(event.target.value)
                             }
                             disabled={record.stage !== "待运营排期"}
+                            aria-label="服务开始时间"
+                          />
+                          <span>至</span>
+                          <Input
+                            type="datetime-local"
+                            value={scheduleEnd}
+                            onChange={(event) =>
+                              setScheduleEnd(event.target.value)
+                            }
+                            disabled={record.stage !== "待运营排期"}
+                            aria-label="服务结束时间"
                           />
                           <Input.TextArea
                             style={{ width: 420 }}
@@ -1123,82 +1141,22 @@ export default function Calls() {
                           </Button>
                         </Space>
                       </div>
-                      {record.commitment ? (
+                      {record.stage === "待专家确认" ? (
                         <section className={wb.block}>
-                          <h3 className={wb.sectionTitle}>
-                            利害关系承诺声明 · E签宝
-                          </h3>
-                          <Descriptions
-                            bordered
-                            size="small"
-                            column={2}
-                            items={[
-                              {
-                                key: 1,
-                                label: "签署单号",
-                                children: record.commitment.id,
-                              },
-                              {
-                                key: 2,
-                                label: "状态",
-                                children: (
-                                  <Tag
-                                    color={
-                                      record.commitment.status === "已签署"
-                                        ? "success"
-                                        : record.commitment.status === "待签署"
-                                          ? "processing"
-                                          : "error"
-                                    }
-                                  >
-                                    {record.commitment.status}
-                                  </Tag>
-                                ),
-                              },
-                              {
-                                key: 3,
-                                label: "创建时间",
-                                children: record.commitment.createdAt,
-                              },
-                              {
-                                key: 4,
-                                label: "签署时间",
-                                children: record.commitment.signedAt || "—",
-                              },
-                              {
-                                key: 5,
-                                label: "利益关系申报",
-                                children:
-                                  record.commitment.conflict || "待申报",
-                              },
-                              { key: 6, label: "签署平台", children: "E签宝" },
-                            ]}
+                          <h3 className={wb.sectionTitle}>专家确认</h3>
+                          <Alert
+                            type="info"
+                            showIcon
+                            message="已发送专家确认邀请"
+                            description="等待专家确认合作后开始履约。"
                           />
-                          <p>
-                            专家在小程序查看声明后跳转
-                            E签宝完成实名认证及电子签署。真实系统通过回调更新状态。
-                          </p>
-                          {record.commitment.status === "待签署" ? (
-                            <Space>
-                              <Button
-                                type="primary"
-                                onClick={() => declarationCallback("已签署")}
-                              >
-                                模拟回调：签署成功
-                              </Button>
-                              <Button
-                                danger
-                                onClick={() => declarationCallback("拒绝签署")}
-                              >
-                                模拟回调：拒绝签署
-                              </Button>
-                              <Button
-                                onClick={() => declarationCallback("已失效")}
-                              >
-                                模拟回调：签署失效
-                              </Button>
-                            </Space>
-                          ) : null}
+                          <Button
+                            type="primary"
+                            style={{ marginTop: 16 }}
+                            onClick={confirmExpertParticipation}
+                          >
+                            模拟专家确认合作
+                          </Button>
                         </section>
                       ) : null}
                     </div>
@@ -1209,19 +1167,19 @@ export default function Calls() {
                   label: "成果与验收",
                   children: (
                     <div className={wb.stack}>
-                      {record.commitment?.status !== "已签署" ? (
+                      {!canEditConsultation ? (
                         <Alert
                           type="warning"
                           showIcon
                           message="咨询记录尚未解锁"
-                          description="运营人员锁定排期并生成邀约后，专家须在小程序通过E签宝签署《利害关系承诺声明》。签署成功后才可填写咨询记录。"
+                          description="专家确认合作后，才可填写咨询记录。"
                         />
                       ) : (
                         <>
                           <Alert
                             type="success"
                             showIcon
-                            message={`声明已签署，咨询记录已解锁（${record.commitment.signedAt}）`}
+                            message="专家已确认合作，咨询记录已解锁"
                           />
                           <Form
                             form={consultationForm}
@@ -1424,7 +1382,7 @@ export default function Calls() {
                           </Space>
                         </section>
                       ) : null}
-                      {record.stage === "待评价" ? (
+                      {["待评价", "已评价完成"].includes(record.stage) ? (
                         <section className={wb.block}>
                           <h3 className={wb.sectionTitle}>
                             本次专家调用履约评价
@@ -1521,65 +1479,69 @@ export default function Calls() {
                               <Checkbox>向专家展示时隐藏评价人姓名</Checkbox>
                             </Form.Item>
                             <Button type="primary" onClick={submitEvaluation}>
-                              提交评价并完成任务
+                              {record.stage === "已评价完成"
+                                ? "提交复评"
+                                : "提交评价并完成任务"}
                             </Button>
                           </Form>
                         </section>
                       ) : null}
-                      {record.evaluation ? (
+                      {recordEvaluations.length ? (
                         <section className={wb.blockSuccess}>
-                          <h3 className={wb.sectionTitle}>已提交的履约评价</h3>
-                          <Descriptions
-                            bordered
-                            size="small"
-                            column={2}
-                            items={[
-                              {
-                                key: 1,
-                                label: "综合得分",
-                                children: `${record.evaluation.total}分 · ${record.evaluation.result}`,
-                              },
-                              {
-                                key: 2,
-                                label: "评价时间",
-                                children: record.evaluation.submittedAt,
-                              },
-                              {
-                                key: 3,
-                                label: "交付质量",
-                                children: `${record.evaluation.delivery}/50`,
-                              },
-                              {
-                                key: 4,
-                                label: "响应效率",
-                                children: `${record.evaluation.response}/30`,
-                              },
-                              {
-                                key: 5,
-                                label: "服务态度",
-                                children: `${record.evaluation.attitude}/20`,
-                              },
-                              {
-                                key: 6,
-                                label: "观点回溯",
-                                children: record.evaluation.retrospective,
-                              },
-                              {
-                                key: 7,
-                                label: "评价标签",
-                                span: 2,
-                                children: (record.evaluation.tags || []).join(
-                                  "、",
-                                ),
-                              },
-                              {
-                                key: 8,
-                                label: "评价说明",
-                                span: 2,
-                                children: record.evaluation.comment,
-                              },
-                            ]}
-                          />
+                          <h3 className={wb.sectionTitle}>履约评价记录</h3>
+                          {recordEvaluations.map((evaluation, index) => (
+                            <Descriptions
+                              key={`${evaluation.submittedAt}-${index}`}
+                              bordered
+                              size="small"
+                              column={2}
+                              style={{ marginBottom: 16 }}
+                              items={[
+                                {
+                                  key: 1,
+                                  label: "综合得分",
+                                  children: `${evaluation.total}分 · ${evaluation.result}`,
+                                },
+                                {
+                                  key: 2,
+                                  label: "评价时间",
+                                  children: evaluation.submittedAt,
+                                },
+                                {
+                                  key: 3,
+                                  label: "交付质量",
+                                  children: `${evaluation.delivery}/50`,
+                                },
+                                {
+                                  key: 4,
+                                  label: "响应效率",
+                                  children: `${evaluation.response}/30`,
+                                },
+                                {
+                                  key: 5,
+                                  label: "服务态度",
+                                  children: `${evaluation.attitude}/20`,
+                                },
+                                {
+                                  key: 6,
+                                  label: "观点回溯",
+                                  children: evaluation.retrospective,
+                                },
+                                {
+                                  key: 7,
+                                  label: "评价标签",
+                                  span: 2,
+                                  children: (evaluation.tags || []).join("、"),
+                                },
+                                {
+                                  key: 8,
+                                  label: "评价说明",
+                                  span: 2,
+                                  children: evaluation.comment,
+                                },
+                              ]}
+                            />
+                          ))}
                         </section>
                       ) : null}
                       <Timeline

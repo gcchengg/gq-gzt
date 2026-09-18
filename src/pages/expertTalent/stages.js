@@ -71,20 +71,20 @@ export const taskStageMeta = {
     tone: "#08979c",
     hint: "人选已确认，等待锁定服务时间",
   },
-  待专家签署声明: {
+  待专家确认: {
     color: "purple",
     tone: "#722ed1",
-    hint: "排期已锁定，等待E签宝签署",
+    hint: "排期已锁定，等待专家确认合作",
   },
   履约中: {
     color: "processing",
     tone: "#1677ff",
-    hint: "声明已签署，可填写咨询记录",
+    hint: "专家已确认合作，可填写咨询记录",
   },
   服务中: {
     color: "processing",
     tone: "#1677ff",
-    hint: "声明已签署，咨询服务进行中",
+    hint: "专家已确认合作，咨询服务进行中",
   },
   待补充: {
     color: "warning",
@@ -98,15 +98,10 @@ export const taskStageMeta = {
   },
   待评价: { color: "blue", tone: "#2563eb", hint: "验收通过，等待履约评价" },
   已完成: { color: "success", tone: "#389e0d", hint: "评价已提交，任务关闭" },
-  声明拒签: {
-    color: "error",
-    tone: "#cf1322",
-    hint: "专家拒绝签署声明，任务暂不可履约",
-  },
-  声明失效: {
-    color: "error",
-    tone: "#cf1322",
-    hint: "声明签署失效，需重新发起邀约",
+  已评价完成: {
+    color: "success",
+    tone: "#389e0d",
+    hint: "评价已完成，可继续追加复评",
   },
 };
 
@@ -115,14 +110,12 @@ export const taskStageStrip = [
   "调用受理中",
   "匹配中",
   "待运营排期",
-  "待专家签署声明",
+  "待专家确认",
   "服务中",
   "待补充",
   "待验收",
   "待评价",
-  "已完成",
-  "声明拒签",
-  "声明失效",
+  "已评价完成",
 ];
 export const taskStageColor = (stage) =>
   taskStageMeta[stage]?.color || "default";

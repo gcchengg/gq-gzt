@@ -371,9 +371,11 @@ function Dashboard() {
 
 function ExpertDrawer({ expert, open, onClose }) {
   const navigate = useNavigate();
+  const { tasks } = useExpertStore();
   const [renewOpen, setRenewOpen] = useState(false);
   const [letterOpen, setLetterOpen] = useState(false);
   const [dismissOpen, setDismissOpen] = useState(false);
+  const [selectedEvaluation, setSelectedEvaluation] = useState(null);
   const [renewForm] = Form.useForm();
   const [letterForm] = Form.useForm();
   const [dismissForm] = Form.useForm();
@@ -398,6 +400,20 @@ function ExpertDrawer({ expert, open, onClose }) {
     : ["限制调用", "已解聘"].includes(expert.status)
       ? `当前状态为“${expert.status}”，不可发起调用`
       : "发起专家调用申请";
+  const callRecords = tasks.filter((task) => task.expertId === expert.id);
+  const evaluationRecords = callRecords.flatMap((task) => {
+    const evaluations = Array.isArray(task.evaluations)
+      ? task.evaluations
+      : task.evaluation
+        ? [task.evaluation]
+        : [];
+    return evaluations.map((evaluation, index) => ({
+      ...evaluation,
+      key: `${task.id}-${evaluation.submittedAt}-${index}`,
+      project: task.project,
+      reviewLabel: index === 0 ? "首次评价" : `复评 ${index}`,
+    }));
+  });
   function save(mutator, success) {
     try {
       updateStore(mutator);
@@ -717,33 +733,36 @@ function ExpertDrawer({ expert, open, onClose }) {
             },
             {
               key: "service",
-              label: `调用记录 ${expert.projects}`,
+              label: `调用记录 ${evaluationRecords.length}`,
               children: (
                 <Table
                   pagination={false}
                   size="small"
                   columns={[
                     { title: "项目", dataIndex: "project" },
-                    { title: "角色", dataIndex: "role" },
-                    { title: "状态", dataIndex: "status" },
-                    { title: "评分", dataIndex: "score" },
-                  ]}
-                  dataSource={[
+                    { title: "评价类型", dataIndex: "reviewLabel" },
                     {
-                      key: 1,
-                      project: "智能驾驶产业链投资机会研究",
-                      role: "首席专家",
-                      status: "服务中",
-                      score: "-",
+                      title: "综合评分",
+                      dataIndex: "total",
+                      render: (value) => `${value} 分`,
                     },
+                    { title: "评价结果", dataIndex: "result" },
+                    { title: "评价时间", dataIndex: "submittedAt" },
                     {
-                      key: 2,
-                      project: "汽车电子赛道年度研判",
-                      role: "评审专家",
-                      status: "已完成",
-                      score: "96",
+                      title: "操作",
+                      width: 110,
+                      render: (_, evaluation) => (
+                        <Button
+                          type="link"
+                          onClick={() => setSelectedEvaluation(evaluation)}
+                        >
+                          查看详情
+                        </Button>
+                      ),
                     },
                   ]}
+                  dataSource={evaluationRecords}
+                  locale={{ emptyText: "暂无评价或复评记录" }}
                 />
               ),
             },
@@ -762,6 +781,67 @@ function ExpertDrawer({ expert, open, onClose }) {
             },
           ]}
         />
+        <Drawer
+          title={`${selectedEvaluation?.reviewLabel || "评价"} · 评价详情`}
+          open={!!selectedEvaluation}
+          onClose={() => setSelectedEvaluation(null)}
+          width="min(680px, 88vw)"
+        >
+          {selectedEvaluation ? (
+            <Descriptions
+              bordered
+              column={1}
+              items={[
+                { key: 1, label: "项目", children: selectedEvaluation.project },
+                {
+                  key: 2,
+                  label: "评价类型",
+                  children: selectedEvaluation.reviewLabel,
+                },
+                {
+                  key: 3,
+                  label: "综合评分",
+                  children: `${selectedEvaluation.total}分 · ${selectedEvaluation.result}`,
+                },
+                {
+                  key: 4,
+                  label: "评价时间",
+                  children: selectedEvaluation.submittedAt,
+                },
+                {
+                  key: 5,
+                  label: "交付质量",
+                  children: `${selectedEvaluation.delivery}/50`,
+                },
+                {
+                  key: 6,
+                  label: "响应效率",
+                  children: `${selectedEvaluation.response}/30`,
+                },
+                {
+                  key: 7,
+                  label: "服务态度",
+                  children: `${selectedEvaluation.attitude}/20`,
+                },
+                {
+                  key: 8,
+                  label: "观点回溯",
+                  children: selectedEvaluation.retrospective || "待回溯",
+                },
+                {
+                  key: 9,
+                  label: "评价标签",
+                  children: (selectedEvaluation.tags || []).join("、") || "—",
+                },
+                {
+                  key: 10,
+                  label: "评价说明",
+                  children: selectedEvaluation.comment || "—",
+                },
+              ]}
+            />
+          ) : null}
+        </Drawer>
         <Modal
           title="发起续聘"
           open={renewOpen}
@@ -907,6 +987,8 @@ function ExpertList({ embedded = false }) {
   const [field, setField] = useState();
   const [status, setStatus] = useState();
   const [selected, setSelected] = useState(null);
+  const [exitExpert, setExitExpert] = useState(null);
+  const [exitReason, setExitReason] = useState("");
   const statusCounts = useMemo(() => {
     const counts = {};
     experts.forEach((item) => {
@@ -925,6 +1007,44 @@ function ExpertList({ embedded = false }) {
       ),
     [experts, keyword, field, status],
   );
+  function requestExit(expert) {
+    setExitExpert(expert);
+    setExitReason(
+      expert.score < 60
+        ? "综合评分低于60分，建议退出专家库"
+        : "个人原因申请退出专家库",
+    );
+  }
+  function submitExitRequest() {
+    if (!exitExpert || !exitReason.trim()) {
+      message.warning("请填写退出原因");
+      return;
+    }
+    try {
+      updateStore((store) => {
+        const item = store.experts.find((entry) => entry.id === exitExpert.id);
+        if (!item || item.status === "已解聘")
+          throw new Error("当前专家不可申请退出");
+        item.exitRequest = {
+          reason: exitReason.trim(),
+          score: item.score,
+          submittedAt: new Date().toLocaleString("zh-CN"),
+          status: "待审核",
+        };
+        item.history.push(
+          log(
+            "股权运营部（演示）",
+            `提交退出申请：${exitReason.trim()}；综合评分${item.score}分`,
+          ),
+        );
+      });
+      message.success("退出申请已提交，待审核");
+      setExitExpert(null);
+      setExitReason("");
+    } catch (error) {
+      message.error(error.message || "退出申请提交失败");
+    }
+  }
   const columns = [
     {
       title: "专家",
@@ -969,23 +1089,36 @@ function ExpertList({ embedded = false }) {
         <Tag color={expertStatusColor(v) || statusColor[v]}>{v}</Tag>
       ),
     },
+    { title: "历史项目数", dataIndex: "projects", width: 100 },
     {
-      title: "项目/评分",
+      title: "综合评分",
+      dataIndex: "score",
       width: 110,
-      render: (_, r) => (
-        <span>
-          {r.projects} / <b className={wb.number}>{r.score}</b>
-        </span>
+      render: (value) => (
+        <Tag color={value < 60 ? "error" : value < 75 ? "warning" : "success"}>
+          {value} 分
+        </Tag>
       ),
     },
     { title: "可服务时间", dataIndex: "availability", width: 120 },
     {
       title: "操作",
-      width: 100,
+      width: 190,
       render: (_, r) => (
-        <Button type="link" onClick={() => setSelected(r)}>
-          查看档案
-        </Button>
+        <Space size={0}>
+          <Button type="link" onClick={() => setSelected(r)}>
+            查看档案
+          </Button>
+          {r.status !== "已解聘" ? (
+            <Button
+              type="link"
+              danger={r.score < 60}
+              onClick={() => requestExit(r)}
+            >
+              申请退出
+            </Button>
+          ) : null}
+        </Space>
       ),
     },
   ];
@@ -1097,6 +1230,36 @@ function ExpertList({ embedded = false }) {
         open={!!selected}
         onClose={() => setSelected(null)}
       />
+      <Modal
+        title="申请退出专家库"
+        open={!!exitExpert}
+        onCancel={() => setExitExpert(null)}
+        onOk={submitExitRequest}
+        okText="提交申请"
+        okButtonProps={{ danger: exitExpert?.score < 60 }}
+      >
+        {exitExpert ? (
+          <>
+            <Alert
+              showIcon
+              type={exitExpert.score < 60 ? "warning" : "info"}
+              message={`当前综合评分：${exitExpert.score}分`}
+              description={
+                exitExpert.score < 60
+                  ? "综合评分低于60分，系统建议申请退出。"
+                  : "当前评分合格，仍可基于个人意愿或其他原因申请退出。"
+              }
+            />
+            <Input.TextArea
+              style={{ marginTop: 16 }}
+              rows={4}
+              value={exitReason}
+              onChange={(event) => setExitReason(event.target.value)}
+              placeholder="请填写退出原因"
+            />
+          </>
+        ) : null}
+      </Modal>
     </div>
   );
 }
