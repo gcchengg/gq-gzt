@@ -3,11 +3,16 @@ import {
   Avatar,
   Button,
   Descriptions,
+  Form,
   Input,
+  Modal,
+  Popconfirm,
   Progress,
   Select,
   Space,
+  Table,
   Tabs,
+  message,
 } from "antd";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -15,6 +20,7 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   FilterOutlined,
@@ -73,7 +79,6 @@ const directorHandlerRoles = {
   "D-01": ["集团董办", "综合管理部-办公室", "董事本人"],
   "D-02": ["集团董办", "综合管理部-人力", "综合管理部-数字化"],
   "D-03": ["集团董办", "综合管理部-董办", "董事本人"],
-  "D-04": ["集团董办", "综合管理部-办公室"],
   "D-05": ["集团董办", "综合管理部-人力"],
   "D-06": ["集团董办", "综合管理部-董办", "董事本人"],
   "D-07": ["集团董办", "综合管理部-董办"],
@@ -103,6 +108,11 @@ export default function DirectorView({
   onSaveDutyReport,
   onReceiveDutyReport,
   suggestionTasks,
+  onCreateMaterial,
+  onUpdateMaterial,
+  onDeleteMaterial,
+  onRequestMaterialUpdate,
+  onPushHandbook,
 }) {
   const [searchParams] = useSearchParams();
   const [keyword, setKeyword] = useState("");
@@ -206,6 +216,11 @@ export default function DirectorView({
         onSaveDutyReport={onSaveDutyReport}
         onReceiveDutyReport={onReceiveDutyReport}
         suggestionTasks={suggestionTasks}
+        onCreateMaterial={onCreateMaterial}
+        onUpdateMaterial={onUpdateMaterial}
+        onDeleteMaterial={onDeleteMaterial}
+        onRequestMaterialUpdate={onRequestMaterialUpdate}
+        onPushHandbook={onPushHandbook}
         currentRole={currentRole}
         appointmentRoleKey={
           appointmentRoleKeys[
@@ -385,6 +400,11 @@ function DirectorLifecycleDrawer({
   onSaveDutyReport,
   onReceiveDutyReport,
   suggestionTasks,
+  onCreateMaterial,
+  onUpdateMaterial,
+  onDeleteMaterial,
+  onRequestMaterialUpdate,
+  onPushHandbook,
   currentRole,
   appointmentRoleKey,
   issueLetterDirector,
@@ -463,6 +483,11 @@ function DirectorLifecycleDrawer({
                   generatedDirectorNames={generatedDirectorNames}
                   director={director}
                   setDirector={() => {}}
+                  onCreateMaterial={onCreateMaterial}
+                  onUpdateMaterial={onUpdateMaterial}
+                  onDeleteMaterial={onDeleteMaterial}
+                  onRequestMaterialUpdate={onRequestMaterialUpdate}
+                  onPushHandbook={onPushHandbook}
                 />
               ) : null}
               {stage === "management" ? (
@@ -712,9 +737,18 @@ function PreparationWorkspace({
   generatedDirectorNames,
   director,
   setDirector,
+  onCreateMaterial,
+  onUpdateMaterial,
+  onDeleteMaterial,
+  onRequestMaterialUpdate,
+  onPushHandbook,
 }) {
   const [historyMaterial, setHistoryMaterial] = useState(null);
   const [planComposerOpen, setPlanComposerOpen] = useState(false);
+  const [selectedMaterialIds, setSelectedMaterialIds] = useState([]);
+  const [materialEditor, setMaterialEditor] = useState(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [materialForm] = Form.useForm();
   const submittedCount = materials.filter(
     (item) => item.status === "已提交",
   ).length;
@@ -723,6 +757,105 @@ function PreparationWorkspace({
     (item) => item.directorName === director.name,
   );
   const annualPlanGenerated = generatedDirectorNames.includes(director.name);
+  const openMaterialEditor = (record = null) => {
+    materialForm.resetFields();
+    materialForm.setFieldsValue(
+      record || {
+        category: "其他",
+        department: "综合管理部-办公室",
+        responsiblePerson: "待指定",
+        frequency: "季度",
+      },
+    );
+    setMaterialEditor(record ? { mode: "edit", record } : { mode: "create" });
+  };
+  const saveMaterial = async () => {
+    const values = await materialForm.validateFields();
+    if (materialEditor?.mode === "edit") {
+      onUpdateMaterial?.(materialEditor.record.id, values);
+      message.success("资料目录已更新");
+    } else {
+      onCreateMaterial?.(values);
+      message.success("资料目录已新增");
+    }
+    setMaterialEditor(null);
+  };
+  const requestSelectedMaterialUpdate = () => {
+    if (!selectedMaterialIds.length) {
+      message.warning("请先选择需要发起更新的资料");
+      return;
+    }
+    onRequestMaterialUpdate?.(selectedMaterialIds);
+    message.success(
+      `已向 ${selectedMaterialIds.length} 项资料的负责人发送更新任务`,
+    );
+    setSelectedMaterialIds([]);
+  };
+  const deleteMaterial = (record) => {
+    onDeleteMaterial?.(record.id);
+    setSelectedMaterialIds((current) =>
+      current.filter((materialId) => materialId !== record.id),
+    );
+    message.success("资料目录已删除");
+  };
+  const materialColumns = [
+    { title: "资料类别", dataIndex: "category", width: 120 },
+    { title: "资料名称", dataIndex: "material", width: 300 },
+    { title: "责任部门", dataIndex: "department", width: 180 },
+    { title: "责任人", dataIndex: "responsiblePerson", width: 130 },
+    { title: "更新频次", dataIndex: "frequency", width: 100 },
+    {
+      title: "任务状态",
+      dataIndex: "taskStatus",
+      width: 110,
+      render: (value, row) => (
+        <StatusPill>
+          {value || (row.status === "已提交" ? "已完成" : "未发起")}
+        </StatusPill>
+      ),
+    },
+    {
+      title: "资料状态",
+      dataIndex: "status",
+      width: 100,
+      render: (value) => <StatusPill>{value}</StatusPill>,
+    },
+    {
+      title: "操作",
+      fixed: "right",
+      width: 190,
+      render: (_, row) => (
+        <Space size={0}>
+          <Button
+            type="link"
+            icon={<EyeOutlined />}
+            onClick={() => setHistoryMaterial(row)}
+          >
+            查看详情
+          </Button>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => openMaterialEditor(row)}
+          >
+            编辑
+          </Button>
+          <Popconfirm
+            title="删除这项资料？"
+            description="删除后不会影响已经归档的历史资料。"
+            okText="删除"
+            cancelText="取消"
+            onConfirm={() => deleteMaterial(row)}
+          >
+            <Button type="link" danger icon={<DeleteOutlined />}>
+              删除
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+  const previewColumns = materialColumns.slice(0, 6);
   return (
     <div
       className={`${styles.stageWorkspace} ${
@@ -785,67 +918,50 @@ function PreparationWorkspace({
       <div className={styles.prepGrid}>
         <SectionCard
           title="董事履职手册"
-          extra={<Button>定期发起资料更新</Button>}
+          extra={
+            <Space wrap>
+              <span className={styles.selectionHint}>
+                已选 {selectedMaterialIds.length} 项
+              </span>
+              <Button
+                icon={<SendOutlined />}
+                disabled={!selectedMaterialIds.length}
+                onClick={requestSelectedMaterialUpdate}
+              >
+                定期发起资料更新
+              </Button>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => openMaterialEditor()}
+              >
+                新增资料
+              </Button>
+            </Space>
+          }
         >
-          {embedded ? (
-            <div className={styles.materialCards}>
-              {materials.map((item) => (
-                <article key={item.id} className={styles.materialCard}>
-                  <div className={styles.materialCardHead}>
-                    <span>{item.category}</span>
-                    <StatusPill>{item.status}</StatusPill>
-                  </div>
-                  <strong>{item.material}</strong>
-                  <div className={styles.materialMeta}>
-                    <span>责任部门：{item.department}</span>
-                    <span>责任人：{item.responsiblePerson}</span>
-                    <span>更新频次：{item.frequency}</span>
-                  </div>
-                  <Button type="link" onClick={() => setHistoryMaterial(item)}>
-                    查看资料详情
-                  </Button>
-                </article>
-              ))}
-            </div>
-          ) : (
-            <DataTable
-              rows={materials}
-              columns={[
-                { title: "资料类别", dataIndex: "category", width: 110 },
-                { title: "资料名称", dataIndex: "material", width: 320 },
-                { title: "责任部门", dataIndex: "department", width: 180 },
-                { title: "责任人", dataIndex: "responsiblePerson", width: 130 },
-                { title: "更新频次", dataIndex: "frequency", width: 100 },
-                {
-                  title: "状态",
-                  dataIndex: "status",
-                  width: 100,
-                  render: (value) => <StatusPill>{value}</StatusPill>,
-                },
-                {
-                  title: "操作",
-                  width: 100,
-                  render: (_, row) => (
-                    <Button
-                      type="link"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        setHistoryMaterial(row);
-                      }}
-                    >
-                      查看详情
-                    </Button>
-                  ),
-                },
-              ]}
-            />
-          )}
+          <Table
+            rowKey="id"
+            size="small"
+            columns={materialColumns}
+            dataSource={materials}
+            pagination={false}
+            scroll={{ x: 1180 }}
+            rowSelection={{
+              selectedRowKeys: selectedMaterialIds,
+              onChange: setSelectedMaterialIds,
+            }}
+          />
           <div className={styles.cardFooter}>
             <span>
               已提交 {submittedCount} / {materials.length}{" "}
               项；全部提交后可预览并推送董事履职手册
             </span>
-            <Button type="primary" disabled={!allSubmitted}>
+            <Button
+              type="primary"
+              disabled={!materials.length || !allSubmitted}
+              onClick={() => setPreviewOpen(true)}
+            >
               预览并推送手册
             </Button>
           </div>
@@ -902,6 +1018,135 @@ function PreparationWorkspace({
         open={!!historyMaterial}
         onClose={() => setHistoryMaterial(null)}
       />
+      <Modal
+        open={Boolean(materialEditor)}
+        title={
+          materialEditor?.mode === "edit" ? "编辑手册资料" : "新增手册资料"
+        }
+        okText="保存"
+        cancelText="取消"
+        onOk={saveMaterial}
+        onCancel={() => setMaterialEditor(null)}
+        destroyOnClose
+      >
+        <Form form={materialForm} layout="vertical">
+          <Form.Item
+            label="资料名称"
+            name="material"
+            rules={[{ required: true, message: "请输入资料名称" }]}
+          >
+            <Input placeholder="请输入手册资料名称" />
+          </Form.Item>
+          <div className={styles.formGrid}>
+            <Form.Item
+              label="资料类别"
+              name="category"
+              rules={[{ required: true }]}
+            >
+              <Select
+                options={[
+                  "战略规划",
+                  "公司简介",
+                  "业务资料",
+                  "支撑机制",
+                  "制度文件",
+                  "其他",
+                ].map((value) => ({ value, label: value }))}
+              />
+            </Form.Item>
+            <Form.Item
+              label="更新频次"
+              name="frequency"
+              rules={[{ required: true }]}
+            >
+              <Select
+                options={["季度", "年度"].map((value) => ({
+                  value,
+                  label: value,
+                }))}
+              />
+            </Form.Item>
+            <Form.Item
+              label="责任部门"
+              name="department"
+              rules={[{ required: true }]}
+            >
+              <Select
+                options={[
+                  "综合管理部-办公室",
+                  "股权运营部",
+                  "投资部",
+                  "综合管理部-数字化",
+                ].map((value) => ({ value, label: value }))}
+              />
+            </Form.Item>
+            <Form.Item
+              label="责任人"
+              name="responsiblePerson"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="请输入负责人" />
+            </Form.Item>
+          </div>
+        </Form>
+      </Modal>
+      <Modal
+        open={previewOpen}
+        width={900}
+        title={`预览并推送手册 · ${director.name}`}
+        okText="确认推送"
+        cancelText="返回修改"
+        onOk={() => {
+          onPushHandbook?.(director.name);
+          setPreviewOpen(false);
+          message.success(`董事履职手册已推送给${director.name}`);
+        }}
+        onCancel={() => setPreviewOpen(false)}
+      >
+        <div className={styles.handbookPreview}>
+          <div className={styles.previewHero}>
+            <div>
+              <span>HANDBOOK PREVIEW · 2026</span>
+              <h3>{director.name}董事履职手册</h3>
+              <p>
+                {director.company} · {director.role} ·
+                当前版本为全部资料最新提交版本
+              </p>
+            </div>
+            <StatusPill>待推送</StatusPill>
+          </div>
+          <Descriptions
+            bordered
+            size="small"
+            column={2}
+            items={[
+              { key: "director", label: "推送对象", children: director.name },
+              { key: "company", label: "任职企业", children: director.company },
+              {
+                key: "count",
+                label: "资料总数",
+                children: `${materials.length} 项`,
+              },
+              { key: "version", label: "手册版本", children: "2026 年度版" },
+            ]}
+          />
+          <div className={styles.previewMessage}>
+            <strong>推送说明</strong>
+            <p>
+              您好，系统已为您准备最新版董事履职手册，内容涵盖战略规划、公司简介、业务资料、支撑机制及制度文件等资料。请在履职过程中按需查阅，并以最新归档内容为准。
+            </p>
+          </div>
+          <h4>手册目录预览</h4>
+          <Table
+            rowKey="id"
+            size="small"
+            columns={previewColumns}
+            dataSource={materials}
+            pagination={false}
+            scroll={{ x: 950, y: 280 }}
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

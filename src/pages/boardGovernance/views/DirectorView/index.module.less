@@ -748,6 +748,62 @@
 .embeddedPreparation .stageIntro {
   padding: 18px 20px;
 }
+.selectionHint {
+  color: #6d7b90;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 14px;
+}
+.handbookPreview {
+  display: grid;
+  gap: 16px;
+}
+.previewHero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border: 1px solid #d5e3f7;
+  border-radius: 12px;
+  background: linear-gradient(120deg, #f8fbff, #edf5ff);
+}
+.previewHero span {
+  color: #2f6bff;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+}
+.previewHero h3 {
+  margin: 7px 0 5px;
+  color: #17365d;
+  font-size: 20px;
+}
+.previewHero p {
+  margin: 0;
+  color: #718096;
+  font-size: 12px;
+}
+.previewMessage {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #526176;
+}
+.previewMessage strong {
+  color: #24364f;
+}
+.previewMessage p {
+  margin: 7px 0 0;
+  line-height: 1.7;
+}
+.handbookPreview h4 {
+  margin: 0 -2px -8px;
+  color: #24364f;
+}
 .materialCards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -840,6 +896,9 @@
     width: 100%;
   }
   .materialCards {
+    grid-template-columns: 1fr;
+  }
+  .formGrid {
     grid-template-columns: 1fr;
   }
 }

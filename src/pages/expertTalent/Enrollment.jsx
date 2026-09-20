@@ -708,7 +708,7 @@ export default function Enrollment({
             type="info"
             showIcon
             message="已发起分管领导审批"
-            description="审批通过后进入待签发聘书状态，并在专家人才库工作台生成聘书签发待办。"
+            description="审批通过后进入待签发聘书状态，并在任务首页生成聘书签发待办。"
           />
           <Input.TextArea
             rows={3}

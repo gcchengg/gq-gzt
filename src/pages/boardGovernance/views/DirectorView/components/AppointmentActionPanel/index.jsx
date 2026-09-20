@@ -35,7 +35,7 @@ export default function AppointmentActionPanel({
     );
   }
 
-  if (item.currentStep <= 5) {
+  if (item.status === "待上传董事简历") {
     if (!allowedActions.includes("resume")) {
       return (
         <RoleNotice
@@ -48,7 +48,7 @@ export default function AppointmentActionPanel({
       if (!files.length) return;
       onUpdate(
         {
-          currentStep: 6,
+          currentStep: 3,
           status: "待权限配置",
           owner: "综合管理部-人力 / 周航",
           recipient: "综合管理部-人力 / 周航",
@@ -99,7 +99,7 @@ export default function AppointmentActionPanel({
     );
   }
 
-  if (item.currentStep <= 7) {
+  if (item.status === "待配置系统权限") {
     if (!allowedActions.includes("permission")) {
       return (
         <RoleNotice
@@ -112,7 +112,7 @@ export default function AppointmentActionPanel({
       onUpdate(
         {
           permissionDone,
-          currentStep: permissionDone ? 8 : 6,
+          currentStep: permissionDone ? 5 : 3,
           status: permissionDone ? "待选举变更" : "待权限配置",
           owner: permissionDone
             ? "综合管理部-董办 / 王珂"
@@ -182,7 +182,7 @@ export default function AppointmentActionPanel({
       onOk: () =>
         onUpdate(
           {
-            currentStep: 10,
+            currentStep: 7,
             status: "已完成",
             owner: "已归档",
             recipient: "—",

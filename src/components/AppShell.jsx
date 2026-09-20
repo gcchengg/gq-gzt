@@ -124,7 +124,7 @@ export default function AppShell() {
     () =>
       isExpertArea
         ? [
-            { id: "expert-workbench", title: "专家人才库工作台", key: "/zj/" },
+            { id: "expert-workbench", title: "任务首页", key: "/zj/" },
             { id: "expert-pool", title: "专家库看板", key: "/zj/pool" },
             { id: "expert-list", title: "专家管理", key: "/zj/list" },
             { id: "expert-tasks", title: "调用管理", key: "/zj/tasks" },

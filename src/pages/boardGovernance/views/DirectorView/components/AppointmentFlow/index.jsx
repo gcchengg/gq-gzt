@@ -42,7 +42,7 @@ const initialCases = [
     recipient: "综合管理部-人力 / 周航",
     deadline: "09-17 17:00",
     status: "待上传董事简历",
-    currentStep: 5,
+    currentStep: 2,
   },
   {
     id: "AP-2026-006",
@@ -54,7 +54,7 @@ const initialCases = [
     recipient: "综合管理部-人力 / 周航",
     deadline: "09-16 12:00",
     status: "待权限配置",
-    currentStep: 6,
+    currentStep: 3,
   },
   {
     id: "AP-2026-005",
@@ -66,19 +66,18 @@ const initialCases = [
     recipient: "综合管理部-董办 / 王珂",
     deadline: "09-20 17:00",
     status: "待选举变更",
-    currentStep: 8,
+    currentStep: 5,
   },
 ];
 
 function casesForDirector(director) {
   if (!director) return initialCases;
   const appointmentState = {
-    待下发董事推荐函: { status: "待下发董事推荐函", currentStep: 3 },
-    待上传董事简历: { status: "待上传董事简历", currentStep: 5 },
-    待配置系统权限: { status: "待配置系统权限", currentStep: 6 },
-    待选举变更: { status: "待选举变更", currentStep: 8 },
-    待完成工商变更: { status: "待完成工商变更", currentStep: 9 },
-    已完成: { status: "已完成", currentStep: 10 },
+    待上传董事简历: { status: "待上传董事简历", currentStep: 2 },
+    待配置系统权限: { status: "待配置系统权限", currentStep: 3 },
+    待选举变更: { status: "待选举变更", currentStep: 5 },
+    待完成工商变更: { status: "待完成工商变更", currentStep: 6 },
+    已完成: { status: "已完成", currentStep: 7 },
   };
   return [
     {
@@ -89,16 +88,13 @@ function casesForDirector(director) {
       position: director.role,
       ...(appointmentState[director.appointmentStatus] || {
         status: "待接收推荐函",
-        currentStep: 4,
+        currentStep: 1,
       }),
     },
   ];
 }
 
 const processSteps = [
-  ["董事会职数核定", "集团体系数字化部", "形成职数核定结果"],
-  ["人选选聘、资格遴选", "集团人力部", "确认候选人及任职资格"],
-  ["形成董事推荐函", "集团人力部", "形成正式推荐材料"],
   ["下发董事推荐函", "集团董办", "线上下发并创建交接任务"],
   ["接收董事推荐函", "综合管理部-办公室", "钉钉提醒指定经办人接收"],
   ["上传董事简历", "综合管理部-办公室", "上传简历并完成材料校验"],
@@ -305,7 +301,7 @@ export default function AppointmentFlow({
       recipient: "综合管理部-人力 / 周航",
       deadline: values.deadline,
       status: "待上传董事简历",
-      currentStep: 5,
+      currentStep: 2,
     };
     setCases((current) => [nextCase, ...current]);
     const now = new Date();
@@ -371,7 +367,6 @@ export default function AppointmentFlow({
               ],
             ]
           : [
-              ["待下发推荐函", "3", "集团董办"],
               ["待上传董事简历", "2", "综合管理部-办公室"],
               ["待配置系统权限", "1", "综合管理部-人力"],
               ["待选举 / 工商变更", "4", "董办 / 法务"],
@@ -642,7 +637,7 @@ export default function AppointmentFlow({
         width={720}
         title="下发董事推荐函"
         okText="下发并发送钉钉消息"
-        cancelText="暂存草稿"
+        footer={(_, { OkBtn }) => <OkBtn />}
         okButtonProps={{ icon: <DingdingOutlined /> }}
         onOk={issueLetter}
         onCancel={() => setOpen(false)}

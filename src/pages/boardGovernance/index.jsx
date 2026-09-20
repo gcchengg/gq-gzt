@@ -94,6 +94,54 @@ export default function BoardGovernancePage() {
       ),
     );
   };
+  const createHandbookMaterial = (values) => {
+    setHandbookMaterials((current) => [
+      ...current,
+      {
+        ...values,
+        id: `HB-${Date.now()}`,
+        status: "待提交",
+        taskStatus: "未发起",
+      },
+    ]);
+  };
+  const updateHandbookMaterial = (materialId, values) => {
+    setHandbookMaterials((current) =>
+      current.map((item) =>
+        item.id === materialId ? { ...item, ...values } : item,
+      ),
+    );
+  };
+  const deleteHandbookMaterial = (materialId) => {
+    setHandbookMaterials((current) =>
+      current.filter((item) => item.id !== materialId),
+    );
+  };
+  const requestMaterialUpdate = (materialIds) => {
+    const requestedAt = getNow();
+    setHandbookMaterials((current) =>
+      current.map((item) =>
+        materialIds.includes(item.id)
+          ? {
+              ...item,
+              status: "待提交",
+              taskStatus: "待办理",
+              updateRequestedAt: requestedAt,
+            }
+          : item,
+      ),
+    );
+  };
+  const pushHandbook = (directorName) => {
+    const pushedAt = getNow();
+    setHandbookMaterials((current) =>
+      current.map((item) => ({
+        ...item,
+        lastPushedTo: directorName,
+        lastPushedAt: pushedAt,
+      })),
+    );
+  };
   const createDutyPlan = (values) => {
     setDutyPlans((current) => [
       ...current,
@@ -312,6 +360,11 @@ export default function BoardGovernancePage() {
         onSaveDutyReport={saveDutyReport}
         onReceiveDutyReport={receiveDutyReport}
         suggestionTasks={suggestionTasks}
+        onCreateMaterial={createHandbookMaterial}
+        onUpdateMaterial={updateHandbookMaterial}
+        onDeleteMaterial={deleteHandbookMaterial}
+        onRequestMaterialUpdate={requestMaterialUpdate}
+        onPushHandbook={pushHandbook}
       />
     ),
     companies: <CompanyMonitoringView mode="companies" />,
