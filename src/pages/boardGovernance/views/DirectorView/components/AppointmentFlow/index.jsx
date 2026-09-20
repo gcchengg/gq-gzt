@@ -10,6 +10,7 @@ import {
   Steps,
   Tabs,
   Timeline,
+  Upload,
   message,
 } from "antd";
 import {
@@ -20,6 +21,7 @@ import {
   SendOutlined,
   TeamOutlined,
   UserAddOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
 import {
   DataTable,
@@ -185,11 +187,13 @@ export default function AppointmentFlow({
   autoOpenIssue = false,
   onIssueLetterOpened,
   embedded = false,
+  modalOnly = false,
 }) {
   const directorCases = casesForDirector(director);
   const [cases, setCases] = useState(directorCases);
   const [selected, setSelected] = useState(directorCases[0]);
   const [open, setOpen] = useState(false);
+  const [letterFileList, setLetterFileList] = useState([]);
   const [auditMessages, setAuditMessages] = useState(initialAuditMessages);
   const [activeAuditId, setActiveAuditId] = useState(
     initialAuditMessages[0].id,
@@ -285,6 +289,10 @@ export default function AppointmentFlow({
   };
 
   const issueLetter = async () => {
+    if (!letterFileList.length) {
+      messageApi.error("请先上传推荐函文件");
+      return;
+    }
     const values = await form.validateFields();
     const nextCase = {
       id: `AP-2026-${String(cases.length + 8).padStart(3, "0")}`,
@@ -292,6 +300,7 @@ export default function AppointmentFlow({
       company: values.company,
       position: values.position,
       letter: values.letter,
+      letterFileName: letterFileList[0].name,
       owner: `综合管理部-办公室 / ${values.recipient}`,
       recipient: "综合管理部-人力 / 周航",
       deadline: values.deadline,
@@ -319,12 +328,13 @@ export default function AppointmentFlow({
     setSelected(nextCase);
     setOpen(false);
     form.resetFields();
+    setLetterFileList([]);
     messageApi.success("推荐函已下发，钉钉消息与待办已送达指定经办人");
   };
 
   return (
     <div
-      className={`${styles.workspace} ${embedded ? styles.embeddedWorkspace : ""}`}
+      className={`${styles.workspace} ${embedded ? styles.embeddedWorkspace : ""} ${modalOnly ? styles.modalOnly : ""}`}
     >
       {contextHolder}
       <section className={styles.command}>
@@ -396,6 +406,11 @@ export default function AppointmentFlow({
                   key: "letter",
                   label: "推荐函",
                   children: selected.letter || "待生成",
+                },
+                {
+                  key: "letterFile",
+                  label: "推荐函文件",
+                  children: selected.letterFileName || "未上传",
                 },
                 {
                   key: "deadline",
@@ -707,6 +722,20 @@ export default function AppointmentFlow({
               rules={[{ required: true }]}
             >
               <Input placeholder="YYYY-MM-DD HH:mm" />
+            </Form.Item>
+            <Form.Item label="推荐函文件" required>
+              <Upload
+                accept=".pdf,.doc,.docx"
+                maxCount={1}
+                fileList={letterFileList}
+                beforeUpload={(file) => {
+                  setLetterFileList([file]);
+                  return false;
+                }}
+                onRemove={() => setLetterFileList([])}
+              >
+                <Button icon={<UploadOutlined />}>选择推荐函文件</Button>
+              </Upload>
             </Form.Item>
           </div>
           <div className={styles.messagePreview}>

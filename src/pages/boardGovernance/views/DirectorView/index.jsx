@@ -115,6 +115,9 @@ export default function DirectorView({
       : "management",
   );
   const currentRole = role === "director" ? "董事本人" : "集团董办";
+  const appointmentDirector =
+    directors.find((item) => item.lifecycleStage === "appointment") ||
+    directors[0];
   const filteredDirectors = directors.filter((item) => {
     const normalized = keyword.trim().toLowerCase();
     const matchesKeyword =
@@ -163,13 +166,7 @@ export default function DirectorView({
         <Button
           type="primary"
           icon={<SendOutlined />}
-          onClick={() => {
-            const appointmentDirector =
-              directors.find((item) => item.lifecycleStage === "appointment") ||
-              directors[0];
-            setOpenIssueLetter(true);
-            openDirector(appointmentDirector, "appointment");
-          }}
+          onClick={() => setOpenIssueLetter(true)}
         >
           下发董事推荐函
         </Button>
@@ -215,6 +212,7 @@ export default function DirectorView({
             roleFilter === "all" ? currentRole : roleFilter
           ] || "groupOffice"
         }
+        issueLetterDirector={appointmentDirector}
         openIssueLetter={openIssueLetter}
         onIssueLetterOpened={() => setOpenIssueLetter(false)}
       />
@@ -389,6 +387,7 @@ function DirectorLifecycleDrawer({
   suggestionTasks,
   currentRole,
   appointmentRoleKey,
+  issueLetterDirector,
   openIssueLetter,
   onIssueLetterOpened,
 }) {
@@ -450,8 +449,6 @@ function DirectorLifecycleDrawer({
                   key={director.id}
                   director={director}
                   handlerRole={appointmentRoleKey}
-                  autoOpenIssue={openIssueLetter}
-                  onIssueLetterOpened={onIssueLetterOpened}
                   embedded
                 />
               ) : null}
@@ -498,6 +495,14 @@ function DirectorLifecycleDrawer({
           </>
         ) : null}
       </GovernanceDrawer>
+      <AppointmentFlow
+        key="standalone-issue-letter"
+        director={issueLetterDirector}
+        handlerRole="groupOffice"
+        autoOpenIssue={openIssueLetter}
+        onIssueLetterOpened={onIssueLetterOpened}
+        modalOnly
+      />
       <EventDetailDrawer event={event} onClose={() => setEvent(null)} />
     </>
   );
