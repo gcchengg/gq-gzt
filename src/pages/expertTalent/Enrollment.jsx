@@ -19,6 +19,7 @@ import {
   message,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./Enrollment.module.less";
 import ApprovalDetailModal from "./components/ApprovalDetailModal";
 import CandidatePool from "./components/CandidatePool";
@@ -92,6 +93,16 @@ const defaultChecks = [
     confirmed: true,
   },
 ];
+const DEFAULT_INVITATION_NOTE =
+  "您好！一汽股权投资（天津）有限公司诚邀您加入专家人才库，发挥您在相关领域的专业经验，为公司投资决策、产业研究及项目咨询提供专业支持。请您进入微信小程序“个人中心—入库邀请”查看合作邀请函，并确认是否接受邀请。后续入库资料及办理流程由工作人员与您联系，感谢您的支持！";
+const drawerHiddenProfileFields = new Set([
+  "roles",
+  "travel",
+  "attachment",
+  "city",
+  "service",
+  "certificates",
+]);
 const processActionText = {
   check: "完成入库资料核对",
   start: "发起分管领导线上审批",
@@ -155,7 +166,7 @@ function lastUpdatedAt(record) {
 function PaperApplication({ readOnly = false, values }) {
   return (
     <div className={styles.paperForm}>
-      <div className={styles.paperTitle}>专家入库申请表</div>
+      <div className={styles.paperTitle}>专家推荐表</div>
       <div className={styles.paperSection}>个人基本信息</div>
       {applicationBasicRows.map((row) => (
         <div className={styles.paperRow} key={row[0][0]}>
@@ -208,7 +219,9 @@ export default function Enrollment({
   innerTab,
   onInnerTabChange,
   inviteTick = 0,
+  initialSelectedId = "",
 }) {
+  const navigate = useNavigate();
   const state = useExpertStore();
   const [uncontrolledTab, setUncontrolledTab] = useState("pool");
   const activeTab = innerTab ?? uncontrolledTab;
@@ -227,6 +240,9 @@ export default function Enrollment({
   const [profileOpen, setProfileOpen] = useState(false);
   const inviteValues = Form.useWatch([], inviteForm) || {};
   const record = state.invitations.find((item) => item.id === selected);
+  const visibleProfileEntries = Object.entries(record?.profile || {}).filter(
+    ([key]) => !drawerHiddenProfileFields.has(key),
+  );
   const canFinishCheck =
     !!record &&
     complete(record) &&
@@ -271,6 +287,7 @@ export default function Enrollment({
       candidateIds: ids,
       letterNo: `YQH-${new Date().getFullYear()}-${String(state.invitations.length + 1).padStart(3, "0")}`,
       letterTemplate: "专家合作邀请函（标准版）",
+      invitationNote: DEFAULT_INVITATION_NOTE,
     });
     setInviteOpen(true);
   }
@@ -278,6 +295,14 @@ export default function Enrollment({
     if (!inviteTick) return;
     openInvite();
   }, [inviteTick]);
+  useEffect(() => {
+    if (!initialSelectedId) return;
+    if (!state.invitations.some((item) => item.id === initialSelectedId))
+      return;
+    setActiveTab("invitations");
+    setSelected(initialSelectedId);
+    setOpinion("");
+  }, [initialSelectedId, state.invitations]);
   async function sendInvitation() {
     const values = await inviteForm.validateFields();
     const targets = state.candidates.filter(
@@ -302,7 +327,7 @@ export default function Enrollment({
               letterNo,
               letterTemplate: values.letterTemplate,
               invitationNote: values.invitationNote,
-              stage: "待确认",
+              stage: "资料完善中",
               agreed: false,
               submitted: false,
               checks: structuredClone(defaultChecks),
@@ -333,6 +358,7 @@ export default function Enrollment({
     ) {
       setInviteOpen(false);
       setActiveTab("invitations");
+      navigate("/zj/");
     }
   }
   function openApplication() {
@@ -347,9 +373,9 @@ export default function Enrollment({
         const item = store.invitations.find((entry) => entry.id === selected);
         item.application = values;
         item.history.push(
-          log("需求部门（演示）", "填写并提交正式《专家入库申请表》"),
+          log("需求部门（演示）", "填写并提交正式《专家推荐表》"),
         );
-      }, "入库申请表已保存")
+      }, "推荐表已保存")
     )
       setApplicationOpen(false);
   }
@@ -474,7 +500,7 @@ export default function Enrollment({
       action === "check" &&
       (!applicationComplete(record) || !checksConfirmed(record))
     )
-      return message.warning("请先完成专家履历资料与入库申请表");
+      return message.warning("请先完成专家履历资料与推荐表");
     if (action === "start" && record.stage !== "核对完成")
       return message.warning("请先完成资料、申请表及校验核对");
     const note =
@@ -503,8 +529,34 @@ export default function Enrollment({
     }
     return false;
   }
+  function decideApproval(passed) {
+    if (!record || record.stage !== "领导审批中") return;
+    if (!opinion.trim()) return message.warning("请填写分管领导审批意见");
+    if (
+      persist(
+        (store) => {
+          const item = store.invitations.find((entry) => entry.id === selected);
+          if (!item || item.stage !== "领导审批中")
+            throw new Error("状态已变化，请刷新后重试");
+          item.stage = passed ? "待签发聘书" : "审批退回";
+          item.history.push(
+            log(
+              "分管领导（线上审批演示）",
+              `${passed ? "审批通过，进入待签发聘书" : "审批退回"}：${opinion.trim()}`,
+            ),
+          );
+        },
+        passed ? "审批完成，已生成聘书签发待办" : "审批已退回",
+      )
+    ) {
+      setOpinion("");
+      setSelected(null);
+      setStageFilter("");
+      if (passed) navigate("/zj/");
+    }
+  }
   function persistPendingMaterials(nextStage) {
-    if (!record || record.stage !== "待确认") return false;
+    if (!record || record.stage !== "资料完善中") return false;
     const profile = draftProfile(record);
     const application = applicationFromProfile({ ...record, profile });
     return persist(
@@ -517,18 +569,18 @@ export default function Enrollment({
         item.history.push(
           log(
             "股权运营部（演示）",
-            nextStage ? "提交入库办理资料，进入待资料核对" : "保存入库办理资料",
+            nextStage ? "提交入库办理资料，进入资料完善中" : "保存入库办理资料",
           ),
         );
       },
-      nextStage ? "已提交，进入待资料核对" : "已保存",
+      nextStage ? "已提交，进入资料完善中" : "已保存",
     );
   }
   function savePendingInvitation() {
     persistPendingMaterials();
   }
   function submitPendingInvitation() {
-    if (persistPendingMaterials("待资料核对")) {
+    if (persistPendingMaterials("资料完善中")) {
       setSelected(null);
       setStageFilter("");
     }
@@ -609,7 +661,7 @@ export default function Enrollment({
 
   function renderStageAction() {
     if (!record) return null;
-    if (["待资料核对", "审批退回", "核对完成"].includes(record.stage)) {
+    if (["资料完善中", "审批退回", "核对完成"].includes(record.stage)) {
       return (
         <div className={styles.actionBar}>
           <Input.TextArea
@@ -622,10 +674,10 @@ export default function Enrollment({
                 : "资料核对意见（选填）"
             }
           />
-          {["待资料核对", "审批退回"].includes(record.stage) ? (
+          {["资料完善中", "审批退回"].includes(record.stage) ? (
             <Popconfirm
               title="确认完成资料与申请核对？"
-              description="请确认专家履历资料与入库申请表已填写完整。"
+              description="请确认专家履历资料与推荐表已填写完整。"
               okText="确认完成"
               cancelText="取消"
               onConfirm={() => process("check")}
@@ -651,17 +703,27 @@ export default function Enrollment({
     }
     if (record.stage === "领导审批中") {
       return (
-        <Alert
-          type="info"
-          showIcon
-          message="已发起分管领导审批"
-          description="请在原工作台审批待办中办理。审批通过后进入待签发聘书状态。"
-          action={
-            <Button size="small" onClick={() => setApprovalDetailId(record.id)}>
-              审批详情
+        <div>
+          <Alert
+            type="info"
+            showIcon
+            message="已发起分管领导审批"
+            description="审批通过后进入待签发聘书状态，并在专家人才库工作台生成聘书签发待办。"
+          />
+          <Input.TextArea
+            rows={3}
+            value={opinion}
+            onChange={(event) => setOpinion(event.target.value)}
+            placeholder="分管领导审批意见（必填）"
+            style={{ marginTop: 12 }}
+          />
+          <Space style={{ marginTop: 12 }}>
+            <Button onClick={() => decideApproval(false)}>审批退回</Button>
+            <Button type="primary" onClick={() => decideApproval(true)}>
+              审批通过
             </Button>
-          }
-        />
+          </Space>
+        </div>
       );
     }
     if (record.stage === "待签发聘书") {
@@ -880,7 +942,7 @@ export default function Enrollment({
             </Form.Item>
           </div>
           <Form.Item name="invitationNote" label="合作邀请说明">
-            <Input.TextArea rows={3} />
+            <Input.TextArea rows={5} showCount maxLength={500} />
           </Form.Item>
           <Alert
             type="info"
@@ -898,7 +960,7 @@ export default function Enrollment({
         destroyOnClose
         onClose={() => setSelected(null)}
         footer={
-          record?.stage === "待确认" ? (
+          record?.stage === "资料完善中" ? (
             <div className={styles.drawerFooter}>
               <Button onClick={savePendingInvitation}>保存</Button>
               <Button type="primary" onClick={submitPendingInvitation}>
@@ -956,7 +1018,7 @@ export default function Enrollment({
                   </b>
                 </span>
                 <span>
-                  入库申请表：
+                  推荐表：
                   <b>{applicationComplete(record) ? "已完成" : "未完成"}</b>
                 </span>
                 <span>
@@ -968,12 +1030,12 @@ export default function Enrollment({
 
             <section className={styles.section}>
               <h3 className={styles.sectionTitle}>专家履历资料</h3>
-              {Object.entries(record.profile || {}).length ? (
+              {visibleProfileEntries.length ? (
                 <Descriptions
                   bordered
                   column={1}
                   size="small"
-                  items={Object.entries(record.profile).map(([key, value]) => ({
+                  items={visibleProfileEntries.map(([key, value]) => ({
                     key,
                     label: profileLabels[key] || key,
                     children:
@@ -1005,14 +1067,12 @@ export default function Enrollment({
             </section>
 
             <section className={styles.section}>
-              <h3 className={styles.sectionTitle}>
-                需求部门《专家入库申请表》
-              </h3>
+              <h3 className={styles.sectionTitle}>需求部门《专家推荐表》</h3>
               {applicationComplete(record) ? null : (
                 <Alert
                   type="warning"
                   showIcon
-                  message="入库申请表尚未填写完整，不能发起审批。可带出的字段已按专家履历资料预填。"
+                  message="推荐表尚未填写完整，不能发起审批。可带出的字段已按专家履历资料预填。"
                 />
               )}
               <PaperApplication
@@ -1024,9 +1084,7 @@ export default function Enrollment({
                   disabled={lockedStages.includes(record.stage)}
                   onClick={openApplication}
                 >
-                  {applicationComplete(record)
-                    ? "修改入库申请表"
-                    : "填写入库申请表"}
+                  {applicationComplete(record) ? "修改推荐表" : "填写推荐表"}
                 </Button>
               </div>
             </section>
@@ -1082,7 +1140,7 @@ export default function Enrollment({
       />
 
       <Modal
-        title="填写《专家入库申请表》"
+        title="填写《专家推荐表》"
         open={applicationOpen}
         onCancel={() => setApplicationOpen(false)}
         onOk={saveApplication}

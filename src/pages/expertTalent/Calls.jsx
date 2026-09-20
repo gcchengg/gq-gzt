@@ -20,7 +20,7 @@ import {
   message,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { experts } from "./data";
 import { demoNotice, log, uid, updateStore, useExpertStore } from "./store";
 import styles from "./Calls.module.less";
@@ -41,19 +41,10 @@ const fields = [
   ["contact", "联系电话 / 邮箱"],
   ["background", "项目背景"],
   ["problem", "核心诉求"],
-  ["field", "所需领域"],
-  ["serviceTime", "预计服务时间段"],
-  ["due", "最终交付截止时间"],
+  ["due", "期望服务截止日期"],
   ["delivery", "交付与验收要求"],
-  ["materials", "材料说明（演示，不上传真实文件）"],
-  ["permission", "材料访问权限"],
 ];
-const textAreaFields = new Set([
-  "background",
-  "problem",
-  "delivery",
-  "materials",
-]);
+const textAreaFields = new Set(["background", "problem", "delivery"]);
 const feeStandards = {
   "外聘专家·两院院士": 2500,
   "外聘专家·高级专家": 2000,
@@ -98,6 +89,7 @@ function scoreCandidate(expert, task) {
 }
 
 export default function Calls() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const state = useExpertStore();
   const [editing, setEditing] = useState(null);
@@ -107,7 +99,6 @@ export default function Calls() {
   const [taskKeyword, setTaskKeyword] = useState("");
   const [taskStage, setTaskStage] = useState();
   const [taskDepartment, setTaskDepartment] = useState();
-  const [taskField, setTaskField] = useState();
   const [taskExpert, setTaskExpert] = useState();
   const [candidate, setCandidate] = useState(null);
   const [matchReason, setMatchReason] = useState("");
@@ -119,6 +110,7 @@ export default function Calls() {
   const [opinion, setOpinion] = useState("");
   const [deadline, setDeadline] = useState("");
   const [preview, setPreview] = useState(null);
+  const [selectedCallRecord, setSelectedCallRecord] = useState(null);
   const [consultationPreview, setConsultationPreview] = useState(null);
   const [consultationForm] = Form.useForm();
   const [evaluationForm] = Form.useForm();
@@ -150,9 +142,6 @@ export default function Calls() {
     () => ({
       departments: [
         ...new Set(state.tasks.map((task) => task.department).filter(Boolean)),
-      ],
-      fields: [
-        ...new Set(state.tasks.map((task) => task.field).filter(Boolean)),
       ],
       experts: [
         ...new Set(
@@ -191,18 +180,10 @@ export default function Calls() {
         matchesKeyword &&
         matchesStage &&
         (!taskDepartment || task.department === taskDepartment) &&
-        (!taskField || task.field === taskField) &&
         (!taskExpert || task.expert === taskExpert)
       );
     });
-  }, [
-    state.tasks,
-    taskKeyword,
-    taskStage,
-    taskDepartment,
-    taskField,
-    taskExpert,
-  ]);
+  }, [state.tasks, taskKeyword, taskStage, taskDepartment, taskExpert]);
 
   function persist(mutator, success) {
     try {
@@ -231,7 +212,6 @@ export default function Calls() {
         : {
             applicant: "郑华峰",
             contact: "138****5208 / zhenghf@example.com",
-            permission: "仅受邀且确认合作的专家可查看",
             expertId: chosen?.id,
             expert: chosen?.name,
             field: chosen?.field,
@@ -273,22 +253,24 @@ export default function Calls() {
           Object.assign(task, values, {
             expert: chosen?.name || values.expert || "待确认",
             estimatedFee: calculateFee(values.feeStandard, values.serviceHours),
-            stage: submit ? "调用受理中" : "草稿",
-            progress: submit ? 10 : 0,
+            stage: submit ? "匹配中" : "草稿",
+            progress: submit ? 15 : 0,
           });
           task.history.push(
             log(
               "PC需求部门（演示）",
               submit
-                ? "提交专家调用申请，等待股权运营部受理"
+                ? "提交专家调用申请，自动进入推荐匹配"
                 : "保存调用申请草稿",
             ),
           );
         },
         submit ? "已提交股权运营部受理" : "草稿已保存",
       )
-    )
+    ) {
       setEditing(null);
+      if (submit) navigate("/zj/");
+    }
   }
   function previewApplication() {
     const values = form.getFieldsValue();
@@ -314,22 +296,26 @@ export default function Calls() {
     const result = scoreCandidate(expert, record);
     if (!result.available || !result.avoidancePassed)
       return message.warning("该专家不可用或回避校验未通过，不能确认");
-    persist((store) => {
-      const task = store.tasks.find((item) => item.id === selected);
-      task.expert = expert.name;
-      task.expertId = expert.id;
-      task.matchReason = matchReason;
-      task.matchScore = result.score;
-      task.matchAdjusted = adjusted;
-      task.stage = "待运营排期";
-      task.progress = 25;
-      task.history.push(
-        log(
-          "需求部门（演示）",
-          `${adjusted ? "调整系统推荐并" : "确认系统推荐"}选择 ${expert.name}，匹配参考分 ${result.score}；理由：${matchReason}`,
-        ),
-      );
-    }, "需求部门已确认专家人选，等待股权运营部锁定排期");
+    if (
+      persist((store) => {
+        const task = store.tasks.find((item) => item.id === selected);
+        task.expert = expert.name;
+        task.expertId = expert.id;
+        task.matchReason = matchReason;
+        task.matchScore = result.score;
+        task.matchAdjusted = adjusted;
+        task.stage = "待运营排期";
+        task.progress = 25;
+        task.history.push(
+          log(
+            "需求部门（演示）",
+            `${adjusted ? "调整系统推荐并" : "确认系统推荐"}选择 ${expert.name}，匹配参考分 ${result.score}；理由：${matchReason}`,
+          ),
+        );
+      }, "需求部门已确认专家人选，已生成锁定排期待办")
+    ) {
+      navigate("/zj/");
+    }
   }
   function chooseCandidate(expert) {
     if (!canSelectCandidate)
@@ -342,16 +328,38 @@ export default function Calls() {
     setDepartmentConfirmed(false);
     setAdjusted(Boolean(expert.id !== recommendations[0]?.id));
   }
-  function acceptTask() {
-    if (record?.stage !== "调用受理中") return;
-    persist((store) => {
-      const task = store.tasks.find((item) => item.id === selected);
-      task.stage = "匹配中";
-      task.progress = 15;
-      task.history.push(
-        log("股权运营部（演示）", "受理专家调用申请，进入推荐匹配与排期"),
-      );
-    }, "已受理，进入推荐匹配");
+  function openCallRecord(expert) {
+    setSelectedCallRecord({
+      expert,
+      records: [
+        {
+          project: "动力电池技术路线研判",
+          reviewLabel: "履约评价",
+          total: 96,
+          result: "优秀",
+          submittedAt: "2026-08-28",
+          delivery: 48,
+          response: 29,
+          attitude: 19,
+          retrospective: "观点与后续实际结果基本一致",
+          tags: ["专业性强", "响应及时"],
+          comment: "交付材料完整，判断依据清晰，能够有效支持项目决策。",
+        },
+        {
+          project: "新能源供应链风险研判",
+          reviewLabel: "履约评价",
+          total: 92,
+          result: "良好",
+          submittedAt: "2026-06-16",
+          delivery: 46,
+          response: 27,
+          attitude: 19,
+          retrospective: "风险识别与项目后续情况基本吻合",
+          tags: ["判断准确", "配合度高"],
+          comment: "能够按期完成咨询任务，并提出具有可操作性的建议。",
+        },
+      ],
+    });
   }
   function lockSchedule() {
     if (
@@ -369,35 +377,19 @@ export default function Calls() {
       const task = store.tasks.find((item) => item.id === selected);
       task.lockedSchedule = schedule;
       task.supportNote = supportNote;
-      task.stage = "待专家确认";
-      task.progress = 35;
+      task.stage = "服务中";
+      task.progress = 50;
       task.history.push(
         log(
           "股权运营部（演示）",
-          `锁定排期 ${schedule}；协调说明：${supportNote}；已发送专家确认邀请`,
+          `锁定排期 ${schedule}；协调说明：${supportNote}；任务直接进入服务中`,
         ),
       );
-    }, "排期已锁定，已发送专家确认邀请");
-  }
-  function confirmExpertParticipation() {
-    if (!record || record.stage !== "待专家确认") return;
-    Modal.confirm({
-      title: "确认专家已确认合作？",
-      content: "确认后将进入履约中，并解锁咨询记录填写。",
-      okText: "确认",
-      cancelText: "取消",
-      onOk: () =>
-        persist((store) => {
-          const task = store.tasks.find((item) => item.id === selected);
-          task.stage = "履约中";
-          task.progress = 50;
-          task.history.push(log("专家（演示）", "已确认合作，任务进入履约中"));
-        }, "专家已确认合作，咨询记录已解锁"),
-    });
+    }, "排期已锁定，任务进入服务中");
   }
   async function saveConsultation(submit) {
     if (!canEditConsultation)
-      return message.warning("专家确认合作后，才能填写咨询记录");
+      return message.warning("任务进入服务中后，才能填写咨询记录");
     const values = submit
       ? await consultationForm.validateFields()
       : consultationForm.getFieldsValue();
@@ -421,18 +413,18 @@ export default function Calls() {
                 attachment: values.attachment || "咨询记录.pdf（演示）",
               },
             ];
-            task.stage = "待验收";
-            task.progress = 80;
+            task.stage = "待评价";
+            task.progress = 95;
             task.history.push(
               log(
                 "专家/经办人（演示）",
-                `正式提交咨询记录 v${number}，等待需求部门验收`,
+                `正式提交咨询记录 v${number}，进入待评价`,
               ),
             );
           } else
             task.history.push(log("专家/经办人（演示）", "保存咨询记录草稿"));
         },
-        submit ? "咨询记录已正式提交，等待验收" : "咨询记录草稿已保存",
+        submit ? "咨询记录已正式提交，进入待评价" : "咨询记录草稿已保存",
       )
     )
       consultationForm.setFieldsValue(values);
@@ -478,36 +470,6 @@ export default function Calls() {
           );
         }, "评价已提交，任务已评价完成，可继续复评"),
     });
-  }
-  function accept(passed) {
-    if (record?.stage !== "待验收" || !record.versions?.length)
-      return message.warning("只有正式提交成果才能验收");
-    if (
-      !opinion.trim() ||
-      (!passed && (!deadline || new Date(deadline).getTime() <= Date.now()))
-    )
-      return message.warning("请填写验收意见；退回还需设置未来补充期限");
-    if (
-      persist((store) => {
-        const task = store.tasks.find((item) => item.id === selected);
-        const entry = {
-          ...log(
-            "PC需求部门（演示）",
-            `${passed ? "咨询成果确认通过" : "退回补充"}：${opinion}`,
-          ),
-          version: task.versions.at(-1).number,
-          deadline: passed ? null : deadline,
-        };
-        task.acceptance.push(entry);
-        task.history.push(entry);
-        task.stage = passed ? "待评价" : "待补充";
-        task.revisionDeadline = passed ? null : deadline;
-        task.progress = passed ? 95 : 75;
-      })
-    ) {
-      setOpinion("");
-      setDeadline("");
-    }
   }
   function openTask(task) {
     if (task.stage === "草稿") return edit(task);
@@ -609,17 +571,6 @@ export default function Calls() {
           />
           <Select
             allowClear
-            style={{ width: 160 }}
-            value={taskField}
-            onChange={setTaskField}
-            placeholder="所需领域"
-            options={filterOptions.fields.map((value) => ({
-              value,
-              label: value,
-            }))}
-          />
-          <Select
-            allowClear
             style={{ width: 150 }}
             value={taskExpert}
             onChange={setTaskExpert}
@@ -634,7 +585,6 @@ export default function Calls() {
               setTaskKeyword("");
               setTaskStage(undefined);
               setTaskDepartment(undefined);
-              setTaskField(undefined);
               setTaskExpert(undefined);
             }}
           >
@@ -677,7 +627,6 @@ export default function Calls() {
                 ),
               },
               { title: "需求部门", dataIndex: "department" },
-              { title: "领域", dataIndex: "field" },
               { title: "专家", dataIndex: "expert" },
               {
                 title: "状态",
@@ -908,11 +857,6 @@ export default function Calls() {
                   label: "需求与轨迹",
                   children: (
                     <div className={wb.stack}>
-                      {record.stage === "调用受理中" ? (
-                        <Button type="primary" onClick={acceptTask}>
-                          运营受理并进入推荐匹配
-                        </Button>
-                      ) : null}
                       <Descriptions
                         bordered
                         column={1}
@@ -949,19 +893,6 @@ export default function Calls() {
                   label: "推荐匹配与排期",
                   children: (
                     <div className={wb.stack}>
-                      {record.stage === "调用受理中" ? (
-                        <Alert
-                          type="warning"
-                          showIcon
-                          message="该调用申请尚未受理"
-                          description="运营人员受理后，候选专家表将进入可选择状态。"
-                          action={
-                            <Button type="primary" onClick={acceptTask}>
-                              运营受理并开始匹配
-                            </Button>
-                          }
-                        />
-                      ) : null}
                       <Alert
                         type="info"
                         showIcon
@@ -1057,6 +988,21 @@ export default function Calls() {
                               </Tag>
                             ),
                           },
+                          {
+                            title: "操作",
+                            width: 100,
+                            render: (_, expert) => (
+                              <Button
+                                type="link"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  openCallRecord(expert);
+                                }}
+                              >
+                                查看详情
+                              </Button>
+                            ),
+                          },
                         ]}
                       />
                       <div className={wb.actionBar}>
@@ -1141,24 +1087,6 @@ export default function Calls() {
                           </Button>
                         </Space>
                       </div>
-                      {record.stage === "待专家确认" ? (
-                        <section className={wb.block}>
-                          <h3 className={wb.sectionTitle}>专家确认</h3>
-                          <Alert
-                            type="info"
-                            showIcon
-                            message="已发送专家确认邀请"
-                            description="等待专家确认合作后开始履约。"
-                          />
-                          <Button
-                            type="primary"
-                            style={{ marginTop: 16 }}
-                            onClick={confirmExpertParticipation}
-                          >
-                            模拟专家确认合作
-                          </Button>
-                        </section>
-                      ) : null}
                     </div>
                   ),
                 },
@@ -1172,7 +1100,7 @@ export default function Calls() {
                           type="warning"
                           showIcon
                           message="咨询记录尚未解锁"
-                          description="专家确认合作后，才可填写咨询记录。"
+                          description="任务进入服务中后，才可填写咨询记录。"
                         />
                       ) : (
                         <>
@@ -1288,32 +1216,8 @@ export default function Calls() {
                             >
                               <Input.TextArea rows={3} />
                             </Form.Item>
-                            <Divider orientation="left">
-                              五、风险提示与行动建议
-                            </Divider>
-                            <Form.Item
-                              name="risks"
-                              label="核心风险点"
-                              rules={[{ required: true, whitespace: true }]}
-                            >
-                              <Input.TextArea rows={3} />
-                            </Form.Item>
-                            <Form.Item
-                              name="suggestions"
-                              label="后续行动建议"
-                              rules={[{ required: true, whitespace: true }]}
-                            >
-                              <Input.TextArea rows={3} />
-                            </Form.Item>
                             <Form.Item name="attachment" label="成果附件">
                               <Input placeholder="如：技术研判意见.pdf（演示）" />
-                            </Form.Item>
-                            <Divider orientation="left">六、归档信息</Divider>
-                            <Form.Item name="archiveNo" label="归档编号">
-                              <Input placeholder="正式提交后由系统生成，可提前登记演示编号" />
-                            </Form.Item>
-                            <Form.Item name="remark" label="备注">
-                              <Input.TextArea rows={2} />
                             </Form.Item>
                           </Form>
                           <Space>
@@ -1354,34 +1258,6 @@ export default function Calls() {
                             </section>
                           ))
                         : null}
-                      {record.stage === "待验收" ? (
-                        <section className={wb.actionBar}>
-                          <h3 className={wb.sectionTitle}>需求部门验收</h3>
-                          <Input.TextArea
-                            value={opinion}
-                            onChange={(event) => setOpinion(event.target.value)}
-                            placeholder="成果确认意见 / 退回原因（必填）"
-                          />
-                          <span>
-                            退回补充期限：
-                            <Input
-                              type="datetime-local"
-                              value={deadline}
-                              onChange={(event) =>
-                                setDeadline(event.target.value)
-                              }
-                            />
-                          </span>
-                          <Space>
-                            <Button type="primary" onClick={() => accept(true)}>
-                              咨询成果确认通过
-                            </Button>
-                            <Button danger onClick={() => accept(false)}>
-                              退回补充
-                            </Button>
-                          </Space>
-                        </section>
-                      ) : null}
                       {["待评价", "已评价完成"].includes(record.stage) ? (
                         <section className={wb.block}>
                           <h3 className={wb.sectionTitle}>
@@ -1544,17 +1420,88 @@ export default function Calls() {
                           ))}
                         </section>
                       ) : null}
-                      <Timeline
-                        items={(record.acceptance || []).map((item, index) => ({
-                          key: index,
-                          children: `${item.at} · v${item.version} · ${item.text}${item.deadline ? ` · 补充期限 ${item.deadline}` : ""}`,
-                        }))}
-                      />
                     </div>
                   ),
                 },
               ]}
             />
+          </div>
+        ) : null}
+      </Drawer>
+      <Drawer
+        title={`${selectedCallRecord?.expert?.name || "专家"} · 调用记录`}
+        open={!!selectedCallRecord}
+        onClose={() => setSelectedCallRecord(null)}
+        width="min(760px, 92vw)"
+      >
+        {selectedCallRecord ? (
+          <div className={wb.drawerBody}>
+            <Alert
+              type="info"
+              showIcon
+              message="调用记录（演示数据）"
+              description={`${selectedCallRecord.expert.company} · ${selectedCallRecord.expert.title}；以下记录用于展示历史调用与履约评价。`}
+            />
+            <Table
+              style={{ marginTop: 16 }}
+              size="small"
+              pagination={false}
+              rowKey="project"
+              columns={[
+                { title: "项目", dataIndex: "project" },
+                { title: "评价类型", dataIndex: "reviewLabel" },
+                {
+                  title: "综合评分",
+                  dataIndex: "total",
+                  render: (value) => `${value} 分`,
+                },
+                { title: "评价结果", dataIndex: "result" },
+                { title: "评价时间", dataIndex: "submittedAt" },
+              ]}
+              dataSource={selectedCallRecord.records}
+            />
+            <h3 className={wb.sectionTitle}>调用记录详情</h3>
+            {selectedCallRecord.records.map((item) => (
+              <section className={wb.block} key={`${item.project}-detail`}>
+                <h3>{item.project}</h3>
+                <Descriptions
+                  bordered
+                  column={1}
+                  size="small"
+                  items={[
+                    { key: 1, label: "评价类型", children: item.reviewLabel },
+                    {
+                      key: 2,
+                      label: "综合评分",
+                      children: `${item.total} 分 · ${item.result}`,
+                    },
+                    { key: 3, label: "评价时间", children: item.submittedAt },
+                    {
+                      key: 4,
+                      label: "交付质量",
+                      children: `${item.delivery}/50`,
+                    },
+                    {
+                      key: 5,
+                      label: "响应效率",
+                      children: `${item.response}/30`,
+                    },
+                    {
+                      key: 6,
+                      label: "服务态度",
+                      children: `${item.attitude}/20`,
+                    },
+                    { key: 7, label: "观点回溯", children: item.retrospective },
+                    {
+                      key: 8,
+                      label: "评价标签",
+                      children: item.tags.join("、"),
+                    },
+                    { key: 9, label: "评价说明", children: item.comment },
+                  ]}
+                />
+              </section>
+            ))}
           </div>
         ) : null}
       </Drawer>
@@ -1609,10 +1556,6 @@ export default function Calls() {
                   ["facts", "事实类"],
                   ["judgment", "判断类"],
                   ["basis", "逻辑类"],
-                  ["risks", "核心风险点"],
-                  ["suggestions", "后续行动建议"],
-                  ["archiveNo", "归档编号"],
-                  ["remark", "备注"],
                 ].map(([key, label]) => ({
                   key,
                   label,

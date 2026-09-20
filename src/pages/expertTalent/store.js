@@ -460,7 +460,7 @@ const seed = {
       letterNo: "YQH-2026-001",
       letterTemplate: "专家合作邀请函（标准版）",
       expiry: "2026-09-30",
-      stage: "待确认",
+      stage: "资料完善中",
       agreed: false,
       submitted: false,
       history: invitationHistory([
@@ -481,7 +481,7 @@ const seed = {
       letterNo: "YQH-2026-002",
       letterTemplate: "专家合作邀请函（标准版）",
       expiry: "2026-09-30",
-      stage: "待资料核对",
+      stage: "资料完善中",
       agreed: true,
       submitted: true,
       profile,
@@ -511,7 +511,7 @@ const seed = {
       letterNo: "YQH-2026-003",
       letterTemplate: "专家合作邀请函（标准版）",
       expiry: "2026-09-30",
-      stage: "待资料核对",
+      stage: "资料完善中",
       agreed: true,
       submitted: true,
       ...dossier({
@@ -920,7 +920,8 @@ function normalize(saved) {
     if (migrated.stage === "待总办会审议") migrated.stage = "领导审批中";
     if (migrated.stage === "总办会通过·待聘任") migrated.stage = "待签发聘书";
     if (migrated.stage === "总办会未通过") migrated.stage = "审批退回";
-    if (migrated.stage === "待补充资料") migrated.stage = "待资料核对";
+    if (["待确认", "待资料核对", "待补充资料"].includes(migrated.stage))
+      migrated.stage = "资料完善中";
     delete migrated.meeting;
     migrated.history = Array.isArray(migrated.history) ? migrated.history : [];
     if (migrated.id === "INV-DEMO-2")
@@ -939,9 +940,15 @@ function normalize(saved) {
   });
   next.tasks = next.tasks.map((task) => {
     const migratedTask = { ...task };
-    if (["待专家签署声明", "声明拒签", "声明失效"].includes(migratedTask.stage))
-      migratedTask.stage = "待专家确认";
+    if (migratedTask.stage === "调用受理中") migratedTask.stage = "匹配中";
+    if (
+      ["待专家签署声明", "声明拒签", "声明失效", "待专家确认"].includes(
+        migratedTask.stage,
+      )
+    )
+      migratedTask.stage = "服务中";
     if (migratedTask.stage === "已完成") migratedTask.stage = "已评价完成";
+    if (migratedTask.stage === "待验收") migratedTask.stage = "待评价";
     delete migratedTask.commitment;
     migratedTask.evaluations = Array.isArray(migratedTask.evaluations)
       ? migratedTask.evaluations
@@ -957,7 +964,6 @@ function normalize(saved) {
       "服务中",
       "履约中",
       "待补充",
-      "待验收",
       "待评价",
       "已评价完成",
       "已完成",
@@ -1063,7 +1069,7 @@ function consultationRecord(task, extras = {}) {
       "补充客户访谈，核验产线与订单，设置阶段性投资条件并持续跟踪关键指标。",
     attachment: extras.attachment || `咨询记录-${task.id}.pdf（演示）`,
     archiveNo: extras.archiveNo || `ZXJL-2026-${String(task.id).slice(-3)}`,
-    remark: extras.remark || "专家确认合作后形成的演示咨询记录。",
+    remark: extras.remark || "排期锁定后形成的演示咨询记录。",
     savedAt: extras.savedAt,
   };
 }
@@ -1152,18 +1158,6 @@ function enrichDemoTask(task) {
       ]),
     };
   }
-  if (task.stage === "调用受理中") {
-    return {
-      ...base,
-      history: taskHistory([
-        [
-          "2026-09-07 10:20:00",
-          "PC需求部门（演示）",
-          "提交专家调用申请，等待股权运营部受理",
-        ],
-      ]),
-    };
-  }
   if (task.stage === "匹配中") {
     return {
       ...base,
@@ -1171,7 +1165,7 @@ function enrichDemoTask(task) {
         [
           "2026-09-06 11:08:00",
           "PC需求部门（演示）",
-          "提交专家调用申请，等待股权运营部受理",
+          "提交专家调用申请，自动进入推荐匹配",
         ],
         [
           "2026-09-06 14:32:00",
@@ -1192,7 +1186,7 @@ function enrichDemoTask(task) {
         [
           "2026-09-05 09:40:00",
           "PC需求部门（演示）",
-          "提交专家调用申请，等待股权运营部受理",
+          "提交专家调用申请，自动进入推荐匹配",
         ],
         [
           "2026-09-05 11:16:00",
@@ -1203,20 +1197,6 @@ function enrichDemoTask(task) {
           "2026-09-05 16:08:00",
           "PC需求部门（演示）",
           `确认专家${task.expert}，等待运营锁定服务时间`,
-        ],
-      ]),
-    };
-  }
-  if (task.stage === "待专家确认") {
-    return {
-      ...base,
-      lockedSchedule: "2026-09-12 14:00 至 2026-09-12 16:00",
-      supportNote: "已与专家确认周五下午线上会议，材料提前一天发送。",
-      history: taskHistory([
-        [
-          "2026-09-06 15:20:00",
-          "股权运营部（演示）",
-          "锁定排期 2026-09-12 14:00 至 2026-09-12 16:00；已发送专家确认邀请",
         ],
       ]),
     };
@@ -1233,8 +1213,8 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-09-01 10:06:18",
-          "专家确认（演示）",
-          "专家已确认合作，成果与验收已解锁",
+          "股权运营部（演示）",
+          "排期已锁定，任务进入服务中，成果与验收已解锁",
         ],
         ["2026-09-05 16:40:00", "专家/经办人（演示）", "保存咨询记录草稿"],
       ]),
@@ -1263,48 +1243,18 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-09-01 10:06:18",
-          "专家确认（演示）",
-          "专家已确认合作，成果与验收已解锁",
+          "股权运营部（演示）",
+          "排期已锁定，任务进入服务中，成果与验收已解锁",
         ],
         [
           "2026-09-04 16:20:00",
           "专家/经办人（演示）",
-          "正式提交咨询记录 v1，等待需求部门验收",
+          "正式提交咨询记录 v1，进入待评价",
         ],
         [
           "2026-09-05 11:08:00",
           "PC需求部门（演示）",
           "退回补充：请补充客户验证与量产进度的量化依据",
-        ],
-      ]),
-    };
-  }
-  if (task.stage === "待验收") {
-    return {
-      ...signedBase,
-      consultationRecord: consultationRecord(task, {
-        consultDate: "2026-09-03",
-        minutes: 180,
-        savedAt: "2026-09-03 17:10:00",
-      }),
-      versions: [
-        {
-          number: 1,
-          at: "2026-09-03 17:10:00",
-          content: record.judgment,
-          attachment: record.attachment,
-        },
-      ],
-      history: taskHistory([
-        [
-          "2026-09-01 10:06:18",
-          "专家确认（演示）",
-          "专家已确认合作，成果与验收已解锁",
-        ],
-        [
-          "2026-09-03 17:10:00",
-          "专家/经办人（演示）",
-          "正式提交咨询记录 v1，等待需求部门验收",
         ],
       ]),
     };
@@ -1337,13 +1287,13 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-09-01 10:06:18",
-          "专家确认（演示）",
-          "专家已确认合作，成果与验收已解锁",
+          "股权运营部（演示）",
+          "排期已锁定，任务进入服务中，成果与验收已解锁",
         ],
         [
           "2026-08-29 16:40:00",
           "专家/经办人（演示）",
-          "正式提交咨询记录 v1，等待需求部门验收",
+          "正式提交咨询记录 v1，进入待评价",
         ],
         [
           "2026-09-02 10:18:00",
@@ -1409,13 +1359,13 @@ function enrichDemoTask(task) {
       history: taskHistory([
         [
           "2026-08-20 10:06:18",
-          "专家确认（演示）",
-          "专家已确认合作，成果与验收已解锁",
+          "股权运营部（演示）",
+          "排期已锁定，任务进入服务中，成果与验收已解锁",
         ],
         [
           "2026-08-22 15:30:00",
           "专家/经办人（演示）",
-          "正式提交咨询记录 v1，等待需求部门验收",
+          "正式提交咨询记录 v1，进入待评价",
         ],
         [
           "2026-08-25 09:40:00",

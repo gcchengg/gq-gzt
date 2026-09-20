@@ -99,6 +99,19 @@ export default function AppShell() {
   const isRecommendationArea = ["/djghome", "/recommendationletter"].includes(
     normalizedPathname,
   );
+  const isExpertArea = [
+    "/zj",
+    "/zj/",
+    "/zj/pool",
+    "/zj/list",
+    "/zj/tasks",
+    "/zj/operations",
+    "/experttalentpool",
+    "/experttalentlist",
+    "/experttalentapplications",
+    "/experttalenttasks",
+    "/experttalentoperations",
+  ].includes(normalizedPathname);
   const isCompanyListArea = [
     "/comapnylist",
     "/companymaintenancelist",
@@ -106,66 +119,53 @@ export default function AppShell() {
     "/executivemaintenancelist",
     "/executivemaintenance",
     "/projectexam",
-    "/experttalentpool",
-    "/experttalentlist",
-    "/experttalentapplications",
-    "/experttalenttasks",
-    "/experttalentoperations",
   ].includes(normalizedPathname);
   const activeMenus = useMemo(
     () =>
-      isCompanyListArea
+      isExpertArea
         ? [
-            { id: "company-list-only", title: "一口清", key: "/comapnyList" },
-            {
-              id: "company-maintenance-only",
-              title: "可比公司维护",
-              key: "/companyMaintenanceList",
-            },
-            {
-              id: "executive-maintenance-only",
-              title: "外派高管履职分析",
-              key: "/executiveMaintenanceList",
-            },
-            {
-              id: "project-exam-only",
-              title: "勋章管家",
-              key: "/projectExam",
-            },
-            {
-              id: "expert-pool",
-              title: "专家库看板",
-              key: "/expertTalentPool",
-            },
-            {
-              id: "expert-list",
-              title: "专家管理",
-              key: "/expertTalentList",
-            },
-            {
-              id: "expert-tasks",
-              title: "调用管理",
-              key: "/expertTalentTasks",
-            },
+            { id: "expert-workbench", title: "专家人才库工作台", key: "/zj/" },
+            { id: "expert-pool", title: "专家库看板", key: "/zj/pool" },
+            { id: "expert-list", title: "专家管理", key: "/zj/list" },
+            { id: "expert-tasks", title: "调用管理", key: "/zj/tasks" },
             {
               id: "expert-operations",
               title: "运营管理",
-              key: "/expertTalentOperations",
+              key: "/zj/operations",
             },
           ]
-        : isRecommendationArea
+        : isCompanyListArea
           ? [
+              { id: "company-list-only", title: "一口清", key: "/comapnyList" },
               {
-                id: "recommendation-letter-only",
-                title: "下发推荐函",
-                key:
-                  normalizedPathname === "/djghome"
-                    ? "/djghome"
-                    : "/recommendationLetter",
+                id: "company-maintenance-only",
+                title: "可比公司维护",
+                key: "/companyMaintenanceList",
+              },
+              {
+                id: "executive-maintenance-only",
+                title: "外派高管履职分析",
+                key: "/executiveMaintenanceList",
+              },
+              {
+                id: "project-exam-only",
+                title: "勋章管家",
+                key: "/projectExam",
               },
             ]
-          : webmenu,
-    [isCompanyListArea, isRecommendationArea, normalizedPathname],
+          : isRecommendationArea
+            ? [
+                {
+                  id: "recommendation-letter-only",
+                  title: "下发推荐函",
+                  key:
+                    normalizedPathname === "/djghome"
+                      ? "/djghome"
+                      : "/recommendationLetter",
+                },
+              ]
+            : webmenu,
+    [isCompanyListArea, isExpertArea, isRecommendationArea, normalizedPathname],
   );
 
   const menuItems = useMemo(() => createMenuItems(activeMenus), [activeMenus]);
@@ -175,9 +175,19 @@ export default function AppShell() {
     if (normalizedPathname === "/executivemaintenance") {
       return "/executiveMaintenanceList";
     }
-    if (normalizedPathname === "/experttalentapplications") {
-      return "/expertTalentList";
+    if (normalizedPathname === "/zj") {
+      return "/zj/";
     }
+    if (normalizedPathname === "/experttalentapplications") {
+      return "/zj/list";
+    }
+    const legacyExpertPath = {
+      "/experttalentpool": "/zj/pool",
+      "/experttalentlist": "/zj/list",
+      "/experttalenttasks": "/zj/tasks",
+      "/experttalentoperations": "/zj/operations",
+    }[normalizedPathname];
+    if (legacyExpertPath) return legacyExpertPath;
     const matched = leafMenus.find(
       (item) => getPathOnly(item.key) === pathname,
     );

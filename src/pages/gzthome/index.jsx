@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Link,
   useLocation,
@@ -6,7 +6,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import "./index.css";
-const ApprovalTasks = lazy(() => import("../expertTalent/ApprovalTasks"));
+import { useExpertStore } from "../expertTalent/store";
 const taskKeyMap = {
   topicApproval: "议题审批",
   meetingVote: "三会表决",
@@ -31,14 +31,8 @@ const taskTabs = [
   "任务闭环",
   "任务管理",
 ];
-const djgTaskTabs = [
-  "下发推荐函",
-  "可比公司维护",
-  "外派高管履职分析",
-  "专家人才库",
-  "专家入库审批",
-  "专家调用申请受理",
-];
+const djgTaskTabs = ["下发推荐函", "可比公司维护", "外派高管履职分析"];
+const expertTaskTabs = ["专家入库", "聘书签发", "专家调用", "锁定排期"];
 const metrics = [
   { label: "总待办数", value: "4450" },
   { label: "总逾期数", value: "0", tone: "red" },
@@ -139,11 +133,6 @@ const taskCopyByCard = {
     title: "2026年度外派高管履职分析",
     description: "复核长春一东外派高管月度履职情况并确认年度分析",
     href: "/executiveMaintenance?company=长春一东&year=2026",
-  },
-  专家人才库: {
-    title: "专家人才库",
-    description: "统一管理专家入库、智能匹配、调用履约与评价回溯",
-    href: "/expertTalentPool",
   },
   任务管理: {
     title: "任务管理",
@@ -417,20 +406,21 @@ function TaskRow({ task, secondary, onDescriptionClick }) {
 function TaskPanel() {
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
+  const state = useExpertStore();
   const normalizedPathname = pathname.toLowerCase();
   const isDjgHome = normalizedPathname === "/djghome";
-  const availableTaskTabs = isDjgHome ? djgTaskTabs : taskTabs;
+  const isExpertHome = ["/zj", "/zj/"].includes(normalizedPathname);
+  const availableTaskTabs = isExpertHome
+    ? expertTaskTabs
+    : isDjgHome
+      ? djgTaskTabs
+      : taskTabs;
   const taskFromUrl = useMemo(() => {
-    if (isDjgHome) {
-      if (searchParams.get("task") === "expertEnrollmentApproval")
-        return "专家入库审批";
-      if (searchParams.get("task") === "expertCallApproval")
-        return "专家调用申请受理";
-      return "下发推荐函";
-    }
+    if (isExpertHome) return "专家入库";
+    if (isDjgHome) return "下发推荐函";
     const mappedTask = taskKeyMap[searchParams.get("task")];
     return availableTaskTabs.includes(mappedTask) ? mappedTask : "议题反馈建议";
-  }, [availableTaskTabs, isDjgHome, searchParams]);
+  }, [availableTaskTabs, isDjgHome, isExpertHome, searchParams]);
   const [activeTab, setActiveTab] = useState(taskFromUrl);
   const [popover, setPopover] = useState({
     text: "",
@@ -440,8 +430,37 @@ function TaskPanel() {
   });
   const primaryTask = taskCopyByCard[activeTab];
   const secondaryTask = secondaryTaskCopyByCard[activeTab];
-  const taskRows =
-    activeTab === "可比公司维护"
+  const expertTaskRows = useMemo(() => {
+    if (activeTab === "专家入库" || activeTab === "聘书签发") {
+      return state.invitations
+        .filter((item) =>
+          activeTab === "聘书签发"
+            ? item.stage === "待签发聘书"
+            : ["资料完善中", "审批退回", "核对完成", "领导审批中"].includes(
+                item.stage,
+              ),
+        )
+        .map((item) => ({
+          title: `${item.name} · ${activeTab}`,
+          description: `当前阶段：${item.stage}`,
+          href: `/zj/list?expertEnrollmentId=${encodeURIComponent(item.id)}`,
+        }));
+    }
+    return state.tasks
+      .filter((item) =>
+        activeTab === "锁定排期"
+          ? item.stage === "待运营排期"
+          : item.stage === "匹配中",
+      )
+      .map((item) => ({
+        title: `${item.project || item.id} · ${activeTab}`,
+        description: `项目：${item.project || item.id}；当前阶段：${item.stage}`,
+        href: `/zj/tasks?taskId=${encodeURIComponent(item.id)}`,
+      }));
+  }, [activeTab, state.invitations, state.tasks]);
+  const taskRows = isExpertHome
+    ? expertTaskRows
+    : activeTab === "可比公司维护"
       ? companyMaintenanceTasks
       : [
           primaryTask,
@@ -515,45 +534,40 @@ function TaskPanel() {
         ))}
       </section>
 
-      {isDjgHome && ["专家入库审批", "专家调用申请受理"].includes(activeTab) ? (
-        <Suspense fallback={<p>正在加载专家业务任务…</p>}>
-          <ApprovalTasks
-            key={activeTab}
-            kind={activeTab === "专家入库审批" ? "enrollment" : "call"}
-          />
-        </Suspense>
-      ) : (
-        <section className={panelClassName} aria-label="基金退出列表">
-          <div className="list-title-row">
-            <div className="list-title-left">
-              <div className="list-title">{activeTab}</div>
-              <div className="summary">
-                <span className="chip">
-                  待办 <b>946</b>
-                </span>
-                <span className="overdue">逾期&nbsp;&nbsp;0</span>
-              </div>
+      <section className={panelClassName} aria-label="基金退出列表">
+        <div className="list-title-row">
+          <div className="list-title-left">
+            <div className="list-title">{activeTab}</div>
+            <div className="summary">
+              <span className="chip">
+                待办 <b>946</b>
+              </span>
+              <span className="overdue">逾期&nbsp;&nbsp;0</span>
             </div>
-            <button className="manual-link" type="button">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              <span>手动创建</span>
-            </button>
           </div>
+          <button className="manual-link" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>手动创建</span>
+          </button>
+        </div>
 
-          <div className={rowsClassName}>
-            {taskRows.map((task, index) => (
+        <div className={rowsClassName}>
+          {taskRows.length ? (
+            taskRows.map((task, index) => (
               <TaskRow
                 key={task.href}
                 task={task}
                 secondary={index > 0 || task.secondary}
                 onDescriptionClick={openDescription}
               />
-            ))}
-          </div>
-        </section>
-      )}
+            ))
+          ) : (
+            <p style={{ padding: 24, color: "#768898" }}>当前暂无待办任务</p>
+          )}
+        </div>
+      </section>
 
       <div
         className={["description-popover", popover.visible ? "show" : ""].join(

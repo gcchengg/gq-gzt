@@ -1,13 +1,8 @@
 export const stageMeta = {
-  待确认: {
-    color: "default",
-    tone: "#94a3b8",
-    hint: "等待专家在小程序确认合作邀请",
-  },
-  待资料核对: {
+  资料完善中: {
     color: "processing",
     tone: "#1677ff",
-    hint: "需经办人核对履历与入库申请表",
+    hint: "专家已接受邀请，正在完善履历与入库申请表",
   },
   核对完成: {
     color: "geekblue",
@@ -37,8 +32,7 @@ export const stageMeta = {
 };
 
 export const stageStrip = [
-  "待确认",
-  "待资料核对",
+  "资料完善中",
   "核对完成",
   "领导审批中",
   "审批退回",
@@ -56,11 +50,6 @@ export const taskStageMeta = {
     tone: "#94a3b8",
     hint: "需求部门尚未提交，可继续编辑",
   },
-  调用受理中: {
-    color: "processing",
-    tone: "#1677ff",
-    hint: "等待股权运营部受理申请",
-  },
   匹配中: {
     color: "geekblue",
     tone: "#2f54eb",
@@ -70,11 +59,6 @@ export const taskStageMeta = {
     color: "cyan",
     tone: "#08979c",
     hint: "人选已确认，等待锁定服务时间",
-  },
-  待专家确认: {
-    color: "purple",
-    tone: "#722ed1",
-    hint: "排期已锁定，等待专家确认合作",
   },
   履约中: {
     color: "processing",
@@ -91,12 +75,11 @@ export const taskStageMeta = {
     tone: "#d48806",
     hint: "成果已退回，等待专家补充",
   },
-  待验收: {
-    color: "gold",
-    tone: "#d48806",
-    hint: "咨询记录已提交，等待需求部门验收",
+  待评价: {
+    color: "blue",
+    tone: "#2563eb",
+    hint: "咨询记录已提交，等待履约评价",
   },
-  待评价: { color: "blue", tone: "#2563eb", hint: "验收通过，等待履约评价" },
   已完成: { color: "success", tone: "#389e0d", hint: "评价已提交，任务关闭" },
   已评价完成: {
     color: "success",
@@ -107,13 +90,10 @@ export const taskStageMeta = {
 
 export const taskStageStrip = [
   "草稿",
-  "调用受理中",
   "匹配中",
   "待运营排期",
-  "待专家确认",
   "服务中",
   "待补充",
-  "待验收",
   "待评价",
   "已评价完成",
 ];

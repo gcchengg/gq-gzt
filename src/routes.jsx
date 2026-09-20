@@ -36,6 +36,14 @@ const ProjectExam = lazy(() => import("@/modules/projectExam/pages"));
 const BoardGovernance = lazy(() => import("@/pages/boardGovernance"));
 const Notfound = lazy(() => import("@/pages/404"));
 export const routes = [
+  ...["zj", "zj/pool", "zj/list", "zj/tasks", "zj/operations"].map((path) => ({
+    path,
+    element: (
+      <Suspense>
+        <ExpertTalent />
+      </Suspense>
+    ),
+  })),
   ...[
     "expertTalentPool",
     "expertTalentList",

@@ -154,7 +154,7 @@ export default function ApprovalTasks({ kind }) {
           </div>
           <Link
             className="manual-link"
-            to={enrollment ? "/expertTalentList" : "/expertTalentTasks"}
+            to={enrollment ? "/zj/list" : "/zj/tasks"}
             state={{ expertManagementTab: "enrollment" }}
           >
             前往业务页面

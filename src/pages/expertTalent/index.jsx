@@ -29,7 +29,12 @@ import {
   message,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { activity, evaluations } from "./data";
 import styles from "./index.module.less";
 import wb from "./workbench.module.less";
@@ -38,6 +43,7 @@ import EvaluationAnalytics from "./components/EvaluationAnalytics";
 import EvaluationRecordsDrawer from "./components/EvaluationRecordsDrawer";
 import Enrollment from "./Enrollment";
 import Calls from "./Calls";
+import GztHome from "../gzthome";
 import { log, uid, updateStore, useExpertStore } from "./store";
 import {
   compareAverageScore,
@@ -159,6 +165,10 @@ function StatCard({ label, value, delta, icon: Icon, tone = "blue" }) {
   );
 }
 
+function ExpertWorkbench() {
+  return <GztHome />;
+}
+
 function Dashboard() {
   const navigate = useNavigate();
   const { tasks: taskRecords } = useExpertStore();
@@ -200,16 +210,14 @@ function Dashboard() {
             <Button
               type="primary"
               onClick={() =>
-                navigate("/expertTalentList", {
+                navigate("/zj/list", {
                   state: { expertManagementTab: "enrollment" },
                 })
               }
             >
               处理待办
             </Button>
-            <Button onClick={() => navigate("/expertTalentList")}>
-              查找专家
-            </Button>
+            <Button onClick={() => navigate("/zj/list")}>查找专家</Button>
           </Space>
         </div>
         <div className={styles.heroVisual}>
@@ -271,7 +279,7 @@ function Dashboard() {
             <Button
               type="link"
               onClick={() =>
-                navigate("/expertTalentList", {
+                navigate("/zj/list", {
                   state: { expertManagementTab: "enrollment" },
                 })
               }
@@ -290,10 +298,10 @@ function Dashboard() {
                 key={text}
                 onClick={() =>
                   type === "入库审核"
-                    ? navigate("/expertTalentList", {
+                    ? navigate("/zj/list", {
                         state: { expertManagementTab: "enrollment" },
                       })
-                    : navigate("/expertTalentTasks")
+                    : navigate("/zj/tasks")
                 }
               >
                 <i className={styles[tone]}>{type.slice(0, 1)}</i>
@@ -1881,19 +1889,23 @@ function Operations() {
 function ExpertManagement() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { invitations } = useExpertStore();
+  const initialSelectedId = searchParams.get("expertEnrollmentId") || "";
   const [panel, setPanel] = useState(() =>
-    location.state?.expertManagementTab === "enrollment"
+    location.state?.expertManagementTab === "enrollment" || initialSelectedId
       ? "enrollment"
       : "experts",
   );
-  const [innerTab, setInnerTab] = useState("pool");
+  const [innerTab, setInnerTab] = useState(
+    initialSelectedId ? "invitations" : "pool",
+  );
   const [inviteTick, setInviteTick] = useState(0);
 
   useEffect(() => {
     if (location.state?.expertManagementTab !== "enrollment") return;
     setPanel("enrollment");
-    navigate("/expertTalentList", { replace: true, state: {} });
+    navigate("/zj/list", { replace: true, state: {} });
   }, [location.state, navigate]);
 
   return (
@@ -1948,6 +1960,7 @@ function ExpertManagement() {
             innerTab={innerTab}
             onInnerTabChange={setInnerTab}
             inviteTick={inviteTick}
+            initialSelectedId={initialSelectedId}
           />
         </div>
       </div>
@@ -1957,6 +1970,11 @@ function ExpertManagement() {
 
 export default function ExpertTalent() {
   const { pathname } = useLocation();
+  if (pathname === "/zj" || pathname === "/zj/") return <ExpertWorkbench />;
+  if (pathname === "/zj/pool") return <Dashboard />;
+  if (pathname === "/zj/list") return <ExpertManagement />;
+  if (pathname === "/zj/tasks") return <Tasks />;
+  if (pathname === "/zj/operations") return <Operations />;
   if (pathname === "/expertTalentList") return <ExpertManagement />;
   if (pathname === "/expertTalentApplications")
     return (

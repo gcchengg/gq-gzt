@@ -15,9 +15,7 @@ const fields = [
   ["source", "人员来源"],
   ["department", "推荐部门"],
   ["recommender", "推荐人"],
-  ["project", "关联项目"],
   ["field", "拟服务领域"],
-  ["reason", "推荐理由"],
 ];
 const requiredFields = ["name", "gender", "phone"];
 const dash = (value) => value || "--";
@@ -108,21 +106,7 @@ export default function CandidatePool({ onInvite }) {
         </div>
       ),
     },
-    {
-      title: "关联项目",
-      dataIndex: "project",
-      width: 160,
-      ellipsis: true,
-      render: dash,
-    },
     { title: "拟服务领域", dataIndex: "field", width: 110, render: dash },
-    {
-      title: "推荐理由",
-      dataIndex: "reason",
-      minWidth: 180,
-      ellipsis: true,
-      render: dash,
-    },
     {
       title: "状态",
       dataIndex: "status",
@@ -184,7 +168,7 @@ export default function CandidatePool({ onInvite }) {
       <div className={styles.toolbar}>
         <Input.Search
           allowClear
-          placeholder="搜索姓名、单位、来源、项目或领域"
+          placeholder="搜索姓名、单位、来源或领域"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
           className={styles.search}
@@ -245,13 +229,7 @@ export default function CandidatePool({ onInvite }) {
                   placeholder="请选择"
                 />
               ) : (
-                <Input.TextArea
-                  autoSize={
-                    key === "reason"
-                      ? { minRows: 2, maxRows: 3 }
-                      : { minRows: 1, maxRows: 1 }
-                  }
-                />
+                <Input.TextArea autoSize={{ minRows: 1, maxRows: 1 }} />
               )}
             </Form.Item>
           ))}

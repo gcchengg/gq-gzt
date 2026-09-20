@@ -46,6 +46,10 @@ const stageSource = readFileSync(
   new URL("./stages.js", import.meta.url),
   "utf8",
 );
+const storeSource = readFileSync(
+  new URL("./store.js", import.meta.url),
+  "utf8",
+);
 
 test("dashboard mounts the evaluation analytics section", () => {
   assert.match(pageSource, /<EvaluationAnalytics/);
@@ -245,6 +249,33 @@ test("invite modal drops expiry, makes note optional, and uses chinese cancel", 
     /label="合作邀请说明"[\s\S]{0,80}required: true/,
   );
   assert.match(enrollmentSource, /cancelText="取消"/);
+  assert.match(enrollmentSource, /DEFAULT_INVITATION_NOTE/);
+  assert.match(
+    enrollmentSource,
+    /一汽股权投资（天津）有限公司诚邀您加入专家人才库/,
+  );
+});
+
+test("recommended-name form and table omit project and recommendation reason", () => {
+  assert.doesNotMatch(poolSource, /\["project", "关联项目"\]/);
+  assert.doesNotMatch(poolSource, /\["reason", "推荐理由"\]/);
+  assert.doesNotMatch(poolSource, /title: "关联项目"/);
+  assert.doesNotMatch(poolSource, /title: "推荐理由"/);
+});
+
+test("enrollment drawer hides non-core profile fields", () => {
+  assert.match(enrollmentSource, /drawerHiddenProfileFields/);
+  assert.match(enrollmentSource, /visibleProfileEntries/);
+  for (const field of [
+    "roles",
+    "travel",
+    "attachment",
+    "city",
+    "service",
+    "certificates",
+  ]) {
+    assert.match(enrollmentSource, new RegExp(`"${field}"`));
+  }
 });
 
 test("enrollment no longer waits for expert appointment signing or return-for-fix", () => {
@@ -261,9 +292,20 @@ test("enrollment no longer waits for expert appointment signing or return-for-fi
 });
 
 test("enrollment drawer shows save and submit only while waiting for confirmation", () => {
-  assert.match(enrollmentSource, /footer=\{\s*record\?\.stage === "待确认"/);
+  assert.match(
+    enrollmentSource,
+    /footer=\{\s*record\?\.stage === "资料完善中"/,
+  );
   assert.match(enrollmentSource, />保存</);
-  assert.match(enrollmentSource, />提交</);
+  assert.match(enrollmentSource, />\s*提交\s*</);
   assert.match(enrollmentSource, /savePendingInvitation/);
   assert.match(enrollmentSource, /submitPendingInvitation/);
+});
+
+test("enrollment confirmation and material-check stages are merged", () => {
+  assert.match(stageSource, /资料完善中/);
+  assert.doesNotMatch(stageSource, /待确认/);
+  assert.doesNotMatch(stageSource, /待资料核对/);
+  assert.match(enrollmentSource, /stage: "资料完善中"/);
+  assert.match(storeSource, /待确认.*待资料核对.*资料完善中/s);
 });
