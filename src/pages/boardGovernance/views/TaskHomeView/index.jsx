@@ -133,8 +133,11 @@ export default function TaskHomeView({
   const materialPendingCount = taskGroups.filter(
     (item) => !item.complete,
   ).length;
-  const confirmationPendingCount = dutyPlans.filter(
-    (item) => item.status !== "已完成",
+  const confirmationPlans = dutyPlans.filter((item) =>
+    ["待确认", "已完成"].includes(item.status),
+  );
+  const confirmationPendingCount = confirmationPlans.filter(
+    (item) => item.status === "待确认",
   ).length;
   const generatedPlans = dutyPlans.filter((item) =>
     generatedDirectorNames.includes(item.directorName),
@@ -177,12 +180,12 @@ export default function TaskHomeView({
         key: "confirmation",
         label: "年度履职计划确认",
         groups: buildDepartmentGroups(
-          dutyPlans,
+          confirmationPlans,
           (item) => item.status === "已完成",
         ),
       },
     ],
-    [dutyPlans, generatedPlans, suggestionTasks, taskGroups],
+    [confirmationPlans, generatedPlans, suggestionTasks, taskGroups],
   );
   const currentCategory =
     taskCategories.find((item) => item.key === activeCategory) ||

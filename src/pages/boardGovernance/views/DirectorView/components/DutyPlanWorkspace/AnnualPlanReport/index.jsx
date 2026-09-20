@@ -4,14 +4,10 @@ function CategoryRows({ category, items }) {
   const rows = items.length
     ? items
     : [{ seq: 1, content: "", date: "", target: "" }];
-  const displayRows = [
-    ...rows,
-    { seq: "...", content: "", date: "", target: "" },
-  ];
-  return displayRows.map((row, index) => (
-    <tr key={`${category}-${row.seq}-${index}`}>
+  return rows.map((row, index) => (
+    <tr key={`${category}-${row.seq}`}>
       {index === 0 ? (
-        <th rowSpan={displayRows.length} className={styles.categoryCell}>
+        <th rowSpan={rows.length} className={styles.categoryCell}>
           {category}
         </th>
       ) : null}

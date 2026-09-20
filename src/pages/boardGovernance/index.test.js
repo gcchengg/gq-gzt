@@ -192,9 +192,20 @@ test("provides an operable three-type duty plan lifecycle", async () => {
   assert.match(director, /履职准备董事选择/);
   assert.match(director, /directors\.map/);
   assert.match(director, /directorPlans/);
+  assert.match(
+    director,
+    /function PreparationWorkspace\(\{[\s\S]{0,500}onDeleteDutyPlan/,
+  );
+  assert.match(
+    director,
+    /function PreparationWorkspace\(\{[\s\S]{0,500}onSubmitDutyPlan/,
+  );
   for (const action of [
     "新增计划",
-    "提交并发送确认任务",
+    "保存为草稿",
+    "提交计划",
+    "批量提交",
+    "删除计划",
     "确认责任人",
     "生成年度计划并创建任务",
     "查看任务",
@@ -204,8 +215,19 @@ test("provides an operable three-type duty plan lifecycle", async () => {
   ]) {
     assert.match(plan, new RegExp(action));
   }
+  assert.match(plan, /selectedDraftIds/);
+  const page = await read("./index.jsx");
+  assert.match(page, /Array\.isArray\(planIds\)/);
   assert.match(plan, /buildAnnualDutyPlanReport/);
   assert.match(plan, /printAnnualPlanReport/);
+  const annualReport = await read(
+    "./views/DirectorView/components/DutyPlanWorkspace/annualPlanReport.js",
+  );
+  const annualReportView = await read(
+    "./views/DirectorView/components/DutyPlanWorkspace/AnnualPlanReport/index.jsx",
+  );
+  assert.match(annualReport, /DEMO_ANNUAL_PLAN_REPORT/);
+  assert.match(annualReportView, /本年度重点工作计划/);
   assert.doesNotMatch(plan, /专项任务|线下/);
 });
 
@@ -245,7 +267,9 @@ test("connects handbook department tasks with the preparation table", async () =
     `${page}${director}`,
     /确认资料|onConfirmMaterial|confirmedCount/,
   );
-  assert.match(director, /disabled=\{!allSubmitted\}/);
+  assert.match(director, /disabled=\{!materials\.length \|\| !allSubmitted\}/);
+  assert.match(director, /const previewColumns = \[/);
+  assert.doesNotMatch(director, /scroll=\{\{ x: 950, y: 280 \}\}/);
   assert.match(historyDrawer, /资料历史详情/);
   assert.match(historyDrawer, /全部年度/);
   assert.match(historyDrawer, /全部季度/);
@@ -263,17 +287,74 @@ test("connects plan confirmation tasks with the workbench and plan table", async
   ]);
   assert.match(page, /plan-confirm-task/);
   assert.match(page, /saveDutyPlanConfirmation/);
+  assert.match(page, /deleteDutyPlan/);
+  assert.match(page, /submitDutyPlan/);
   assert.match(page, /generateDutyTasks/);
   assert.match(taskHome, /年度履职计划确认/);
   assert.match(taskHome, /已创建履职任务/);
-  assert.match(taskHome, />编辑</);
   assert.match(task, /保存修改/);
   assert.match(task, /提交确认/);
   assert.doesNotMatch(task, /disabled=\{completed\}/);
   assert.match(plan, /label="确认责任人"/);
+  assert.match(plan, /保存为草稿/);
+  assert.match(plan, /删除计划/);
+  assert.match(plan, /提交计划/);
+  assert.match(page, /status: "已提交"/);
   assert.match(plan, /查看结果/);
   assert.match(plan, /disabled=\{!canGenerateAnnual\}/);
   assert.equal((data.match(/status: "已完成"/g) || []).length, 3);
+});
+
+test("shows the annual-plan source details and completion progress in duty tasks", async () => {
+  const [manager, planData] = await Promise.all([
+    read("./views/DutyTaskManagerView/index.jsx"),
+    read("./dutyPlanData.js"),
+  ]);
+  for (const label of [
+    "履职年度",
+    "履职季度",
+    "确认责任人",
+    "年度履职计划基础信息",
+    "计划填写完整度",
+    "任务办理填写情况",
+  ]) {
+    assert.match(manager, new RegExp(label));
+  }
+  for (const planId of ["PLAN-001", "PLAN-002", "PLAN-003"]) {
+    const planRecord = planData.slice(
+      planData.indexOf(`id: \"${planId}\"`),
+      planData.indexOf(`id: \"${planId}\"`) + 1200,
+    );
+    for (const field of [
+      "actualDate",
+      "evidenceNote",
+      "completionSummary",
+      "supplementFiles",
+    ]) {
+      assert.match(planRecord, new RegExp(field));
+    }
+  }
+});
+
+test("supplements management-stage demo data for every director archive", async () => {
+  const director = await read("./views/DirectorView/index.jsx");
+  for (const helper of [
+    "buildManagementDemoPlans",
+    "buildManagementDemoReports",
+    "buildManagementDemoSuggestions",
+  ]) {
+    assert.match(director, new RegExp(helper));
+  }
+  for (const label of [
+    "年度董事会及重点议题审议",
+    "公司治理与风险防控专题培训",
+    "经营情况专题调研",
+  ]) {
+    assert.match(director, new RegExp(label));
+  }
+  assert.match(director, /managementPlans/);
+  assert.match(director, /managementReports/);
+  assert.match(director, /managementSuggestions/);
 });
 
 test("connects responsible-person tasks with director records and reports", async () => {
@@ -316,6 +397,16 @@ test("connects responsible-person tasks with director records and reports", asyn
   assert.match(report, /保存完善内容/);
   assert.match(report, /提交接收/);
   assert.match(report, /接收履职报告/);
+  for (const label of [
+    "引用履职任务明细",
+    "实际完成日期",
+    "成果说明",
+    "完成情况",
+    "佐证材料",
+  ]) {
+    assert.match(report, new RegExp(label));
+  }
+  assert.match(page, /taskSnapshots/);
 });
 
 test("provides complete duty execution, suggestion, report, and evaluation workflows", async () => {
@@ -376,6 +467,11 @@ test("provides a personnel-maintain style role configuration page", async () => 
   ]);
   assert.match(page, /RoleConfigView/);
   assert.match(page, /"roles"/);
+  assert.match(data, /title: "办公室 · 资料类别",\n\s+hidden: true/);
+  assert.match(
+    view,
+    /subsections\.filter\(\(subsection\) => !subsection\.hidden\)/,
+  );
   for (const label of [
     "集团董办",
     "综合管理部",

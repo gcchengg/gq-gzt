@@ -148,13 +148,28 @@ export default function BoardGovernancePage() {
       {
         ...values,
         id: `PLAN-${Date.now()}`,
-        status: "待确认",
+        status: "草稿",
         confirmationNote: "",
         confirmedAt: "",
       },
     ]);
     setGeneratedDirectorNames((current) =>
       current.filter((name) => name !== values.directorName),
+    );
+  };
+  const deleteDutyPlan = (planId) => {
+    setDutyPlans((current) => current.filter((item) => item.id !== planId));
+  };
+  const submitDutyPlan = (planIds) => {
+    const submittedPlanIds = new Set(
+      Array.isArray(planIds) ? planIds : [planIds],
+    );
+    setDutyPlans((current) =>
+      current.map((item) =>
+        submittedPlanIds.has(item.id)
+          ? { ...item, status: "已提交", submittedAt: getNow() }
+          : item,
+      ),
     );
   };
   const saveDutyPlanConfirmation = (planId, values, submit = false) => {
@@ -269,12 +284,23 @@ export default function BoardGovernancePage() {
       status: "待完善",
       sourceCount: completedPlans.length,
       sourcePlanIds: completedPlans.map((item) => item.id),
+      taskSnapshots: completedPlans.map((item) => ({
+        id: item.id,
+        content: item.content,
+        type: item.type,
+        workCategory: item.workCategory,
+        actualDate: item.actualDate,
+        evidenceNote: item.evidenceNote,
+        completionSummary: item.completionSummary,
+        target: item.target,
+        supplementFiles: item.supplementFiles || [],
+      })),
       generatedAt: getNow(),
       summary: `${director.name}在${values.period}围绕会议、培训和调研计划开展履职工作，系统已归集${completedPlans.length}条已确认履职记录。`,
       workHighlights: completedPlans
         .map(
           (item, index) =>
-            `${index + 1}. ${item.content}：${item.completionSummary || item.target}`,
+            `${index + 1}. ${item.content}\n实际完成日期：${item.actualDate || "—"}\n成果说明：${item.evidenceNote || "—"}\n完成情况：${item.completionSummary || item.target}`,
         )
         .join("\n"),
       suggestions:
@@ -353,6 +379,8 @@ export default function BoardGovernancePage() {
         materials={handbookMaterials}
         dutyPlans={dutyPlans}
         onCreateDutyPlan={createDutyPlan}
+        onDeleteDutyPlan={deleteDutyPlan}
+        onSubmitDutyPlan={submitDutyPlan}
         onGenerateDutyTasks={generateDutyTasks}
         generatedDirectorNames={generatedDirectorNames}
         dutyReports={dutyReports}

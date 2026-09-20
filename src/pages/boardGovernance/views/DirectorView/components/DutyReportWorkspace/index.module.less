@@ -8,8 +8,27 @@
 .reportList aside { display: flex; align-items: center; gap: 8px; }
 .reportEditor { display: grid; gap: 18px; }
 .reportEditor :global(.ant-upload-wrapper .ant-upload-drag) { padding: 12px; background: #f8fbff; }
+.sourceTaskSection { display: grid; gap: 12px; padding: 14px; border: 1px solid #dce7f5; border-radius: 12px; background: #f8fbff; }
+.sourceTaskHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.sourceTaskHeader > div { display: grid; gap: 4px; }
+.sourceTaskHeader strong { color: #17365d; font-size: 14px; }
+.sourceTaskHeader span { color: #718097; font-size: 12px; line-height: 1.5; }
+.sourceTaskHeader > b { color: #245fca; white-space: nowrap; }
+.sourceTaskList { display: grid; gap: 10px; }
+.sourceTaskList article { display: grid; gap: 10px; padding: 12px; border: 1px solid #e4ebf4; border-radius: 10px; background: #fff; }
+.sourceTaskTitle { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.sourceTaskTitle > span { color: #5c7dac; font-size: 11px; white-space: nowrap; }
+.sourceTaskTitle strong { min-width: 0; flex: 1; color: #24364f; overflow-wrap: anywhere; }
+.sourceTaskList dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin: 0; }
+.sourceTaskList dl > div { display: grid; gap: 3px; min-width: 0; }
+.sourceTaskList dt { color: #8190a3; font-size: 11px; }
+.sourceTaskList dd { margin: 0; color: #516177; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.sourceTaskList .fullLine { grid-column: 1 / -1; }
 .actionBar { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding-top: 14px; border-top: 1px solid #e8edf4; }
 @media (max-width: 700px) {
   .reportList article { grid-template-columns: auto minmax(0, 1fr); }
   .reportList aside { grid-column: 1 / -1; justify-content: flex-end; }
+  .sourceTaskHeader { flex-direction: column; }
+  .sourceTaskList dl { grid-template-columns: 1fr; }
+  .sourceTaskList .fullLine { grid-column: auto; }
 }

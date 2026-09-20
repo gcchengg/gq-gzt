@@ -20,7 +20,6 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
-  DeleteOutlined,
   EditOutlined,
   EyeOutlined,
   FilterOutlined,
@@ -101,6 +100,8 @@ export default function DirectorView({
   materials,
   dutyPlans,
   onCreateDutyPlan,
+  onDeleteDutyPlan,
+  onSubmitDutyPlan,
   onGenerateDutyTasks,
   generatedDirectorNames,
   dutyReports,
@@ -209,6 +210,8 @@ export default function DirectorView({
         materials={materials}
         dutyPlans={dutyPlans}
         onCreateDutyPlan={onCreateDutyPlan}
+        onDeleteDutyPlan={onDeleteDutyPlan}
+        onSubmitDutyPlan={onSubmitDutyPlan}
         onGenerateDutyTasks={onGenerateDutyTasks}
         generatedDirectorNames={generatedDirectorNames}
         dutyReports={dutyReports}
@@ -240,6 +243,201 @@ function getDirectorStage(director) {
   return lifecycleStages.some((item) => item.key === director.lifecycleStage)
     ? director.lifecycleStage
     : "management";
+}
+
+function buildManagementDemoPlans(director) {
+  if (!director) return [];
+  const planSeed = [
+    [
+      "会议计划",
+      "参加董事会",
+      "年度董事会及重点议题审议",
+      "综合管理部-董办",
+      "阮迪",
+      "2026-10-18",
+      "完成重点议题审议并形成决议事项清单",
+      "会议纪要、表决记录和决议事项清单已归档。",
+      ["董事会会议纪要.pdf", "重点议题决议清单.xlsx"],
+    ],
+    [
+      "培训计划",
+      "参加能力培训",
+      "公司治理与风险防控专题培训",
+      "综合管理部-人力",
+      "周航",
+      "2026-10-25",
+      "完成专题学习并形成培训反馈与学习总结",
+      "培训课件、签到记录和学习总结已归档。",
+      ["公司治理专题培训课件.pdf", "培训学习反馈汇总.xlsx"],
+    ],
+    [
+      "调研计划",
+      "参加调研",
+      `${director.company}经营情况专题调研`,
+      "股权运营部",
+      "陈哲",
+      "2026-11-06",
+      "形成经营情况专题调研报告及意见建议清单",
+      "调研报告、访谈纪要和意见建议清单已归档。",
+      ["经营情况专题调研报告.pdf", "调研意见建议清单.xlsx"],
+    ],
+  ];
+  return planSeed.map(
+    (
+      [
+        type,
+        workCategory,
+        content,
+        owner,
+        taskAssignee,
+        date,
+        target,
+        evidenceNote,
+        supplementFiles,
+      ],
+      index,
+    ) => ({
+      id: `DEMO-${director.id}-PLAN-${index + 1}`,
+      directorName: director.name,
+      servingCompany: director.company,
+      dutyYear: "2026年",
+      dutyQuarter: "四季度",
+      type,
+      workCategory,
+      content,
+      owner,
+      confirmOwner: director.name,
+      date,
+      target,
+      status: "已完成",
+      confirmationNote: "计划内容、时间安排及预期成果已确认。",
+      confirmedAt: `2026-09-${18 + index} 10:20`,
+      taskStatus: "已完成",
+      taskAssignee,
+      actualDate: date,
+      completionSummary: `已完成${content}，相关履职成果及佐证材料已归集。`,
+      resultSuggestion:
+        index === 2 ? "建议持续跟踪重点经营指标和专项风险处置进展。" : "",
+      evidenceNote,
+      supplementFiles,
+      taskCompletedAt: `${date} 16:30`,
+    }),
+  );
+}
+
+function buildManagementDemoReports(director, plans) {
+  if (!director) return [];
+  const sourcePlanIds = plans.map((item) => item.id);
+  const reportSeed = [
+    [
+      "月度报告",
+      "2026年10月",
+      "已接收",
+      "已归集董事会审议及专题培训履职事实，履职材料完整。",
+      `1. 完成董事会重点议题审议。\n2. 完成公司治理与风险防控专题学习。`,
+      "持续跟踪重点治理事项的落地情况。",
+      [`${director.name}2026年10月履职写实报告.pdf`],
+    ],
+    [
+      "季度报告",
+      "2026年第四季度",
+      "待完善",
+      "系统已自动归集会议、培训及调研履职信息，待补充后续建议。",
+      "1. 围绕重点议题开展决策履职。\n2. 完成专题培训与经营调研。",
+      "待补充对重点经营风险和项目收益的后续建议。",
+      [],
+    ],
+    [
+      "年度报告",
+      "2026年度",
+      "待接收",
+      "年度履职成果已形成，覆盖会议决策、能力提升与经营调研。",
+      "完成年度计划任务，形成履职成果与相关建议。",
+      "建议持续深化对子企业重点事项的监督与跟踪。",
+      [`${director.name}2026年度履职报告.docx`],
+    ],
+  ];
+  return reportSeed.map(
+    (
+      [reportType, period, status, summary, workHighlights, suggestions, files],
+      index,
+    ) => ({
+      id: `DEMO-${director.id}-REPORT-${index + 1}`,
+      directorName: director.name,
+      company: director.company,
+      reportType,
+      period,
+      title: `${period}${director.name}履职${reportType}`,
+      status,
+      sourceCount: index === 0 ? 2 : sourcePlanIds.length,
+      sourcePlanIds: index === 0 ? sourcePlanIds.slice(0, 2) : sourcePlanIds,
+      generatedAt: `2026-${index === 0 ? "10-31" : "12-20"} 09:20`,
+      submittedAt: status === "待接收" ? "2026-12-27 15:10" : undefined,
+      receivedAt: status === "已接收" ? "2026-11-02 10:30" : undefined,
+      summary,
+      workHighlights,
+      suggestions,
+      files,
+    }),
+  );
+}
+
+function buildManagementDemoSuggestions(director, plans) {
+  if (!director) return [];
+  const suggestionSeed = [
+    [
+      "经营管理类",
+      "持续跟踪重点项目收益、经营风险及整改措施落实情况。",
+      plans[2]?.content || "经营情况专题调研",
+      "股权运营部",
+      "陈哲",
+      "2026-12-15",
+      100,
+      "已完成",
+    ],
+    [
+      "风险防控类",
+      "完善重大事项风险研判和决策前置沟通机制。",
+      plans[0]?.content || "年度董事会及重点议题审议",
+      "审计风控与法务部",
+      "孙博",
+      "2026-12-20",
+      75,
+      "办理中",
+    ],
+    [
+      "治理提升类",
+      "持续提升董事履职资料的时效性和针对性。",
+      plans[1]?.content || "公司治理与风险防控专题培训",
+      "综合管理部-办公室",
+      "胡欣悦",
+      "2026-12-31",
+      30,
+      "待办理",
+    ],
+  ];
+  return suggestionSeed.map(
+    (
+      [type, content, source, owner, assignee, deadline, progress, status],
+      index,
+    ) => ({
+      id: `DEMO-${director.id}-SUG-${index + 1}`,
+      directorName: director.name,
+      type,
+      content,
+      source,
+      owner,
+      assignee,
+      deadline,
+      progress,
+      status,
+      handlingPlan: "已明确责任分工、推进步骤和办理时限。",
+      result: status === "待办理" ? "" : "已形成阶段性办理成果并完成内部核验。",
+      feedback: status === "已完成" ? "董事已查看办理结果，同意归档。" : "",
+      files: status === "待办理" ? [] : ["意见建议办理佐证材料.pdf"],
+      completedAt: status === "已完成" ? "2026-12-12 16:20" : undefined,
+    }),
+  );
 }
 
 function directorColumns({
@@ -393,6 +591,8 @@ function DirectorLifecycleDrawer({
   materials,
   dutyPlans,
   onCreateDutyPlan,
+  onDeleteDutyPlan,
+  onSubmitDutyPlan,
   onGenerateDutyTasks,
   generatedDirectorNames,
   dutyReports,
@@ -422,6 +622,15 @@ function DirectorLifecycleDrawer({
   const visibleSuggestions = suggestionTasks.filter(
     (item) => item.directorName === director?.name,
   );
+  const managementPlans = visiblePlans.length
+    ? visiblePlans
+    : buildManagementDemoPlans(director);
+  const managementReports = visibleReports.length
+    ? visibleReports
+    : buildManagementDemoReports(director, managementPlans);
+  const managementSuggestions = visibleSuggestions.length
+    ? visibleSuggestions
+    : buildManagementDemoSuggestions(director, managementPlans);
   return (
     <>
       <GovernanceDrawer
@@ -479,6 +688,8 @@ function DirectorLifecycleDrawer({
                   materials={materials}
                   dutyPlans={dutyPlans}
                   onCreateDutyPlan={onCreateDutyPlan}
+                  onDeleteDutyPlan={onDeleteDutyPlan}
+                  onSubmitDutyPlan={onSubmitDutyPlan}
                   onGenerateDutyTasks={onGenerateDutyTasks}
                   generatedDirectorNames={generatedDirectorNames}
                   director={director}
@@ -498,13 +709,13 @@ function DirectorLifecycleDrawer({
                   tab={managementTab}
                   setTab={setManagementTab}
                   onEvent={setEvent}
-                  dutyPlans={dutyPlans}
+                  dutyPlans={managementPlans}
                   materials={materials}
-                  dutyReports={dutyReports}
+                  dutyReports={managementReports}
                   onGenerateDutyReport={onGenerateDutyReport}
                   onSaveDutyReport={onSaveDutyReport}
                   onReceiveDutyReport={onReceiveDutyReport}
-                  suggestionTasks={visibleSuggestions}
+                  suggestionTasks={managementSuggestions}
                 />
               ) : null}
               {stage === "evaluation" ? (
@@ -621,6 +832,8 @@ function PreparationDrawerPanel({
   materials,
   dutyPlans,
   onCreateDutyPlan,
+  onDeleteDutyPlan,
+  onSubmitDutyPlan,
   onGenerateDutyTasks,
   generatedDirectorNames,
 }) {
@@ -733,6 +946,8 @@ function PreparationWorkspace({
   materials,
   dutyPlans,
   onCreateDutyPlan,
+  onDeleteDutyPlan,
+  onSubmitDutyPlan,
   onGenerateDutyTasks,
   generatedDirectorNames,
   director,
@@ -799,43 +1014,37 @@ function PreparationWorkspace({
     message.success("资料目录已删除");
   };
   const materialColumns = [
-    { title: "资料类别", dataIndex: "category", width: 120 },
-    { title: "资料名称", dataIndex: "material", width: 300 },
-    { title: "责任部门", dataIndex: "department", width: 180 },
-    { title: "责任人", dataIndex: "responsiblePerson", width: 130 },
-    { title: "更新频次", dataIndex: "frequency", width: 100 },
+    { title: "资料类别", dataIndex: "category", width: 90, ellipsis: true },
+    { title: "资料名称", dataIndex: "material", width: 180, ellipsis: true },
+    { title: "责任部门", dataIndex: "department", width: 145, ellipsis: true },
     {
-      title: "任务状态",
-      dataIndex: "taskStatus",
-      width: 110,
-      render: (value, row) => (
-        <StatusPill>
-          {value || (row.status === "已提交" ? "已完成" : "未发起")}
-        </StatusPill>
-      ),
+      title: "责任人",
+      dataIndex: "responsiblePerson",
+      width: 105,
+      ellipsis: true,
     },
+    { title: "频次", dataIndex: "frequency", width: 70 },
     {
-      title: "资料状态",
+      title: "状态",
       dataIndex: "status",
-      width: 100,
+      width: 92,
       render: (value) => <StatusPill>{value}</StatusPill>,
     },
     {
       title: "操作",
-      fixed: "right",
-      width: 190,
+      width: 148,
       render: (_, row) => (
         <Space size={0}>
           <Button
             type="link"
-            icon={<EyeOutlined />}
+            size="small"
             onClick={() => setHistoryMaterial(row)}
           >
             查看详情
           </Button>
           <Button
             type="link"
-            icon={<EditOutlined />}
+            size="small"
             onClick={() => openMaterialEditor(row)}
           >
             编辑
@@ -847,7 +1056,7 @@ function PreparationWorkspace({
             cancelText="取消"
             onConfirm={() => deleteMaterial(row)}
           >
-            <Button type="link" danger icon={<DeleteOutlined />}>
+            <Button type="link" danger size="small">
               删除
             </Button>
           </Popconfirm>
@@ -855,7 +1064,24 @@ function PreparationWorkspace({
       ),
     },
   ];
-  const previewColumns = materialColumns.slice(0, 6);
+  const previewColumns = [
+    { title: "资料类别", dataIndex: "category", width: 90, ellipsis: true },
+    { title: "资料名称", dataIndex: "material", width: 220, ellipsis: true },
+    { title: "责任部门", dataIndex: "department", width: 150, ellipsis: true },
+    {
+      title: "责任人",
+      dataIndex: "responsiblePerson",
+      width: 110,
+      ellipsis: true,
+    },
+    { title: "更新频次", dataIndex: "frequency", width: 100 },
+    {
+      title: "资料状态",
+      dataIndex: "status",
+      width: 90,
+      render: (value) => <StatusPill>{value}</StatusPill>,
+    },
+  ];
   return (
     <div
       className={`${styles.stageWorkspace} ${
@@ -943,10 +1169,10 @@ function PreparationWorkspace({
           <Table
             rowKey="id"
             size="small"
+            tableLayout="fixed"
             columns={materialColumns}
             dataSource={materials}
             pagination={false}
-            scroll={{ x: 1180 }}
             rowSelection={{
               selectedRowKeys: selectedMaterialIds,
               onChange: setSelectedMaterialIds,
@@ -1009,6 +1235,8 @@ function PreparationWorkspace({
         onCreateOpenChange={setPlanComposerOpen}
         plans={directorPlans}
         onCreatePlan={onCreateDutyPlan}
+        onDeletePlan={onDeleteDutyPlan}
+        onSubmitPlan={onSubmitDutyPlan}
         onGenerateTasks={() => onGenerateDutyTasks(director.name)}
         annualGenerated={annualPlanGenerated}
         activeDirector={director}
@@ -1092,7 +1320,8 @@ function PreparationWorkspace({
       </Modal>
       <Modal
         open={previewOpen}
-        width={900}
+        className={styles.handbookPreviewModal}
+        width={860}
         title={`预览并推送手册 · ${director.name}`}
         okText="确认推送"
         cancelText="返回修改"
@@ -1140,10 +1369,11 @@ function PreparationWorkspace({
           <Table
             rowKey="id"
             size="small"
+            tableLayout="fixed"
             columns={previewColumns}
             dataSource={materials}
             pagination={false}
-            scroll={{ x: 950, y: 280 }}
+            scroll={{ y: 280 }}
           />
         </div>
       </Modal>

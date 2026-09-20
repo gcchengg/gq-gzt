@@ -42,6 +42,13 @@ export default function DutyReportWorkspace({
     [plans],
   );
   const selectedReport = reports.find((item) => item.id === selectedReportId);
+  const reportSourceTasks = useMemo(() => {
+    if (!selectedReport) return [];
+    if (selectedReport.taskSnapshots?.length)
+      return selectedReport.taskSnapshots;
+    const sourcePlanIds = new Set(selectedReport.sourcePlanIds || []);
+    return plans.filter((item) => sourcePlanIds.has(item.id));
+  }, [plans, selectedReport]);
   const visibleReports =
     reportTypeFilter === "全部报告"
       ? reports
@@ -234,6 +241,50 @@ export default function DutyReportWorkspace({
                 },
               ]}
             />
+            <section className={styles.sourceTaskSection}>
+              <div className={styles.sourceTaskHeader}>
+                <div>
+                  <strong>引用履职任务明细</strong>
+                  <span>
+                    报告根据已完成履职任务自动生成；以下任务事实可作为报告正文修改时的参考。
+                  </span>
+                </div>
+                <b>{reportSourceTasks.length} 条</b>
+              </div>
+              <div className={styles.sourceTaskList}>
+                {reportSourceTasks.map((task, index) => (
+                  <article key={task.id}>
+                    <div className={styles.sourceTaskTitle}>
+                      <span>任务 {index + 1}</span>
+                      <strong>{task.content}</strong>
+                      <StatusPill>{task.type}</StatusPill>
+                    </div>
+                    <dl>
+                      <div>
+                        <dt>实际完成日期</dt>
+                        <dd>{task.actualDate || "—"}</dd>
+                      </div>
+                      <div>
+                        <dt>成果说明</dt>
+                        <dd>{task.evidenceNote || "—"}</dd>
+                      </div>
+                      <div className={styles.fullLine}>
+                        <dt>完成情况</dt>
+                        <dd>{task.completionSummary || task.target || "—"}</dd>
+                      </div>
+                      <div className={styles.fullLine}>
+                        <dt>佐证材料</dt>
+                        <dd>
+                          {task.supplementFiles?.length
+                            ? task.supplementFiles.join("、")
+                            : "暂无附件"}
+                        </dd>
+                      </div>
+                    </dl>
+                  </article>
+                ))}
+              </div>
+            </section>
             <Form form={reportForm} layout="vertical">
               <Form.Item
                 name="title"

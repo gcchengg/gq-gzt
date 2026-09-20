@@ -2,9 +2,27 @@
   font-size: 11px;
   color: #7d8797;
 }
+.submittedHint {
+  color: #5d8a6d;
+  font-size: 12px;
+}
 .planCards {
   display: grid;
   gap: 10px;
+}
+.batchActionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #d9e5f5;
+  border-radius: 8px;
+  background: #f4f8ff;
+}
+.batchActionBar span {
+  color: #61728a;
+  font-size: 12px;
 }
 .planCard {
   display: grid;
@@ -23,6 +41,16 @@
 }
 .planCardHead > span {
   color: #2f6bff;
+  font-size: 11px;
+}
+.planCardStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+.planCardStatus :global(.ant-checkbox-wrapper) {
+  color: #718097;
   font-size: 11px;
 }
 .planCard > strong {
@@ -239,6 +267,13 @@
   .embeddedPlanCard .planFooter {
     align-items: stretch;
     flex-direction: column;
+  }
+  .batchActionBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .batchActionBar button {
+    width: 100%;
   }
   .embeddedPlanCard .footerActions,
   .embeddedPlanCard .footerActions a,

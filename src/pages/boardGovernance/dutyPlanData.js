@@ -25,6 +25,11 @@ export const initialDutyPlans = [
     confirmedAt: "2026-09-15 14:20",
     taskStatus: "待执行",
     taskAssignee: "阮迪",
+    actualDate: "2026-12-16",
+    completionSummary:
+      "已完成第四次定期董事会会务组织、议题材料归集及会议纪要整理。",
+    evidenceNote: "会议通知、议题材料、会议纪要及决议清单已归档。",
+    supplementFiles: ["第四次定期董事会会议纪要.pdf", "董事会决议清单.xlsx"],
   },
   {
     id: "PLAN-002",
@@ -44,6 +49,11 @@ export const initialDutyPlans = [
     confirmedAt: "2026-09-15 14:35",
     taskStatus: "办理中",
     taskAssignee: "周航",
+    actualDate: "2026-10-22",
+    completionSummary:
+      "已完成风险与合规专题培训，参训人员签到、课件及学习反馈已汇总。",
+    evidenceNote: "培训课件、签到表、培训总结及学习反馈已归档。",
+    supplementFiles: ["风险与合规培训课件.pdf", "培训签到及反馈汇总.xlsx"],
   },
   {
     id: "PLAN-003",

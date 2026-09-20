@@ -167,6 +167,7 @@ export const ROLE_DIRECTORY = [
         subsections: [
           {
             title: "办公室 · 资料类别",
+            hidden: true,
             roles: [
               ROLE_KEYS.OFFICE_STRATEGY,
               ROLE_KEYS.OFFICE_PROFILE,

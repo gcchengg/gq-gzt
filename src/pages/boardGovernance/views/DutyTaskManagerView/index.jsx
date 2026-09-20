@@ -68,6 +68,39 @@ export default function DutyTaskManagerView({
     activeTaskType === "confirmation"
       ? plans.find((item) => item.id === planId)
       : null;
+  const planInputValues = selectedTask
+    ? [
+        selectedTask.directorName,
+        selectedTask.servingCompany,
+        selectedTask.dutyYear,
+        selectedTask.dutyQuarter,
+        selectedTask.type,
+        selectedTask.workCategory,
+        selectedTask.owner,
+        selectedTask.confirmOwner,
+        selectedTask.date,
+        selectedTask.content,
+        selectedTask.target,
+      ]
+    : [];
+  const planInputCompleted = planInputValues.filter(Boolean).length;
+  const executionFields = selectedTask
+    ? [
+        { label: "实际完成日期", completed: Boolean(selectedTask.actualDate) },
+        { label: "成果说明", completed: Boolean(selectedTask.evidenceNote) },
+        {
+          label: "完成情况",
+          completed: Boolean(selectedTask.completionSummary),
+        },
+        {
+          label: "补充材料",
+          completed: Boolean(selectedTask.supplementFiles?.length),
+        },
+      ]
+    : [];
+  const executionCompleted = executionFields.filter(
+    (item) => item.completed,
+  ).length;
 
   useEffect(() => {
     if (!selectedTask) return;
@@ -280,6 +313,11 @@ export default function DutyTaskManagerView({
             columns={[
               { title: "任务名称", dataIndex: "content", width: 280 },
               { title: "董事", dataIndex: "directorName", width: 100 },
+              {
+                title: "履职周期",
+                width: 150,
+                render: (_, row) => `${row.dutyYear} · ${row.dutyQuarter}`,
+              },
               { title: "任务类型", dataIndex: "type", width: 110 },
               { title: "责任部门", dataIndex: "owner", width: 170 },
               { title: "负责人", dataIndex: "taskAssignee", width: 110 },
@@ -468,44 +506,135 @@ export default function DutyTaskManagerView({
                 { title: "确认完成" },
               ]}
             />
-            <Descriptions
-              bordered
-              column={2}
-              items={[
-                {
-                  key: "director",
-                  label: "董事",
-                  children: selectedTask.directorName,
-                },
-                {
-                  key: "company",
-                  label: "任职企业",
-                  children: selectedTask.servingCompany,
-                },
-                { key: "type", label: "任务类型", children: selectedTask.type },
-                {
-                  key: "category",
-                  label: "工作类别",
-                  children: selectedTask.workCategory,
-                },
-                {
-                  key: "owner",
-                  label: "责任部门",
-                  children: selectedTask.owner,
-                },
-                { key: "date", label: "计划时间", children: selectedTask.date },
-                {
-                  key: "note",
-                  label: "计划确认信息",
-                  children: selectedTask.confirmationNote || "已确认",
-                },
-                {
-                  key: "target",
-                  label: "预期成果",
-                  children: selectedTask.target,
-                },
-              ]}
-            />
+            <section className={styles.planSourceInfo}>
+              <div className={styles.infoSectionHeader}>
+                <div>
+                  <strong>年度履职计划基础信息</strong>
+                  <span>
+                    任务由该年度履职计划生成，办理时可随时核对原始要求。
+                  </span>
+                </div>
+                <div className={styles.completionMetric}>
+                  <span>计划填写完整度</span>
+                  <b>
+                    {planInputCompleted}/{planInputValues.length}
+                  </b>
+                  <Progress
+                    percent={Math.round(
+                      (planInputCompleted / planInputValues.length) * 100,
+                    )}
+                    showInfo={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              <Descriptions
+                bordered
+                column={2}
+                items={[
+                  {
+                    key: "director",
+                    label: "姓名",
+                    children: selectedTask.directorName,
+                  },
+                  {
+                    key: "company",
+                    label: "任职企业",
+                    children: selectedTask.servingCompany,
+                  },
+                  {
+                    key: "year",
+                    label: "履职年度",
+                    children: selectedTask.dutyYear,
+                  },
+                  {
+                    key: "quarter",
+                    label: "履职季度",
+                    children: selectedTask.dutyQuarter,
+                  },
+                  {
+                    key: "type",
+                    label: "计划类型",
+                    children: selectedTask.type,
+                  },
+                  {
+                    key: "category",
+                    label: "工作类别",
+                    children: selectedTask.workCategory,
+                  },
+                  {
+                    key: "owner",
+                    label: "责任部门",
+                    children: selectedTask.owner,
+                  },
+                  {
+                    key: "confirmOwner",
+                    label: "确认责任人",
+                    children: selectedTask.confirmOwner,
+                  },
+                  {
+                    key: "date",
+                    label: "计划时间",
+                    children: selectedTask.date,
+                  },
+                  {
+                    key: "confirmedAt",
+                    label: "确认时间",
+                    children: selectedTask.confirmedAt || "—",
+                  },
+                  {
+                    key: "content",
+                    label: "计划内容",
+                    span: 2,
+                    children: selectedTask.content,
+                  },
+                  {
+                    key: "target",
+                    label: "预期成果",
+                    span: 2,
+                    children: selectedTask.target,
+                  },
+                  {
+                    key: "note",
+                    label: "计划确认信息",
+                    span: 2,
+                    children: selectedTask.confirmationNote || "已确认",
+                  },
+                ]}
+              />
+            </section>
+            <section className={styles.executionStatus}>
+              <div className={styles.infoSectionHeader}>
+                <div>
+                  <strong>任务办理填写情况</strong>
+                  <span>完成下列信息填写后，可确认该履职任务完成。</span>
+                </div>
+                <div className={styles.completionMetric}>
+                  <span>已填写</span>
+                  <b>
+                    {executionCompleted}/{executionFields.length}
+                  </b>
+                  <Progress
+                    percent={Math.round(
+                      (executionCompleted / executionFields.length) * 100,
+                    )}
+                    showInfo={false}
+                    size="small"
+                  />
+                </div>
+              </div>
+              <div className={styles.fieldStatusList}>
+                {executionFields.map((item) => (
+                  <div
+                    key={item.label}
+                    className={item.completed ? styles.fieldFilled : ""}
+                  >
+                    <span>{item.label}</span>
+                    <b>{item.completed ? "已填写" : "待填写"}</b>
+                  </div>
+                ))}
+              </div>
+            </section>
             <Form form={form} layout="vertical">
               <div className={styles.formGrid}>
                 <Form.Item

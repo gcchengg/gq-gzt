@@ -1,12 +1,14 @@
 import { useMemo, useRef, useState } from "react";
 import {
   Button,
+  Checkbox,
   Descriptions,
   Drawer,
   Form,
   Input,
   message,
   Modal,
+  Popconfirm,
   Select,
   Space,
 } from "antd";
@@ -43,6 +45,8 @@ export default function DutyPlanWorkspace({
   onCreateOpenChange,
   plans,
   onCreatePlan,
+  onDeletePlan,
+  onSubmitPlan,
   onGenerateTasks,
   annualGenerated,
   activeDirector,
@@ -50,17 +54,17 @@ export default function DutyPlanWorkspace({
   const [resultPlan, setResultPlan] = useState(null);
   const [generateConfirmOpen, setGenerateConfirmOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [selectedDraftIds, setSelectedDraftIds] = useState([]);
   const [form] = Form.useForm();
   const paperRef = useRef(null);
-  const pendingCount = useMemo(
-    () => plans.filter((item) => item.status !== "已完成").length,
+  const draftCount = useMemo(
+    () => plans.filter((item) => item.status === "草稿").length,
     [plans],
   );
-  const canGenerateAnnual = plans.length > 0 && pendingCount === 0;
-  const annualReport = useMemo(
-    () => buildAnnualDutyPlanReport(plans, activeDirector),
-    [plans, activeDirector],
-  );
+  const canGenerateAnnual =
+    plans.length > 0 &&
+    plans.every((item) => ["已提交", "已完成"].includes(item.status));
+  const annualReport = useMemo(() => buildAnnualDutyPlanReport(), []);
 
   const closeComposer = () => {
     onCreateOpenChange(false);
@@ -70,8 +74,32 @@ export default function DutyPlanWorkspace({
   const savePlan = async () => {
     const values = await form.validateFields();
     onCreatePlan(values);
-    message.success(`确认任务已发送给${values.confirmOwner}`);
+    message.success("年度履职计划已保存为草稿");
     closeComposer();
+  };
+
+  const submitPlan = (plan) => {
+    onSubmitPlan?.(plan.id);
+    setSelectedDraftIds((current) => current.filter((id) => id !== plan.id));
+    message.success(`“${plan.content}”已提交`);
+  };
+
+  const toggleDraftSelection = (planId, checked) => {
+    setSelectedDraftIds((current) =>
+      checked
+        ? [...new Set([...current, planId])]
+        : current.filter((id) => id !== planId),
+    );
+  };
+
+  const submitSelectedDrafts = () => {
+    if (!selectedDraftIds.length) {
+      message.warning("请先选择要提交的计划草稿");
+      return;
+    }
+    onSubmitPlan?.(selectedDraftIds);
+    message.success(`已提交 ${selectedDraftIds.length} 项计划`);
+    setSelectedDraftIds([]);
   };
 
   const generateAnnualPlan = () => {
@@ -97,6 +125,44 @@ export default function DutyPlanWorkspace({
     }
   };
 
+  const renderPlanActions = (row) => {
+    if (row.status === "草稿") {
+      return (
+        <Space size={0}>
+          <Button type="link" size="small" onClick={() => submitPlan(row)}>
+            提交计划
+          </Button>
+          <Popconfirm
+            title="删除该计划？"
+            description="删除后无法恢复。"
+            okText="删除"
+            cancelText="取消"
+            onConfirm={() => onDeletePlan?.(row.id)}
+          >
+            <Button type="link" danger size="small">
+              删除计划
+            </Button>
+          </Popconfirm>
+        </Space>
+      );
+    }
+    if (row.status === "已完成") {
+      return (
+        <Button type="link" size="small" onClick={() => setResultPlan(row)}>
+          查看结果
+        </Button>
+      );
+    }
+    if (row.status === "待确认") {
+      return (
+        <Link to={`/boardGovernance/plan-confirm-task?planId=${row.id}`}>
+          查看任务
+        </Link>
+      );
+    }
+    return <span className={styles.submittedHint}>已提交</span>;
+  };
+
   const columns = [
     { title: "姓名", dataIndex: "directorName", width: 90 },
     { title: "任职企业", dataIndex: "servingCompany", width: 180 },
@@ -118,22 +184,13 @@ export default function DutyPlanWorkspace({
     },
     {
       title: "操作",
-      width: 100,
+      width: 130,
       fixed: "right",
-      render: (_, row) =>
-        row.status === "已完成" ? (
-          <Button type="link" onClick={() => setResultPlan(row)}>
-            查看结果
-          </Button>
-        ) : (
-          <Link to={`/boardGovernance/plan-confirm-task?planId=${row.id}`}>
-            查看任务
-          </Link>
-        ),
+      render: (_, row) => renderPlanActions(row),
     },
   ];
 
-  const flowIndex = annualGenerated ? 3 : pendingCount === 0 ? 2 : 1;
+  const flowIndex = annualGenerated ? 3 : canGenerateAnnual ? 2 : 1;
 
   return (
     <>
@@ -156,6 +213,18 @@ export default function DutyPlanWorkspace({
       >
         {embedded ? (
           <div className={styles.planCards}>
+            {draftCount ? (
+              <div className={styles.batchActionBar}>
+                <span>已选择 {selectedDraftIds.length} 项草稿计划</span>
+                <Button
+                  type="primary"
+                  disabled={!selectedDraftIds.length}
+                  onClick={submitSelectedDrafts}
+                >
+                  批量提交
+                </Button>
+              </div>
+            ) : null}
             {plans.length ? (
               plans.map((plan) => (
                 <article key={plan.id} className={styles.planCard}>
@@ -163,7 +232,19 @@ export default function DutyPlanWorkspace({
                     <span>
                       {plan.type} · {plan.workCategory}
                     </span>
-                    <StatusPill>{plan.status}</StatusPill>
+                    <div className={styles.planCardStatus}>
+                      {plan.status === "草稿" ? (
+                        <Checkbox
+                          checked={selectedDraftIds.includes(plan.id)}
+                          onChange={(event) =>
+                            toggleDraftSelection(plan.id, event.target.checked)
+                          }
+                        >
+                          选择
+                        </Checkbox>
+                      ) : null}
+                      <StatusPill>{plan.status}</StatusPill>
+                    </div>
                   </div>
                   <strong>{plan.content}</strong>
                   <div className={styles.planCardMeta}>
@@ -178,17 +259,7 @@ export default function DutyPlanWorkspace({
                     </span>
                     <span>预期成果：{plan.target}</span>
                   </div>
-                  {plan.status === "已完成" ? (
-                    <Button type="link" onClick={() => setResultPlan(plan)}>
-                      查看结果
-                    </Button>
-                  ) : (
-                    <Link
-                      to={`/boardGovernance/plan-confirm-task?planId=${plan.id}`}
-                    >
-                      查看任务
-                    </Link>
-                  )}
+                  {renderPlanActions(plan)}
                 </article>
               ))
             ) : (
@@ -205,14 +276,14 @@ export default function DutyPlanWorkspace({
             <strong>
               {annualGenerated
                 ? `年度计划已生成，${plans.length} 项履职任务已创建`
-                : pendingCount
-                  ? `${pendingCount} 项确认任务待提交`
-                  : "全部确认任务已完成，可生成正式年度计划"}
+                : draftCount
+                  ? `${draftCount} 项计划草稿待提交`
+                  : "全部计划已提交，可生成正式年度计划"}
             </strong>
             <span>
               {annualGenerated
                 ? "可查看年度履职计划报告，任务已同步至工作台首页"
-                : "确认责任人提交后，计划状态自动更新为已完成"}
+                : "请提交全部计划后，再生成年度履职计划与履职任务"}
             </span>
           </div>
           {annualGenerated ? (
@@ -243,8 +314,8 @@ export default function DutyPlanWorkspace({
           className={`${styles.flowNote} ${embedded ? styles.embeddedFlow : ""}`}
         >
           {[
-            "计划制定与任务下发",
-            "确认责任人提交",
+            "计划制定",
+            "计划全部提交",
             "年度履职计划生成",
             "自动创建履职任务",
           ].map((label, index) => (
@@ -260,7 +331,7 @@ export default function DutyPlanWorkspace({
       <Modal
         open={createOpen}
         title="新增年度履职计划"
-        okText="提交并发送确认任务"
+        okText="保存为草稿"
         cancelText="取消"
         onOk={savePlan}
         onCancel={closeComposer}
@@ -281,7 +352,7 @@ export default function DutyPlanWorkspace({
         width={680}
       >
         <p className={styles.modalTip}>
-          填写计划并指定确认责任人，提交后系统将在工作台首页生成确认任务。
+          填写计划并保存草稿；可在计划列表中继续删除或提交。全部计划提交后，才可生成年度履职计划与履职任务。
         </p>
         <Form form={form} layout="vertical" preserve={false}>
           <h4 className={styles.formSectionTitle}>履职基础信息</h4>

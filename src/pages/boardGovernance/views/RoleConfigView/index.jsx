@@ -215,20 +215,22 @@ function DirectorySection({ section, selectedRole, roleCounts, onSelect }) {
         <p className={styles.sectionTitle}>{section.title}</p>
       ) : null}
       {section.subsections
-        ? section.subsections.map((subsection) => (
-            <div key={subsection.title}>
-              <p className={styles.subSectionTitle}>{subsection.title}</p>
-              {subsection.roles.map((role) => (
-                <RoleCard
-                  key={role}
-                  role={role}
-                  selectedRole={selectedRole}
-                  count={roleCounts[role] || 0}
-                  onSelect={onSelect}
-                />
-              ))}
-            </div>
-          ))
+        ? section.subsections
+            .filter((subsection) => !subsection.hidden)
+            .map((subsection) => (
+              <div key={subsection.title}>
+                <p className={styles.subSectionTitle}>{subsection.title}</p>
+                {subsection.roles.map((role) => (
+                  <RoleCard
+                    key={role}
+                    role={role}
+                    selectedRole={selectedRole}
+                    count={roleCounts[role] || 0}
+                    onSelect={onSelect}
+                  />
+                ))}
+              </div>
+            ))
         : section.roles.map((role) => (
             <RoleCard
               key={role}
