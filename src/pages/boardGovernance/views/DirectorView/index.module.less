@@ -164,8 +164,29 @@
 }
 .prepGrid {
   display: grid;
-  grid-template-columns: 1.55fr 0.65fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
+}
+.preparationTabs {
+  min-width: 0;
+  padding: 0 18px 18px;
+  border: 1px solid #dce4ef;
+  border-radius: 14px;
+  background: #fff;
+}
+.preparationTabs :global(.ant-tabs-nav) {
+  margin-bottom: 18px;
+}
+.preparationTabs :global(.ant-tabs-tab-btn) {
+  font-weight: 600;
+}
+.annualPlanTab {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+.preparationTabs :global(.ant-steps) {
+  padding: 8px 4px 2px;
 }
 .cardFooter {
   display: flex;

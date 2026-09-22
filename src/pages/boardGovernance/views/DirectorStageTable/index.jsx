@@ -35,13 +35,13 @@ export default function DirectorStageTable({
   return (
     <>
       <div className={styles.directorToolbar}>
-        <Input
+        {/* <Input
           allowClear
           prefix={<FilterOutlined />}
           placeholder="搜索董事姓名、编号、企业或董事类型"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
-        />
+        /> */}
         <Select
           value={stage}
           onChange={setStage}

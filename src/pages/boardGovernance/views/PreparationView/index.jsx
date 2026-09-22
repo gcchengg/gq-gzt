@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PreparationWorkspace } from "../DirectorView";
 import DirectorStageTable from "../DirectorStageTable";
 import MaterialHistoryDrawer from "../DirectorView/components/MaterialHistoryDrawer";
@@ -34,6 +34,7 @@ export default function PreparationView({
   onSavePlan,
 }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [materialId, setMaterialId] = useState(null);
   const workspaceProps = {
     materials,
@@ -105,6 +106,12 @@ export default function PreparationView({
           <PreparationWorkspace
             compact
             embedded
+            planMode={searchParams.get("planMode") || "default"}
+            defaultTab={
+              searchParams.get("tab") === "annual-plan"
+                ? "annual-plan"
+                : "handbook"
+            }
             director={selectedDirector}
             setDirector={() => {}}
             onViewMaterial={(row) => setMaterialId(row.id)}

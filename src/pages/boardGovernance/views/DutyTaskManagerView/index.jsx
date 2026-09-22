@@ -9,6 +9,7 @@ import {
   InputNumber,
   message,
   Progress,
+  Select,
   Steps,
   Tabs,
   Upload,
@@ -31,6 +32,91 @@ import AnnualPlanConfirmTaskView from "../AnnualPlanConfirmTaskView";
 import styles from "./index.module.less";
 
 const { Dragger } = Upload;
+
+const executionFieldsByType = {
+  会议计划: [
+    [
+      "meetingType",
+      "会议类型",
+      "select",
+      "出席董事会相关会议",
+      ["出席董事会相关会议", "参加子企业重要会议/活动", "参加专委会会议"],
+    ],
+    [
+      "meetingName",
+      "会议名称 / 活动主题",
+      "text",
+      "一汽股权2026年董事会第二次会议",
+    ],
+    ["meetingDate", "会议 / 活动日期", "text", "2026-01-28"],
+    [
+      "meetingFormat",
+      "会议形式",
+      "select",
+      "现场召开",
+      ["现场召开", "视频会议", "通讯会议"],
+    ],
+    [
+      "attendanceFormat",
+      "参会形式 / 参加方式",
+      "select",
+      "现场参会",
+      ["现场参会", "视频参会", "通讯参会"],
+    ],
+    ["proposalCount", "议案数量", "number", 2],
+    ["dutyDays", "履职天数", "number", 2],
+  ],
+  培训计划: [
+    [
+      "trainingName",
+      "培训名称",
+      "text",
+      "股权思享汇：参股企业财务风险处置与投后管理赋能典型案例分享",
+    ],
+    ["trainingDate", "培训日期", "text", "2026-01-30"],
+    [
+      "trainingMethod",
+      "培训方式",
+      "select",
+      "视频",
+      ["现场", "视频", "线上学习"],
+    ],
+    ["trainingTeacher", "培训师资", "text", "高驰"],
+    ["dutyDays", "履职天数", "number", 0.5],
+    [
+      "trainingContent",
+      "培训内容",
+      "textarea",
+      "参股企业财务风险处置与投后管理赋能典型案例分享。",
+    ],
+  ],
+  调研计划: [
+    ["researchTopic", "调研主题", "text", "专题调研战略规划、数字化建设情况"],
+    ["researchCompany", "调研单位", "text", "一汽股权"],
+    [
+      "researchMethod",
+      "调研方式",
+      "select",
+      "现场",
+      ["现场", "视频", "书面调研"],
+    ],
+    ["researchDate", "调研日期", "text", "2026-01-29"],
+    ["hasResearchReport", "是否形成调研报告", "select", "否", ["是", "否"]],
+    [
+      "researchConcerns",
+      "调研期间发现的问题或关注的事项",
+      "textarea",
+      "重点了解直投与基金双轮驱动发展路径、基金设立与募资机制、投资战略布局以及以工作台为核心的数字化平台建设进展。",
+    ],
+    ["dutyDays", "履职天数", "number", 0.5],
+    [
+      "researchSuggestions",
+      "调研期间提出的意见建议",
+      "textarea",
+      "建议明确数字化建设阶段目标，持续完善投后管理机制。",
+    ],
+  ],
+};
 
 export default function DutyTaskManagerView({
   role,
@@ -107,32 +193,18 @@ export default function DutyTaskManagerView({
       ]
     : [];
   const planInputCompleted = planInputValues.filter(Boolean).length;
-  const executionFields = selectedTask
-    ? [
-        { label: "实际完成日期", completed: Boolean(selectedTask.actualDate) },
-        { label: "成果说明", completed: Boolean(selectedTask.evidenceNote) },
-        {
-          label: "完成情况",
-          completed: Boolean(selectedTask.completionSummary),
-        },
-        {
-          label: "补充材料",
-          completed: Boolean(selectedTask.supplementFiles?.length),
-        },
-      ]
-    : [];
-  const executionCompleted = executionFields.filter(
-    (item) => item.completed,
-  ).length;
+  const executionFields = executionFieldsByType[selectedTask?.type] || [];
 
   useEffect(() => {
     if (!selectedTask) return;
-    form.setFieldsValue({
-      actualDate: selectedTask.actualDate || selectedTask.date,
-      completionSummary: selectedTask.completionSummary || "",
-      resultSuggestion: selectedTask.resultSuggestion || "",
-      evidenceNote: selectedTask.evidenceNote || "",
-    });
+    form.resetFields();
+    form.setFieldsValue(
+      Object.fromEntries(
+        (executionFieldsByType[selectedTask.type] || []).map(
+          ([name, , , value]) => [name, selectedTask[name] ?? value],
+        ),
+      ),
+    );
     setFiles(
       (selectedTask.supplementFiles || []).map((name, index) => ({
         uid: `${selectedTask.id}-${index}`,
@@ -676,11 +748,7 @@ export default function DutyTaskManagerView({
                     label: "计划时间",
                     children: selectedTask.date,
                   },
-                  {
-                    key: "confirmedAt",
-                    label: "确认时间",
-                    children: selectedTask.confirmedAt || "—",
-                  },
+
                   {
                     key: "content",
                     label: "计划内容",
@@ -702,68 +770,37 @@ export default function DutyTaskManagerView({
                 ]}
               />
             </section>
-            <section className={styles.executionStatus}>
-              <div className={styles.infoSectionHeader}>
-                <div>
-                  <strong>任务办理填写情况</strong>
-                  <span>完成下列信息填写后，可确认该履职任务完成。</span>
-                </div>
-                <div className={styles.completionMetric}>
-                  <span>已填写</span>
-                  <b>
-                    {executionCompleted}/{executionFields.length}
-                  </b>
-                  <Progress
-                    percent={Math.round(
-                      (executionCompleted / executionFields.length) * 100,
-                    )}
-                    showInfo={false}
-                    size="small"
-                  />
-                </div>
-              </div>
-              <div className={styles.fieldStatusList}>
-                {executionFields.map((item) => (
-                  <div
-                    key={item.label}
-                    className={item.completed ? styles.fieldFilled : ""}
-                  >
-                    <span>{item.label}</span>
-                    <b>{item.completed ? "已填写" : "待填写"}</b>
-                  </div>
-                ))}
-              </div>
-            </section>
             <Form form={form} layout="vertical">
               <div className={styles.formGrid}>
-                <Form.Item
-                  name="actualDate"
-                  label="实际完成日期"
-                  rules={[{ required: true, message: "请填写实际完成日期" }]}
-                >
-                  <Input placeholder="例如：2026-10-15" />
-                </Form.Item>
-                <Form.Item
-                  name="evidenceNote"
-                  label="成果说明"
-                  rules={[{ required: true, message: "请填写成果说明" }]}
-                >
-                  <Input placeholder="例如：已形成会议纪要及决议清单" />
-                </Form.Item>
+                {executionFields
+                  .filter(([, , type]) => type !== "textarea")
+                  .map(([name, label, type, , options]) => (
+                    <Form.Item key={name} name={name} label={label}>
+                      {type === "select" ? (
+                        <Select
+                          options={options.map((value) => ({
+                            value,
+                            label: value,
+                          }))}
+                        />
+                      ) : type === "number" ? (
+                        <InputNumber
+                          min={0}
+                          step={name === "dutyDays" ? 0.5 : 1}
+                        />
+                      ) : (
+                        <Input />
+                      )}
+                    </Form.Item>
+                  ))}
               </div>
-              <Form.Item
-                name="completionSummary"
-                label="完成情况"
-                rules={[{ required: true, message: "请填写完成情况" }]}
-              >
-                <Input.TextArea
-                  rows={4}
-                  placeholder="说明任务执行过程和完成结果"
-                />
-              </Form.Item>
-              <Form.Item name="resultSuggestion" label="形成的意见建议">
-                <Input.TextArea rows={3} placeholder="没有意见建议时可不填写" />
-              </Form.Item>
+              {executionFields
+                .filter(([, , type]) => type === "textarea")
+                .map(([name, label]) => (
+                  <Form.Item key={name} name={name} label={label}>
+                    <Input.TextArea rows={3} />
+                  </Form.Item>
+                ))}
               <Form.Item label="补充材料">
                 <Dragger
                   multiple

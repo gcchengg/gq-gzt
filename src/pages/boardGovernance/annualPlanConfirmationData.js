@@ -41,13 +41,24 @@ const demoDirectors = [
   { id: "D-02", name: "李晨光", company: "一汽股权" },
 ];
 
-const demoTasks = demoDirectors.map((director) =>
-  buildAnnualPlanConfirmationTask({
+const demoTasks = demoDirectors.map((director) => {
+  const task = buildAnnualPlanConfirmationTask({
     director,
     report: buildAnnualDutyPlanReport(director),
     submittedAt: "2026-09-22 10:00",
-  }),
-);
+  });
+  const rows = task.rows.slice(0, 6);
+  return {
+    ...task,
+    rows,
+    selectedRowIds: rows.map((row) => row.id),
+    report: {
+      ...task.report,
+      notes:
+        "演示数据：以上为年度履职计划编排阶段已选择的计划，董事可再次勾选调整。",
+    },
+  };
+});
 
 export const initialAnnualPlanConfirmationTasks = [
   demoTasks[0],

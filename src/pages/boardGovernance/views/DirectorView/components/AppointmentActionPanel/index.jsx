@@ -48,8 +48,8 @@ export default function AppointmentActionPanel({
       if (!files.length) return;
       onUpdate(
         {
-          currentStep: 3,
-          status: "待权限配置",
+          currentStep: 2,
+          status: "待配置系统权限并纳入组织架构",
           owner: "综合管理部-人力 / 周航",
           recipient: "综合管理部-人力 / 周航",
           resumeName: files[0].name,
@@ -99,12 +99,12 @@ export default function AppointmentActionPanel({
     );
   }
 
-  if (item.status === "待配置系统权限") {
+  if (item.status === "待配置系统权限并纳入组织架构") {
     if (!allowedActions.includes("permission")) {
       return (
         <RoleNotice
           roleLabel={roleLabel}
-          message="当前事项等待综合管理部-数字化配置系统权限"
+          message="当前事项等待配置系统权限并纳入组织架构"
         />
       );
     }
@@ -112,8 +112,10 @@ export default function AppointmentActionPanel({
       onUpdate(
         {
           permissionDone,
-          currentStep: permissionDone ? 5 : 3,
-          status: permissionDone ? "待完成工商变更" : "待权限配置",
+          currentStep: permissionDone ? 3 : 2,
+          status: permissionDone
+            ? "待完成工商变更"
+            : "待配置系统权限并纳入组织架构",
           owner: permissionDone
             ? "综合管理部-董办 / 王珂"
             : "综合管理部-数字化 / 林远",
@@ -122,8 +124,8 @@ export default function AppointmentActionPanel({
             : "综合管理部-数字化 / 林远",
         },
         permissionDone
-          ? "系统权限已配置，事项进入待完成工商变更"
-          : "权限配置状态已保存",
+          ? "系统权限已配置并纳入组织架构，事项进入待完成工商变更"
+          : "权限与组织架构配置状态已保存",
       );
     };
     return (
@@ -134,17 +136,17 @@ export default function AppointmentActionPanel({
           </div>
           <div>
             <span>当前办理角色 · {roleLabel}</span>
-            <h3>配置系统权限</h3>
+            <h3>配置系统权限并纳入组织架构</h3>
             <p>
-              确认工作台账号、任职企业和数据权限，完成后自动流转至综合管理部-董办。
+              确认工作台账号、任职企业和数据权限，同步人员、岗位与任期信息，完成后自动流转至综合管理部-董办。
             </p>
           </div>
         </header>
         <div className={styles.switches}>
           <label>
             <div>
-              <b>配置系统权限</b>
-              <span>账号、董事工作台、任职企业数据权限</span>
+              <b>配置系统权限并纳入组织架构</b>
+              <span>账号、董事工作台、企业数据权限及人员、岗位、任期信息</span>
             </div>
             <Switch
               checked={permissionDone}
@@ -157,7 +159,7 @@ export default function AppointmentActionPanel({
         <div className={styles.actionBar}>
           <span>手动修改后点击保存，系统记录操作人和操作时间</span>
           <Button type="primary" onClick={saveConfiguration}>
-            保存权限配置
+            保存权限与组织架构配置
           </Button>
         </div>
       </section>
@@ -182,7 +184,7 @@ export default function AppointmentActionPanel({
       onOk: () =>
         onUpdate(
           {
-            currentStep: 7,
+            currentStep: 4,
             status: "已完成",
             owner: "已归档",
             recipient: "—",

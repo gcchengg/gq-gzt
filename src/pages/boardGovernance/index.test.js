@@ -67,6 +67,7 @@ test("filters board governance menus by the selected role", async () => {
   ]);
   assert.match(shell, /groupOffice: \["appointment"\]/);
   assert.match(shell, /adminDepartment: navigationItems\.map/);
+  assert.match(shell, /auditLegalDepartment: \["home"\]/);
   assert.match(shell, /director: \["home", "management", "duty-tasks"\]/);
   assert.doesNotMatch(
     shell,
@@ -74,6 +75,7 @@ test("filters board governance menus by the selected role", async () => {
   );
   assert.match(shell, /label: "集团董办"/);
   assert.match(shell, /label: "综合管理部"/);
+  assert.match(shell, /label: "审计封控与法务部"/);
   assert.match(shell, /label: "董事"/);
   assert.match(page, /useState\("groupOffice"\)/);
   assert.match(appointment, /role === "groupOffice"/);
@@ -282,7 +284,7 @@ test("provides an operable three-type duty plan lifecycle", async () => {
     "确认责任人",
     "生成年度计划并创建任务",
     "查看任务",
-    "查看结果",
+    "去执行",
     "查看年度履职计划报告",
     "打印 / 导出 PDF",
   ]) {
@@ -333,7 +335,18 @@ test("connects handbook department tasks with the preparation table", async () =
   assert.match(taskHome, /任务视图/);
   assert.match(taskHome, /总待办数/);
   assert.match(taskHome, /董事履职手册资料更新/);
-  assert.match(taskHome, /履职准备-董事履职手册/);
+  assert.match(taskHome, /label: "履职准备"/);
+  assert.match(taskHome, /department: "董事履职手册"/);
+  assert.match(taskHome, /department: "年度履职计划"/);
+  assert.equal(
+    (taskHome.match(/department: "(?:董事履职手册|年度履职计划)"/g) || [])
+      .length,
+    2,
+  );
+  assert.match(taskHome, /const pendingCount = visibleTaskCategories\.reduce/);
+  assert.match(taskHome, /董事履职手册确认任务/);
+  assert.match(taskHome, /preparation\/directors\/D-02\?tab=handbook/);
+  assert.match(taskHome, /preparation\/directors\/D-02\?tab=annual-plan/);
   assert.match(task, /Dragger/);
   assert.match(task, /提交资料/);
   assert.match(page, /status: "已提交"/);
@@ -346,6 +359,20 @@ test("connects handbook department tasks with the preparation table", async () =
     /确认资料|onConfirmMaterial|confirmedCount/,
   );
   assert.match(director, /disabled=\{!materials\.length \|\| !allSubmitted\}/);
+  assert.match(director, /label: "董事履职手册"/);
+  assert.match(director, /label: "年度履职计划编排"/);
+  for (const step of [
+    "计划制定",
+    "计划全部提交",
+    "年度履职计划生成",
+    "自动创建履职任务",
+  ]) {
+    assert.match(director, new RegExp(step));
+  }
+  assert.match(director, /<Steps[\s\S]{0,220}current=\{annualPlanStep\}/);
+  assert.match(director, /annualPlanGenerated\s*\? 4/);
+  const dutyPlanData = await read("./dutyPlanData.js");
+  assert.equal((dutyPlanData.match(/id: "PLAN-D02-/g) || []).length, 3);
   assert.match(director, /const previewColumns = \[/);
   assert.doesNotMatch(director, /scroll=\{\{ x: 950, y: 280 \}\}/);
   assert.match(historyDrawer, /资料历史详情/);
@@ -369,6 +396,17 @@ test("opens appointment task drawers from the workbench", async () => {
   }
   assert.match(home, /\/boardGovernance\/appointment\/\$\{item\.id\}/);
   assert.match(home, /描述：\{item\.status\}/);
+});
+
+test("splits business-registration appointment tasks by department role", async () => {
+  const home = await read("./views/TaskHomeView/index.jsx");
+  assert.match(home, /const visibleAppointmentTasks = useMemo/);
+  assert.match(home, /role === "auditLegalDepartment"/);
+  assert.match(home, /item\.status === "待完成工商变更"/);
+  assert.match(home, /role === "adminDepartment"/);
+  assert.match(home, /item\.status !== "待完成工商变更"/);
+  assert.match(home, /records: visibleAppointmentTasks/);
+  assert.match(home, /key === "appointment"/);
 });
 
 test("submits annual reports into selectable confirmation tasks", async () => {
@@ -413,7 +451,11 @@ test("shows role-specific workbench categories and task tabs", async () => {
   assert.match(page, /<DutyTaskManagerView\s+role=\{role\}/);
   assert.match(
     home,
-    /role === "director"\s*\? key === "annual-plan-confirmation"\s*: key !== "annual-plan-confirmation"/,
+    /if \(role === "director"\) return key === "annual-plan-confirmation"/,
+  );
+  assert.match(
+    home,
+    /if \(role === "auditLegalDepartment"\) return key === "appointment"/,
   );
   assert.match(home, /visibleTaskCategories\.map/);
   assert.match(home, /selectedCategoryKey === "annual-plan-confirmation"/);
@@ -462,7 +504,7 @@ test("connects plan confirmation tasks with the workbench and plan table", async
   assert.match(plan, /删除计划/);
   assert.match(plan, /提交计划/);
   assert.match(page, /status: "已提交"/);
-  assert.match(plan, /查看结果/);
+  assert.match(plan, /去执行/);
   assert.match(plan, /disabled=\{!canGenerateAnnual\}/);
   assert.equal((data.match(/status: "已完成"/g) || []).length, 3);
 });
@@ -700,7 +742,7 @@ test("keeps stage drawer tables from overflowing the drawer width", async () => 
   );
   assert.match(
     director,
-    /function SyncedSuggestions[\s\S]{0,1200}title: "操作"[\s\S]{0,120}width: compact/,
+    /function SyncedSuggestions[\s\S]{0,1800}title: "操作"[\s\S]{0,120}width: compact/,
   );
   assert.match(evalWs, /scroll=\{embedded \? undefined/);
   assert.match(evalWsStyle, /table-layout:\s*fixed/);

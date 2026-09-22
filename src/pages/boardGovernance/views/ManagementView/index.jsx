@@ -19,6 +19,8 @@ import {
 } from "../../stageRouting";
 import styles from "./index.module.less";
 
+const currentDirectorName = "张铁斌";
+
 export default function ManagementView({
   role,
   resource,

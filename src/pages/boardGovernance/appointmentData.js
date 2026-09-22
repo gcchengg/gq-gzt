@@ -1,10 +1,10 @@
 import { directors } from "./mockData.js";
 
 const appointmentState = {
-  待上传董事简历: { status: "待上传董事简历", currentStep: 2 },
-  待配置系统权限: { status: "待配置系统权限", currentStep: 3 },
-  待完成工商变更: { status: "待完成工商变更", currentStep: 6 },
-  已完成: { status: "已完成", currentStep: 7 },
+  待上传董事简历: { status: "待上传董事简历", currentStep: 1 },
+  待配置系统权限: { status: "待配置系统权限并纳入组织架构", currentStep: 2 },
+  待完成工商变更: { status: "待完成工商变更", currentStep: 3 },
+  已完成: { status: "已完成", currentStep: 4 },
 };
 
 const extraCases = [
@@ -20,7 +20,7 @@ const extraCases = [
     recipient: "综合管理部-人力 / 周航",
     deadline: "09-17 17:00",
     status: "待上传董事简历",
-    currentStep: 2,
+    currentStep: 1,
   },
 ];
 
@@ -40,8 +40,8 @@ export const initialAppointmentCases = [
       recipient: "综合管理部-人力 / 周航",
       deadline: "09-20 17:00",
       ...(appointmentState[director.appointmentStatus] || {
-        status: "待接收推荐函",
-        currentStep: 1,
+        status: "待下发董事推荐函",
+        currentStep: 0,
       }),
     })),
 ];

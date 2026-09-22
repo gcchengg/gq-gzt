@@ -3,7 +3,12 @@ import { Button, Descriptions, message, Modal, Table } from "antd";
 import { StatusPill } from "../../components/PageKit";
 import styles from "./index.module.less";
 
-export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
+export default function AnnualPlanConfirmTaskView({
+  task,
+  onSave,
+  onClose,
+  generation = false,
+}) {
   const [selectedRowIds, setSelectedRowIds] = useState([]);
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
 
@@ -29,7 +34,11 @@ export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
   const submit = () => {
     onSave(task.id, selectedRowIds, true);
     setSubmitConfirmOpen(false);
-    message.success("年度履职计划确认/调整结果已提交");
+    message.success(
+      generation
+        ? "年度履职计划已生成，履职任务已创建"
+        : "年度履职计划确认/调整结果已提交",
+    );
     onClose?.();
   };
 
@@ -49,7 +58,7 @@ export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
           },
           {
             key: "title",
-            label: "报告名称",
+            label: "计划名称",
             children: task.report.title,
             span: 2,
           },
@@ -63,7 +72,11 @@ export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
       <div className={styles.selectionBar}>
         <div>
           <strong>年度履职计划明细</strong>
-          <span>请选择确认接收的计划，可多选后保存或提交。</span>
+          <span>
+            {generation
+              ? "请选择纳入年度履职计划的事项，可多选后生成任务。"
+              : "以下为编排阶段已选择的计划，可再次勾选调整后提交。"}
+          </span>
         </div>
         <b>已选择 {selectedRowIds.length} 项</b>
       </div>
@@ -86,8 +99,8 @@ export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
               width: 58,
               align: "center",
               className: styles.sequenceColumn,
-              render: (value) => (
-                <span className={styles.sequenceNumber}>{value}</span>
+              render: (_value, _record, index) => (
+                <span className={styles.sequenceNumber}>{index + 1}</span>
               ),
             },
             { title: "任职企业", dataIndex: "company", width: "15%" },
@@ -100,7 +113,11 @@ export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
       </div>
       <p className={styles.reportNotes}>{task.report.notes}</p>
       <div className={styles.actionBar}>
-        <span>保存可稍后继续办理；提交后将记录董事确认结果。</span>
+        <span>
+          {generation
+            ? "演示数据：选择计划后生成年度履职任务。"
+            : "保存可稍后继续办理；提交后将记录董事确认结果。"}
+        </span>
         <div>
           <Button onClick={onClose}>取消</Button>
           <Button disabled={!selectedRowIds.length} onClick={() => save(false)}>
@@ -111,12 +128,16 @@ export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
             disabled={!selectedRowIds.length}
             onClick={() => save(true)}
           >
-            提交
+            {generation ? "生成年度计划并创建任务" : "提交"}
           </Button>
         </div>
       </div>
       <Modal
-        title="确认提交年度履职计划？"
+        title={
+          generation
+            ? "确认生成年度履职计划并创建任务？"
+            : "确认提交年度履职计划？"
+        }
         open={submitConfirmOpen}
         okText="确认提交"
         cancelText="返回检查"
@@ -124,7 +145,10 @@ export default function AnnualPlanConfirmTaskView({ task, onSave, onClose }) {
         onCancel={() => setSubmitConfirmOpen(false)}
       >
         本次共选择 {selectedRowIds.length}
-        项计划。提交后系统将记录董事的确认/调整结果，请确认无误后继续。
+        项计划。
+        {generation
+          ? "确认后生成年度履职计划并创建任务。"
+          : "提交后系统将记录董事的确认/调整结果，请确认无误后继续。"}
       </Modal>
     </div>
   );

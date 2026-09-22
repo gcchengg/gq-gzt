@@ -82,3 +82,5 @@ boardGovernance/home 中 董事只显示 年度履职计划确认/调整
             console.log(payload);
           }}
 当为董事角色的时候，boardGovernance/management，应该有TaskIssueDrawer，title为任务浮窗
+
+boardGovernance/home 页面新增 履职评价任务

@@ -10,6 +10,7 @@ import {
   Progress,
   Select,
   Space,
+  Steps,
   Table,
   Tabs,
   message,
@@ -159,13 +160,13 @@ export default function DirectorView({
         subtitle="董事聘任、履职准备、履职管理、履职评价全周期协同与证据留痕"
       />
       <div className={styles.directorToolbar}>
-        <Input
+        {/* <Input
           allowClear
           prefix={<FilterOutlined />}
           placeholder="搜索董事姓名、编号、企业或董事类型"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
-        />
+        /> */}
         {/* <Select
           value={roleFilter}
           onChange={setRoleFilter}
@@ -957,6 +958,8 @@ function ManagementDrawerPanel({
 export function PreparationWorkspace({
   compact = false,
   embedded = false,
+  defaultTab = "handbook",
+  planMode = "default",
   hideDirectorChrome = false,
   hidePlans = false,
   onViewMaterial,
@@ -990,6 +993,18 @@ export function PreparationWorkspace({
     (item) => item.directorName === director.name,
   );
   const annualPlanGenerated = generatedDirectorNames.includes(director.name);
+  const allPlansSubmitted =
+    directorPlans.length > 0 &&
+    directorPlans.every((item) =>
+      ["已提交", "待确认", "已完成"].includes(item.status),
+    );
+  const annualPlanStep = annualPlanGenerated
+    ? 4
+    : allPlansSubmitted
+      ? 2
+      : directorPlans.length
+        ? 1
+        : 0;
   const openMaterialEditor = (record = null) => {
     materialForm.resetFields();
     materialForm.setFieldsValue(
@@ -1154,120 +1169,152 @@ export function PreparationWorkspace({
               定期发起资料更新，推送董事履职手册；汇总会议、培训、调研计划，经董事确认后自动生成履职任务。
             </p>
           </div>
-          <Button
+          {/* <Button
             type="primary"
             icon={<CalendarOutlined />}
             onClick={() => setPlanComposerOpen(true)}
           >
             发起年度履职计划
-          </Button>
+          </Button> */}
         </div>
       )}
-      <div className={styles.prepGrid}>
-        <SectionCard
-          title="董事履职手册"
-          extra={
-            <Space wrap>
-              <span className={styles.selectionHint}>
-                已选 {selectedMaterialIds.length} 项
-              </span>
-              <Button
-                icon={<SendOutlined />}
-                disabled={!selectedMaterialIds.length}
-                onClick={requestSelectedMaterialUpdate}
-              >
-                定期发起资料更新
-              </Button>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => openMaterialEditor()}
-              >
-                新增资料
-              </Button>
-            </Space>
-          }
-        >
-          <Table
-            rowKey="id"
-            size="small"
-            tableLayout="fixed"
-            columns={materialColumns}
-            dataSource={materials}
-            pagination={false}
-            rowSelection={{
-              selectedRowKeys: selectedMaterialIds,
-              onChange: setSelectedMaterialIds,
-            }}
-          />
-          <div className={styles.cardFooter}>
-            <span>
-              已提交 {submittedCount} / {materials.length}{" "}
-              项；全部提交后可预览并推送董事履职手册
-            </span>
-            <Button
-              type="primary"
-              disabled={!materials.length || !allSubmitted}
-              onClick={() => setPreviewOpen(true)}
-            >
-              预览并推送手册
-            </Button>
-          </div>
-        </SectionCard>
-        <SectionCard title="准备阶段进度">
-          <ol className={styles.prepSteps}>
-            <li className={styles.done}>
-              <CheckCircleOutlined />
-              <div>
-                <b>资料目录确认</b>
-                <span>{materials.length} 项资料已匹配责任部门和责任人</span>
-              </div>
-            </li>
-            <li className={styles.done}>
-              <CheckCircleOutlined />
-              <div>
-                <b>更新任务发起</b>
-                <span>资料更新任务已发送至 4 个责任部门</span>
-              </div>
-            </li>
-            <li className={allSubmitted ? styles.done : styles.current}>
-              <FileTextOutlined />
-              <div>
-                <b>资料内容更新</b>
-                <span>{materials.length - submittedCount} 项资料待提交</span>
-              </div>
-            </li>
-            <li className={allSubmitted ? styles.current : ""}>
-              <TeamOutlined />
-              <div>
-                <b>董事履职手册推送</b>
-                <span>
-                  {allSubmitted
-                    ? "资料已全部提交，可预览并推送"
-                    : "待资料全部提交"}
-                </span>
-              </div>
-            </li>
-          </ol>
-        </SectionCard>
-      </div>
-      {!hidePlans ? (
-        <DutyPlanWorkspace
-          embedded={embedded}
-          createOpen={planComposerOpen}
-          onCreateOpenChange={setPlanComposerOpen}
-          plans={directorPlans}
-          onCreatePlan={onCreateDutyPlan}
-          onDeletePlan={onDeleteDutyPlan}
-          onSubmitPlan={onSubmitDutyPlan}
-          onGenerateTasks={() => onGenerateDutyTasks(director.name)}
-          onSubmitAnnualPlanReport={(report) =>
-            onSubmitAnnualPlanReport?.(director, report)
-          }
-          annualGenerated={annualPlanGenerated}
-          activeDirector={director}
+      <div className={styles.preparationTabs}>
+        <Tabs
+          defaultActiveKey={defaultTab}
+          items={[
+            {
+              key: "handbook",
+              label: "董事履职手册",
+              children: (
+                <div className={styles.prepGrid}>
+                  <SectionCard title="准备阶段进度">
+                    <Steps
+                      direction="horizontal"
+                      responsive={false}
+                      labelPlacement="vertical"
+                      size="small"
+                      current={allSubmitted ? 3 : 2}
+                      items={[
+                        {
+                          title: "资料目录确认",
+                          // description: `${materials.length} 项资料已匹配责任部门和责任人`,
+                        },
+                        {
+                          title: "更新任务发起",
+                          // description: "资料更新任务已发送至 4 个责任部门",
+                        },
+                        {
+                          title: "资料内容更新",
+                          // description: `${materials.length - submittedCount} 项资料待提交`,
+                        },
+                        {
+                          title: "董事履职手册推送",
+                          // description: allSubmitted
+                          //   ? "资料已全部提交，可预览并推送"
+                          //   : "待资料全部提交",
+                        },
+                      ]}
+                    />
+                  </SectionCard>
+                  <SectionCard
+                    title="董事履职手册"
+                    extra={
+                      <Space wrap>
+                        <span className={styles.selectionHint}>
+                          已选 {selectedMaterialIds.length} 项
+                        </span>
+                        <Button
+                          icon={<SendOutlined />}
+                          disabled={!selectedMaterialIds.length}
+                          onClick={requestSelectedMaterialUpdate}
+                        >
+                          定期发起资料更新
+                        </Button>
+                        <Button
+                          type="primary"
+                          icon={<PlusOutlined />}
+                          onClick={() => openMaterialEditor()}
+                        >
+                          新增资料
+                        </Button>
+                      </Space>
+                    }
+                  >
+                    <Table
+                      rowKey="id"
+                      size="small"
+                      tableLayout="fixed"
+                      columns={materialColumns}
+                      dataSource={materials}
+                      pagination={false}
+                      rowSelection={{
+                        selectedRowKeys: selectedMaterialIds,
+                        onChange: setSelectedMaterialIds,
+                      }}
+                    />
+                    <div className={styles.cardFooter}>
+                      <span>
+                        已提交 {submittedCount} / {materials.length}{" "}
+                        项；全部提交后可预览并推送董事履职手册
+                      </span>
+                      <Button
+                        type="primary"
+                        disabled={!materials.length || !allSubmitted}
+                        onClick={() => setPreviewOpen(true)}
+                      >
+                        预览并推送手册
+                      </Button>
+                    </div>
+                  </SectionCard>
+                </div>
+              ),
+            },
+            hidePlans
+              ? null
+              : {
+                  key: "annual-plan",
+                  label: "年度履职计划编排",
+                  children: (
+                    <div className={styles.annualPlanTab}>
+                      <SectionCard title="准备阶段进度">
+                        <Steps
+                          direction="horizontal"
+                          responsive={false}
+                          labelPlacement="vertical"
+                          size="small"
+                          current={annualPlanStep}
+                          items={[
+                            { title: "计划制定" },
+                            { title: "计划全部提交" },
+                            { title: "年度履职计划生成" },
+                            { title: "自动创建履职任务" },
+                          ]}
+                        />
+                      </SectionCard>
+                      <DutyPlanWorkspace
+                        embedded={embedded}
+                        mode={planMode}
+                        createOpen={planComposerOpen}
+                        onCreateOpenChange={setPlanComposerOpen}
+                        plans={directorPlans}
+                        onCreatePlan={onCreateDutyPlan}
+                        onDeletePlan={onDeleteDutyPlan}
+                        onSubmitPlan={onSubmitDutyPlan}
+                        onGenerateTasks={() =>
+                          onGenerateDutyTasks(director.name)
+                        }
+                        onSubmitAnnualPlanReport={(report) =>
+                          onSubmitAnnualPlanReport?.(director, report)
+                        }
+                        annualGenerated={annualPlanGenerated}
+                        activeDirector={director}
+                      />
+                    </div>
+                  ),
+                },
+          ].filter(Boolean)}
         />
-      ) : null}
+      </div>
       <MaterialHistoryDrawer
         material={historyMaterial}
         open={!!historyMaterial}
@@ -2102,7 +2149,7 @@ function SyncedSuggestions({ suggestionTasks, compact = false }) {
               <Link
                 to={`/boardGovernance/duty-tasks?taskType=suggestion&bizId=${row.id}`}
               >
-                {row.status === "已完成" ? "查看结果" : "去办理"}
+                {row.status === "已完成" ? "去执行" : "去办理"}
               </Link>
             ),
           },

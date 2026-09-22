@@ -27,9 +27,16 @@ export default function AppointmentView({
   const navigate = useNavigate();
   const canIssueLetter = role === "groupOffice";
   const [openIssue, setOpenIssue] = useState(false);
+  const visibleCases = useMemo(
+    () =>
+      role === "auditLegalDepartment"
+        ? cases.filter((item) => item.status === "待完成工商变更")
+        : cases,
+    [cases, role],
+  );
   const appointmentDirectors = useMemo(
     () =>
-      cases.map((item) => {
+      visibleCases.map((item) => {
         const director = directorRecords.find(
           (record) =>
             record.id === item.directorId || record.name === item.director,
@@ -46,10 +53,10 @@ export default function AppointmentView({
           appointmentOwner: item.owner,
         };
       }),
-    [cases, directorRecords],
+    [visibleCases, directorRecords],
   );
   const current =
-    resource === "case" ? cases.find((item) => item.id === id) : null;
+    resource === "case" ? visibleCases.find((item) => item.id === id) : null;
   const closeDetail = () => navigate("/boardGovernance/appointment");
   return (
     <div className={styles.page}>
@@ -75,7 +82,11 @@ export default function AppointmentView({
           ) : null
         }
         onViewDetail={(director) =>
-          navigate(directorStageDetailPath("appointment", director, { cases }))
+          navigate(
+            directorStageDetailPath("appointment", director, {
+              cases: visibleCases,
+            }),
+          )
         }
       />
       <AppointmentFlow
@@ -83,7 +94,7 @@ export default function AppointmentView({
         canIssueLetter={canIssueLetter}
         autoOpenIssue={openIssue}
         onIssueLetterOpened={() => setOpenIssue(false)}
-        cases={cases}
+        cases={visibleCases}
         onCasesChange={onCasesChange}
         onIssueCreated={(nextCase) => {
           onIssueCreated?.(nextCase);
@@ -108,7 +119,7 @@ export default function AppointmentView({
             variant="detail"
             embedded
             canIssueLetter={canIssueLetter}
-            cases={cases}
+            cases={visibleCases}
             onCasesChange={onCasesChange}
             selectedId={id}
             onCaseCompleted={onCaseCompleted}

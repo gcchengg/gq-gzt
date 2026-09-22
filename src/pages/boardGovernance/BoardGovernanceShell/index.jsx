@@ -25,18 +25,21 @@ import styles from "./index.module.less";
 const roleOptions = [
   { key: "groupOffice", label: "集团董办", avatar: "董" },
   { key: "adminDepartment", label: "综合管理部", avatar: "综" },
+  { key: "auditLegalDepartment", label: "审计封控与法务部", avatar: "审" },
   { key: "director", label: "董事", avatar: "董" },
 ];
 
 const roleMenuKeys = {
   groupOffice: ["appointment"],
   adminDepartment: navigationItems.map(({ key }) => key),
+  auditLegalDepartment: ["home", "appointment"],
   director: ["home", "management", "duty-tasks"],
 };
 
 const roleDefaultPage = {
   groupOffice: "appointment",
   adminDepartment: "home",
+  auditLegalDepartment: "home",
   director: "home",
 };
 
@@ -126,19 +129,19 @@ export default function BoardGovernanceShell({
         <div className={styles.workspace}>
           <header className={styles.topbar}>
             <div className={styles.switches}>
-              <Select
+              {/* <Select
                 defaultValue="2026"
                 options={[
                   { value: "2026", label: "2026 年度" },
                   { value: "2025", label: "2025 年度" },
                 ]}
-              />
+              /> */}
             </div>
             <div className={styles.tools}>
-              <Input
+              {/* <Input
                 prefix={<SearchOutlined />}
                 placeholder="搜索董事、会议、议题、任务和资料"
-              />
+              /> */}
               <Tooltip title="董事移动端">
                 <Link to="/boardGovernance/mobile">
                   <Button type="text" icon={<MobileOutlined />} />
@@ -152,6 +155,10 @@ export default function BoardGovernanceShell({
                   items: [
                     { key: "groupOffice", label: "集团董办" },
                     { key: "adminDepartment", label: "综合管理部" },
+                    {
+                      key: "auditLegalDepartment",
+                      label: "审计封控与法务部",
+                    },
                     { key: "director", label: "董事" },
                   ],
                   onClick: ({ key }) => handleRoleChange(key),

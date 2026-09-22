@@ -16,7 +16,6 @@ import {
 } from "antd";
 import {
   BellOutlined,
-  CheckCircleFilled,
   DingdingOutlined,
   FileDoneOutlined,
   SendOutlined,
@@ -43,7 +42,7 @@ const initialCases = [
     recipient: "综合管理部-人力 / 周航",
     deadline: "09-17 17:00",
     status: "待上传董事简历",
-    currentStep: 2,
+    currentStep: 1,
   },
   {
     id: "AP-2026-006",
@@ -55,8 +54,8 @@ const initialCases = [
     owner: "综合管理部-人力 / 周航",
     recipient: "综合管理部-人力 / 周航",
     deadline: "09-16 12:00",
-    status: "待权限配置",
-    currentStep: 3,
+    status: "待配置系统权限并纳入组织架构",
+    currentStep: 2,
   },
   {
     id: "AP-2026-005",
@@ -69,17 +68,17 @@ const initialCases = [
     recipient: "综合管理部-董办 / 王珂",
     deadline: "09-20 17:00",
     status: "待完成工商变更",
-    currentStep: 5,
+    currentStep: 3,
   },
 ];
 
 function casesForDirector(director) {
   if (!director) return initialCases;
   const appointmentState = {
-    待上传董事简历: { status: "待上传董事简历", currentStep: 2 },
-    待配置系统权限: { status: "待配置系统权限", currentStep: 3 },
-    待完成工商变更: { status: "待完成工商变更", currentStep: 6 },
-    已完成: { status: "已完成", currentStep: 7 },
+    待上传董事简历: { status: "待上传董事简历", currentStep: 1 },
+    待配置系统权限: { status: "待配置系统权限并纳入组织架构", currentStep: 2 },
+    待完成工商变更: { status: "待完成工商变更", currentStep: 3 },
+    已完成: { status: "已完成", currentStep: 4 },
   };
   return [
     {
@@ -89,8 +88,8 @@ function casesForDirector(director) {
       company: director.company,
       position: director.role,
       ...(appointmentState[director.appointmentStatus] || {
-        status: "待接收推荐函",
-        currentStep: 1,
+        status: "待下发董事推荐函",
+        currentStep: 0,
       }),
     },
   ];
@@ -98,11 +97,12 @@ function casesForDirector(director) {
 
 const processSteps = [
   ["下发董事推荐函", "集团董办", "线上下发并创建交接任务"],
-  ["接收董事推荐函", "综合管理部-办公室", "钉钉提醒指定经办人接收"],
   ["上传董事简历", "综合管理部-办公室", "上传简历并完成材料校验"],
-  ["配置系统权限", "综合管理部-人力", "按董事身份开通工作台权限"],
-  ["纳入组织架构", "综合管理部-人力", "同步人员、岗位与任期信息"],
-  ["人员选举 / 专委会委员变更", "综合管理部-董办", "完成后更新聘任事项状态"],
+  [
+    "配置系统权限并纳入组织架构",
+    "综合管理部-人力",
+    "开通工作台权限，同步人员、岗位与任期信息",
+  ],
   ["工商变更", "审计风控与法务部", "确认完成后归档聘任事项"],
 ];
 
@@ -294,7 +294,7 @@ export default function AppointmentFlow({
       current.map((item) => (item.id === selected.id ? next : item)),
     );
     messageApi.success(successMessage);
-    if (next.status === "已完成" || next.currentStep >= 7) {
+    if (next.status === "已完成" || next.currentStep >= processSteps.length) {
       onCaseCompleted?.(next);
     }
   };
@@ -320,7 +320,7 @@ export default function AppointmentFlow({
       recipient: "综合管理部-人力 / 周航",
       deadline: values.deadline,
       status: "待上传董事简历",
-      currentStep: 2,
+      currentStep: 1,
     };
     setCases((current) => [nextCase, ...current]);
     const now = new Date();
@@ -380,6 +380,25 @@ export default function AppointmentFlow({
         ) : null}
       </section>
 
+      {!listOnly && selected ? (
+        <SectionCard
+          title={`${selected.director} · 全流程定位`}
+          extra={<StatusPill>{selected.status}</StatusPill>}
+        >
+          <Steps
+            current={selected.currentStep}
+            size="small"
+            direction="horizontal"
+            labelPlacement="vertical"
+            responsive={false}
+            items={processSteps.map(([title, owner]) => ({
+              title,
+              description: owner,
+            }))}
+          />
+        </SectionCard>
+      ) : null}
+
       {listOnly ? (
         <div className={styles.metrics}>
           <Segmented
@@ -397,11 +416,10 @@ export default function AppointmentFlow({
             ? [
                 [
                   "流程进度",
-                  `${Math.min(selected.currentStep + 1, processSteps.length)} / ${processSteps.length}`,
+                  `${Math.min(selected.currentStep, processSteps.length)} / ${processSteps.length}`,
                   "已完成节点 / 全部节点",
                 ],
                 ["当前状态", selected.status, roleMeta.label],
-                ["办理时限", selected.deadline, "超时前自动提醒"],
                 [
                   "交接记录",
                   `${visibleAuditMessages.length} 条`,
@@ -410,8 +428,8 @@ export default function AppointmentFlow({
               ]
             : [
                 ["待上传董事简历", "2", "综合管理部-办公室"],
-                ["待配置系统权限", "1", "综合管理部-人力"],
-                ["待选举 / 工商变更", "4", "董办 / 法务"],
+                ["待配置系统权限并纳入组织架构", "1", "综合管理部-人力"],
+                ["待完成工商变更", "4", "董办 / 法务"],
               ]
           ).map(([label, value, owner]) => (
             <article key={label}>
@@ -456,11 +474,6 @@ export default function AppointmentFlow({
                   ) : (
                     "未上传"
                   ),
-                },
-                {
-                  key: "deadline",
-                  label: "办理时限",
-                  children: selected.deadline,
                 },
                 { key: "owner", label: "当前责任人", children: selected.owner },
                 {
@@ -534,7 +547,6 @@ export default function AppointmentFlow({
               { title: "推荐函", dataIndex: "letter", width: 210 },
               { title: "当前责任人", dataIndex: "owner", width: 210 },
               { title: "下一接收人", dataIndex: "recipient", width: 220 },
-              { title: "办理时限", dataIndex: "deadline" },
               {
                 title: "状态",
                 dataIndex: "status",
@@ -554,50 +566,6 @@ export default function AppointmentFlow({
             allowedActions={Object.values(roleActionSteps).flat()}
             onUpdate={updateSelected}
           />
-
-          <SectionCard
-            title={`${selected.director} · 全流程定位`}
-            extra={<StatusPill>{selected.status}</StatusPill>}
-          >
-            {!detailOnly ? (
-              <Steps
-                current={selected.currentStep}
-                size="small"
-                responsive={false}
-                items={processSteps.map(([title, owner]) => ({
-                  title,
-                  description: owner,
-                }))}
-              />
-            ) : null}
-            <div
-              className={
-                detailOnly ? styles.embeddedProcess : styles.laneDetail
-              }
-            >
-              {processSteps.map(([title, owner, detail], index) => (
-                <article
-                  key={title}
-                  className={`${index === selected.currentStep ? styles.activeStep : ""} ${index < selected.currentStep ? styles.completedStep : ""}`}
-                >
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <div>
-                    <b>{title}</b>
-                    <small>{owner}</small>
-                    <p>{detail}</p>
-                  </div>
-                  <em>
-                    {index < selected.currentStep
-                      ? "已完成"
-                      : index === selected.currentStep
-                        ? "办理中"
-                        : "待办理"}
-                  </em>
-                  {index < selected.currentStep ? <CheckCircleFilled /> : null}
-                </article>
-              ))}
-            </div>
-          </SectionCard>
 
           <SectionCard
             title="消息与审计轨迹"
@@ -685,12 +653,6 @@ export default function AppointmentFlow({
         onOk={issueLetter}
         onCancel={() => setOpen(false)}
       >
-        <Alert
-          type="info"
-          showIcon
-          message="下发后将自动通知综合管理部-办公室经办人"
-          description="办公室上传董事简历后，系统继续通知综合管理部-人力经办人配置系统权限、纳入组织架构。"
-        />
         <Form
           form={form}
           layout="vertical"
@@ -754,13 +716,6 @@ export default function AppointmentFlow({
                 options={["阮迪", "胡欣悦", "王玥"].map((value) => ({ value }))}
               />
             </Form.Item>
-            <Form.Item
-              label="办理时限"
-              name="deadline"
-              rules={[{ required: true }]}
-            >
-              <Input placeholder="YYYY-MM-DD HH:mm" />
-            </Form.Item>
             <Form.Item label="推荐函文件" required>
               <Upload
                 accept=".pdf,.doc,.docx"
@@ -775,15 +730,6 @@ export default function AppointmentFlow({
                 <Button icon={<UploadOutlined />}>选择推荐函文件</Button>
               </Upload>
             </Form.Item>
-          </div>
-          <div className={styles.messagePreview}>
-            <DingdingOutlined />
-            <div>
-              <b>钉钉消息预览</b>
-              <p>
-                【董事聘任任务】集团董办已下发董事推荐函，请在办理时限前接收并上传董事简历。完成后系统将通知人力科室配置系统权限并纳入组织架构。
-              </p>
-            </div>
           </div>
         </Form>
       </Modal>
