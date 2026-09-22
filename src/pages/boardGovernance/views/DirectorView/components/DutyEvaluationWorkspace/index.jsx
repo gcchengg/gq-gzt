@@ -223,6 +223,7 @@ export default function DutyEvaluationWorkspace({
       >
         <Steps
           current={currentStep}
+          size={embedded ? "small" : "default"}
           items={[
             { title: "接收报告" },
             { title: "发起评价" },
@@ -285,6 +286,7 @@ export default function DutyEvaluationWorkspace({
       >
         <DataTable
           rows={evaluators}
+          scroll={embedded ? undefined : { x: "max-content" }}
           columns={[
             {
               title: "评价角色",

@@ -30,14 +30,7 @@
 .laneDetail .activeStep,.embeddedProcess .activeStep { border-color:#2f6bff; background:#edf4ff; box-shadow:inset 0 0 0 1px #2f6bff; }
 .laneDetail .activeStep>em,.embeddedProcess .activeStep>em { background:#2f6bff; color:#fff; }
 .laneDetail .completedStep>em,.embeddedProcess .completedStep>em { background:#e4f5ec; color:#168255; }
-.bottomGrid { display:grid; grid-template-columns:1.65fr .75fr; gap:16px; }
-.handoffs { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.handoffs article { padding:16px; border:1px solid #e2e8f0; border-radius:12px; background:linear-gradient(150deg,#fff,#f7faff); }
-.handoffs span { font-size:10px; color:#2f6bff; }
-.handoffs h3 { margin:8px 0; }
-.handoffs p { min-height:54px; font-size:11px; line-height:1.6; color:#69768a; }
-.handoffs small { display:block; padding-top:10px; border-top:1px dashed #dfe6f0; color:#8791a1; }
-.handoffIcon { display:grid; place-items:center; width:34px; height:34px; margin-bottom:12px; border-radius:9px; background:#e9f1ff; color:#2f6bff; font-size:17px; }
+.fileValue { display:inline-flex; align-items:center; gap:6px; color:#245fca; }
 .auditCount { display:flex; align-items:center; gap:6px; font-size:11px; color:#6f7d90; }
 .auditTabs :global(.ant-tabs-nav) { margin-bottom:14px; }
 .auditTabLabel { display:grid; min-width:70px; gap:2px; text-align:left; }
@@ -61,7 +54,6 @@
 .embeddedWorkspace .metrics article { padding:12px; }
 .embeddedWorkspace .metrics strong { min-width:0; font-size:18px; overflow-wrap:anywhere; text-align:right; }
 .embeddedWorkspace .metrics small { overflow-wrap:anywhere; }
-.embeddedWorkspace .bottomGrid { grid-template-columns:1fr; gap:12px; }
 .embeddedWorkspace .commandMeta { min-width:210px; max-width:280px; }
 .embeddedWorkspace .commandMeta small { overflow-wrap:anywhere; }
 .caseOverview { display:grid; grid-template-columns:210px minmax(0,1fr); gap:20px; align-items:start; }
@@ -72,6 +64,6 @@
 .caseOverview :global(.ant-descriptions-view) { width:100%; }
 .caseOverview :global(.ant-descriptions-item-label),.caseOverview :global(.ant-descriptions-item-content) { overflow-wrap:anywhere; }
 .messagePreview p { margin:4px 0 0; font-size:12px; line-height:1.6; color:#607089; }
-@media(max-width:1200px) { .metrics { grid-template-columns:repeat(2,1fr); } .laneDetail { grid-template-columns:repeat(2,1fr); } .bottomGrid { grid-template-columns:1fr; } }
-@media(max-width:900px) { .embeddedWorkspace .command { align-items:flex-start; flex-direction:column; }.embeddedWorkspace .commandMeta { width:100%; max-width:none; min-width:0; }.embeddedWorkspace .caseOverview,.embeddedWorkspace .embeddedProcess,.embeddedWorkspace .handoffs { grid-template-columns:1fr; } }
-@media(max-width:760px) { .command { align-items:flex-start; flex-direction:column; } .roleControl { width:100%; justify-content:flex-start; }.roleControl>span { text-align:left; }.roleControl :global(.ant-select) { flex:1; }.metrics,.handoffs,.formGrid,.filters,.embeddedProcess,.caseOverview { grid-template-columns:1fr; } .laneDetail { grid-template-columns:1fr; } .embeddedWorkspace .commandMeta { width:100%; max-width:none; min-width:0; }.auditSummary { align-items:flex-start; flex-direction:column; } .auditSummary span { text-align:left; } }
+@media(max-width:1200px) { .metrics { grid-template-columns:repeat(2,1fr); } .laneDetail { grid-template-columns:repeat(2,1fr); } }
+@media(max-width:900px) { .embeddedWorkspace .command { align-items:flex-start; flex-direction:column; }.embeddedWorkspace .commandMeta { width:100%; max-width:none; min-width:0; }.embeddedWorkspace .caseOverview,.embeddedWorkspace .embeddedProcess { grid-template-columns:1fr; } }
+@media(max-width:760px) { .command { align-items:flex-start; flex-direction:column; } .roleControl { width:100%; justify-content:flex-start; }.roleControl>span { text-align:left; }.roleControl :global(.ant-select) { flex:1; }.metrics,.formGrid,.filters,.embeddedProcess,.caseOverview { grid-template-columns:1fr; } .laneDetail { grid-template-columns:1fr; } .embeddedWorkspace .commandMeta { width:100%; max-width:none; min-width:0; }.auditSummary { align-items:flex-start; flex-direction:column; } .auditSummary span { text-align:left; } }

@@ -27,11 +27,13 @@ import {
 } from "../../components/PageKit";
 import MaterialTaskView from "../MaterialTaskView";
 import PlanConfirmTaskView from "../PlanConfirmTaskView";
+import AnnualPlanConfirmTaskView from "../AnnualPlanConfirmTaskView";
 import styles from "./index.module.less";
 
 const { Dragger } = Upload;
 
 export default function DutyTaskManagerView({
+  role,
   plans,
   materials,
   onComplete,
@@ -39,6 +41,8 @@ export default function DutyTaskManagerView({
   onSavePlan,
   suggestionTasks,
   onSaveSuggestion,
+  annualPlanConfirmationTasks = [],
+  onSaveAnnualPlanConfirmation,
 }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -46,18 +50,33 @@ export default function DutyTaskManagerView({
   const department = searchParams.get("department");
   const planId = searchParams.get("planId");
   const requestedTaskType = searchParams.get("taskType");
-  const activeTaskType = [
+  const requestedTaskTypeIsValid = [
     "duty",
     "suggestion",
     "material",
     "confirmation",
-  ].includes(requestedTaskType)
-    ? requestedTaskType
-    : "duty";
+    "annual-plan-confirmation",
+  ].includes(requestedTaskType);
+  const activeTaskType =
+    role === "director"
+      ? "annual-plan-confirmation"
+      : requestedTaskTypeIsValid &&
+          requestedTaskType !== "annual-plan-confirmation"
+        ? requestedTaskType
+        : "duty";
   const [form] = Form.useForm();
   const [suggestionForm] = Form.useForm();
   const [files, setFiles] = useState([]);
   const tasks = useMemo(() => plans.filter((item) => item.taskStatus), [plans]);
+  const visibleAnnualPlanConfirmationTasks = useMemo(
+    () =>
+      role === "director"
+        ? annualPlanConfirmationTasks.filter(
+            (task) => task.id === "ANNUAL-D-08",
+          )
+        : annualPlanConfirmationTasks,
+    [annualPlanConfirmationTasks, role],
+  );
   const selectedTask =
     activeTaskType === "duty" ? tasks.find((item) => item.id === bizId) : null;
   const selectedSuggestion =
@@ -67,6 +86,10 @@ export default function DutyTaskManagerView({
   const selectedPlan =
     activeTaskType === "confirmation"
       ? plans.find((item) => item.id === planId)
+      : null;
+  const selectedAnnualPlan =
+    activeTaskType === "annual-plan-confirmation"
+      ? visibleAnnualPlanConfirmationTasks.find((item) => item.id === bizId)
       : null;
   const planInputValues = selectedTask
     ? [
@@ -158,13 +181,21 @@ export default function DutyTaskManagerView({
     );
   };
 
+  const openAnnualPlanConfirmation = (task) => {
+    navigate(
+      `/boardGovernance/duty-tasks?taskType=annual-plan-confirmation&bizId=${task.id}`,
+    );
+  };
+
   const closeTask = () => {
     navigate(
       activeTaskType === "material"
         ? "/boardGovernance/duty-tasks?taskType=material"
-        : activeTaskType === "confirmation"
-          ? "/boardGovernance/duty-tasks?taskType=confirmation"
-          : "/boardGovernance/duty-tasks",
+        : activeTaskType === "annual-plan-confirmation"
+          ? "/boardGovernance/duty-tasks?taskType=annual-plan-confirmation"
+          : activeTaskType === "confirmation"
+            ? "/boardGovernance/duty-tasks?taskType=confirmation"
+            : "/boardGovernance/duty-tasks",
     );
     form.resetFields();
     suggestionForm.resetFields();
@@ -231,6 +262,9 @@ export default function DutyTaskManagerView({
   const confirmationPendingCount = plans.filter(
     (item) => item.status !== "已完成",
   ).length;
+  const annualPlanPendingCount = visibleAnnualPlanConfirmationTasks.filter(
+    (item) => item.status !== "已完成",
+  ).length;
   const selectedMaterial =
     activeTaskType === "material" && department
       ? materialTasks.find((item) => item.department === department)
@@ -240,17 +274,21 @@ export default function DutyTaskManagerView({
       ? suggestionTasks.length
       : activeTaskType === "material"
         ? materialTasks.length
-        : activeTaskType === "confirmation"
-          ? plans.length
-          : tasks.length;
+        : activeTaskType === "annual-plan-confirmation"
+          ? visibleAnnualPlanConfirmationTasks.length
+          : activeTaskType === "confirmation"
+            ? plans.length
+            : tasks.length;
   const currentPending =
     activeTaskType === "suggestion"
       ? suggestionPendingCount
       : activeTaskType === "material"
         ? materialPendingCount
-        : activeTaskType === "confirmation"
-          ? confirmationPendingCount
-          : pendingCount;
+        : activeTaskType === "annual-plan-confirmation"
+          ? annualPlanPendingCount
+          : activeTaskType === "confirmation"
+            ? confirmationPendingCount
+            : pendingCount;
 
   return (
     <div className={styles.page}>
@@ -279,7 +317,7 @@ export default function DutyTaskManagerView({
         </article>
       </div>
       <SectionCard
-        title="负责人任务列表"
+        title="履职任务列表"
         extra={
           <span className={styles.hint}>
             点击“办理”通过 URL bizId 打开右侧任务抽屉
@@ -292,11 +330,11 @@ export default function DutyTaskManagerView({
             navigate(`/boardGovernance/duty-tasks?taskType=${value}`)
           }
           items={[
-            { key: "duty", label: `履职任务 ${tasks.length}` },
-            {
-              key: "suggestion",
-              label: `意见建议落实 ${suggestionTasks.length}`,
-            },
+            { key: "duty", label: `履职计划任务 ${tasks.length}` },
+            // {
+            //   key: "suggestion",
+            //   label: `意见建议落实 ${suggestionTasks.length}`,
+            // },
             {
               key: "material",
               label: `履职手册资料 ${materialTasks.length}`,
@@ -305,7 +343,15 @@ export default function DutyTaskManagerView({
               key: "confirmation",
               label: `年度履职计划确认 ${plans.length}`,
             },
-          ]}
+            {
+              key: "annual-plan-confirmation",
+              label: `年度履职计划确认/调整 ${visibleAnnualPlanConfirmationTasks.length}`,
+            },
+          ].filter(({ key }) =>
+            role === "director"
+              ? key === "annual-plan-confirmation"
+              : key !== "annual-plan-confirmation",
+          )}
         />
         {activeTaskType === "duty" && tasks.length ? (
           <DataTable
@@ -443,11 +489,50 @@ export default function DutyTaskManagerView({
             ]}
           />
         ) : null}
+        {activeTaskType === "annual-plan-confirmation" ? (
+          <DataTable
+            rows={visibleAnnualPlanConfirmationTasks}
+            columns={[
+              { title: "任务名称", dataIndex: "title", width: 280 },
+              { title: "董事", dataIndex: "directorName", width: 100 },
+              { title: "任职企业", dataIndex: "company", width: 180 },
+              { title: "履职年度", dataIndex: "year", width: 100 },
+              {
+                title: "计划条目",
+                width: 100,
+                render: (_, row) => `${row.rows.length} 项`,
+              },
+              {
+                title: "已选条目",
+                width: 100,
+                render: (_, row) => `${row.selectedRowIds.length} 项`,
+              },
+              {
+                title: "状态",
+                dataIndex: "status",
+                width: 100,
+                render: (value) => <StatusPill>{value}</StatusPill>,
+              },
+              {
+                title: "操作",
+                width: 110,
+                render: (_, row) => (
+                  <Button
+                    type="link"
+                    onClick={() => openAnnualPlanConfirmation(row)}
+                  >
+                    {row.status === "已完成" ? "查看/调整" : "去确认"}
+                  </Button>
+                ),
+              },
+            ]}
+          />
+        ) : null}
         {activeTaskType === "duty" && !tasks.length ? (
           <Alert
             showIcon
             type="info"
-            message="暂无负责人任务"
+            message="暂无履职任务"
             description="请先在履职准备阶段生成年度计划并创建任务。"
           />
         ) : null}
@@ -455,23 +540,31 @@ export default function DutyTaskManagerView({
 
       <Drawer
         open={
-          Boolean(bizId) || Boolean(selectedMaterial) || Boolean(selectedPlan)
+          (activeTaskType === "annual-plan-confirmation"
+            ? Boolean(selectedAnnualPlan)
+            : Boolean(bizId)) ||
+          Boolean(selectedMaterial) ||
+          Boolean(selectedPlan)
         }
-        width={720}
+        width={selectedAnnualPlan ? "min(1100px, 100vw)" : 720}
         title={
-          selectedTask
-            ? `${selectedTask.content} · 履职任务执行详情`
-            : selectedSuggestion
-              ? `${selectedSuggestion.content} · 意见建议落实办理`
-              : selectedMaterial
-                ? `${selectedMaterial.department} · 履职手册资料更新`
-                : selectedPlan
-                  ? `${selectedPlan.content} · 年度履职计划确认`
-                  : "任务不存在"
+          selectedAnnualPlan
+            ? `${selectedAnnualPlan.directorName} · 年度履职计划确认/调整`
+            : selectedTask
+              ? `${selectedTask.content} · 履职任务执行详情`
+              : selectedSuggestion
+                ? `${selectedSuggestion.content} · 意见建议落实办理`
+                : selectedMaterial
+                  ? `${selectedMaterial.department} · 履职手册资料更新`
+                  : selectedPlan
+                    ? `${selectedPlan.content} · 年度履职计划确认`
+                    : "任务不存在"
         }
         onClose={closeTask}
         extra={
-          selectedTask ? (
+          selectedAnnualPlan ? (
+            <StatusPill>{selectedAnnualPlan.status}</StatusPill>
+          ) : selectedTask ? (
             <StatusPill>{selectedTask.taskStatus}</StatusPill>
           ) : selectedSuggestion ? (
             <StatusPill>{selectedSuggestion.status}</StatusPill>
@@ -482,7 +575,13 @@ export default function DutyTaskManagerView({
           ) : null
         }
       >
-        {selectedTask ? (
+        {selectedAnnualPlan ? (
+          <AnnualPlanConfirmTaskView
+            task={selectedAnnualPlan}
+            onSave={onSaveAnnualPlanConfirmation}
+            onClose={closeTask}
+          />
+        ) : selectedTask ? (
           <div className={styles.drawerContent}>
             <div className={styles.taskHero}>
               {selectedTask.taskStatus === "已完成" ? (

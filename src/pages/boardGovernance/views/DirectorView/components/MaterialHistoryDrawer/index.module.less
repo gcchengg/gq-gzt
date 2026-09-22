@@ -44,12 +44,23 @@
   color: #7c8796;
   font-size: 12px;
 }
+.drawer :global(.ant-drawer-body) {
+  overflow-x: hidden;
+}
+.drawer :global(.ant-table) {
+  table-layout: fixed;
+  width: 100% !important;
+}
 .drawer :global(.ant-table-cell .ant-btn-link) {
   max-width: 280px;
   padding: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.page {
+  width: 100%;
+  min-width: 0;
 }
 @media (max-width: 760px) {
   .drawer :global(.ant-drawer-content-wrapper) {

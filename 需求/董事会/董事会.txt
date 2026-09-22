@@ -1,4 +1,84 @@
-http://localhost:5173/boardGovernance/duty-tasks?taskType=confirmation&planId=PLAN-001
-上面这个任务其实就是
-http://localhost:5173/boardGovernance/directors 页面中抽屉页中【履职准备】，新增年度履职计划 modal中的新内容需要确认
-希望最起码这些字段都能对齐，字段编辑权限也要一致
+角色区分：
+1.集团董办
+2.综合管理部
+3.董事
+
+菜单页面：
+1.工作台首页
+2.董事聘任
+3.履职准备
+4.履职管理
+5.履职评价
+6.履职任务
+7.履职角色配置
+
+当角色是：集团董办，显示页面如下：
+2.董事聘任
+当角色是：综合管理部，显示页面如下：
+1.工作台首页 boardGovernance/home
+2.董事聘任 boardGovernance/appointment
+3.履职准备 boardGovernance/preparation
+4.履职管理 boardGovernance/management
+5.履职评价 boardGovernance/duty-evaluation
+6.履职任务 boardGovernance/duty-tasks
+7.履职角色配置 boardGovernance/roles
+当角色是：董事，显示页面如下：
+4.履职管理
+
+修改/Users/guocc/Documents/guquan/files/gq-gzt/src/pages/boardGovernance/BoardGovernanceShell/index.jsx页面
+把              <Dropdown
+                menu={{
+                  items: [
+                    { key: "office", label: "公司董办" },
+                    { key: "director", label: "董事视角" },
+                  ],
+                  onClick: ({ key }) => onRoleChange(key),
+                }}
+              > 改为上面所示角色
+只有 集团董办 可以在董事聘任阶段点击 【下发董事推荐函】
+
+
+
+
+
+董事聘任 列表显示的内容，应该显示【下发董事推荐函】的 董事类型 接收人（但是列表要显示负责人）
+查看详情的抽屉页面应该添加显示【下发董事推荐函】的推荐函文件 ，并删除【跨部门交接规则】下面内容，
+列表删除董事聘 风险状态，只保留当前阶段，但是删除待选举变更这个状态
+
+
+
+
+boardGovernance/home 页面新增 董事聘任任务 （描述分别为 待上传董事简历 待配置系统权限 待完成工商变更），要有三个任务
+点击去执行跳转到 boardGovernance/appointment ，任务去执行进入根据描述的不同，打开该页面不同状态下的抽屉
+
+
+
+boardGovernance/preparation/directors/D-08
+年度履职计划报告 modal，下方增加一个提交按钮，提交后有二次确认
+boardGovernance/home 页面新增 年度履职计划确认/调整 任务，点击去执行进入boardGovernance/duty-tasks 查看对应tab页的任务，要打开对应的抽屉
+boardGovernance/duty-tasks 新增 年度履职计划确认/调整 tab页面，
+页面显示 年度履职计划报告modal的内容，内容以table的形式展示年度履职计划报告modal的内容，董事接收该任务可以多选
+选择后可以保存和提交，提交要有二次确认
+
+董事角色下，菜单也要显示工作台首页
+boardGovernance/home 中 董事只显示 年度履职计划确认/调整
+综合管理部角色下除了年度履职计划确认/调整 其余都显示
+
+
+
+
+
+
+
+
+
+参考 /Users/guocc/Documents/guquan/files/gq-gzt/src/pages/newSanhui/components/TopicEvaluation/PdfAnnotationEditor.jsx
+页面下的
+        <TaskIssueDrawer
+          zIndex={12120}
+          title="议题评估任务浮窗"
+          defaultTaskType="500"
+          onSubmit={(payload) => {
+            console.log(payload);
+          }}
+当为董事角色的时候，boardGovernance/management，应该有TaskIssueDrawer，title为任务浮窗

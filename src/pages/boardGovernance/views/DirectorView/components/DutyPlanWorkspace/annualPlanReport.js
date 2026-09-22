@@ -139,8 +139,19 @@ const escapeHtml = (value = "") =>
       ],
   );
 
-export function buildAnnualDutyPlanReport() {
-  return DEMO_ANNUAL_PLAN_REPORT;
+export function buildAnnualDutyPlanReport(director = {}) {
+  const directorName = director.name || DEMO_ANNUAL_PLAN_REPORT.directorName;
+  return {
+    ...DEMO_ANNUAL_PLAN_REPORT,
+    directorName,
+    fileName: director.name
+      ? `子企业专职外部董事年度工作计划-${directorName}-${DEMO_ANNUAL_PLAN_REPORT.year}.pdf`
+      : DEMO_ANNUAL_PLAN_REPORT.fileName,
+    pages: DEMO_ANNUAL_PLAN_REPORT.pages.map((page) => ({
+      ...page,
+      company: director.company || page.company,
+    })),
+  };
 }
 
 export function buildAnnualPlanPrintDocument(

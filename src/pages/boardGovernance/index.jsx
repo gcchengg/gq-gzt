@@ -1,17 +1,28 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import BoardGovernanceShell from "./BoardGovernanceShell";
 import { handbookMaterials as initialHandbookMaterials } from "./handbookData";
 import { initialDutyPlans } from "./dutyPlanData";
 import { initialDutyReports } from "./dutyReportData";
 import { initialSuggestionTasks } from "./dutySuggestionData";
+import { directors as initialDirectors } from "./mockData";
+import { initialAppointmentCases } from "./appointmentData";
+import { initialEvaluations } from "./evaluationData";
+import {
+  buildAnnualPlanConfirmationTask,
+  initialAnnualPlanConfirmationTasks,
+} from "./annualPlanConfirmationData";
+import { resolveBoardGovernanceLocation, shellActiveKey } from "./stageRouting";
 import MaterialTaskView from "./views/MaterialTaskView";
 import PlanConfirmTaskView from "./views/PlanConfirmTaskView";
 import DutyTaskManagerView from "./views/DutyTaskManagerView";
 import RoleConfigView from "./views/RoleConfigView";
 import TaskHomeView from "./views/TaskHomeView";
 import PlanningMeetingView from "./views/PlanningMeetingView";
-import DirectorView from "./views/DirectorView";
+import AppointmentView from "./views/AppointmentView";
+import PreparationView from "./views/PreparationView";
+import ManagementView from "./views/ManagementView";
+import DutyEvaluationStageView from "./views/DutyEvaluationStageView";
 import CompanyMonitoringView from "./views/CompanyMonitoringView";
 import EvaluationResourceView from "./views/EvaluationResourceView";
 import MobileDirectorView from "./views/MobileDirectorView";
@@ -20,7 +31,10 @@ const validKeys = new Set([
   "home",
   "planning",
   "meetings",
-  "directors",
+  "appointment",
+  "preparation",
+  "management",
+  "duty-evaluation",
   "companies",
   "monitoring",
   "evaluation",
@@ -53,26 +67,42 @@ const getNow = () =>
 
 export default function BoardGovernancePage() {
   const location = useLocation();
-  const pathParts = location.pathname.split("/").filter(Boolean);
-  const key = pathParts[1] || "home";
+  const resolved = resolveBoardGovernanceLocation(
+    location.pathname,
+    location.search,
+  );
+  const key = resolved.key;
   const activeKey = validKeys.has(key) ? key : "home";
-  const [role, setRole] = useState("office");
+  const [role, setRole] = useState("groupOffice");
+  const [directorRecords, setDirectorRecords] = useState(initialDirectors);
+  const [appointmentCases, setAppointmentCases] = useState(
+    initialAppointmentCases,
+  );
+  const [evaluations, setEvaluations] = useState(initialEvaluations);
   const [handbookMaterials, setHandbookMaterials] = useState(
     initialHandbookMaterials,
   );
   const [dutyPlans, setDutyPlans] = useState(initialDutyPlans);
+  const [annualPlanConfirmationTasks, setAnnualPlanConfirmationTasks] =
+    useState(initialAnnualPlanConfirmationTasks);
   const [generatedDirectorNames, setGeneratedDirectorNames] = useState(() => [
-    ...new Set(
-      initialDutyPlans
+    ...new Set([
+      ...initialDutyPlans
         .filter((item) => item.taskStatus)
         .map((item) => item.directorName),
-    ),
+      ...initialDirectors
+        .filter((item) => item.lifecycleStage === "management")
+        .map((item) => item.name),
+    ]),
   ]);
   const [dutyReports, setDutyReports] = useState(initialDutyReports);
   const [suggestionTasks, setSuggestionTasks] = useState(
     initialSuggestionTasks,
   );
   if (activeKey === "mobile") return <MobileDirectorView />;
+  if (resolved.redirectTo) {
+    return <Navigate to={resolved.redirectTo} replace />;
+  }
   const submitMaterials = (materialFiles) => {
     const submittedAt = new Intl.DateTimeFormat("zh-CN", {
       year: "numeric",
@@ -216,6 +246,48 @@ export default function BoardGovernancePage() {
     setGeneratedDirectorNames((current) =>
       current.includes(directorName) ? current : [...current, directorName],
     );
+    setDirectorRecords((current) =>
+      current.map((item) =>
+        item.name === directorName
+          ? {
+              ...item,
+              lifecycleStage: "management",
+              preparationStatus: "已完成",
+              managementStatus: "执行中",
+            }
+          : item,
+      ),
+    );
+  };
+  const submitAnnualPlanReport = (director, report) => {
+    const task = buildAnnualPlanConfirmationTask({
+      director,
+      report,
+      submittedAt: getNow(),
+    });
+    setAnnualPlanConfirmationTasks((current) =>
+      current.some((item) => item.directorId === director.id)
+        ? current.map((item) => (item.directorId === director.id ? task : item))
+        : [...current, task],
+    );
+  };
+  const saveAnnualPlanConfirmation = (
+    taskId,
+    selectedRowIds,
+    submit = false,
+  ) => {
+    setAnnualPlanConfirmationTasks((current) =>
+      current.map((item) =>
+        item.id === taskId
+          ? {
+              ...item,
+              selectedRowIds,
+              status: submit || item.status === "已完成" ? "已完成" : "办理中",
+              completedAt: submit ? getNow() : item.completedAt,
+            }
+          : item,
+      ),
+    );
   };
   const completeDutyTask = (planId, values) => {
     setDutyPlans((current) =>
@@ -336,17 +408,114 @@ export default function BoardGovernancePage() {
       ),
     );
   };
-  if (activeKey === "home") {
-    return (
+  const registerAppointmentDirector = (item) => {
+    setDirectorRecords((current) => {
+      if (
+        current.some(
+          (row) => row.name === item.director || row.id === item.directorId,
+        )
+      ) {
+        return current;
+      }
+      return [
+        ...current,
+        {
+          id: item.directorId || `D-${Date.now()}`,
+          name: item.director,
+          role: item.position,
+          company: item.company,
+          term: "待维护",
+          committee: "待配置",
+          days: 0,
+          completion: 0,
+          report: "未开始",
+          risk: "正常",
+          lifecycleStage: "appointment",
+          appointmentStatus: item.status || "待上传董事简历",
+          preparationStatus: "未开始",
+          managementStatus: "未开始",
+          evaluationStatus: "未开始",
+        },
+      ];
+    });
+  };
+  const completeAppointment = (item) => {
+    setDirectorRecords((current) => {
+      const existing = current.find(
+        (row) => row.name === item.director || row.id === item.directorId,
+      );
+      if (existing) {
+        return current.map((row) =>
+          row.id === existing.id
+            ? {
+                ...row,
+                appointmentStatus: "已完成",
+                lifecycleStage:
+                  row.lifecycleStage === "appointment"
+                    ? "preparation"
+                    : row.lifecycleStage,
+                preparationStatus:
+                  row.preparationStatus === "未开始"
+                    ? "待补充"
+                    : row.preparationStatus,
+              }
+            : row,
+        );
+      }
+      return [
+        ...current,
+        {
+          id: `D-${Date.now()}`,
+          name: item.director,
+          role: item.position,
+          company: item.company,
+          term: "待维护",
+          committee: "待配置",
+          days: 0,
+          completion: 0,
+          report: "未开始",
+          risk: "正常",
+          lifecycleStage: "preparation",
+          appointmentStatus: "已完成",
+          preparationStatus: "待补充",
+          managementStatus: "未开始",
+          evaluationStatus: "未开始",
+        },
+      ];
+    });
+  };
+  const createEvaluation = (values) => {
+    const next = {
+      id: `EVA-${Date.now()}`,
+      status: "评价中",
+      snapshot: {
+        completedPlanCount: dutyPlans.filter(
+          (item) => item.taskStatus === "已完成",
+        ).length,
+        receivedReportCount: dutyReports.filter(
+          (item) => item.status === "已接收",
+        ).length,
+        completedSuggestionCount: suggestionTasks.filter(
+          (item) => item.status === "已完成",
+        ).length,
+      },
+      ...values,
+    };
+    setEvaluations((current) => [next, ...current]);
+    return next;
+  };
+  const views = {
+    home: (
       <TaskHomeView
+        role={role}
+        appointmentCases={appointmentCases}
         handbookMaterials={handbookMaterials}
         dutyPlans={dutyPlans}
+        annualPlanConfirmationTasks={annualPlanConfirmationTasks}
         generatedDirectorNames={generatedDirectorNames}
         suggestionTasks={suggestionTasks}
       />
-    );
-  }
-  const views = {
+    ),
     "material-task": (
       <MaterialTaskView
         materials={handbookMaterials}
@@ -361,7 +530,10 @@ export default function BoardGovernancePage() {
     ),
     "duty-tasks": (
       <DutyTaskManagerView
+        role={role}
         plans={dutyPlans}
+        annualPlanConfirmationTasks={annualPlanConfirmationTasks}
+        onSaveAnnualPlanConfirmation={saveAnnualPlanConfirmation}
         materials={handbookMaterials}
         onComplete={completeDutyTask}
         onSubmitMaterial={submitMaterials}
@@ -373,26 +545,67 @@ export default function BoardGovernancePage() {
     roles: <RoleConfigView />,
     planning: <PlanningMeetingView mode="planning" />,
     meetings: <PlanningMeetingView mode="meetings" />,
-    directors: (
-      <DirectorView
+    appointment: (
+      <AppointmentView
         role={role}
+        resource={resolved.resource}
+        id={resolved.id}
+        cases={appointmentCases}
+        directorRecords={directorRecords}
+        generatedDirectorNames={generatedDirectorNames}
+        onCasesChange={setAppointmentCases}
+        onCaseCompleted={completeAppointment}
+        onIssueCreated={registerAppointmentDirector}
+      />
+    ),
+    preparation: (
+      <PreparationView
+        resource={resolved.resource}
+        id={resolved.id}
+        directorRecords={directorRecords}
         materials={handbookMaterials}
         dutyPlans={dutyPlans}
+        generatedDirectorNames={generatedDirectorNames}
         onCreateDutyPlan={createDutyPlan}
         onDeleteDutyPlan={deleteDutyPlan}
         onSubmitDutyPlan={submitDutyPlan}
         onGenerateDutyTasks={generateDutyTasks}
-        generatedDirectorNames={generatedDirectorNames}
-        dutyReports={dutyReports}
-        onGenerateDutyReport={generateDutyReport}
-        onSaveDutyReport={saveDutyReport}
-        onReceiveDutyReport={receiveDutyReport}
-        suggestionTasks={suggestionTasks}
+        onSubmitAnnualPlanReport={submitAnnualPlanReport}
         onCreateMaterial={createHandbookMaterial}
         onUpdateMaterial={updateHandbookMaterial}
         onDeleteMaterial={deleteHandbookMaterial}
         onRequestMaterialUpdate={requestMaterialUpdate}
         onPushHandbook={pushHandbook}
+        onSavePlan={saveDutyPlanConfirmation}
+      />
+    ),
+    management: (
+      <ManagementView
+        role={role}
+        resource={resolved.resource}
+        id={resolved.id}
+        directorRecords={directorRecords}
+        materials={handbookMaterials}
+        dutyPlans={dutyPlans}
+        dutyReports={dutyReports}
+        suggestionTasks={suggestionTasks}
+        generatedDirectorNames={generatedDirectorNames}
+        onGenerateDutyReport={generateDutyReport}
+        onSaveDutyReport={saveDutyReport}
+        onReceiveDutyReport={receiveDutyReport}
+      />
+    ),
+    "duty-evaluation": (
+      <DutyEvaluationStageView
+        resource={resolved.resource}
+        id={resolved.id}
+        directorRecords={directorRecords}
+        dutyPlans={dutyPlans}
+        dutyReports={dutyReports}
+        suggestionTasks={suggestionTasks}
+        generatedDirectorNames={generatedDirectorNames}
+        evaluations={evaluations}
+        onCreateEvaluation={createEvaluation}
       />
     ),
     companies: <CompanyMonitoringView mode="companies" />,
@@ -402,11 +615,7 @@ export default function BoardGovernancePage() {
   };
   return (
     <BoardGovernanceShell
-      activeKey={
-        ["material-task", "plan-confirm-task"].includes(activeKey)
-          ? "home"
-          : activeKey
-      }
+      activeKey={shellActiveKey(activeKey)}
       role={role}
       onRoleChange={setRole}
     >

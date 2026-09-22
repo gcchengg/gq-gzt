@@ -32,7 +32,7 @@ function Rays() {
   );
 }
 
-function Topbar() {
+function Topbar({ role }) {
   const navigate = useNavigate();
   return (
     <header className={styles.topbar}>
@@ -48,7 +48,13 @@ function Topbar() {
         </button>
         <button
           type="button"
-          onClick={() => navigate("/boardGovernance/directors")}
+          onClick={() =>
+            navigate(
+              role === "director"
+                ? "/boardGovernance/management"
+                : "/boardGovernance/appointment",
+            )
+          }
         >
           <span className={styles.appIcon}>▦</span>应用
         </button>
@@ -105,11 +111,23 @@ function buildDepartmentGroups(items, isComplete) {
 }
 
 export default function TaskHomeView({
+  role,
+  appointmentCases = [],
   handbookMaterials,
   dutyPlans,
+  annualPlanConfirmationTasks = [],
   generatedDirectorNames,
   suggestionTasks,
 }) {
+  const appointmentTasks = useMemo(
+    () =>
+      ["待上传董事简历", "待配置系统权限", "待完成工商变更"]
+        .map((status) =>
+          appointmentCases.find((item) => item.status === status),
+        )
+        .filter(Boolean),
+    [appointmentCases],
+  );
   const taskGroups = useMemo(
     () =>
       handbookDepartments.map((department) => {
@@ -128,7 +146,7 @@ export default function TaskHomeView({
       }),
     [handbookMaterials],
   );
-  const [activeCategory, setActiveCategory] = useState("material");
+  const [activeCategory, setActiveCategory] = useState("appointment");
   const [activeDepartment, setActiveDepartment] = useState("");
   const materialPendingCount = taskGroups.filter(
     (item) => !item.complete,
@@ -151,8 +169,20 @@ export default function TaskHomeView({
   const taskCategories = useMemo(
     () => [
       {
+        key: "appointment",
+        label: "董事聘任任务",
+        groups: [
+          {
+            department: "董事聘任",
+            records: appointmentTasks,
+            completed: 0,
+            pending: appointmentTasks.length,
+          },
+        ],
+      },
+      {
         key: "material",
-        label: "董事履职手册资料",
+        label: "履职准备-董事履职手册",
         groups: taskGroups.map((item) => ({
           department: item.department,
           records: item.materials,
@@ -160,20 +190,28 @@ export default function TaskHomeView({
           pending: item.materials.length - item.submitted,
         })),
       },
-      {
-        key: "suggestion",
-        label: "意见建议落实任务",
-        groups: buildDepartmentGroups(
-          suggestionTasks,
-          (item) => item.status === "已完成",
-        ),
-      },
+      // {
+      //   key: "suggestion",
+      //   label: "意见建议落实任务",
+      //   groups: buildDepartmentGroups(
+      //     suggestionTasks,
+      //     (item) => item.status === "已完成",
+      //   ),
+      // },
       {
         key: "duty",
-        label: "已创建履职任务",
+        label: "已确认履职计划任务",
         groups: buildDepartmentGroups(
           generatedPlans,
           (item) => item.taskStatus === "已完成",
+        ),
+      },
+      {
+        key: "annual-plan-confirmation",
+        label: "年度履职计划确认/调整",
+        groups: buildDepartmentGroups(
+          annualPlanConfirmationTasks,
+          (item) => item.status === "已完成",
         ),
       },
       {
@@ -185,35 +223,58 @@ export default function TaskHomeView({
         ),
       },
     ],
-    [confirmationPlans, generatedPlans, suggestionTasks, taskGroups],
+    [
+      appointmentTasks,
+      annualPlanConfirmationTasks,
+      confirmationPlans,
+      generatedPlans,
+      suggestionTasks,
+      taskGroups,
+    ],
+  );
+  const visibleTaskCategories = taskCategories.filter(({ key }) =>
+    role === "director"
+      ? key === "annual-plan-confirmation"
+      : key !== "annual-plan-confirmation",
   );
   const currentCategory =
-    taskCategories.find((item) => item.key === activeCategory) ||
-    taskCategories[0];
+    visibleTaskCategories.find((item) => item.key === activeCategory) ||
+    visibleTaskCategories[0];
+  const selectedCategoryKey = currentCategory.key;
   const currentGroup =
     currentCategory.groups.find(
       (item) => item.department === activeDepartment,
     ) ||
     currentCategory.groups.find((item) => item.pending > 0) ||
     currentCategory.groups[0];
+  const annualPendingCount = annualPlanConfirmationTasks.filter(
+    (item) => item.status !== "已完成",
+  ).length;
+  const annualCompletedCount =
+    annualPlanConfirmationTasks.length - annualPendingCount;
   const pendingCount =
-    materialPendingCount +
-    confirmationPendingCount +
-    generatedTaskCount +
-    suggestionPendingCount;
+    role === "director"
+      ? annualPendingCount
+      : appointmentTasks.length +
+        materialPendingCount +
+        confirmationPendingCount +
+        generatedTaskCount +
+        suggestionPendingCount;
   const completedCount =
-    taskGroups.length -
-    materialPendingCount +
-    dutyPlans.filter((item) => item.status === "已完成").length +
-    generatedPlans.filter((item) => item.taskStatus === "已完成").length +
-    suggestionTasks.filter((item) => item.status === "已完成").length;
+    role === "director"
+      ? annualCompletedCount
+      : taskGroups.length -
+        materialPendingCount +
+        dutyPlans.filter((item) => item.status === "已完成").length +
+        generatedPlans.filter((item) => item.taskStatus === "已完成").length +
+        suggestionTasks.filter((item) => item.status === "已完成").length;
   const taskHref = currentGroup
     ? `/boardGovernance/duty-tasks?taskType=material&department=${encodeURIComponent(currentGroup.department)}`
     : "/boardGovernance/duty-tasks?taskType=material";
 
   return (
     <div className={styles.page}>
-      <Topbar />
+      <Topbar role={role} />
       <main className={styles.stage}>
         <section className={styles.metrics} aria-label="统计概览">
           <MetricCard label="总待办数" value={pendingCount} tone="blue" />
@@ -244,7 +305,7 @@ export default function TaskHomeView({
           </div>
         </section>
         <section className={styles.categoryStrip} aria-label="任务大类">
-          {taskCategories.map((category) => {
+          {visibleTaskCategories.map((category) => {
             const pending = category.groups.reduce(
               (total, item) => total + item.pending,
               0,
@@ -252,7 +313,7 @@ export default function TaskHomeView({
             return (
               <button
                 className={
-                  currentCategory.key === category.key
+                  selectedCategoryKey === category.key
                     ? styles.activeCategory
                     : ""
                 }
@@ -297,19 +358,19 @@ export default function TaskHomeView({
                 已完成　{currentGroup?.completed || 0}
               </span>
             </div>
-            {activeCategory === "material" ? (
+            {selectedCategoryKey === "material" ? (
               <button type="button">＋　手动创建</button>
             ) : null}
-            {activeCategory === "duty" ? (
-              <Link to="/boardGovernance/duty-tasks">进入负责人任务管理</Link>
+            {selectedCategoryKey === "duty" ? (
+              <Link to="/boardGovernance/duty-tasks">进入履职任务管理</Link>
             ) : null}
-            {activeCategory === "suggestion" ? (
+            {selectedCategoryKey === "suggestion" ? (
               <Link to="/boardGovernance/duty-tasks?taskType=suggestion">
                 进入意见建议任务管理
               </Link>
             ) : null}
           </header>
-          {activeCategory === "material" && currentGroup ? (
+          {selectedCategoryKey === "material" && currentGroup ? (
             <article className={styles.taskRow}>
               <div>
                 <h3>2026年度董事履职手册资料更新</h3>
@@ -329,7 +390,27 @@ export default function TaskHomeView({
               </aside>
             </article>
           ) : null}
-          {activeCategory === "confirmation"
+          {selectedCategoryKey === "appointment"
+            ? currentGroup?.records.map((item) => (
+                <article className={styles.taskRow} key={item.id}>
+                  <div>
+                    <h3>{item.director}董事聘任任务</h3>
+                    <p>
+                      任职企业：{item.company}　　董事类型：{item.position}
+                      　　负责人：{item.owner}　　办理时限：{item.deadline}
+                      　　描述：{item.status}
+                    </p>
+                  </div>
+                  <aside>
+                    <StatusPill>{item.status}</StatusPill>
+                    <Link to={`/boardGovernance/appointment/${item.id}`}>
+                      去执行
+                    </Link>
+                  </aside>
+                </article>
+              ))
+            : null}
+          {selectedCategoryKey === "confirmation"
             ? currentGroup?.records.map((plan) => (
                 <article className={styles.taskRow} key={plan.id}>
                   <div>
@@ -354,7 +435,29 @@ export default function TaskHomeView({
                 </article>
               ))
             : null}
-          {activeCategory === "duty"
+          {selectedCategoryKey === "annual-plan-confirmation"
+            ? currentGroup?.records.map((task) => (
+                <article className={styles.taskRow} key={task.id}>
+                  <div>
+                    <h3>{task.title}</h3>
+                    <p>
+                      董事：{task.directorName}　　任职企业：{task.company}
+                      　　履职年度：{task.year}
+                      　　描述：确认/调整年度履职计划报告
+                    </p>
+                  </div>
+                  <aside>
+                    <StatusPill>{task.status}</StatusPill>
+                    <Link
+                      to={`/boardGovernance/duty-tasks?taskType=annual-plan-confirmation&bizId=${task.id}`}
+                    >
+                      {task.status === "已完成" ? "查看结果" : "去执行"}
+                    </Link>
+                  </aside>
+                </article>
+              ))
+            : null}
+          {selectedCategoryKey === "duty"
             ? currentGroup?.records.map((plan) => (
                 <article className={styles.taskRow} key={`duty-${plan.id}`}>
                   <div>
@@ -374,7 +477,7 @@ export default function TaskHomeView({
                 </article>
               ))
             : null}
-          {activeCategory === "suggestion"
+          {selectedCategoryKey === "suggestion"
             ? currentGroup?.records.map((task) => (
                 <article className={styles.taskRow} key={task.id}>
                   <div>

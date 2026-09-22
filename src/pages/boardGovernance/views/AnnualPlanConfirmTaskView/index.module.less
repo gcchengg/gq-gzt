@@ -1,0 +1,164 @@
+.content {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.summary {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.summary :global(.ant-descriptions-item-content) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.selectionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid #dce7f5;
+  border-radius: 10px;
+  background: #f6f9ff;
+}
+
+.selectionBar > div {
+  display: grid;
+  gap: 4px;
+}
+
+.selectionBar strong {
+  color: #17365d;
+}
+
+.selectionBar span {
+  color: #748197;
+  font-size: 12px;
+}
+
+.selectionBar b {
+  flex: none;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eaf1ff;
+  color: #2f6bff;
+  font-size: 13px;
+}
+
+.tableCard {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e4eaf2;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.tableCard :global(.ant-table-wrapper),
+.tableCard :global(.ant-spin-nested-loading),
+.tableCard :global(.ant-spin-container),
+.tableCard :global(.ant-table),
+.tableCard :global(.ant-table-container) {
+  min-width: 0;
+  width: 100%;
+}
+
+.tableCard :global(.ant-table-cell) {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.tableCard :global(.ant-table-thead > tr > th) {
+  background: #f6f8fb;
+  color: #43536a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tableCard :global(.ant-table-tbody > tr > td) {
+  color: #334155;
+  line-height: 1.55;
+  vertical-align: top;
+}
+
+.tableCard :global(.ant-table-selection-column) {
+  min-width: 44px;
+  width: 44px;
+  padding-inline: 12px !important;
+  text-align: center;
+}
+
+.sequenceColumn {
+  padding-inline: 8px !important;
+  text-align: center !important;
+}
+
+.sequenceNumber {
+  display: inline-grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 7px;
+  background: #eef4ff;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reportNotes {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #e6ebf2;
+  border-radius: 8px;
+  background: #fbfcfe;
+  color: #68778c;
+  font-size: 12px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.actionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e8edf4;
+}
+
+.actionBar > span {
+  color: #748197;
+  font-size: 12px;
+}
+
+.actionBar > div {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 800px) {
+  .selectionBar,
+  .actionBar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .actionBar > div,
+  .actionBar button {
+    width: 100%;
+  }
+
+  .tableCard :global(.ant-table-cell) {
+    padding: 9px 6px !important;
+    font-size: 12px;
+  }
+
+  .tableCard :global(.ant-table-selection-column) {
+    min-width: 36px;
+    width: 36px;
+    padding-inline: 8px !important;
+  }
+}

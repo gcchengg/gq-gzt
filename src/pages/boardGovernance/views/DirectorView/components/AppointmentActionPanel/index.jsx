@@ -113,7 +113,7 @@ export default function AppointmentActionPanel({
         {
           permissionDone,
           currentStep: permissionDone ? 5 : 3,
-          status: permissionDone ? "待选举变更" : "待权限配置",
+          status: permissionDone ? "待完成工商变更" : "待权限配置",
           owner: permissionDone
             ? "综合管理部-董办 / 王珂"
             : "综合管理部-数字化 / 林远",
@@ -122,7 +122,7 @@ export default function AppointmentActionPanel({
             : "综合管理部-数字化 / 林远",
         },
         permissionDone
-          ? "系统权限已配置，事项进入待选举变更"
+          ? "系统权限已配置，事项进入待完成工商变更"
           : "权限配置状态已保存",
       );
     };

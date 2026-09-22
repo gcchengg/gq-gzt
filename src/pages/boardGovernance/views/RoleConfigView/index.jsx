@@ -112,7 +112,7 @@ export default function RoleConfigView() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>角色配置</h1>
+      <h1 className={styles.pageTitle}>履职角色配置</h1>
       <div className={styles.content}>
         <aside className={`${styles.panel} ${styles.roleDirectory}`}>
           <h2 className={styles.directoryTitle}>权限角色</h2>

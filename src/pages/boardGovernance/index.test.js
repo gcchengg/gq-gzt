@@ -5,12 +5,16 @@ import { readFile } from "node:fs/promises";
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
 
 test("registers an isolated board governance route", async () => {
-  const [routes, shell] = await Promise.all([
+  const [routes, shell, boardShell] = await Promise.all([
     read("../../routes.jsx"),
     read("../../components/AppShell.jsx"),
+    read("./BoardGovernanceShell/index.jsx"),
   ]);
   assert.match(routes, /path: "boardGovernance\/\*"/);
   assert.match(shell, /startsWith\("\/boardgovernance"\)/);
+  assert.match(boardShell, /gq-app-sidebar/);
+  assert.match(boardShell, /gq-app-menu/);
+  assert.match(boardShell, /className="gq-app-menu"/);
 });
 
 test("keeps only the requested board governance menus visible", async () => {
@@ -19,10 +23,19 @@ test("keeps only the requested board governance menus visible", async () => {
     source.indexOf("export const navigationItems"),
     source.indexOf("export const metrics"),
   );
-  for (const label of ["工作台首页", "董事履职", "负责人任务", "角色配置"]) {
+  for (const label of [
+    "工作台首页",
+    "董事聘任",
+    "履职准备",
+    "履职管理",
+    "履职评价",
+    "履职任务",
+    "履职角色配置",
+  ]) {
     assert.match(navigationSource, new RegExp(label));
   }
   for (const label of [
+    "董事履职",
     "治理规划",
     "会议管理",
     "子企业治理",
@@ -32,9 +45,55 @@ test("keeps only the requested board governance menus visible", async () => {
   ]) {
     assert.doesNotMatch(navigationSource, new RegExp(label));
   }
-  for (const key of ["home", "directors", "duty-tasks", "roles"]) {
+  for (const key of [
+    "home",
+    "appointment",
+    "preparation",
+    "management",
+    "duty-evaluation",
+    "duty-tasks",
+    "roles",
+  ]) {
     assert.match(navigationSource, new RegExp(`key: "${key}"`));
   }
+});
+
+test("filters board governance menus by the selected role", async () => {
+  const [shell, page, appointment, flow] = await Promise.all([
+    read("./BoardGovernanceShell/index.jsx"),
+    read("./index.jsx"),
+    read("./views/AppointmentView/index.jsx"),
+    read("./views/DirectorView/components/AppointmentFlow/index.jsx"),
+  ]);
+  assert.match(shell, /groupOffice: \["appointment"\]/);
+  assert.match(shell, /adminDepartment: navigationItems\.map/);
+  assert.match(shell, /director: \["home", "management", "duty-tasks"\]/);
+  assert.doesNotMatch(
+    shell,
+    /currentRole\.key === "director" && activeKey === "duty-tasks"/,
+  );
+  assert.match(shell, /label: "集团董办"/);
+  assert.match(shell, /label: "综合管理部"/);
+  assert.match(shell, /label: "董事"/);
+  assert.match(page, /useState\("groupOffice"\)/);
+  assert.match(appointment, /role === "groupOffice"/);
+  assert.match(flow, /仅集团董办可以下发董事推荐函/);
+});
+
+test("shows the reusable task issue drawer on director management only", async () => {
+  const [page, management] = await Promise.all([
+    read("./index.jsx"),
+    read("./views/ManagementView/index.jsx"),
+  ]);
+  assert.match(page, /<ManagementView\s+role=\{role\}/);
+  assert.match(
+    management,
+    /import TaskIssueDrawer from "@\/components\/TaskIssueDrawer"/,
+  );
+  assert.match(management, /role === "director"\s*\?\s*\(/);
+  assert.match(management, /title="任务浮窗"/);
+  assert.match(management, /defaultTaskType="500"/);
+  assert.match(management, /zIndex=\{12120\}/);
 });
 
 test("covers the approved business workspaces", async () => {
@@ -97,10 +156,13 @@ test("keeps board governance styles feature-scoped", async () => {
 });
 
 test("covers the four-stage director lifecycle and appointment handoff", async () => {
-  const [director, appointment, actions] = await Promise.all([
+  const [director, appointment, actions, actionStyles] = await Promise.all([
     read("./views/DirectorView/index.jsx"),
     read("./views/DirectorView/components/AppointmentFlow/index.jsx"),
     read("./views/DirectorView/components/AppointmentActionPanel/index.jsx"),
+    read(
+      "./views/DirectorView/components/AppointmentActionPanel/index.module.less",
+    ),
   ]);
   for (const label of ["董事聘任", "履职准备", "履职管理", "履职评价"]) {
     assert.match(director, new RegExp(label));
@@ -126,9 +188,12 @@ test("covers the four-stage director lifecycle and appointment handoff", async (
   assert.match(appointment, /setAuditMessages/);
   assert.match(appointment, /visibleAuditMessages\.map/);
   assert.match(appointment, /item\.caseId === selected\.id/);
-  assert.match(appointment, /selectedRowKey=\{selected\.id\}/);
+  assert.match(appointment, /selectedRowKey=\{selected\?\.id\}/);
   assert.match(appointment, /activeAuditId/);
   assert.match(appointment, /<Tabs/);
+  assert.match(actionStyles, /grid-template-columns:minmax\(0,1fr\)/);
+  assert.match(actionStyles, /min-width:76px/);
+  assert.match(actionStyles, /\.ant-btn-primary\)\{color:#fff\}/);
   assert.doesNotMatch(`${appointment}${actions}`, /待办公室接收|线下/);
 });
 
@@ -138,6 +203,13 @@ test("keeps every board-governance workspace responsive", async () => {
     "./views/HomeView/index.module.less",
     "./views/PlanningMeetingView/index.module.less",
     "./views/DirectorView/index.module.less",
+    "./views/AppointmentView/index.module.less",
+    "./views/DirectorStageTable/index.module.less",
+    "./views/StageDetailDrawer/index.module.less",
+    "./views/PreparationView/index.module.less",
+    "./views/ManagementView/index.module.less",
+    "./views/DutyEvaluationStageView/index.module.less",
+    "./views/StageBlocked/index.module.less",
     "./views/DirectorView/components/AppointmentFlow/index.module.less",
     "./views/DirectorView/components/AppointmentActionPanel/index.module.less",
     "./views/DirectorView/components/MaterialHistoryDrawer/index.module.less",
@@ -156,10 +228,11 @@ test("keeps every board-governance workspace responsive", async () => {
 });
 
 test("provides an operable three-type duty plan lifecycle", async () => {
-  const [director, plan, planOptions] = await Promise.all([
+  const [director, plan, planOptions, planStyles] = await Promise.all([
     read("./views/DirectorView/index.jsx"),
     read("./views/DirectorView/components/DutyPlanWorkspace/index.jsx"),
     read("./dutyPlanOptions.js"),
+    read("./views/DirectorView/components/DutyPlanWorkspace/index.module.less"),
   ]);
   assert.match(director, /发起年度履职计划/);
   for (const label of ["会议计划", "培训计划", "调研计划"]) {
@@ -216,6 +289,9 @@ test("provides an operable three-type duty plan lifecycle", async () => {
     assert.match(plan, new RegExp(action));
   }
   assert.match(plan, /selectedDraftIds/);
+  assert.match(plan, /className=\{styles\.planFooterCopy\}/);
+  assert.match(planStyles, /\.planFooterCopy span/);
+  assert.doesNotMatch(planStyles, /\.planFooter span/);
   const page = await read("./index.jsx");
   assert.match(page, /Array\.isArray\(planIds\)/);
   assert.match(plan, /buildAnnualDutyPlanReport/);
@@ -257,10 +333,12 @@ test("connects handbook department tasks with the preparation table", async () =
   assert.match(taskHome, /任务视图/);
   assert.match(taskHome, /总待办数/);
   assert.match(taskHome, /董事履职手册资料更新/);
+  assert.match(taskHome, /履职准备-董事履职手册/);
   assert.match(task, /Dragger/);
   assert.match(task, /提交资料/);
   assert.match(page, /status: "已提交"/);
-  assert.match(page, /"material-task", "plan-confirm-task"/);
+  assert.match(page, /"material-task"/);
+  assert.match(page, /"plan-confirm-task"/);
   assert.match(director, /title: "责任人"/);
   assert.match(director, /查看详情/);
   assert.doesNotMatch(
@@ -274,7 +352,91 @@ test("connects handbook department tasks with the preparation table", async () =
   assert.match(historyDrawer, /全部年度/);
   assert.match(historyDrawer, /全部季度/);
   assert.match(historyDrawer, /历史内容/);
-  assert.match(page, /activeKey === "home"/);
+  assert.match(page, /home:\s*\(/);
+});
+
+test("opens appointment task drawers from the workbench", async () => {
+  const [page, home, data] = await Promise.all([
+    read("./index.jsx"),
+    read("./views/TaskHomeView/index.jsx"),
+    read("./appointmentData.js"),
+  ]);
+  assert.match(page, /appointmentCases=\{appointmentCases\}/);
+  assert.match(home, /label: "董事聘任任务"/);
+  assert.match(home, /useState\("appointment"\)/);
+  for (const status of ["待上传董事简历", "待配置系统权限", "待完成工商变更"]) {
+    assert.match(`${home}${data}`, new RegExp(status));
+  }
+  assert.match(home, /\/boardGovernance\/appointment\/\$\{item\.id\}/);
+  assert.match(home, /描述：\{item\.status\}/);
+});
+
+test("submits annual reports into selectable confirmation tasks", async () => {
+  const [page, preparation, workspace, home, manager, detail] =
+    await Promise.all([
+      read("./index.jsx"),
+      read("./views/PreparationView/index.jsx"),
+      read("./views/DirectorView/components/DutyPlanWorkspace/index.jsx"),
+      read("./views/TaskHomeView/index.jsx"),
+      read("./views/DutyTaskManagerView/index.jsx"),
+      read("./views/AnnualPlanConfirmTaskView/index.jsx"),
+    ]);
+  assert.match(preparation, /onSubmitAnnualPlanReport/);
+  assert.match(workspace, /确认提交年度履职计划报告/);
+  assert.match(workspace, /onSubmitAnnualPlanReport\?\.\(annualReport\)/);
+  assert.match(
+    await read("./views/DirectorView/index.jsx"),
+    /onSubmitAnnualPlanReport\?\.\(director, report\)/,
+  );
+  assert.match(page, /buildAnnualPlanConfirmationTask/);
+  assert.match(await read("./dutyPlanData.js"), /id: "PLAN-D08-001"/);
+  assert.match(
+    page,
+    /onSaveAnnualPlanConfirmation=\{saveAnnualPlanConfirmation\}/,
+  );
+  assert.match(home, /年度履职计划确认\/调整/);
+  assert.match(home, /taskType=annual-plan-confirmation&bizId=\$\{task\.id\}/);
+  assert.match(manager, /selectedAnnualPlan/);
+  assert.match(manager, /<AnnualPlanConfirmTaskView/);
+  assert.match(detail, /rowSelection=\{\{/);
+  assert.match(detail, /onChange: setSelectedRowIds/);
+  assert.match(detail, /确认提交年度履职计划/);
+});
+
+test("shows role-specific workbench categories and task tabs", async () => {
+  const [page, home, manager] = await Promise.all([
+    read("./index.jsx"),
+    read("./views/TaskHomeView/index.jsx"),
+    read("./views/DutyTaskManagerView/index.jsx"),
+  ]);
+  assert.match(page, /<TaskHomeView\s+role=\{role\}/);
+  assert.match(page, /<DutyTaskManagerView\s+role=\{role\}/);
+  assert.match(
+    home,
+    /role === "director"\s*\? key === "annual-plan-confirmation"\s*: key !== "annual-plan-confirmation"/,
+  );
+  assert.match(home, /visibleTaskCategories\.map/);
+  assert.match(home, /selectedCategoryKey === "annual-plan-confirmation"/);
+  assert.match(manager, /role === "director"\s*\? "annual-plan-confirmation"/);
+  assert.match(
+    manager,
+    /role === "director"\s*\? key === "annual-plan-confirmation"\s*: key !== "annual-plan-confirmation"/,
+  );
+  assert.match(manager, /const visibleAnnualPlanConfirmationTasks = useMemo/);
+  assert.match(manager, /task\.id === "ANNUAL-D-08"/);
+  assert.match(manager, /rows=\{visibleAnnualPlanConfirmationTasks\}/);
+  assert.match(manager, /visibleAnnualPlanConfirmationTasks\.find/);
+});
+
+test("annual plan confirmation drawer fits without horizontal table scrolling", async () => {
+  const detail = await read("./views/AnnualPlanConfirmTaskView/index.jsx");
+  const style = await read(
+    "./views/AnnualPlanConfirmTaskView/index.module.less",
+  );
+  assert.doesNotMatch(detail, /scroll=\{\{\s*x:/);
+  assert.match(detail, /tableLayout="fixed"/);
+  assert.match(detail, /className: styles\.sequenceColumn/);
+  assert.match(style, /overflow-wrap:\s*anywhere/);
 });
 
 test("connects plan confirmation tasks with the workbench and plan table", async () => {
@@ -291,7 +453,7 @@ test("connects plan confirmation tasks with the workbench and plan table", async
   assert.match(page, /submitDutyPlan/);
   assert.match(page, /generateDutyTasks/);
   assert.match(taskHome, /年度履职计划确认/);
-  assert.match(taskHome, /已创建履职任务/);
+  assert.match(taskHome, /已确认履职计划任务/);
   assert.match(task, /保存修改/);
   assert.match(task, /提交确认/);
   assert.doesNotMatch(task, /disabled=\{completed\}/);
@@ -369,7 +531,7 @@ test("connects responsible-person tasks with director records and reports", asyn
       read("./views/DirectorView/components/DutyReportWorkspace/index.jsx"),
     ]);
   assert.match(page, /"duty-tasks"/);
-  assert.match(navigation, /key: "duty-tasks", label: "负责人任务"/);
+  assert.match(navigation, /key: "duty-tasks", label: "履职任务"/);
   assert.equal((data.match(/taskStatus:/g) || []).length, 3);
   assert.equal((data.match(/taskAssignee:/g) || []).length, 3);
   assert.match(data, /taskStatus: "待执行"/);
@@ -387,12 +549,13 @@ test("connects responsible-person tasks with director records and reports", asyn
     "履职记录",
     "意见建议",
     "成果报告",
-    "履职手册",
-    "评价结果",
-    "任职记录",
   ]) {
     assert.match(director, new RegExp(label));
   }
+  assert.doesNotMatch(
+    director,
+    /key: "handbook", label: "履职手册"|key: "evaluation", label: "评价结果"|key: "appointment", label: "任职记录"/,
+  );
   assert.match(report, /自动生成履职报告/);
   assert.match(report, /保存完善内容/);
   assert.match(report, /提交接收/);
@@ -459,6 +622,139 @@ test("provides complete duty execution, suggestion, report, and evaluation workf
   assert.match(director, /DutyEvaluationWorkspace/);
 });
 
+test("splits director lifecycle into four independent list and detail pages", async () => {
+  const [page, appointment, preparation, management, evaluation] =
+    await Promise.all([
+      read("./index.jsx"),
+      read("./views/AppointmentView/index.jsx"),
+      read("./views/PreparationView/index.jsx"),
+      read("./views/ManagementView/index.jsx"),
+      read("./views/DutyEvaluationStageView/index.jsx"),
+    ]);
+  assert.match(page, /resolveBoardGovernanceLocation/);
+  assert.match(page, /<Navigate to=\{resolved\.redirectTo\} replace \/>/);
+  assert.match(page, /AppointmentView/);
+  assert.match(page, /PreparationView/);
+  assert.match(page, /ManagementView/);
+  assert.match(page, /DutyEvaluationStageView/);
+  assert.doesNotMatch(page, /<DirectorView/);
+  assert.match(appointment, /variant="detail"/);
+  assert.match(preparation, /resource === "material"/);
+  assert.match(preparation, /resource === "director"/);
+  assert.match(preparation, /canOpenPreparationDirector/);
+  assert.match(management, /canOpenManagementDirector/);
+  assert.match(evaluation, /eligibleEvaluationDirectors/);
+  assert.match(evaluation, /发起履职评价/);
+});
+
+test("shows each stage detail in a drawer over the list", async () => {
+  const [
+    drawer,
+    drawerStyle,
+    appointment,
+    preparation,
+    management,
+    evaluation,
+  ] = await Promise.all([
+    read("./views/StageDetailDrawer/index.jsx"),
+    read("./views/StageDetailDrawer/index.module.less"),
+    read("./views/AppointmentView/index.jsx"),
+    read("./views/PreparationView/index.jsx"),
+    read("./views/ManagementView/index.jsx"),
+    read("./views/DutyEvaluationStageView/index.jsx"),
+  ]);
+  assert.match(drawer, /<Drawer/);
+  for (const source of [appointment, preparation, management, evaluation]) {
+    assert.match(source, /StageDetailDrawer/);
+    assert.match(source, /DirectorStageTable/);
+  }
+  assert.doesNotMatch(appointment, /返回聘任列表/);
+  assert.doesNotMatch(management, /返回履职管理<\/Button>/);
+  assert.doesNotMatch(evaluation, /返回评价列表/);
+  assert.match(
+    appointment,
+    /<AppointmentFlow\s+variant="detail"[\s\S]{0,180}embedded/,
+  );
+  assert.match(evaluation, /<DutyEvaluationWorkspace\s+[\s\S]{0,180}embedded/);
+  assert.match(drawerStyle, /overflow-x/);
+});
+
+test("keeps stage drawer tables from overflowing the drawer width", async () => {
+  const [directorStyle, director, evalWs, evalWsStyle, history] =
+    await Promise.all([
+      read("./views/DirectorView/index.module.less"),
+      read("./views/DirectorView/index.jsx"),
+      read("./views/DirectorView/components/DutyEvaluationWorkspace/index.jsx"),
+      read(
+        "./views/DirectorView/components/DutyEvaluationWorkspace/index.module.less",
+      ),
+      read("./views/DirectorView/components/MaterialHistoryDrawer/index.jsx"),
+    ]);
+  assert.match(
+    directorStyle,
+    /\.compactLayout :global\(\.ant-table\)[\s\S]{0,80}table-layout:\s*fixed/,
+  );
+  assert.match(
+    directorStyle,
+    /\.compactLayout[\s\S]{0,240}:global\(\.progress\)[\s\S]{0,40}min-width:\s*0/,
+  );
+  assert.match(
+    director,
+    /function SyncedSuggestions[\s\S]{0,1200}title: "操作"[\s\S]{0,120}width: compact/,
+  );
+  assert.match(evalWs, /scroll=\{embedded \? undefined/);
+  assert.match(evalWsStyle, /table-layout:\s*fixed/);
+  assert.doesNotMatch(history, /scroll=\{\{ x: 835 \}\}/);
+});
+
+test("uses the same director table on every stage list page", async () => {
+  const [table, appointment, preparation, management, evaluation] =
+    await Promise.all([
+      read("./views/DirectorStageTable/index.jsx"),
+      read("./views/AppointmentView/index.jsx"),
+      read("./views/PreparationView/index.jsx"),
+      read("./views/ManagementView/index.jsx"),
+      read("./views/DutyEvaluationStageView/index.jsx"),
+    ]);
+  for (const label of [
+    "董事信息",
+    "任职企业",
+    "任期",
+    "当前阶段",
+    "风险状态",
+    "查看详情",
+  ]) {
+    assert.match(table, new RegExp(label));
+  }
+  assert.match(table, /directorTableColumnTitles/);
+  assert.match(table, /defaultStage/);
+  assert.match(table, /title: "董事类型"/);
+  assert.match(table, /title: "负责人"/);
+  assert.match(appointment, /appointmentOwner: item\.owner/);
+  for (const source of [appointment, preparation, management, evaluation]) {
+    assert.match(source, /DirectorStageTable/);
+    assert.match(source, /filterDirectorsForStage/);
+    assert.match(source, /directorStageDetailPath/);
+  }
+  assert.doesNotMatch(appointment, /variant="list"/);
+  assert.doesNotMatch(preparation, /title="已完成聘任的董事"/);
+  assert.doesNotMatch(preparation, /title="年度履职计划"/);
+  assert.doesNotMatch(management, /title="履职中的董事"/);
+  assert.doesNotMatch(evaluation, /title="评价批次"/);
+});
+
+test("shows appointment letter files and removes handoff rules", async () => {
+  const [flow, data] = await Promise.all([
+    read("./views/DirectorView/components/AppointmentFlow/index.jsx"),
+    read("./appointmentData.js"),
+  ]);
+  assert.match(flow, /label: "推荐函文件"/);
+  assert.match(flow, /selected\.letterFileName/);
+  assert.match(data, /letterFileName/);
+  assert.doesNotMatch(flow, /跨部门交接规则/);
+  assert.doesNotMatch(flow, /const handoffs/);
+});
+
 test("provides a personnel-maintain style role configuration page", async () => {
   const [page, view, data] = await Promise.all([
     read("./index.jsx"),
@@ -470,7 +766,7 @@ test("provides a personnel-maintain style role configuration page", async () => 
   assert.match(data, /title: "办公室 · 资料类别",\n\s+hidden: true/);
   assert.match(
     view,
-    /subsections\.filter\(\(subsection\) => !subsection\.hidden\)/,
+    /subsections\s*\n\s*\.filter\(\(subsection\) => !subsection\.hidden\)/,
   );
   for (const label of [
     "集团董办",

@@ -34,7 +34,12 @@ function buildHistory(material) {
   });
 }
 
-export default function MaterialHistoryDrawer({ material, open, onClose }) {
+export default function MaterialHistoryDrawer({
+  material,
+  open,
+  onClose,
+  asPage = false,
+}) {
   const [year, setYear] = useState("all");
   const [quarter, setQuarter] = useState("all");
   const history = useMemo(() => buildHistory(material), [material]);
@@ -75,19 +80,8 @@ export default function MaterialHistoryDrawer({ material, open, onClose }) {
     },
   ];
 
-  return (
-    <Drawer
-      className={styles.drawer}
-      width={900}
-      open={open}
-      onClose={onClose}
-      title={
-        <div className={styles.drawerTitle}>
-          <strong>资料历史详情</strong>
-          <span>{material?.material}</span>
-        </div>
-      }
-    >
+  const body = (
+    <>
       <Descriptions
         className={styles.summary}
         column={2}
@@ -145,11 +139,32 @@ export default function MaterialHistoryDrawer({ material, open, onClose }) {
       </div>
       <Table
         rowKey="id"
+        tableLayout="fixed"
         columns={columns}
         dataSource={filteredHistory}
         pagination={{ pageSize: 8, showSizeChanger: false }}
-        scroll={{ x: 835 }}
       />
+    </>
+  );
+
+  if (asPage) {
+    return <div className={styles.page}>{body}</div>;
+  }
+
+  return (
+    <Drawer
+      className={styles.drawer}
+      width={900}
+      open={open}
+      onClose={onClose}
+      title={
+        <div className={styles.drawerTitle}>
+          <strong>资料历史详情</strong>
+          <span>{material?.material}</span>
+        </div>
+      }
+    >
+      {body}
     </Drawer>
   );
 }

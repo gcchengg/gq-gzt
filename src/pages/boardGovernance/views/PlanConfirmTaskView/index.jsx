@@ -31,10 +31,12 @@ export default function PlanConfirmTaskView({
   onSave,
   embedded = false,
   onClose,
+  planId: planIdProp,
+  backTo = "/boardGovernance/preparation",
 }) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const planId = searchParams.get("planId");
+  const planId = planIdProp || searchParams.get("planId");
   const plan = plans.find((item) => item.id === planId);
   const [form] = Form.useForm();
   const completed = plan?.status === "已完成";
@@ -70,7 +72,7 @@ export default function PlanConfirmTaskView({
                 返回任务列表
               </Button>
             ) : (
-              <Link to="/boardGovernance/home">返回工作台首页</Link>
+              <Link to={backTo}>返回履职准备</Link>
             )
           }
         />
@@ -87,7 +89,7 @@ export default function PlanConfirmTaskView({
         onClose?.();
         return;
       }
-      navigate("/boardGovernance/directors?stage=preparation");
+      navigate("/boardGovernance/preparation");
       return;
     }
     message.success(
@@ -102,7 +104,9 @@ export default function PlanConfirmTaskView({
           <Breadcrumb
             className={styles.breadcrumb}
             items={[
-              { title: <Link to="/boardGovernance/home">工作台首页</Link> },
+              {
+                title: <Link to="/boardGovernance/preparation">履职准备</Link>,
+              },
               { title: "年度履职计划确认" },
               { title: plan.content },
             ]}
@@ -116,7 +120,7 @@ export default function PlanConfirmTaskView({
             actions={
               <Button
                 icon={<ArrowLeftOutlined />}
-                onClick={() => navigate("/boardGovernance/home")}
+                onClick={() => navigate("/boardGovernance/preparation")}
               >
                 返回工作台
               </Button>
@@ -255,7 +259,7 @@ export default function PlanConfirmTaskView({
         <div>
           <Button
             onClick={() =>
-              embedded ? onClose?.() : navigate("/boardGovernance/home")
+              embedded ? onClose?.() : navigate("/boardGovernance/preparation")
             }
           >
             返回

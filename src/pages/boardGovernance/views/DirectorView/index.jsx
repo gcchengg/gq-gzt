@@ -125,7 +125,13 @@ export default function DirectorView({
       ? searchParams.get("stage")
       : "management",
   );
-  const currentRole = role === "director" ? "董事本人" : "集团董办";
+  const canIssueLetter = role === "groupOffice";
+  const currentRole =
+    role === "director"
+      ? "董事本人"
+      : role === "adminDepartment"
+        ? "综合管理部"
+        : "集团董办";
   const appointmentDirector =
     directors.find((item) => item.lifecycleStage === "appointment") ||
     directors[0];
@@ -174,13 +180,15 @@ export default function DirectorView({
           ]}
         /> */}
         {/* <span className={styles.toolbarHint}>当前身份：{currentRole}</span> */}
-        <Button
-          type="primary"
-          icon={<SendOutlined />}
-          onClick={() => setOpenIssueLetter(true)}
-        >
-          下发董事推荐函
-        </Button>
+        {canIssueLetter ? (
+          <Button
+            type="primary"
+            icon={<SendOutlined />}
+            onClick={() => setOpenIssueLetter(true)}
+          >
+            下发董事推荐函
+          </Button>
+        ) : null}
       </div>
       <SectionCard
         title="董事列表"
@@ -225,6 +233,7 @@ export default function DirectorView({
         onRequestMaterialUpdate={onRequestMaterialUpdate}
         onPushHandbook={onPushHandbook}
         currentRole={currentRole}
+        canIssueLetter={canIssueLetter}
         appointmentRoleKey={
           appointmentRoleKeys[
             roleFilter === "all" ? currentRole : roleFilter
@@ -245,7 +254,7 @@ function getDirectorStage(director) {
     : "management";
 }
 
-function buildManagementDemoPlans(director) {
+export function buildManagementDemoPlans(director) {
   if (!director) return [];
   const planSeed = [
     [
@@ -325,7 +334,7 @@ function buildManagementDemoPlans(director) {
   );
 }
 
-function buildManagementDemoReports(director, plans) {
+export function buildManagementDemoReports(director, plans) {
   if (!director) return [];
   const sourcePlanIds = plans.map((item) => item.id);
   const reportSeed = [
@@ -382,7 +391,7 @@ function buildManagementDemoReports(director, plans) {
   );
 }
 
-function buildManagementDemoSuggestions(director, plans) {
+export function buildManagementDemoSuggestions(director, plans) {
   if (!director) return [];
   const suggestionSeed = [
     [
@@ -606,6 +615,7 @@ function DirectorLifecycleDrawer({
   onRequestMaterialUpdate,
   onPushHandbook,
   currentRole,
+  canIssueLetter,
   appointmentRoleKey,
   issueLetterDirector,
   openIssueLetter,
@@ -678,6 +688,7 @@ function DirectorLifecycleDrawer({
                   key={director.id}
                   director={director}
                   handlerRole={appointmentRoleKey}
+                  canIssueLetter={canIssueLetter}
                   embedded
                 />
               ) : null}
@@ -735,6 +746,7 @@ function DirectorLifecycleDrawer({
         key="standalone-issue-letter"
         director={issueLetterDirector}
         handlerRole="groupOffice"
+        canIssueLetter={canIssueLetter}
         autoOpenIssue={openIssueLetter}
         onIssueLetterOpened={onIssueLetterOpened}
         modalOnly
@@ -744,7 +756,7 @@ function DirectorLifecycleDrawer({
   );
 }
 
-function EventDetailDrawer({ event, onClose }) {
+export function EventDetailDrawer({ event, onClose }) {
   return (
     <GovernanceDrawer
       open={!!event}
@@ -783,7 +795,7 @@ function EventDetailDrawer({ event, onClose }) {
   );
 }
 
-function AppointmentDrawerPanel({ director }) {
+function AppointmentDrawerPanel({ director, canIssueLetter = false }) {
   return (
     <div className={styles.drawerGrid}>
       <SectionCard title="聘任办理状态" extra={<StatusPill>办理中</StatusPill>}>
@@ -797,9 +809,11 @@ function AppointmentDrawerPanel({ director }) {
           ]}
         />
         <div className={styles.drawerActions}>
-          <Button type="primary" icon={<SendOutlined />}>
-            下发董事推荐函
-          </Button>
+          {canIssueLetter ? (
+            <Button type="primary" icon={<SendOutlined />}>
+              下发董事推荐函
+            </Button>
+          ) : null}
           <Button>查看推荐函</Button>
         </div>
       </SectionCard>
@@ -940,15 +954,19 @@ function ManagementDrawerPanel({
   );
 }
 
-function PreparationWorkspace({
+export function PreparationWorkspace({
   compact = false,
   embedded = false,
+  hideDirectorChrome = false,
+  hidePlans = false,
+  onViewMaterial,
   materials,
   dutyPlans,
   onCreateDutyPlan,
   onDeleteDutyPlan,
   onSubmitDutyPlan,
   onGenerateDutyTasks,
+  onSubmitAnnualPlanReport,
   generatedDirectorNames,
   director,
   setDirector,
@@ -1038,7 +1056,9 @@ function PreparationWorkspace({
           <Button
             type="link"
             size="small"
-            onClick={() => setHistoryMaterial(row)}
+            onClick={() =>
+              onViewMaterial ? onViewMaterial(row) : setHistoryMaterial(row)
+            }
           >
             查看详情
           </Button>
@@ -1088,7 +1108,7 @@ function PreparationWorkspace({
         embedded ? styles.embeddedPreparation : ""
       }`}
     >
-      {!compact ? (
+      {!compact && !hideDirectorChrome ? (
         <section
           className={styles.directorSelector}
           aria-label="履职准备董事选择"
@@ -1125,22 +1145,24 @@ function PreparationWorkspace({
           </div>
         </section>
       ) : null}
-      <div className={styles.stageIntro}>
-        <div>
-          <span>当前阶段 · {director.name} · 履职准备</span>
-          <h2>为 {director.name} 准备履职手册与年度履职计划</h2>
-          <p>
-            定期发起资料更新，推送董事履职手册；汇总会议、培训、调研计划，经董事确认后自动生成履职任务。
-          </p>
+      {hideDirectorChrome ? null : (
+        <div className={styles.stageIntro}>
+          <div>
+            <span>当前阶段 · {director.name} · 履职准备</span>
+            <h2>为 {director.name} 准备履职手册与年度履职计划</h2>
+            <p>
+              定期发起资料更新，推送董事履职手册；汇总会议、培训、调研计划，经董事确认后自动生成履职任务。
+            </p>
+          </div>
+          <Button
+            type="primary"
+            icon={<CalendarOutlined />}
+            onClick={() => setPlanComposerOpen(true)}
+          >
+            发起年度履职计划
+          </Button>
         </div>
-        <Button
-          type="primary"
-          icon={<CalendarOutlined />}
-          onClick={() => setPlanComposerOpen(true)}
-        >
-          发起年度履职计划
-        </Button>
-      </div>
+      )}
       <div className={styles.prepGrid}>
         <SectionCard
           title="董事履职手册"
@@ -1229,18 +1251,23 @@ function PreparationWorkspace({
           </ol>
         </SectionCard>
       </div>
-      <DutyPlanWorkspace
-        embedded={embedded}
-        createOpen={planComposerOpen}
-        onCreateOpenChange={setPlanComposerOpen}
-        plans={directorPlans}
-        onCreatePlan={onCreateDutyPlan}
-        onDeletePlan={onDeleteDutyPlan}
-        onSubmitPlan={onSubmitDutyPlan}
-        onGenerateTasks={() => onGenerateDutyTasks(director.name)}
-        annualGenerated={annualPlanGenerated}
-        activeDirector={director}
-      />
+      {!hidePlans ? (
+        <DutyPlanWorkspace
+          embedded={embedded}
+          createOpen={planComposerOpen}
+          onCreateOpenChange={setPlanComposerOpen}
+          plans={directorPlans}
+          onCreatePlan={onCreateDutyPlan}
+          onDeletePlan={onDeleteDutyPlan}
+          onSubmitPlan={onSubmitDutyPlan}
+          onGenerateTasks={() => onGenerateDutyTasks(director.name)}
+          onSubmitAnnualPlanReport={(report) =>
+            onSubmitAnnualPlanReport?.(director, report)
+          }
+          annualGenerated={annualPlanGenerated}
+          activeDirector={director}
+        />
+      ) : null}
       <MaterialHistoryDrawer
         material={historyMaterial}
         open={!!historyMaterial}
@@ -1381,7 +1408,7 @@ function PreparationWorkspace({
   );
 }
 
-function DutyManagement({
+export function DutyManagement({
   compact = false,
   director,
   setDirector,
@@ -1445,6 +1472,12 @@ function DutyManagement({
               <span>季度报告</span>
             </p>
           </div>
+          <Space>
+            <Link to={`/boardGovernance/preparation/directors/${director.id}`}>
+              查看履职准备
+            </Link>
+            <Link to="/boardGovernance/appointment">查看任职记录</Link>
+          </Space>
         </div>
         <Tabs
           activeKey={tab}
@@ -1455,12 +1488,10 @@ function DutyManagement({
             { key: "events", label: "履职记录" },
             { key: "suggestions", label: "意见建议" },
             { key: "reports", label: "成果报告" },
-            { key: "handbook", label: "履职手册" },
-            { key: "evaluation", label: "评价结果" },
-            { key: "appointment", label: "任职记录" },
           ]}
         />
         <TabContent
+          compact={compact}
           tab={tab}
           director={director}
           onEvent={onEvent}
@@ -1602,6 +1633,7 @@ function DutyEvaluation() {
 }
 
 function TabContent({
+  compact = false,
   tab,
   director,
   onEvent,
@@ -1617,11 +1649,13 @@ function TabContent({
   const events = taskEventsFromPlans(plans);
   if (tab === "overview")
     return <SyncedOverview plans={plans} events={events} onEvent={onEvent} />;
-  if (tab === "plan") return <SyncedPlan plans={plans} />;
+  if (tab === "plan") return <SyncedPlan plans={plans} compact={compact} />;
   if (tab === "events")
-    return <SyncedEvents events={events} onEvent={onEvent} />;
+    return <SyncedEvents events={events} onEvent={onEvent} compact={compact} />;
   if (tab === "suggestions")
-    return <SyncedSuggestions suggestionTasks={suggestionTasks} />;
+    return (
+      <SyncedSuggestions suggestionTasks={suggestionTasks} compact={compact} />
+    );
   if (tab === "reports")
     return (
       <DutyReportWorkspace
@@ -1633,12 +1667,7 @@ function TabContent({
         onReceive={onReceiveDutyReport}
       />
     );
-  if (tab === "handbook") return <SyncedHandbook materials={materials} />;
-  if (tab === "evaluation")
-    return (
-      <SyncedEvaluation director={director} plans={plans} reports={reports} />
-    );
-  return <SyncedAppointment director={director} />;
+  return <SyncedOverview plans={plans} events={events} onEvent={onEvent} />;
 }
 function Overview({ director, onEvent }) {
   return (
@@ -1924,7 +1953,7 @@ function SyncedOverview({ plans, events, onEvent }) {
           <p>
             {plans.length} 项计划已完成 {completedCount} 项
           </p>
-          <small>{plans.length - completedCount} 项负责人任务待确认完成</small>
+          <small>{plans.length - completedCount} 项履职任务待确认完成</small>
         </div>
       </SectionCard>
       <SectionCard title="最近履职记录" className={styles.span2}>
@@ -1956,17 +1985,30 @@ function SyncedOverview({ plans, events, onEvent }) {
   );
 }
 
-function SyncedPlan({ plans }) {
+function SyncedPlan({ plans, compact = false }) {
   return (
-    <SectionCard title="年度履职计划" extra={<span>与负责人任务实时同步</span>}>
+    <SectionCard title="年度履职计划" extra={<span>与履职任务实时同步</span>}>
       <DataTable
         rows={plans}
+        scroll={compact ? undefined : { x: "max-content" }}
         columns={[
           { title: "计划类型", dataIndex: "type" },
-          { title: "工作类别", dataIndex: "workCategory", width: 180 },
-          { title: "工作内容", dataIndex: "content", width: 260 },
+          {
+            title: "工作类别",
+            dataIndex: "workCategory",
+            width: compact ? 120 : 180,
+          },
+          {
+            title: "工作内容",
+            dataIndex: "content",
+            width: compact ? 160 : 260,
+          },
           { title: "计划时间", dataIndex: "date" },
-          { title: "预期目标", dataIndex: "target", width: 240 },
+          {
+            title: "预期目标",
+            dataIndex: "target",
+            width: compact ? 160 : 240,
+          },
           { title: "负责人", dataIndex: "taskAssignee" },
           {
             title: "任务状态",
@@ -1979,20 +2021,25 @@ function SyncedPlan({ plans }) {
   );
 }
 
-function SyncedEvents({ events, onEvent }) {
+function SyncedEvents({ events, onEvent, compact = false }) {
   return (
     <SectionCard
       title="履职记录"
-      extra={<span>负责人任务同步 {events.length} 条</span>}
+      extra={<span>履职任务同步 {events.length} 条</span>}
     >
       <DataTable
         rows={events}
         onRowClick={onEvent}
+        scroll={compact ? undefined : { x: "max-content" }}
         columns={[
           { title: "日期", dataIndex: "date" },
           { title: "类型", dataIndex: "type" },
-          { title: "事件名称", dataIndex: "title", width: 330 },
-          { title: "成果说明", dataIndex: "evidence", width: 280 },
+          { title: "事件名称", dataIndex: "title", width: compact ? 180 : 330 },
+          {
+            title: "成果说明",
+            dataIndex: "evidence",
+            width: compact ? 160 : 280,
+          },
           {
             title: "任务状态",
             dataIndex: "status",
@@ -2004,33 +2051,53 @@ function SyncedEvents({ events, onEvent }) {
   );
 }
 
-function SyncedSuggestions({ suggestionTasks }) {
+function SyncedSuggestions({ suggestionTasks, compact = false }) {
   const rows = suggestionTasks;
   return (
     <SectionCard
       title="意见建议落实"
-      extra={<span>来源于负责人任务办理结果</span>}
+      extra={<span>来源于履职任务办理结果</span>}
     >
       <DataTable
         rows={rows}
+        scroll={compact ? undefined : { x: "max-content" }}
         columns={[
-          { title: "类型", dataIndex: "type" },
-          { title: "意见建议", dataIndex: "content", width: 380 },
-          { title: "来源任务", dataIndex: "source" },
-          { title: "责任部门", dataIndex: "owner" },
-          { title: "完成期限", dataIndex: "deadline" },
+          { title: "类型", dataIndex: "type", width: compact ? 96 : undefined },
+          {
+            title: "意见建议",
+            dataIndex: "content",
+            width: compact ? 140 : 380,
+          },
+          {
+            title: "来源任务",
+            dataIndex: "source",
+            width: compact ? 108 : undefined,
+          },
+          {
+            title: "责任部门",
+            dataIndex: "owner",
+            width: compact ? 108 : undefined,
+          },
+          {
+            title: "完成期限",
+            dataIndex: "deadline",
+            width: compact ? 96 : undefined,
+          },
           {
             title: "进度",
             dataIndex: "progress",
+            width: compact ? 118 : undefined,
             render: (value) => <ProgressCell value={value} />,
           },
           {
             title: "状态",
             dataIndex: "status",
+            width: compact ? 72 : undefined,
             render: (value) => <StatusPill>{value}</StatusPill>,
           },
           {
             title: "操作",
+            width: compact ? 72 : undefined,
             render: (_, row) => (
               <Link
                 to={`/boardGovernance/duty-tasks?taskType=suggestion&bizId=${row.id}`}

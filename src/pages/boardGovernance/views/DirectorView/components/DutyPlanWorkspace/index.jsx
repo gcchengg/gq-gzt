@@ -48,12 +48,14 @@ export default function DutyPlanWorkspace({
   onDeletePlan,
   onSubmitPlan,
   onGenerateTasks,
+  onSubmitAnnualPlanReport,
   annualGenerated,
   activeDirector,
 }) {
   const [resultPlan, setResultPlan] = useState(null);
   const [generateConfirmOpen, setGenerateConfirmOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [reportSubmitConfirmOpen, setReportSubmitConfirmOpen] = useState(false);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
   const [form] = Form.useForm();
   const paperRef = useRef(null);
@@ -64,7 +66,10 @@ export default function DutyPlanWorkspace({
   const canGenerateAnnual =
     plans.length > 0 &&
     plans.every((item) => ["已提交", "已完成"].includes(item.status));
-  const annualReport = useMemo(() => buildAnnualDutyPlanReport(), []);
+  const annualReport = useMemo(
+    () => buildAnnualDutyPlanReport(activeDirector),
+    [activeDirector],
+  );
 
   const closeComposer = () => {
     onCreateOpenChange(false);
@@ -125,6 +130,13 @@ export default function DutyPlanWorkspace({
     }
   };
 
+  const submitAnnualPlanReport = () => {
+    onSubmitAnnualPlanReport?.(annualReport);
+    setReportSubmitConfirmOpen(false);
+    setReportOpen(false);
+    message.success("年度履职计划报告已提交，董事确认/调整任务已创建");
+  };
+
   const renderPlanActions = (row) => {
     if (row.status === "草稿") {
       return (
@@ -155,7 +167,7 @@ export default function DutyPlanWorkspace({
     }
     if (row.status === "待确认") {
       return (
-        <Link to={`/boardGovernance/plan-confirm-task?planId=${row.id}`}>
+        <Link to={`/boardGovernance/preparation/plans/${row.id}`}>
           查看任务
         </Link>
       );
@@ -272,7 +284,7 @@ export default function DutyPlanWorkspace({
           <DataTable rows={plans} columns={columns} />
         )}
         <div className={styles.planFooter}>
-          <div>
+          <div className={styles.planFooterCopy}>
             <strong>
               {annualGenerated
                 ? `年度计划已生成，${plans.length} 项履职任务已创建`
@@ -419,15 +431,15 @@ export default function DutyPlanWorkspace({
                 options={confirmationOwners.map((value) => ({ value }))}
               />
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               name="date"
               label="计划时间"
               // rules={[{ required: true, message: "请填写计划时间" }]}
             >
               <Input placeholder="例如：2026-11-20" />
-            </Form.Item>
+            </Form.Item> */}
           </div>
-          <Form.Item
+          {/* <Form.Item
             name="content"
             label="计划内容"
             // rules={[{ required: true, message: "请填写计划内容" }]}
@@ -440,7 +452,7 @@ export default function DutyPlanWorkspace({
             // rules={[{ required: true, message: "请填写预期成果" }]}
           >
             <Input.TextArea rows={3} placeholder="请输入计划应形成的成果" />
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Modal>
 
@@ -527,11 +539,30 @@ export default function DutyPlanWorkspace({
           >
             打印 / 导出 PDF
           </Button>,
+          <Button
+            key="submit"
+            type="primary"
+            disabled={!onSubmitAnnualPlanReport || !annualReport.pages.length}
+            onClick={() => setReportSubmitConfirmOpen(true)}
+          >
+            提交
+          </Button>,
         ]}
       >
         <div className={styles.reportPreview}>
           <AnnualPlanReport report={annualReport} paperRef={paperRef} />
         </div>
+      </Modal>
+      <Modal
+        title="确认提交年度履职计划报告？"
+        open={reportSubmitConfirmOpen}
+        okText="确认提交"
+        cancelText="返回检查"
+        onOk={submitAnnualPlanReport}
+        onCancel={() => setReportSubmitConfirmOpen(false)}
+      >
+        提交后将为 {activeDirector?.name}{" "}
+        创建“年度履职计划确认/调整”任务，请确认报告内容无误。
       </Modal>
     </>
   );

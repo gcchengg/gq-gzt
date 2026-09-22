@@ -45,6 +45,7 @@ export function DataTable({
   onRowClick,
   rowKey = "id",
   selectedRowKey,
+  scroll = { x: "max-content" },
 }) {
   return (
     <Table
@@ -53,7 +54,7 @@ export function DataTable({
       dataSource={rows}
       pagination={false}
       size="middle"
-      scroll={{ x: "max-content" }}
+      scroll={scroll}
       rowClassName={(row) =>
         row[rowKey] === selectedRowKey ? styles.selectedRow : ""
       }
@@ -68,6 +69,7 @@ export function ProgressCell({ value }) {
       <Progress
         percent={value}
         size="small"
+        showInfo={false}
         strokeColor={value < 60 ? "#d98300" : "#2f6bff"}
       />
       <span>{value}%</span>

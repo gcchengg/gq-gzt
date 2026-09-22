@@ -1,22 +1,44 @@
+import { useEffect, useMemo, useState } from "react";
 import {
   Badge,
   Button,
   ConfigProvider,
   Dropdown,
   Input,
+  Menu,
   Select,
   Tooltip,
 } from "antd";
 import {
   BellOutlined,
   DownOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   MobileOutlined,
   SearchOutlined,
-  SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { navigationItems } from "../mockData";
+import "@/components/AppShell.css";
 import styles from "./index.module.less";
+
+const roleOptions = [
+  { key: "groupOffice", label: "集团董办", avatar: "董" },
+  { key: "adminDepartment", label: "综合管理部", avatar: "综" },
+  { key: "director", label: "董事", avatar: "董" },
+];
+
+const roleMenuKeys = {
+  groupOffice: ["appointment"],
+  adminDepartment: navigationItems.map(({ key }) => key),
+  director: ["home", "management", "duty-tasks"],
+};
+
+const roleDefaultPage = {
+  groupOffice: "appointment",
+  adminDepartment: "home",
+  director: "home",
+};
 
 export default function BoardGovernanceShell({
   activeKey,
@@ -24,57 +46,86 @@ export default function BoardGovernanceShell({
   onRoleChange,
   children,
 }) {
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+  const currentRole =
+    roleOptions.find(({ key }) => key === role) || roleOptions[0];
+  const visibleMenuKeys = roleMenuKeys[currentRole.key];
+  const menuItems = useMemo(
+    () =>
+      navigationItems
+        .filter(({ key }) => visibleMenuKeys.includes(key))
+        .map(({ key, label, icon: Icon }) => {
+          const path = `/boardGovernance/${key}`;
+          return {
+            key: path,
+            icon: <Icon />,
+            label: <Link to={path}>{label}</Link>,
+          };
+        }),
+    [visibleMenuKeys],
+  );
+
+  useEffect(() => {
+    if (!visibleMenuKeys.includes(activeKey)) {
+      navigate(`/boardGovernance/${roleDefaultPage[currentRole.key]}`, {
+        replace: true,
+      });
+    }
+  }, [activeKey, currentRole.key, navigate, visibleMenuKeys]);
+
+  const handleRoleChange = (nextRole) => {
+    onRoleChange(nextRole);
+    const nextVisibleMenuKeys = roleMenuKeys[nextRole];
+    if (!nextVisibleMenuKeys.includes(activeKey)) {
+      navigate(`/boardGovernance/${roleDefaultPage[nextRole]}`);
+    }
+  };
+
   return (
     <ConfigProvider
       theme={{
         token: {
-          colorPrimary: "#245fca",
+          colorPrimary: "#1677ff",
           borderRadius: 8,
           fontFamily: '"Microsoft YaHei", "PingFang SC", Arial, sans-serif',
         },
       }}
     >
       <div className={styles.shell}>
-        <aside className={styles.sidebar}>
-          <div className={styles.brand}>
-            <div className={styles.logo}>FAW</div>
-            <div>
-              <strong>董事会建设工作台</strong>
-              <span>BOARD GOVERNANCE</span>
-            </div>
+        <aside
+          className={["gq-app-sidebar", collapsed ? "is-collapsed" : ""]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <div className="gq-app-brand">
+            <div className="gq-app-brand-mark">GQ</div>
+            {collapsed ? null : (
+              <div className="gq-app-brand-copy">
+                <strong>董事会建设工作台</strong>
+              </div>
+            )}
           </div>
-          <nav>
-            {navigationItems.map(({ key, label, icon: Icon }) => (
-              <Link
-                key={key}
-                className={activeKey === key ? styles.active : ""}
-                to={`/boardGovernance/${key}`}
-              >
-                <Icon />
-                <span>{label}</span>
-                {key === "monitoring" ? <b>3</b> : null}
-              </Link>
-            ))}
-          </nav>
-          <div className={styles.sidebarFoot}>
-            <SafetyCertificateOutlined />
-            <div>
-              <strong>内部系统</strong>
-              <span>操作全程留痕</span>
-            </div>
+          <Menu
+            className="gq-app-menu"
+            mode="inline"
+            inlineCollapsed={collapsed}
+            selectedKeys={[`/boardGovernance/${activeKey}`]}
+            items={menuItems}
+          />
+          <div className="gq-app-sidebar-footer">
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed((value) => !value)}
+            >
+              {collapsed ? null : "收起导航"}
+            </Button>
           </div>
         </aside>
         <div className={styles.workspace}>
           <header className={styles.topbar}>
             <div className={styles.switches}>
-              {/* <Select
-                defaultValue="all"
-                options={[
-                  { value: "all", label: "一汽股权及所属企业" },
-                  { value: "gq", label: "一汽股权" },
-                  { value: "qn", label: "旗新动力科技" },
-                ]}
-              /> */}
               <Select
                 defaultValue="2026"
                 options={[
@@ -99,19 +150,18 @@ export default function BoardGovernanceShell({
               <Dropdown
                 menu={{
                   items: [
-                    { key: "office", label: "公司董办" },
-                    { key: "director", label: "董事视角" },
+                    { key: "groupOffice", label: "集团董办" },
+                    { key: "adminDepartment", label: "综合管理部" },
+                    { key: "director", label: "董事" },
                   ],
-                  onClick: ({ key }) => onRoleChange(key),
+                  onClick: ({ key }) => handleRoleChange(key),
                 }}
               >
                 <button className={styles.user}>
-                  <span>{role === "director" ? "张" : "阮"}</span>
+                  <span>{currentRole.avatar}</span>
                   <div>
-                    <strong>{role === "director" ? "张铁斌" : "阮迪"}</strong>
-                    <small>
-                      {role === "director" ? "外部董事召集人" : "公司董办"}
-                    </small>
+                    <strong>{currentRole.label}</strong>
+                    <small>当前角色</small>
                   </div>
                   <DownOutlined />
                 </button>

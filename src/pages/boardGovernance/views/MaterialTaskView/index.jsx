@@ -61,7 +61,7 @@ export default function MaterialTaskView({
       onClose?.();
       return;
     }
-    navigate("/boardGovernance/directors?stage=preparation");
+    navigate("/boardGovernance/preparation");
   };
 
   if (departmentMaterials.length === 0) {
@@ -77,7 +77,7 @@ export default function MaterialTaskView({
                 返回任务列表
               </Button>
             ) : (
-              <Link to="/boardGovernance/home">返回工作台首页</Link>
+              <Link to="/boardGovernance/preparation">返回履职准备</Link>
             )
           }
         />
@@ -93,6 +93,9 @@ export default function MaterialTaskView({
             className={styles.breadcrumb}
             items={[
               { title: <Link to="/boardGovernance/home">工作台首页</Link> },
+              {
+                title: <Link to="/boardGovernance/preparation">履职准备</Link>,
+              },
               { title: "任务执行" },
               { title: department },
             ]}
@@ -104,7 +107,7 @@ export default function MaterialTaskView({
             actions={
               <Button
                 icon={<ArrowLeftOutlined />}
-                onClick={() => navigate("/boardGovernance/home")}
+                onClick={() => navigate("/boardGovernance/preparation")}
               >
                 返回工作台
               </Button>
@@ -195,7 +198,7 @@ export default function MaterialTaskView({
         <div>
           <Button
             onClick={() =>
-              embedded ? onClose?.() : navigate("/boardGovernance/home")
+              embedded ? onClose?.() : navigate("/boardGovernance/preparation")
             }
           >
             取消

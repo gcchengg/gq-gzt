@@ -745,6 +745,9 @@
 .embeddedPreparation .prepGrid {
   grid-template-columns: 1fr;
 }
+.embeddedPreparation :global(.ant-table-content) {
+  overflow-x: hidden;
+}
 .embeddedPreparation .stageIntro {
   padding: 18px 20px;
 }
@@ -868,6 +871,33 @@
 }
 .compactLayout .profile {
   min-width: 0;
+}
+.compactLayout .hero {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.compactLayout .heroStats {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.compactLayout :global(.ant-table) {
+  table-layout: fixed;
+  width: 100% !important;
+}
+.compactLayout :global(.ant-table-content) {
+  overflow-x: hidden;
+}
+.compactLayout :global(.ant-table-cell) {
+  white-space: normal;
+  word-break: break-word;
+}
+.compactLayout :global(.progress) {
+  min-width: 0;
+  gap: 4px;
+}
+.compactLayout :global(.progress span) {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 @media (max-width: 1100px) {
   .lifecycle {

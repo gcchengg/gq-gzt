@@ -1,15 +1,21 @@
 import {
+  AuditOutlined,
+  CalendarOutlined,
   CheckSquareOutlined,
   DashboardOutlined,
   SettingOutlined,
+  SolutionOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
 
 export const navigationItems = [
   { key: "home", label: "工作台首页", icon: DashboardOutlined },
-  { key: "directors", label: "董事履职", icon: TeamOutlined },
-  { key: "duty-tasks", label: "负责人任务", icon: CheckSquareOutlined },
-  { key: "roles", label: "角色配置", icon: SettingOutlined },
+  { key: "appointment", label: "董事聘任", icon: SolutionOutlined },
+  { key: "preparation", label: "履职准备", icon: CalendarOutlined },
+  { key: "management", label: "履职管理", icon: TeamOutlined },
+  { key: "duty-evaluation", label: "履职评价", icon: AuditOutlined },
+  { key: "duty-tasks", label: "履职任务", icon: CheckSquareOutlined },
+  { key: "roles", label: "履职角色配置", icon: SettingOutlined },
 ];
 
 export const metrics = [
@@ -272,7 +278,7 @@ export const directors = [
     completion: 88,
     report: "已提交",
     risk: "正常",
-    lifecycleStage: "evaluation",
+    lifecycleStage: "management",
     appointmentStatus: "已完成",
     preparationStatus: "已完成",
     managementStatus: "已完成",
@@ -358,7 +364,7 @@ export const directors = [
     report: "未开始",
     risk: "正常",
     lifecycleStage: "appointment",
-    appointmentStatus: "待选举变更",
+    appointmentStatus: "待完成工商变更",
     preparationStatus: "未开始",
     managementStatus: "未开始",
     evaluationStatus: "未开始",
