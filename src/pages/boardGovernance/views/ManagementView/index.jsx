@@ -38,9 +38,13 @@ export default function ManagementView({
   const navigate = useNavigate();
   const [tab, setTab] = useState("overview");
   const [event, setEvent] = useState(null);
+  const scopedDirectors =
+    role === "director"
+      ? directorRecords.filter((item) => item.name === currentDirectorName)
+      : directorRecords;
   const director =
     resource === "director"
-      ? directorRecords.find((item) => item.id === id)
+      ? scopedDirectors.find((item) => item.id === id)
       : null;
   const canOpen = canOpenManagementDirector(director, generatedDirectorNames);
   const visiblePlans = dutyPlans.filter(
@@ -70,7 +74,7 @@ export default function ManagementView({
         subtitle="跟踪已生成履职任务的董事：任务、写实、建议与成果报告"
       />
       <DirectorStageTable
-        directors={directorRecords}
+        directors={scopedDirectors}
         defaultStage="management"
         generatedDirectorNames={generatedDirectorNames}
         filterDirectorsForStage={filterDirectorsForStage}

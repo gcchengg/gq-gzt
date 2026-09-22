@@ -83,4 +83,55 @@ boardGovernance/home 中 董事只显示 年度履职计划确认/调整
           }}
 当为董事角色的时候，boardGovernance/management，应该有TaskIssueDrawer，title为任务浮窗
 
-boardGovernance/home 页面新增 履职评价任务
+
+角色增加 审计封控与法务部，当角色为审计封控与法务部时
+boardGovernance/home 
+仅仅能显示 董事聘任任务下面的描述为待完成工商变更的数据，原有综合管理部的角色不能看见描述为待完成工商变更的数据
+
+boardGovernance/home 页面中 履职准备-董事履职手册，改为 履职准备，下方现在有四个部门tab页，改为董事履职手册 董事履职手册确认 年度履职计划 两个tab，把原先4个tab 的数据都放在董事履职手册下面
+boardGovernance/preparation/directors/D-02 的抽屉页面内容，拆解成两个tab页面，董事履职手册 和 年度履职计划编排
+准备阶段进度 内容 计划制定/计划全部提交/年度履职计划生成/自动创建履职任务需要放在个字的tab页以step的形式展示
+董事履职手册确认任务去执行跳转到董事履职手册tab
+年度履职计划去执行跳转到年度履职计划编排tab
+默认写假数据，本项目只为给领导演示，不做过多数据逻辑校验
+
+
+
+
+boardGovernance/appointment 页面中抽屉页全流程定位要以step的形式在上方展示，删除【接收董事推荐函 】和 【人员选举 / 专委会委员变更】
+把配置系统权限和纳入组织架构 合并成一个状态
+
+boardGovernance/preparation/directors/D-02?tab=handbook 页面中，点击新增计划的时候
+新增年度履职计划 的modal，仅显示 姓名 履职类型（年度/季度/月度 下拉） 履职年度 履职季度 确认责任人（可以多选）
+下面分为两部分，
+上面部分：
+新增计划完显示上面modal信息，但是要加一个提交时间
+下面部分：
+显示原有的数据，这部分数据其实是boardGovernance/duty-tasks?taskType=confirmation&planId=PLAN-001 完成后才显示
+因为是给领导演示demo，不用写交互逻辑，写好假数据就行，不用验证
+
+
+boardGovernance/home 【履职准备】【年度履职计划】下面
+增加 【履职计划确认】任务
+由 【2026年度履职计划编排任务】进入不显示【履职计划确认明细】下面内容，由【履职计划确认】任务去执行进入不显示【新增计划】按钮
+
+
+
+
+
+
+boardGovernance/preparation/directors/D-02
+页面中 【年度履职计划编排】tab页面下：
+点击 【生成年度计划并创建任务】，不想要pdf了也想要duty-tasks?taskType=annual-plan-confirmation&bizId=ANNUAL-D-08 页面抽屉页中，可以选择的形式
+但是这个页面其实是董事【生成年度计划并创建任务】选择后的数据，他能再次选择
+因为是给领导演示demo，不用写交互逻辑，写好假数据就行，不用验证
+
+
+
+boardGovernance/duty-tasks?bizId=PLAN-001 页面修改如下：
+1.删除 任务办理填写情况 相关内容
+2.删除 实际完成日期  成果说明 完成情况 形成的意见建议
+3.添加内容参考下面信息，根据计划类型 是会议计划 培训计划 调研计划 来添加不同字段
+4./boardGovernance/home 页面中【已确认履职计划任务】，去掉tab页显示，三个任务直接放在【已确认履职计划任务】下方
+查看/修改 等变成 去执行，任务下方应该只能由去执行操作，应该会议计划 培训计划 调研计划 类型的任务各有一个
+

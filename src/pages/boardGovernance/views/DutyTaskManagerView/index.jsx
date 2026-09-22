@@ -368,11 +368,11 @@ export default function DutyTaskManagerView({
         eyebrow="RESPONSIBLE PERSON WORKBENCH"
         title="履职任务负责人工作台"
         subtitle="接收年度履职计划生成的任务，补充办理成果和佐证材料，确认完成后同步履职档案"
-        actions={
-          <Button onClick={() => navigate("/boardGovernance/home")}>
-            返回工作台首页
-          </Button>
-        }
+        // actions={
+        //   <Button onClick={() => navigate("/boardGovernance/home")}>
+        //     返回工作台首页
+        //   </Button>
+        // }
       />
       <div className={styles.metrics}>
         <article>

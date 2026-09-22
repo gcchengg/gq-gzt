@@ -98,6 +98,21 @@ test("shows the reusable task issue drawer on director management only", async (
   assert.match(management, /zIndex=\{12120\}/);
 });
 
+test("limits director management to the logged-in director record", async () => {
+  const management = await read("./views/ManagementView/index.jsx");
+  assert.match(management, /const currentDirectorName = "张铁斌";/);
+  assert.match(
+    management,
+    /role === "director"\s*\n\s*\? directorRecords\.filter\(\(item\) => item\.name === currentDirectorName\)\s*\n\s*: directorRecords;/,
+  );
+  assert.match(
+    management,
+    /resource === "director"\s*\n\s*\? scopedDirectors\.find\(\(item\) => item\.id === id\)/,
+  );
+  assert.match(management, /directors=\{scopedDirectors\}/);
+  assert.doesNotMatch(management, /directors=\{directorRecords\}/);
+});
+
 test("covers the approved business workspaces", async () => {
   const files = await Promise.all([
     read("./views/HomeView/index.jsx"),

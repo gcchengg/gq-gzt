@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Alert,
   Button,
-  Descriptions,
   Drawer,
   Form,
   Input,
@@ -10,18 +9,12 @@ import {
   Modal,
   Select,
   Tabs,
-  Upload,
 } from "antd";
-import {
-  FileDoneOutlined,
-  FileTextOutlined,
-  InboxOutlined,
-  RobotOutlined,
-} from "@ant-design/icons";
+import { FileTextOutlined, RobotOutlined } from "@ant-design/icons";
 import { SectionCard, StatusPill } from "../../../../components/PageKit";
 import styles from "./index.module.less";
 
-const { Dragger } = Upload;
+import ReportEditor from "./ReportEditor";
 
 export default function DutyReportWorkspace({
   director,
@@ -34,42 +27,16 @@ export default function DutyReportWorkspace({
   const [generateOpen, setGenerateOpen] = useState(false);
   const [reportTypeFilter, setReportTypeFilter] = useState("全部报告");
   const [selectedReportId, setSelectedReportId] = useState(null);
-  const [reportFiles, setReportFiles] = useState([]);
   const [generateForm] = Form.useForm();
-  const [reportForm] = Form.useForm();
   const completedPlans = useMemo(
     () => plans.filter((item) => item.taskStatus === "已完成"),
     [plans],
   );
   const selectedReport = reports.find((item) => item.id === selectedReportId);
-  const reportSourceTasks = useMemo(() => {
-    if (!selectedReport) return [];
-    if (selectedReport.taskSnapshots?.length)
-      return selectedReport.taskSnapshots;
-    const sourcePlanIds = new Set(selectedReport.sourcePlanIds || []);
-    return plans.filter((item) => sourcePlanIds.has(item.id));
-  }, [plans, selectedReport]);
   const visibleReports =
     reportTypeFilter === "全部报告"
       ? reports
       : reports.filter((item) => item.reportType === reportTypeFilter);
-
-  useEffect(() => {
-    if (!selectedReport) return;
-    reportForm.setFieldsValue({
-      title: selectedReport.title,
-      summary: selectedReport.summary,
-      workHighlights: selectedReport.workHighlights,
-      suggestions: selectedReport.suggestions,
-    });
-    setReportFiles(
-      (selectedReport.files || []).map((name, index) => ({
-        uid: `${selectedReport.id}-${index}`,
-        name,
-        status: "done",
-      })),
-    );
-  }, [reportForm, selectedReport]);
 
   const generateReport = async () => {
     const values = await generateForm.validateFields();
@@ -78,19 +45,6 @@ export default function DutyReportWorkspace({
     generateForm.resetFields();
     setSelectedReportId(report.id);
     message.success("履职报告已根据确认完成的履职记录自动生成");
-  };
-
-  const saveReport = async (submit) => {
-    const values = await reportForm.validateFields();
-    onSave(
-      selectedReport.id,
-      {
-        ...values,
-        files: reportFiles.map((file) => file.name),
-      },
-      submit,
-    );
-    message.success(submit ? "履职报告已提交接收" : "履职报告已保存");
   };
 
   return (
@@ -113,7 +67,7 @@ export default function DutyReportWorkspace({
             type="success"
             showIcon
             message={`已归集 ${completedPlans.length} 条负责人确认完成的履职记录`}
-            description="报告自动引用任务完成情况、成果说明、意见建议和补充材料。"
+            description="月度采用履职写实表，季度及年度采用工作报告模板；生成后可编辑并打印。"
           />
         ) : (
           <Alert
@@ -170,16 +124,16 @@ export default function DutyReportWorkspace({
         onOk={generateReport}
         onCancel={() => setGenerateOpen(false)}
       >
-        <Alert
+        {/* <Alert
           showIcon
           type="info"
           message={`系统将引用 ${completedPlans.length} 条已确认履职记录`}
           description="生成后可以继续完善正文、意见建议和附件，再提交董办接收。"
-        />
+        /> */}
         <Form
           form={generateForm}
           layout="vertical"
-          initialValues={{ reportType: "季度报告", period: "2026年第三季度" }}
+          initialValues={{ reportType: "季度报告", period: "2026年第一季度" }}
         >
           <Form.Item
             name="reportType"
@@ -187,6 +141,16 @@ export default function DutyReportWorkspace({
             rules={[{ required: true }]}
           >
             <Select
+              onChange={(value) =>
+                generateForm.setFieldValue(
+                  "period",
+                  value === "月度报告"
+                    ? "2026年1月"
+                    : value === "年度报告"
+                      ? "2026年度"
+                      : "2026年第一季度",
+                )
+              }
               options={["月度报告", "季度报告", "年度报告"].map((value) => ({
                 value,
               }))}
@@ -204,7 +168,7 @@ export default function DutyReportWorkspace({
 
       <Drawer
         open={Boolean(selectedReport)}
-        width={780}
+        width={1280}
         title={selectedReport?.title}
         onClose={() => setSelectedReportId(null)}
         extra={
@@ -214,136 +178,14 @@ export default function DutyReportWorkspace({
         }
       >
         {selectedReport ? (
-          <div className={styles.reportEditor}>
-            <Descriptions
-              bordered
-              column={2}
-              items={[
-                {
-                  key: "director",
-                  label: "董事",
-                  children: selectedReport.directorName,
-                },
-                {
-                  key: "period",
-                  label: "报告周期",
-                  children: selectedReport.period,
-                },
-                {
-                  key: "sources",
-                  label: "引用记录",
-                  children: `${selectedReport.sourceCount} 条`,
-                },
-                {
-                  key: "generated",
-                  label: "生成时间",
-                  children: selectedReport.generatedAt,
-                },
-              ]}
-            />
-            <section className={styles.sourceTaskSection}>
-              <div className={styles.sourceTaskHeader}>
-                <div>
-                  <strong>引用履职任务明细</strong>
-                  <span>
-                    报告根据已完成履职任务自动生成；以下任务事实可作为报告正文修改时的参考。
-                  </span>
-                </div>
-                <b>{reportSourceTasks.length} 条</b>
-              </div>
-              <div className={styles.sourceTaskList}>
-                {reportSourceTasks.map((task, index) => (
-                  <article key={task.id}>
-                    <div className={styles.sourceTaskTitle}>
-                      <span>任务 {index + 1}</span>
-                      <strong>{task.content}</strong>
-                      <StatusPill>{task.type}</StatusPill>
-                    </div>
-                    <dl>
-                      <div>
-                        <dt>实际完成日期</dt>
-                        <dd>{task.actualDate || "—"}</dd>
-                      </div>
-                      <div>
-                        <dt>成果说明</dt>
-                        <dd>{task.evidenceNote || "—"}</dd>
-                      </div>
-                      <div className={styles.fullLine}>
-                        <dt>完成情况</dt>
-                        <dd>{task.completionSummary || task.target || "—"}</dd>
-                      </div>
-                      <div className={styles.fullLine}>
-                        <dt>佐证材料</dt>
-                        <dd>
-                          {task.supplementFiles?.length
-                            ? task.supplementFiles.join("、")
-                            : "暂无附件"}
-                        </dd>
-                      </div>
-                    </dl>
-                  </article>
-                ))}
-              </div>
-            </section>
-            <Form form={reportForm} layout="vertical">
-              <Form.Item
-                name="title"
-                label="报告名称"
-                rules={[{ required: true }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
-                name="summary"
-                label="履职综述"
-                rules={[{ required: true }]}
-              >
-                <Input.TextArea rows={4} />
-              </Form.Item>
-              <Form.Item
-                name="workHighlights"
-                label="主要履职情况"
-                rules={[{ required: true }]}
-              >
-                <Input.TextArea rows={7} />
-              </Form.Item>
-              <Form.Item name="suggestions" label="意见建议与后续安排">
-                <Input.TextArea rows={4} />
-              </Form.Item>
-              <Form.Item label="报告附件">
-                <Dragger
-                  multiple
-                  beforeUpload={() => false}
-                  fileList={reportFiles}
-                  onChange={({ fileList }) => setReportFiles(fileList)}
-                >
-                  <InboxOutlined />
-                  <p>上传报告附件或其他补充材料</p>
-                </Dragger>
-              </Form.Item>
-            </Form>
-            <div className={styles.actionBar}>
-              <Button onClick={() => setSelectedReportId(null)}>关闭</Button>
-              <Button onClick={() => saveReport(false)}>保存完善内容</Button>
-              {selectedReport.status === "待完善" ? (
-                <Button type="primary" onClick={() => saveReport(true)}>
-                  提交接收
-                </Button>
-              ) : null}
-              {selectedReport.status === "待接收" ? (
-                <Button
-                  type="primary"
-                  icon={<FileDoneOutlined />}
-                  onClick={() => {
-                    onReceive(selectedReport.id);
-                    message.success("履职报告已接收并归档");
-                  }}
-                >
-                  接收履职报告
-                </Button>
-              ) : null}
-            </div>
-          </div>
+          <ReportEditor
+            key={selectedReport.id}
+            report={selectedReport}
+            director={director}
+            onSave={onSave}
+            onReceive={onReceive}
+            onClose={() => setSelectedReportId(null)}
+          />
         ) : null}
       </Drawer>
     </div>

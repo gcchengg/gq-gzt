@@ -9,7 +9,7 @@ export const initialSuggestionTasks = [
     assignee: "陈哲",
     deadline: "2026-10-30",
     progress: 20,
-    status: "待办理",
+    status: "办理中",
     handlingPlan: "建立重点项目月度跟踪清单，明确收益和风险预警指标。",
     result: "",
     feedback: "",

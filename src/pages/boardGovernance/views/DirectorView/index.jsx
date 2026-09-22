@@ -1519,12 +1519,12 @@ export function DutyManagement({
               <span>季度报告</span>
             </p>
           </div>
-          <Space>
+          {/* <Space>
             <Link to={`/boardGovernance/preparation/directors/${director.id}`}>
               查看履职准备
             </Link>
             <Link to="/boardGovernance/appointment">查看任职记录</Link>
-          </Space>
+          </Space> */}
         </div>
         <Tabs
           activeKey={tab}
@@ -2033,10 +2033,11 @@ function SyncedOverview({ plans, events, onEvent }) {
 }
 
 function SyncedPlan({ plans, compact = false }) {
+  const rows = plans.filter((item) => item.taskStatus !== "已完成");
   return (
     <SectionCard title="年度履职计划" extra={<span>与履职任务实时同步</span>}>
       <DataTable
-        rows={plans}
+        rows={rows}
         scroll={compact ? undefined : { x: "max-content" }}
         columns={[
           { title: "计划类型", dataIndex: "type" },
@@ -2069,13 +2070,14 @@ function SyncedPlan({ plans, compact = false }) {
 }
 
 function SyncedEvents({ events, onEvent, compact = false }) {
+  const rows = events.filter((item) => item.status === "已完成");
   return (
     <SectionCard
       title="履职记录"
-      extra={<span>履职任务同步 {events.length} 条</span>}
+      extra={<span>履职任务同步 {rows.length} 条</span>}
     >
       <DataTable
-        rows={events}
+        rows={rows}
         onRowClick={onEvent}
         scroll={compact ? undefined : { x: "max-content" }}
         columns={[
@@ -2130,12 +2132,12 @@ function SyncedSuggestions({ suggestionTasks, compact = false }) {
             dataIndex: "deadline",
             width: compact ? 96 : undefined,
           },
-          {
-            title: "进度",
-            dataIndex: "progress",
-            width: compact ? 118 : undefined,
-            render: (value) => <ProgressCell value={value} />,
-          },
+          // {
+          //   title: "进度",
+          //   dataIndex: "progress",
+          //   width: compact ? 118 : undefined,
+          //   render: (value) => <ProgressCell value={value} />,
+          // },
           {
             title: "状态",
             dataIndex: "status",
@@ -2145,13 +2147,7 @@ function SyncedSuggestions({ suggestionTasks, compact = false }) {
           {
             title: "操作",
             width: compact ? 72 : undefined,
-            render: (_, row) => (
-              <Link
-                to={`/boardGovernance/duty-tasks?taskType=suggestion&bizId=${row.id}`}
-              >
-                {row.status === "已完成" ? "去执行" : "去办理"}
-              </Link>
-            ),
+            render: (_, row) => <Link>查看</Link>,
           },
         ]}
       />
