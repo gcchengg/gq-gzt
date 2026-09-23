@@ -30,8 +30,10 @@ const roleOptions = [
 ];
 
 const roleMenuKeys = {
-  groupOffice: ["appointment"],
-  adminDepartment: navigationItems.map(({ key }) => key),
+  groupOffice: ["home", "appointment", "director-special-tasks"],
+  adminDepartment: navigationItems
+    .filter(({ key }) => key !== "director-special-tasks")
+    .map(({ key }) => key),
   auditLegalDepartment: ["home", "appointment"],
   director: ["home", "management", "duty-tasks"],
 };

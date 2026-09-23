@@ -649,11 +649,6 @@ function DirectorLifecycleDrawer({
         onClose={onClose}
         width="min(1040px, 100vw)"
         title={director ? `${director.name} · 董事履职档案` : ""}
-        subtitle={
-          director
-            ? `${director.company} · ${director.role} · 当前办理角色：${currentRole}`
-            : ""
-        }
       >
         {director ? (
           <>
@@ -978,6 +973,7 @@ export function PreparationWorkspace({
   onDeleteMaterial,
   onRequestMaterialUpdate,
   onPushHandbook,
+  onHandbookPushComplete,
 }) {
   const [historyMaterial, setHistoryMaterial] = useState(null);
   const [planComposerOpen, setPlanComposerOpen] = useState(false);
@@ -1403,6 +1399,7 @@ export function PreparationWorkspace({
           onPushHandbook?.(director.name);
           setPreviewOpen(false);
           message.success(`董事履职手册已推送给${director.name}`);
+          onHandbookPushComplete?.();
         }}
         onCancel={() => setPreviewOpen(false)}
       >

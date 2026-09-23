@@ -26,6 +26,7 @@ import DutyEvaluationStageView from "./views/DutyEvaluationStageView";
 import CompanyMonitoringView from "./views/CompanyMonitoringView";
 import EvaluationResourceView from "./views/EvaluationResourceView";
 import MobileDirectorView from "./views/MobileDirectorView";
+import DirectorSpecialTaskView from "./views/DirectorSpecialTaskView";
 
 const validKeys = new Set([
   "home",
@@ -44,6 +45,7 @@ const validKeys = new Set([
   "plan-confirm-task",
   "duty-tasks",
   "roles",
+  "director-special-tasks",
 ]);
 
 const taskAssigneeByDepartment = {
@@ -531,6 +533,7 @@ export default function BoardGovernancePage() {
     "duty-tasks": (
       <DutyTaskManagerView
         role={role}
+        onRoleChange={setRole}
         plans={dutyPlans}
         annualPlanConfirmationTasks={annualPlanConfirmationTasks}
         onSaveAnnualPlanConfirmation={saveAnnualPlanConfirmation}
@@ -543,6 +546,7 @@ export default function BoardGovernancePage() {
       />
     ),
     roles: <RoleConfigView />,
+    "director-special-tasks": <DirectorSpecialTaskView />,
     planning: <PlanningMeetingView mode="planning" />,
     meetings: <PlanningMeetingView mode="meetings" />,
     appointment: (

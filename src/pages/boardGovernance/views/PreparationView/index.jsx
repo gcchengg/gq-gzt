@@ -50,6 +50,15 @@ export default function PreparationView({
     onDeleteMaterial,
     onRequestMaterialUpdate,
     onPushHandbook,
+    onHandbookPushComplete: () =>
+      navigate("/boardGovernance/home", {
+        state: {
+          taskSelection: {
+            category: "plan-creation",
+            department: "履职计划制定",
+          },
+        },
+      }),
   };
   const selectedDirector =
     resource === "director"

@@ -67,3 +67,70 @@
 @media(max-width:1200px) { .metrics { grid-template-columns:repeat(2,1fr); } .laneDetail { grid-template-columns:repeat(2,1fr); } }
 @media(max-width:900px) { .embeddedWorkspace .command { align-items:flex-start; flex-direction:column; }.embeddedWorkspace .commandMeta { width:100%; max-width:none; min-width:0; }.embeddedWorkspace .caseOverview,.embeddedWorkspace .embeddedProcess { grid-template-columns:1fr; } }
 @media(max-width:760px) { .command { align-items:flex-start; flex-direction:column; } .roleControl { width:100%; justify-content:flex-start; }.roleControl>span { text-align:left; }.roleControl :global(.ant-select) { flex:1; }.metrics,.formGrid,.filters,.embeddedProcess,.caseOverview { grid-template-columns:1fr; } .laneDetail { grid-template-columns:1fr; } .embeddedWorkspace .commandMeta { width:100%; max-width:none; min-width:0; }.auditSummary { align-items:flex-start; flex-direction:column; } .auditSummary span { text-align:left; } }
+
+/* 流程四步横向卡片 */
+.processCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.processCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f2;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.processCard.current {
+  border-color: #2f6bff;
+  background: #f4f7ff;
+  box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.12);
+}
+.processCard.done {
+  border-color: #b8e2cd;
+  background: #f4fff8;
+}
+.processCardIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.processCardContent {
+  flex: 1;
+  min-width: 0;
+}
+.processCardContent strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #526078;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.processCard.current .processCardContent strong {
+  color: #2f6bff;
+}
+.processCard.done .processCardContent strong {
+  color: #1a8a5a;
+}
+.processCardContent small {
+  font-size: 10px;
+  color: #8892a4;
+  display: block;
+  margin-top: 2px;
+}
+.processCardCheck {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1db86c;
+  color: #fff;
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  font-weight: bold;
+}

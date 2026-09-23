@@ -1,2 +1,322 @@
-.panel{padding:20px;border:1px solid #cddcf0;border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(31,51,79,.06)}.panel header{display:flex;gap:14px;margin-bottom:18px}.panel header>div:last-child{min-width:0}.panel header span{font-size:10px;color:#2f6bff}.panel h3{margin:5px 0;font-size:19px;color:#17365d}.panel p{margin:0;color:#718095}.roleNotice{padding:18px 20px;border:1px dashed #cbd8eb;border-radius:14px;background:#f8fafc}.roleNotice span,.roleNotice strong,.roleNotice p{display:block}.roleNotice span{font-size:11px;color:#2f6bff}.roleNotice strong{margin-top:7px;font-size:15px;color:#27364e}.roleNotice p{margin:6px 0 0;font-size:12px;color:#738096}.icon{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:11px;background:#eaf2ff;color:#2f6bff;font-size:21px}.panel :global(.ant-upload-drag){padding:18px}.panel :global(.ant-upload-drag-icon){margin-bottom:4px!important}.panel :global(.ant-upload-drag-icon .anticon){font-size:34px;color:#2f6bff}.panel :global(.ant-upload-text){font-weight:700}.panel :global(.ant-upload-hint){font-size:11px}.actionBar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid #e7ecf3}.actionBar span{font-size:11px;color:#7b8798}.actionBar :global(.ant-btn-primary){color:#fff}.switches{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.switches label{display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;padding:17px;border:1px solid #e1e7f0;border-radius:11px;background:#f8fafc}.switches label>div{min-width:0}.switches b,.switches span{display:block}.switches span{margin-top:5px;font-size:10px;color:#7e8999}.switches :global(.ant-switch){flex:0 0 76px;min-width:76px}.switches :global(.ant-switch-inner){padding-inline:9px 6px}.switches :global(.ant-switch-checked .ant-switch-inner){padding-inline:6px 9px}.checkList{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}.checkList label{padding:15px;border:1px solid #e1e7f0;border-radius:10px;background:#f8fafc}.registrationForm{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.registrationForm>div:nth-child(3),.registrationForm>.actionBar{grid-column:1/-1}.completed{display:flex;align-items:center;gap:18px;padding:24px;border:1px solid #b8e2cd;border-radius:14px;background:linear-gradient(120deg,#f4fff9,#e8f8f0)}.completed>svg{font-size:38px;color:#15945c}.completed span{font-size:10px;color:#15945c}.completed h3{margin:5px 0;color:#17573c}.completed p{margin:0;color:#5e7c6e}@media(max-width:760px){.switches,.checkList,.registrationForm{grid-template-columns:1fr}.registrationForm>div:nth-child(3),.registrationForm>.actionBar{grid-column:auto}.actionBar{align-items:stretch;flex-direction:column}.actionBar button{width:100%}.completed{align-items:flex-start}}
-.finalAction{display:flex;justify-content:flex-end;padding:20px;border:1px solid #dce5f2;border-radius:14px;background:#fff}.finalAction button{min-width:180px}@media(max-width:760px){.finalAction button{width:100%}}
+/* ── 操作面板整体容器 ── */
+.actionPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid #e2e9f5;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(31, 51, 79, 0.05);
+}
+
+/* ── 当前步骤操作区 ── */
+.stepBody {
+  padding: 20px 24px;
+}
+
+.stepBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #edf2ff;
+  color: #2f6bff;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.stepHeader h3 {
+  margin: 0 0 5px;
+  font-size: 18px;
+  color: #17365d;
+}
+
+.stepHeader p {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: #7a8494;
+}
+
+.stepCard {
+  padding: 16px;
+  border: 1px solid #e2e9f5;
+  border-radius: 12px;
+  background: #f9fbfe;
+}
+
+.stepInfo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.stepInfo span {
+  font-size: 11px;
+  color: #8892a4;
+  flex-shrink: 0;
+}
+
+.stepInfo strong {
+  font-size: 13px;
+  color: #27364e;
+}
+
+.stepNote {
+  margin: 0;
+  font-size: 13px;
+  color: #7a8494;
+  padding: 8px 0;
+}
+
+/* Dragger 上传区域 */
+.stepCard :global(.ant-upload-drag) {
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px dashed #c5d2e8;
+  background: #fff;
+}
+
+.stepCard :global(.ant-upload-drag-icon) {
+  color: #2f6bff;
+  margin-bottom: 6px;
+}
+
+.stepCard :global(.ant-upload-drag-icon .anticon) {
+  font-size: 30px;
+  color: #2f6bff;
+}
+
+.stepCard :global(.ant-upload-text) {
+  font-weight: 700;
+  color: #17365d;
+}
+
+.stepCard :global(.ant-upload-hint) {
+  font-size: 11px;
+  color: #9aa5b8;
+}
+
+/* Switch 行 */
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #dde5f0;
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.switchRow:hover {
+  border-color: #2f6bff;
+  background: #f8faff;
+}
+
+.switchRow > div {
+  min-width: 0;
+}
+
+.switchRow b {
+  display: block;
+  font-size: 13px;
+  color: #27364e;
+  font-weight: 600;
+}
+
+.switchRow span {
+  display: block;
+  font-size: 11px;
+  color: #8892a4;
+  margin-top: 3px;
+}
+
+/* 工商变更确认 */
+.changeConfirm {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #f0faf4;
+  border: 1px solid #b8e2cd;
+  margin-bottom: 14px;
+}
+
+.changeIcon {
+  font-size: 26px;
+  color: #1db86c;
+  flex-shrink: 0;
+}
+
+.changeConfirm strong {
+  display: block;
+  font-size: 14px;
+  color: #17573c;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+
+.changeConfirm p {
+  margin: 0;
+  font-size: 12px;
+  color: #5e7c6e;
+}
+
+/* 底部操作栏 */
+.actionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e7ecf3;
+}
+
+.actionBar > span {
+  flex: 1;
+  font-size: 11px;
+  color: #7b8798;
+}
+
+.actionBar :global(.ant-btn) {
+  flex-shrink: 0;
+  min-width: 140px;
+  height: 34px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── 后续步骤预览 ── */
+.upcomingSteps {
+  padding: 14px 24px 16px;
+  border-top: 1px dashed #e8edf5;
+  background: #f9fbfe;
+}
+
+.upcomingLabel {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #9aa5b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.upcomingStep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.upcomingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid #d0d8ec;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.upcomingStep strong {
+  display: block;
+  font-size: 12px;
+  color: #9aa5b8;
+}
+
+.upcomingStep small {
+  font-size: 11px;
+  color: #b8c0cc;
+}
+
+/* ── 已完成状态 ── */
+.completed {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  border: 1px solid #b8e2cd;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #f4fff9, #e8f8f0);
+}
+
+.completed > :global(.anticon) {
+  font-size: 38px;
+  color: #15945c;
+}
+
+.completed span {
+  font-size: 10px;
+  color: #15945c;
+}
+
+.completed h3 {
+  margin: 5px 0;
+  color: #17573c;
+  font-size: 16px;
+}
+
+.completed p {
+  margin: 0;
+  color: #5e7c6e;
+  font-size: 13px;
+}
+
+/* ── 无权限提示 ── */
+.roleNotice {
+  padding: 18px 20px;
+  border: 1px dashed #cbd8eb;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.roleNotice span,
+.roleNotice strong,
+.roleNotice p {
+  display: block;
+}
+
+.roleNotice span {
+  font-size: 11px;
+  color: #2f6bff;
+}
+
+.roleNotice strong {
+  margin-top: 7px;
+  font-size: 15px;
+  color: #27364e;
+}
+
+.roleNotice p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #738096;
+}
+
+/* ── 响应式 ── */
+@media (max-width: 760px) {
+  .stepBody {
+    padding: 16px;
+  }
+
+  .actionBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actionBar button {
+    width: 100%;
+  }
+}

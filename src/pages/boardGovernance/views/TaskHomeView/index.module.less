@@ -422,6 +422,63 @@
   cursor: pointer;
   font: inherit;
 }
+.appointmentCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px 24px;
+}
+.appointmentCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid #e4eaf2;
+  border-radius: 12px;
+  background: #f8faff;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  &:hover {
+    border-color: #2f6bff;
+    box-shadow: 0 4px 14px rgba(47, 107, 255, 0.13);
+    transform: translateY(-1px);
+  }
+}
+.appointmentCardIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #eef2ff, #dde5ff);
+  color: #2f6bff;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.appointmentCardBody {
+  flex: 1;
+  min-width: 0;
+}
+.appointmentCardBody strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #17365d;
+  margin-bottom: 5px;
+}
+.appointmentCardBody p {
+  margin: 0 0 3px;
+  font-size: 12px;
+  color: #526078;
+}
+.appointmentCardBody span {
+  font-size: 11px;
+  color: #8892a4;
+}
+.appointmentCardAction {
+  flex-shrink: 0;
+}
 .chip {
   display: inline-flex;
   align-items: center;
@@ -473,15 +530,31 @@
   font-size: 17px;
   font-weight: 800;
 }
+.taskHint {
+  display: inline-grid;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f04438;
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+  vertical-align: 2px;
+}
+.taskDescription {
+  display: block;
+  margin-top: 4px;
+}
 .taskRow p {
-  overflow: hidden;
   max-width: 1220px;
   margin: 0;
   color: #8a8d94;
   font-size: 15px;
   line-height: 24px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }
 .taskRow aside {
   display: flex;

@@ -1,8 +1,27 @@
-import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Tooltip } from "antd";
 import { StatusPill } from "../../components/PageKit";
 import { handbookDepartments } from "../../handbookData";
 import styles from "./index.module.less";
+
+const appointmentTaskMeta = {
+  待上传董事简历: {
+    owner: "综合管理部-人力资源/许红昇",
+    description: "董事简历",
+  },
+  待配置系统权限并纳入组织架构: {
+    owner: "综合管理部-体系数字化/尚书新",
+    description: "系统权限配置",
+  },
+  待完成工商变更: {
+    owner: "审计风控与法务部/曹星宇",
+    description: "工商变更",
+  },
+};
+
+const dutyTaskTooltip =
+  "a.年度履职计划中所有的各项任务，点击去执行，填报该任务的具体开展时间、地点、材料等信息，点击确认后，通知董事本人、综合董办、综合办公室完成差旅、日程等安排，本任务不关闭\nb.针对已经提交了实际开展的日期等信息的任务，进行完成情况确认。";
 
 function BrandMark() {
   return (
@@ -121,9 +140,10 @@ export default function TaskHomeView({
   generatedDirectorNames,
   suggestionTasks,
 }) {
+  const location = useLocation();
   const appointmentTasks = useMemo(
     () =>
-      ["待上传董事简历", "待配置系统权限", "待完成工商变更"]
+      ["待上传董事简历", "待配置系统权限并纳入组织架构", "待完成工商变更"]
         .map((status) =>
           appointmentCases.find((item) => item.status === status),
         )
@@ -161,8 +181,16 @@ export default function TaskHomeView({
       }),
     [handbookMaterials],
   );
-  const [activeCategory, setActiveCategory] = useState("appointment");
+  const [activeCategory, setActiveCategory] = useState(
+    role === "groupOffice" ? "special-task" : "appointment",
+  );
   const [activeDepartment, setActiveDepartment] = useState("");
+  useEffect(() => {
+    const taskSelection = location.state?.taskSelection;
+    if (!taskSelection) return;
+    setActiveCategory(taskSelection.category);
+    setActiveDepartment(taskSelection.department);
+  }, [location.state]);
   const confirmationPlans = dutyPlans.filter((item) =>
     ["待确认", "已完成"].includes(item.status),
   );
@@ -171,17 +199,49 @@ export default function TaskHomeView({
       dutyPlans.find((item) => item.type === type && item.taskStatus),
     )
     .filter(Boolean);
+  const directorPlanCreationTasks = annualPlanConfirmationTasks.filter(
+    (item) => item.directorName === "刘欣然",
+  );
   const taskCategories = useMemo(
     () => [
       {
         key: "appointment",
-        label: "董事聘任任务",
+        label: "董事聘任",
         groups: [
           {
             department: "董事聘任",
             records: visibleAppointmentTasks,
             completed: 0,
             pending: visibleAppointmentTasks.length,
+          },
+        ],
+      },
+      {
+        key: "special-task",
+        label: "下发董事专项任务",
+        groups: [
+          {
+            department: "董事专项任务",
+            records: [
+              {
+                id: "SPECIAL-LETTER",
+                title: "下发董事推荐函",
+                description: "向拟任董事发起推荐函下发与聘任流程",
+                status: "待办理",
+                deadline: "2026-09-30",
+                href: "/boardGovernance/appointment",
+              },
+              {
+                id: "SPECIAL-EVALUATION",
+                title: "发起评价",
+                description: "发起董事年度履职评价专项任务",
+                status: "待办理",
+                deadline: "2026-10-15",
+                href: "/boardGovernance/director-special-tasks",
+              },
+            ],
+            completed: 0,
+            pending: 2,
           },
         ],
       },
@@ -193,13 +253,29 @@ export default function TaskHomeView({
             department: "董事履职手册",
             records: taskGroups,
             completed: taskGroups.filter((item) => item.complete).length,
-            pending: taskGroups.filter((item) => !item.complete).length + 1,
+            pending: taskGroups.filter((item) => !item.complete).length,
           },
+        ],
+      },
+      {
+        key: "plan-creation",
+        label: "履职计划制定",
+        groups: [
           {
-            department: "年度履职计划",
-            records: [],
-            completed: 0,
-            pending: 2,
+            department: "履职计划制定",
+            records: directorPlanCreationTasks,
+            completed:
+              role === "director"
+                ? directorPlanCreationTasks.filter(
+                    (item) => item.status === "已完成",
+                  ).length
+                : 0,
+            pending:
+              role === "director"
+                ? directorPlanCreationTasks.filter(
+                    (item) => item.status !== "已完成",
+                  ).length
+                : 2,
           },
         ],
       },
@@ -213,7 +289,7 @@ export default function TaskHomeView({
       // },
       {
         key: "duty",
-        label: "已确认履职计划任务",
+        label: "履职任务管理",
         groups: [
           {
             department: "已确认履职计划任务",
@@ -237,11 +313,31 @@ export default function TaskHomeView({
       },
       {
         key: "confirmation",
-        label: "年度履职计划确认",
-        groups: buildDepartmentGroups(
-          confirmationPlans,
-          (item) => item.status === "已完成",
-        ),
+        label: "履职报告完善",
+        groups: [
+          {
+            department: "履职报告完善",
+            records: confirmationPlans,
+            completed: confirmationPlans.filter(
+              (item) => item.status === "已完成",
+            ).length,
+            pending: confirmationPlans.filter(
+              (item) => item.status !== "已完成",
+            ).length,
+          },
+        ],
+      },
+      {
+        key: "duty-evaluation",
+        label: "履职评价",
+        groups: [
+          {
+            department: "履职评价",
+            records: [],
+            completed: 0,
+            pending: 0,
+          },
+        ],
       },
     ],
     [
@@ -249,13 +345,17 @@ export default function TaskHomeView({
       annualPlanConfirmationTasks,
       confirmationPlans,
       generatedPlans,
+      directorPlanCreationTasks,
+      role,
       suggestionTasks,
       taskGroups,
     ],
   );
   const visibleTaskCategories = taskCategories.filter(({ key }) => {
-    if (role === "director") return key === "annual-plan-confirmation";
+    if (role === "director") return key === "plan-creation";
     if (role === "auditLegalDepartment") return key === "appointment";
+    if (role === "groupOffice") return key === "special-task";
+    if (role !== "groupOffice" && key === "special-task") return false;
     return key !== "annual-plan-confirmation";
   });
   const currentCategory =
@@ -344,7 +444,8 @@ export default function TaskHomeView({
             );
           })}
         </section>
-        {selectedCategoryKey !== "duty" ? (
+        {selectedCategoryKey !== "duty" &&
+        selectedCategoryKey !== "confirmation" ? (
           <section className={styles.tabStrip} aria-label="责任部门">
             {currentCategory.groups.map((item) => (
               <button
@@ -415,7 +516,7 @@ export default function TaskHomeView({
               })}
               <article className={styles.taskRow}>
                 <div>
-                  <h3>董事履职手册确认任务</h3>
+                  <h3>履职手册确认</h3>
                   <p>
                     董事：李晨光　　任职企业：一汽股权　　履职年度：2026年
                     　　描述：确认董事履职手册目录及资料内容
@@ -430,19 +531,20 @@ export default function TaskHomeView({
               </article>
             </>
           ) : null}
-          {selectedCategoryKey === "material" &&
-          currentGroup?.department === "年度履职计划" ? (
+          {role !== "director" && selectedCategoryKey === "plan-creation" ? (
             <>
               <article className={styles.taskRow}>
                 <div>
-                  <h3>2026年度履职计划编排任务</h3>
-                  <p>
-                    董事：李晨光　　任职企业：一汽股权　　履职年度：2026年
-                    　　描述：编排会议、培训、调研等年度履职计划
-                  </p>
+                  <h3>
+                    2026年度-李晨光-履职计划制定
+                    <Tooltip title="各部门责任人的履职计划制定任务、点击去执行后分别填报董事本年度的各类事项（会议、活动、培训、调研、其他等的计划）若相关部门/领域无计划内容，支持不提报，点击提交任务关闭。全部提交完毕后，形成整体的年度履职计划，自动触发“年度履职计划确认”任务，董事点击去执行，勾选确认后，形成最终的年度履职计划，自动触发“履职任务管理中”的对应任务">
+                      <span className={styles.taskHint}>!</span>
+                    </Tooltip>
+                  </h3>
+                  <p>任务描述：2026年度-李晨光-履职计划制定</p>
                 </div>
                 <aside>
-                  <StatusPill>待编排</StatusPill>
+                  <StatusPill>待制定</StatusPill>
                   <Link to="/boardGovernance/preparation/directors/D-02?tab=annual-plan&planMode=planning">
                     去执行
                   </Link>
@@ -450,11 +552,8 @@ export default function TaskHomeView({
               </article>
               <article className={styles.taskRow}>
                 <div>
-                  <h3>履职计划确认</h3>
-                  <p>
-                    董事：李晨光　　任职企业：一汽股权　　履职年度：2026年
-                    　　描述：确认年度履职计划内容及履职安排
-                  </p>
+                  <h3>2026-李晨光-履职计划确认</h3>
+                  <p>任务描述：年度履职计划确认</p>
                 </div>
                 <aside>
                   <StatusPill>待确认</StatusPill>
@@ -465,21 +564,63 @@ export default function TaskHomeView({
               </article>
             </>
           ) : null}
+          {role === "director" && selectedCategoryKey === "plan-creation"
+            ? currentGroup?.records.map((task) => (
+                <article className={styles.taskRow} key={task.id}>
+                  <div>
+                    <h3>{task.title}</h3>
+                    <p>任务描述：年度计划确认</p>
+                  </div>
+                  <aside>
+                    <StatusPill>{task.status}</StatusPill>
+                    <Link
+                      to={`/boardGovernance/duty-tasks?taskType=annual-plan-confirmation&bizId=${task.id}`}
+                    >
+                      去执行
+                    </Link>
+                  </aside>
+                </article>
+              ))
+            : null}
           {selectedCategoryKey === "appointment"
+            ? currentGroup?.records.map((item) => {
+                const taskMeta = appointmentTaskMeta[item.status] || {
+                  owner: item.owner,
+                  description: item.status,
+                };
+                return (
+                  <article className={styles.taskRow} key={item.id}>
+                    <div>
+                      <h3>{item.director}董事聘任任务</h3>
+                      <p>
+                        任职企业：{item.company}
+                        　　负责人：{taskMeta.owner}　　 　　描述：
+                        {taskMeta.description}
+                      </p>
+                    </div>
+                    <aside>
+                      <StatusPill>{item.status}</StatusPill>
+                      <Link to={`/boardGovernance/appointment/${item.id}`}>
+                        去执行
+                      </Link>
+                    </aside>
+                  </article>
+                );
+              })
+            : null}
+          {selectedCategoryKey === "special-task"
             ? currentGroup?.records.map((item) => (
                 <article className={styles.taskRow} key={item.id}>
                   <div>
-                    <h3>{item.director}董事聘任任务</h3>
+                    <h3>{item.title}</h3>
                     <p>
-                      任职企业：{item.company}　　董事类型：{item.position}
-                      　　负责人：{item.owner}　　 　　描述：{item.status}
+                      截止时间：{item.deadline}　　发送人：集团董办　　描述：
+                      {item.description}
                     </p>
                   </div>
                   <aside>
                     <StatusPill>{item.status}</StatusPill>
-                    <Link to={`/boardGovernance/appointment/${item.id}`}>
-                      去执行
-                    </Link>
+                    <Link to={item.href}>去执行</Link>
                   </aside>
                 </article>
               ))
@@ -495,7 +636,7 @@ export default function TaskHomeView({
                     <p>
                       确认责任人：{plan.confirmOwner}　　任职企业：
                       {plan.servingCompany}　　工作类别：{plan.workCategory}
-                      　　状态：{plan.status}
+                      　　状态：{plan.status}　　任务描述：完善年度履职报告
                     </p>
                   </div>
                   <aside>
@@ -503,7 +644,7 @@ export default function TaskHomeView({
                     <Link
                       to={`/boardGovernance/duty-tasks?taskType=confirmation&planId=${plan.id}`}
                     >
-                      编辑
+                      去执行
                     </Link>
                   </aside>
                 </article>
@@ -537,11 +678,17 @@ export default function TaskHomeView({
                   <div>
                     <h3>
                       {plan.type} · {plan.content}
+                      <Tooltip title={dutyTaskTooltip}>
+                        <span className={styles.taskHint}>!</span>
+                      </Tooltip>
                     </h3>
                     <p>
                       董事：{plan.directorName}　　任务类型：{plan.type}
                       　　执行部门：{plan.owner}
                       　　计划时间：{plan.date}　　预期成果：{plan.target}
+                      <span className={styles.taskDescription}>
+                        任务描述：确认实际开展信息并组织开展
+                      </span>
                     </p>
                   </div>
                   <aside>

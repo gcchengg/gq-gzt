@@ -7,6 +7,7 @@ export default function AnnualPlanConfirmTaskView({
   task,
   onSave,
   onClose,
+  onSubmitComplete,
   generation = false,
 }) {
   const [selectedRowIds, setSelectedRowIds] = useState([]);
@@ -39,7 +40,11 @@ export default function AnnualPlanConfirmTaskView({
         ? "年度履职计划已生成，履职任务已创建"
         : "年度履职计划确认/调整结果已提交",
     );
-    onClose?.();
+    if (onSubmitComplete) {
+      onSubmitComplete();
+    } else {
+      onClose?.();
+    }
   };
 
   return (

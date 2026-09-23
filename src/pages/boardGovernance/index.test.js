@@ -397,6 +397,19 @@ test("connects handbook department tasks with the preparation table", async () =
   assert.match(page, /home:\s*\(/);
 });
 
+test("opens annual plan tasks after pushing the director handbook", async () => {
+  const [preparation, director, taskHome] = await Promise.all([
+    read("./views/PreparationView/index.jsx"),
+    read("./views/DirectorView/index.jsx"),
+    read("./views/TaskHomeView/index.jsx"),
+  ]);
+  assert.match(director, /onHandbookPushComplete\?\.\(\)/);
+  assert.match(preparation, /navigate\("\/boardGovernance\/home",/);
+  assert.match(preparation, /category: "material"/);
+  assert.match(preparation, /department: "年度履职计划"/);
+  assert.match(taskHome, /location\.state\?\.taskSelection/);
+});
+
 test("opens appointment task drawers from the workbench", async () => {
   const [page, home, data] = await Promise.all([
     read("./index.jsx"),

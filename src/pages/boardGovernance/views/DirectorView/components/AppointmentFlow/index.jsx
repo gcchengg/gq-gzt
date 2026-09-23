@@ -8,14 +8,10 @@ import {
   Modal,
   Select,
   Segmented,
-  Steps,
-  Tabs,
-  Timeline,
   Upload,
   message,
 } from "antd";
 import {
-  BellOutlined,
   DingdingOutlined,
   FileDoneOutlined,
   SendOutlined,
@@ -38,7 +34,7 @@ const initialCases = [
     position: "外部董事",
     letter: "一汽股董推〔2026〕17号",
     letterFileName: "董事推荐函-赵启明.pdf",
-    owner: "综合管理部-办公室 / 阮迪",
+    owner: "综合管理部-人力资源/许红昇",
     recipient: "综合管理部-人力 / 周航",
     deadline: "09-17 17:00",
     status: "待上传董事简历",
@@ -51,7 +47,7 @@ const initialCases = [
     position: "专职外部董事",
     letter: "一汽股董推〔2026〕16号",
     letterFileName: "董事推荐函-陈思远.pdf",
-    owner: "综合管理部-人力 / 周航",
+    owner: "综合管理部-体系数字化/尚书新",
     recipient: "综合管理部-人力 / 周航",
     deadline: "09-16 12:00",
     status: "待配置系统权限并纳入组织架构",
@@ -64,7 +60,7 @@ const initialCases = [
     position: "外部董事",
     letter: "一汽股董推〔2026〕15号",
     letterFileName: "董事推荐函-林舒然.pdf",
-    owner: "综合管理部-人力 / 周航",
+    owner: "审计风控与法务部/曹星宇",
     recipient: "综合管理部-董办 / 王珂",
     deadline: "09-20 17:00",
     status: "待完成工商变更",
@@ -100,50 +96,21 @@ const processSteps = [
   ["上传董事简历", "综合管理部-办公室", "上传简历并完成材料校验"],
   [
     "配置系统权限并纳入组织架构",
-    "综合管理部-人力",
+    "综合管理部-体系数字化",
     "开通工作台权限，同步人员、岗位与任期信息",
   ],
   ["工商变更", "审计风控与法务部", "确认完成后归档聘任事项"],
-];
-
-const initialAuditMessages = [
-  {
-    id: "MSG-20260915-003",
-    time: "14:21",
-    caseId: "AP-2026-007",
-    director: "赵启明",
-    recipient: "综合管理部-办公室 / 阮迪",
-    deadline: "09-17 17:00",
-    title: "董事推荐函已下发",
-    detail: "请在 09-17 17:00 前上传董事简历，完成后转交人力科室办理。",
-  },
-  {
-    id: "MSG-20260915-002",
-    time: "11:06",
-    caseId: "AP-2026-006",
-    director: "陈思远",
-    recipient: "综合管理部-办公室 / 胡欣悦",
-    deadline: "09-16 12:00",
-    title: "董事推荐函已下发",
-    detail: "请在 09-16 12:00 前上传董事简历，完成后转交人力科室办理。",
-  },
-  {
-    id: "MSG-20260914-001",
-    time: "09-14 16:42",
-    caseId: "AP-2026-005",
-    director: "林舒然",
-    recipient: "综合管理部-办公室 / 王玥",
-    deadline: "09-20 17:00",
-    title: "董事推荐函已下发",
-    detail: "推荐函、办理要求和董事简历上传任务已送达。",
-  },
 ];
 
 const appointmentRoles = [
   { value: "groupOffice", label: "集团董办", action: "下发董事推荐函" },
   { value: "adminOffice", label: "综合管理部-办公室", action: "查看聘任事项" },
   { value: "adminHr", label: "综合管理部-人力", action: "上传董事简历" },
-  { value: "adminDigital", label: "综合管理部-数字化", action: "配置系统权限" },
+  {
+    value: "adminDigital",
+    label: "综合管理部-体系数字化",
+    action: "配置系统权限",
+  },
   { value: "adminBoard", label: "综合管理部-董办", action: "完成变更" },
 ];
 
@@ -153,6 +120,41 @@ const roleActionSteps = {
   adminDigital: ["permission"],
   adminBoard: ["change"],
 };
+
+/* 四步横向流程卡片 */
+function ProcessCard({ currentStep = 0 }) {
+  const steps = [
+    { title: "下发董事推荐函", owner: "集团董办", icon: "✉" },
+    { title: "上传董事简历", owner: "综合管理部-办公室", icon: "📄" },
+    {
+      title: "配置系统权限并纳入组织架构",
+      owner: "综合管理部-体系数字化",
+      icon: "🔐",
+    },
+    { title: "工商变更", owner: "综合管理部-董办", icon: "🏢" },
+  ];
+
+  const isDone = (idx) => idx < currentStep;
+  const isCurrent = (idx) => idx === currentStep;
+
+  return (
+    <div className={styles.processCards}>
+      {steps.map((step, idx) => (
+        <div
+          key={step.title}
+          className={`${styles.processCard} ${isDone(idx) ? styles.done : ""} ${isCurrent(idx) ? styles.current : ""}`}
+        >
+          <div className={styles.processCardIcon}>{step.icon}</div>
+          <div className={styles.processCardContent}>
+            <strong>{step.title}</strong>
+            <small>{step.owner}</small>
+          </div>
+          {isDone(idx) && <div className={styles.processCardCheck}>✓</div>}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function AppointmentFlow({
   director,
@@ -189,10 +191,6 @@ export default function AppointmentFlow({
     directorCases[0];
   const [open, setOpen] = useState(false);
   const [letterFileList, setLetterFileList] = useState([]);
-  const [auditMessages, setAuditMessages] = useState(initialAuditMessages);
-  const [activeAuditId, setActiveAuditId] = useState(
-    initialAuditMessages[0].id,
-  );
   const role = handlerRole;
   const [keyword, setKeyword] = useState("");
   const [progressFilter, setProgressFilter] = useState("open");
@@ -200,30 +198,6 @@ export default function AppointmentFlow({
   const [ownerFilter, setOwnerFilter] = useState("all");
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
-  const selectedAuditMessages = useMemo(
-    () =>
-      selected
-        ? auditMessages.filter((item) => item.caseId === selected.id)
-        : [],
-    [auditMessages, selected],
-  );
-  const visibleAuditMessages = useMemo(() => {
-    if (!selected) return [];
-    return selectedAuditMessages.length
-      ? selectedAuditMessages
-      : [
-          {
-            id: `MSG-${selected.id}`,
-            time: "09:30",
-            caseId: selected.id,
-            director: selected.director,
-            recipient: selected.owner,
-            deadline: selected.deadline,
-            title: "聘任事项已创建",
-            detail: `事项已进入${selected.status}阶段，当前由${selected.owner}办理。`,
-          },
-        ];
-  }, [selected, selectedAuditMessages]);
   const roleMeta =
     appointmentRoles.find((item) => item.value === role) || appointmentRoles[0];
 
@@ -233,12 +207,6 @@ export default function AppointmentFlow({
       onIssueLetterOpened?.();
     }
   }, [autoOpenIssue, canIssueLetter, onIssueLetterOpened]);
-
-  useEffect(() => {
-    if (!visibleAuditMessages.some((item) => item.id === activeAuditId)) {
-      setActiveAuditId(visibleAuditMessages[0]?.id);
-    }
-  }, [activeAuditId, selected?.id, visibleAuditMessages]);
   const ownerOptions = useMemo(
     () => [...new Set(cases.map((item) => item.owner))],
     [cases],
@@ -271,8 +239,6 @@ export default function AppointmentFlow({
   const selectCase = (nextCase) => {
     setSelectedLocal(nextCase);
     onSelectId?.(nextCase.id);
-    const nextAudit = auditMessages.find((item) => item.caseId === nextCase.id);
-    setActiveAuditId(nextAudit?.id);
   };
 
   useEffect(() => {
@@ -323,23 +289,6 @@ export default function AppointmentFlow({
       currentStep: 1,
     };
     setCases((current) => [nextCase, ...current]);
-    const now = new Date();
-    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    const auditId = `MSG-${Date.now()}`;
-    setAuditMessages((current) => [
-      {
-        id: auditId,
-        time,
-        caseId: nextCase.id,
-        director: nextCase.director,
-        recipient: nextCase.owner,
-        deadline: nextCase.deadline,
-        title: "董事推荐函已下发",
-        detail: `请在 ${nextCase.deadline} 前上传董事简历，完成后转交人力科室办理。`,
-      },
-      ...current,
-    ]);
-    setActiveAuditId(auditId);
     setSelectedLocal(nextCase);
     setOpen(false);
     form.resetFields();
@@ -355,7 +304,7 @@ export default function AppointmentFlow({
       {contextHolder}
       <section className={styles.command}>
         <div>
-          <span className={styles.role}>当前角色 · {roleMeta.label}</span>
+          {/* <span className={styles.role}>当前角色 · {roleMeta.label}</span> */}
           <h2>董事聘任工作台</h2>
           <p>
             {detailOnly && selected
@@ -375,28 +324,22 @@ export default function AppointmentFlow({
           <div className={styles.commandMeta}>
             <span>当前聘任状态</span>
             <strong>{selected.status}</strong>
-            <small>当前责任人：{selected.owner}</small>
+            <small>
+              当前责任人：
+              {{
+                待上传董事简历: "综合管理部-人力资源/许红昇",
+                待配置系统权限并纳入组织架构: "综合管理部-体系数字化/尚书新",
+                待完成工商变更: "审计风控与法务部/曹星宇",
+              }[selected.status] ||
+                selected.owner ||
+                "待指定"}
+            </small>
           </div>
         ) : null}
       </section>
 
       {!listOnly && selected ? (
-        <SectionCard
-          title={`${selected.director} · 全流程定位`}
-          extra={<StatusPill>{selected.status}</StatusPill>}
-        >
-          <Steps
-            current={selected.currentStep}
-            size="small"
-            direction="horizontal"
-            labelPlacement="vertical"
-            responsive={false}
-            items={processSteps.map(([title, owner]) => ({
-              title,
-              description: owner,
-            }))}
-          />
-        </SectionCard>
+        <ProcessCard currentStep={selected.currentStep} />
       ) : null}
 
       {listOnly ? (
@@ -416,15 +359,11 @@ export default function AppointmentFlow({
             ? [
                 [
                   "流程进度",
-                  `${Math.min(selected.currentStep, processSteps.length)} / ${processSteps.length}`,
+                  `${selected.currentStep} / ${processSteps.length}`,
                   "已完成节点 / 全部节点",
                 ],
                 ["当前状态", selected.status, roleMeta.label],
-                [
-                  "交接记录",
-                  `${visibleAuditMessages.length} 条`,
-                  "消息与审计轨迹",
-                ],
+                // ["当前责任人", selected.owner, ""],
               ]
             : [
                 ["待上传董事简历", "2", "综合管理部-办公室"],
@@ -563,83 +502,13 @@ export default function AppointmentFlow({
             key={`${selected.id}-${selected.currentStep}`}
             item={selected}
             roleLabel={roleMeta.label}
-            allowedActions={Object.values(roleActionSteps).flat()}
+            allowedActions={
+              detailOnly
+                ? Object.values(roleActionSteps).flat()
+                : roleActionSteps[role] || []
+            }
             onUpdate={updateSelected}
           />
-
-          <SectionCard
-            title="消息与审计轨迹"
-            extra={
-              <span className={styles.auditCount}>
-                <BellOutlined /> 共 {visibleAuditMessages.length} 条
-              </span>
-            }
-          >
-            <Tabs
-              className={styles.auditTabs}
-              activeKey={activeAuditId}
-              onChange={setActiveAuditId}
-              items={visibleAuditMessages.map((item) => ({
-                key: item.id,
-                label: (
-                  <span className={styles.auditTabLabel}>
-                    <b>{item.director}</b>
-                    <small>{item.time}</small>
-                  </span>
-                ),
-                children: (
-                  <div className={styles.auditTimeline}>
-                    <div className={styles.auditSummary}>
-                      <strong>{item.caseId}</strong>
-                      <span>接收人：{item.recipient}</span>
-                    </div>
-                    <Timeline
-                      items={[
-                        {
-                          color: "green",
-                          children: (
-                            <>
-                              <b>{item.time} 推荐函下发</b>
-                              <p>集团董办 / 刘颖 · {item.caseId}</p>
-                            </>
-                          ),
-                        },
-                        {
-                          color: "blue",
-                          children: (
-                            <>
-                              <b>{item.time} 发送钉钉消息</b>
-                              <p>送达 {item.recipient}</p>
-                            </>
-                          ),
-                        },
-                        {
-                          color: "blue",
-                          children: (
-                            <>
-                              <b>{item.time} 创建办理待办</b>
-                              <p>要求上传董事简历，截止 {item.deadline}</p>
-                            </>
-                          ),
-                        },
-                        {
-                          color: "gray",
-                          children: (
-                            <>
-                              <b>待上传董事简历</b>
-                              <p>
-                                超时前 24 小时自动提醒，逾期升级至部门负责人
-                              </p>
-                            </>
-                          ),
-                        },
-                      ]}
-                    />
-                  </div>
-                ),
-              }))}
-            />
-          </SectionCard>
         </>
       ) : null}
 

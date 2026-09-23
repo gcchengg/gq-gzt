@@ -129,6 +129,7 @@ export default function DutyTaskManagerView({
   onSaveSuggestion,
   annualPlanConfirmationTasks = [],
   onSaveAnnualPlanConfirmation,
+  onRoleChange,
 }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -652,6 +653,17 @@ export default function DutyTaskManagerView({
             task={selectedAnnualPlan}
             onSave={onSaveAnnualPlanConfirmation}
             onClose={closeTask}
+            onSubmitComplete={() => {
+              onRoleChange?.("adminDepartment");
+              navigate("/boardGovernance/home", {
+                state: {
+                  taskSelection: {
+                    category: "duty",
+                    department: "已确认履职计划任务",
+                  },
+                },
+              });
+            }}
           />
         ) : selectedTask ? (
           <div className={styles.drawerContent}>
@@ -819,7 +831,7 @@ export default function DutyTaskManagerView({
               <Button type="primary" onClick={completeTask}>
                 {selectedTask.taskStatus === "已完成"
                   ? "保存修改"
-                  : "确认完成该计划"}
+                  : "确认并下发任务通知"}
               </Button>
             </div>
           </div>

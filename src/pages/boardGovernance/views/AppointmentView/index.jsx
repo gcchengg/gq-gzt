@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { SendOutlined } from "@ant-design/icons";
+import TaskIssueDrawer from "@/components/TaskIssueDrawer";
 import AppointmentFlow from "../DirectorView/components/AppointmentFlow";
 import DirectorStageTable from "../DirectorStageTable";
 import StageBlocked from "../StageBlocked";
@@ -63,7 +64,7 @@ export default function AppointmentView({
       <PageHeader
         eyebrow="DIRECTOR APPOINTMENT"
         title="董事聘任"
-        subtitle="按董事办理推荐函、简历、权限、选举与工商变更"
+        subtitle="按董事完成简历准备、系统权限配置、工商变更等事项"
       />
       <DirectorStageTable
         directors={appointmentDirectors}
@@ -134,6 +135,16 @@ export default function AppointmentView({
           />
         )}
       </StageDetailDrawer>
+      {role === "groupOffice" ? (
+        <TaskIssueDrawer
+          zIndex={12120}
+          title="任务浮窗"
+          defaultTaskType="500"
+          onSubmit={(payload) => {
+            console.log(payload);
+          }}
+        />
+      ) : null}
     </div>
   );
 }

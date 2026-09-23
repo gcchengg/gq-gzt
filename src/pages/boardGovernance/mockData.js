@@ -3,6 +3,7 @@ import {
   CalendarOutlined,
   CheckSquareOutlined,
   DashboardOutlined,
+  SendOutlined,
   SettingOutlined,
   SolutionOutlined,
   TeamOutlined,
@@ -11,6 +12,11 @@ import {
 export const navigationItems = [
   { key: "home", label: "工作台首页", icon: DashboardOutlined },
   { key: "appointment", label: "董事聘任", icon: SolutionOutlined },
+  {
+    key: "director-special-tasks",
+    label: "下发董事专项任务",
+    icon: SendOutlined,
+  },
   { key: "preparation", label: "履职准备", icon: CalendarOutlined },
   { key: "management", label: "履职管理", icon: TeamOutlined },
   { key: "duty-evaluation", label: "履职评价", icon: AuditOutlined },
