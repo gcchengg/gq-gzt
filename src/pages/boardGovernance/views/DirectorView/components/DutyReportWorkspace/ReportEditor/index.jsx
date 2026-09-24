@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Button, Input, Select, Upload, message } from "antd";
+import {
+  Button,
+  Cascader,
+  Input,
+  Modal,
+  Select,
+  Tag,
+  Upload,
+  message,
+} from "antd";
 import { PrinterOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   buildReportDraft,
@@ -9,6 +18,57 @@ import {
   sectionDays,
 } from "./reportTemplate";
 import styles from "./index.module.less";
+import userDirectory from "../../../../../views/DutyTaskManagerView/user.json";
+
+const reportRecipients = (userDirectory.data || [])
+  .filter(
+    (person) => person.validFlag === "1" && person.fullName && person.loginId,
+  )
+  .map((person, index) => ({
+    ...person,
+    value: `${person.loginId}:${person.orgId}:${person.id || index}`,
+  }));
+
+const reportRecipientByValue = new Map(
+  reportRecipients.map((person) => [person.value, person]),
+);
+
+const reportRecipientOptions = (() => {
+  const companies = new Map();
+  reportRecipients.forEach((person) => {
+    const companyName = person.deptOrgName || person.orgName || "其他单位";
+    const departmentName = person.deptOrgName ? person.orgName : null;
+    if (!companies.has(companyName)) {
+      companies.set(companyName, {
+        value: companyName,
+        label: companyName,
+        children: [],
+      });
+    }
+    const company = companies.get(companyName);
+    let parent = company;
+    if (departmentName && departmentName !== companyName) {
+      let department = company.children.find(
+        (item) => item.value === departmentName,
+      );
+      if (!department) {
+        department = {
+          value: departmentName,
+          label: departmentName,
+          children: [],
+        };
+        company.children.push(department);
+      }
+      parent = department;
+    }
+    parent.children.push({
+      value: person.value,
+      label: person.fullName,
+      isLeaf: true,
+    });
+  });
+  return [...companies.values()];
+})();
 
 function ReportContent({
   draft,
@@ -246,6 +306,8 @@ export default function ReportEditor({
       status: "done",
     })),
   );
+  const [sendOpen, setSendOpen] = useState(false);
+  const [recipientPaths, setRecipientPaths] = useState([]);
   const monthly = report.reportType === "月度报告";
   const update = (key, value) =>
     setDraft((current) => ({ ...current, [key]: value }));
@@ -266,7 +328,7 @@ export default function ReportEditor({
         ),
       },
     }));
-  const save = (submit) => {
+  const save = (submit, recipients = []) => {
     onSave(
       report.id,
       {
@@ -276,10 +338,28 @@ export default function ReportEditor({
         period: draft.period,
         templateData: draft,
         files: files.map((file) => file.name),
+        recipients: submit
+          ? recipients.map((person) => ({
+              userId: person.loginId,
+              userName: person.fullName,
+              orgName: [person.deptOrgName, person.orgName]
+                .filter(Boolean)
+                .join(" / "),
+            }))
+          : report.recipients || [],
       },
       submit,
     );
-    message.success(submit ? "履职报告已提交接收" : "履职报告已保存");
+    message.success(submit ? "履职报告已确认发送" : "履职报告已保存");
+  };
+  const confirmSend = () => {
+    const recipients = recipientPaths
+      .map((path) => reportRecipientByValue.get(path[path.length - 1]))
+      .filter(Boolean);
+    if (!recipients.length) return;
+    save(true, recipients);
+    setSendOpen(false);
+    setRecipientPaths([]);
   };
   const print = () => {
     const popup = window.open("", "_blank");
@@ -333,14 +413,11 @@ export default function ReportEditor({
           打印 / 保存为 PDF
         </Button>
         <Button onClick={() => save(false)}>保存报告</Button>
-        {report.status === "待完善" && (
-          <Button type="primary" onClick={() => save(true)}>
-            提交接收
-          </Button>
-        )}
+        <Button type="primary" onClick={() => setSendOpen(true)}>
+          确认发送
+        </Button>
         {report.status === "待接收" && (
           <Button
-            type="primary"
             onClick={() => {
               save(false);
               onReceive(report.id);
@@ -351,6 +428,79 @@ export default function ReportEditor({
           </Button>
         )}
       </div>
+      <Modal
+        open={sendOpen}
+        title="确认发送履职报告"
+        width={680}
+        okText="确认发送"
+        cancelText="取消"
+        okButtonProps={{ disabled: recipientPaths.length === 0 }}
+        onOk={confirmSend}
+        onCancel={() => setSendOpen(false)}
+      >
+        <div className={styles.sendIntro}>
+          <span className={styles.sendIcon}>↗</span>
+          <div>
+            <strong>选择报告接收人</strong>
+            <p>按单位、部门逐级查找人员，可多选后统一发送。</p>
+          </div>
+        </div>
+        <div className={styles.recipientPicker}>
+          <label htmlFor="report-recipient-picker">接收人员</label>
+          <Cascader
+            id="report-recipient-picker"
+            className={styles.recipientCascader}
+            options={reportRecipientOptions}
+            value={recipientPaths}
+            onChange={(paths) => setRecipientPaths(paths || [])}
+            placeholder="请选择单位 / 部门 / 人员"
+            multiple
+            showSearch
+            allowClear
+            maxTagCount={2}
+            displayRender={(labels) => labels[labels.length - 1]}
+          />
+          <small>支持搜索姓名或组织名称，至少选择一位接收人。</small>
+        </div>
+        <div className={styles.selectedRecipients}>
+          <div className={styles.selectedHeading}>
+            <strong>你选择的人</strong>
+            <span>{recipientPaths.length} 人</span>
+          </div>
+          {recipientPaths.length ? (
+            <div className={styles.recipientTags}>
+              {recipientPaths.map((path) => {
+                const person = reportRecipientByValue.get(
+                  path[path.length - 1],
+                );
+                if (!person) return null;
+                return (
+                  <Tag
+                    key={person.value}
+                    closable
+                    title={[person.deptOrgName, person.orgName]
+                      .filter(Boolean)
+                      .join(" / ")}
+                    onClose={() =>
+                      setRecipientPaths((current) =>
+                        current.filter(
+                          (item) => item[item.length - 1] !== person.value,
+                        ),
+                      )
+                    }
+                  >
+                    {person.fullName}
+                  </Tag>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={styles.emptyRecipients}>
+              还没有选择人员，选择结果会显示在这里
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

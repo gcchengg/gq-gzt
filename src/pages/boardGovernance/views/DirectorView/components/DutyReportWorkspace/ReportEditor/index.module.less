@@ -20,4 +20,19 @@
 .tableWrap textarea { font-size: 12px; }
 .subtotal { text-align: right; color: #245fca; font-weight: 600; }
 .actions { position: sticky; bottom: -24px; background: #fff; border-top: 1px solid #e3e9f1; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; padding: 16px 0; z-index: 2; }
+.sendIntro { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border: 1px solid #e6edfb; border-radius: 14px; background: linear-gradient(115deg, #f4f7ff, #fbfcff); }
+.sendIcon { display: grid; flex: 0 0 42px; width: 42px; height: 42px; place-items: center; border-radius: 13px; color: #fff; background: linear-gradient(145deg, #5b7cff, #3458d4); box-shadow: 0 6px 14px rgba(52, 88, 212, .2); font-size: 21px; }
+.sendIntro strong { color: #202d48; font-size: 15px; }
+.sendIntro p { margin: 4px 0 0; color: #74809a; font-size: 12px; }
+.recipientPicker { display: grid; gap: 8px; margin-top: 20px; }
+.recipientPicker label { color: #33415c; font-size: 13px; font-weight: 600; }
+.recipientCascader { width: 100%; }
+.recipientCascader :global(.ant-select-selector) { min-height: 44px !important; align-items: center; border-radius: 10px !important; }
+.recipientPicker small { color: #8b95a8; font-size: 12px; }
+.selectedRecipients { min-height: 112px; margin-top: 20px; padding: 15px 16px; border: 1px solid #e8ebf1; border-radius: 12px; background: #fcfcfd; }
+.selectedHeading { display: flex; align-items: center; justify-content: space-between; color: #34415b; font-size: 13px; }
+.selectedHeading span { padding: 3px 9px; border-radius: 20px; color: #3458d4; background: #edf2ff; font-size: 12px; font-weight: 600; }
+.recipientTags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+.recipientTags :global(.ant-tag) { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 5px 9px; border: 1px solid #dce5fb; border-radius: 8px; color: #3554a0; background: #f3f6ff; font-size: 12px; }
+.emptyRecipients { display: grid; min-height: 55px; place-items: center; color: #9aa3b2; font-size: 12px; }
 @media (max-width: 800px) { .metadata { grid-template-columns: repeat(2, minmax(0, 1fr)); } .paper { padding: 16px; } }

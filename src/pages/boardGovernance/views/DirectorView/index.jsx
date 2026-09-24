@@ -1458,6 +1458,7 @@ export function DutyManagement({
   setDirector,
   tab,
   setTab,
+  reportTypeFilter,
   onEvent,
   dutyPlans,
   materials,
@@ -1537,6 +1538,7 @@ export function DutyManagement({
         <TabContent
           compact={compact}
           tab={tab}
+          reportTypeFilter={reportTypeFilter}
           director={director}
           onEvent={onEvent}
           dutyPlans={dutyPlans}
@@ -1679,6 +1681,7 @@ function DutyEvaluation() {
 function TabContent({
   compact = false,
   tab,
+  reportTypeFilter,
   director,
   onEvent,
   dutyPlans,
@@ -1706,6 +1709,7 @@ function TabContent({
         director={director}
         plans={plans}
         reports={reports}
+        initialReportType={reportTypeFilter}
         onGenerate={onGenerateDutyReport}
         onSave={onSaveDutyReport}
         onReceive={onReceiveDutyReport}

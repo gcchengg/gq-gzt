@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Button,
@@ -20,12 +20,22 @@ export default function DutyReportWorkspace({
   director,
   plans,
   reports,
+  initialReportType,
   onGenerate,
   onSave,
   onReceive,
 }) {
   const [generateOpen, setGenerateOpen] = useState(false);
-  const [reportTypeFilter, setReportTypeFilter] = useState("全部报告");
+  const [reportTypeFilter, setReportTypeFilter] = useState(
+    ["月度报告", "季度报告", "年度报告"].includes(initialReportType)
+      ? initialReportType
+      : "全部报告",
+  );
+  useEffect(() => {
+    if (["月度报告", "季度报告", "年度报告"].includes(initialReportType)) {
+      setReportTypeFilter(initialReportType);
+    }
+  }, [initialReportType]);
   const [selectedReportId, setSelectedReportId] = useState(null);
   const [generateForm] = Form.useForm();
   const completedPlans = useMemo(

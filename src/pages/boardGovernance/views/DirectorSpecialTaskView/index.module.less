@@ -20,8 +20,81 @@
   font-size: 18px;
 }
 
+.createForm {
+  max-height: min(70vh, 700px);
+  overflow-y: auto;
+  padding: 4px 4px 0 0;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.selectionSummary {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin: -7px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #e5ebf4;
+  border-radius: 10px;
+  background: #f8faff;
+}
+
+.selectionSummary strong {
+  color: #34415b;
+  font-size: 12px;
+}
+
+.selectionSummary > span {
+  color: #315ecb;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.selectionSummary > div,
+.selectionSummary > small {
+  grid-column: 1 / -1;
+}
+
+.selectionSummary > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.selectionSummary > div :global(.ant-tag) {
+  margin: 0;
+  border-radius: 7px;
+}
+
+.selectionSummary > small,
+.uploadHint {
+  color: #8792a5;
+  font-size: 11px;
+}
+
+.uploadHint {
+  margin-top: 7px;
+}
+
+.uploadHint :global(.anticon) {
+  margin-right: 4px;
+}
+
 @media (max-width: 768px) {
   .page {
     gap: 12px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
   }
 }

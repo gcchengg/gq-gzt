@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import TaskIssueDrawer from "@/components/TaskIssueDrawer";
 import {
   DutyManagement,
@@ -36,8 +36,14 @@ export default function ManagementView({
   onReceiveDutyReport,
 }) {
   const navigate = useNavigate();
-  const [tab, setTab] = useState("overview");
+  const [searchParams] = useSearchParams();
+  const requestedTab = searchParams.get("tab");
+  const requestedReportType = searchParams.get("reportType");
+  const [tab, setTab] = useState(requestedTab || "overview");
   const [event, setEvent] = useState(null);
+  useEffect(() => {
+    setTab(requestedTab || "overview");
+  }, [requestedTab, id]);
   const scopedDirectors =
     role === "director"
       ? directorRecords.filter((item) => item.name === currentDirectorName)
@@ -103,6 +109,7 @@ export default function ManagementView({
               director={director}
               setDirector={() => {}}
               tab={tab}
+              reportTypeFilter={requestedReportType}
               setTab={setTab}
               onEvent={setEvent}
               dutyPlans={managementPlans}

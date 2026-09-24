@@ -121,6 +121,15 @@ const roleActionSteps = {
   adminBoard: ["change"],
 };
 
+const mockRecognizedRecommendation = {
+  letter: "中国一汽发〔2024〕153号",
+  documentName: "关于推荐撤回宋明君等任职的通知",
+  appointmentDescription:
+    "推荐【蒋奇锋】任一汽股权投资(天津)有限公司董事、外部董事召集人，\n撤回【历伟】任一汽股权投资(天津)有限公司董事、外部董事召集人的推荐",
+  issueTime: "2024年9月2日",
+  director: "蒋奇锋",
+};
+
 /* 四步横向流程卡片 */
 function ProcessCard({ currentStep = 0 }) {
   const steps = [
@@ -191,6 +200,7 @@ export default function AppointmentFlow({
     directorCases[0];
   const [open, setOpen] = useState(false);
   const [letterFileList, setLetterFileList] = useState([]);
+  const [aiRecognizing, setAiRecognizing] = useState(false);
   const role = handlerRole;
   const [keyword, setKeyword] = useState("");
   const [progressFilter, setProgressFilter] = useState("open");
@@ -207,6 +217,19 @@ export default function AppointmentFlow({
       onIssueLetterOpened?.();
     }
   }, [autoOpenIssue, canIssueLetter, onIssueLetterOpened]);
+  useEffect(() => {
+    if (!letterFileList.length) {
+      setAiRecognizing(false);
+      return undefined;
+    }
+    setAiRecognizing(true);
+    const timer = window.setTimeout(() => {
+      form.setFieldsValue(mockRecognizedRecommendation);
+      setAiRecognizing(false);
+      messageApi.success("AI识别完成，请核对并完善推荐函信息");
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [letterFileList, form, messageApi]);
   const ownerOptions = useMemo(
     () => [...new Set(cases.map((item) => item.owner))],
     [cases],
@@ -270,21 +293,24 @@ export default function AppointmentFlow({
       messageApi.error("仅集团董办可以下发董事推荐函");
       return;
     }
-    if (!letterFileList.length) {
-      messageApi.error("请先上传推荐函文件");
+    if (aiRecognizing) {
+      messageApi.info("推荐函正在识别，请稍候");
       return;
     }
     const values = await form.validateFields();
     const nextCase = {
       id: `AP-2026-${String(cases.length + 8).padStart(3, "0")}`,
       director: values.director,
-      company: values.company,
-      position: values.position,
+      company: "一汽股权投资(天津)有限公司",
+      position: "董事、外部董事召集人",
       letter: values.letter,
-      letterFileName: letterFileList[0].name,
-      owner: `综合管理部-办公室 / ${values.recipient}`,
+      documentName: values.documentName,
+      appointmentDescription: values.appointmentDescription,
+      issueTime: values.issueTime,
+      letterFileName: letterFileList[0]?.name || "未上传附件",
+      owner: "综合管理部-办公室 / 阮迪",
       recipient: "综合管理部-人力 / 周航",
-      deadline: values.deadline,
+      deadline: "2026-09-17 17:00",
       status: "待上传董事简历",
       currentStep: 1,
     };
@@ -293,7 +319,7 @@ export default function AppointmentFlow({
     setOpen(false);
     form.resetFields();
     setLetterFileList([]);
-    messageApi.success("推荐函已下发，钉钉消息与待办已送达指定经办人");
+    messageApi.success("推荐函已下发，待办已送达指定经办人");
     onIssueCreated?.(nextCase);
   };
 
@@ -514,91 +540,107 @@ export default function AppointmentFlow({
 
       <Modal
         open={open && canIssueLetter}
-        width={720}
+        width={820}
         title="下发董事推荐函"
-        okText="下发并发送钉钉消息"
-        footer={(_, { OkBtn }) => <OkBtn />}
-        okButtonProps={{ icon: <DingdingOutlined /> }}
+        okText="下发"
+        cancelText="取消"
+        okButtonProps={{ icon: <DingdingOutlined />, loading: aiRecognizing }}
         onOk={issueLetter}
         onCancel={() => setOpen(false)}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          className={styles.issueForm}
-          initialValues={{
-            company: "一汽能源科技",
-            position: "外部董事",
-            recipient: "阮迪",
-            deadline: "2026-09-17 17:00",
-          }}
-        >
-          <div className={styles.formGrid}>
-            <Form.Item
-              label="推荐函编号"
-              name="letter"
-              rules={[{ required: true }]}
-            >
-              <Input placeholder="如：一汽股董推〔2026〕18号" />
-            </Form.Item>
-            <Form.Item
-              label="拟任董事"
-              name="director"
-              rules={[{ required: true }]}
-            >
-              <Input prefix={<UserAddOutlined />} placeholder="请输入姓名" />
-            </Form.Item>
-            <Form.Item
-              label="任职企业"
-              name="company"
-              rules={[{ required: true }]}
-            >
-              <Select
-                options={[
-                  "一汽股权",
-                  "一汽能源科技",
-                  "旗新动力科技",
-                  "红旗私募基金",
-                ].map((value) => ({ value }))}
-              />
-            </Form.Item>
-            <Form.Item
-              label="董事类型"
-              name="position"
-              rules={[{ required: true }]}
-            >
-              <Select
-                options={["外部董事", "专职外部董事", "职工董事"].map(
-                  (value) => ({ value }),
-                )}
-              />
-            </Form.Item>
-            <Form.Item label="接收部门">
-              <Input value="综合管理部-办公室" disabled />
-            </Form.Item>
-            <Form.Item
-              label="接收人"
-              name="recipient"
-              rules={[{ required: true }]}
-            >
-              <Select
-                options={["阮迪", "胡欣悦", "王玥"].map((value) => ({ value }))}
-              />
-            </Form.Item>
-            <Form.Item label="推荐函文件" required>
-              <Upload
-                accept=".pdf,.doc,.docx"
-                maxCount={1}
-                fileList={letterFileList}
-                beforeUpload={(file) => {
-                  setLetterFileList([file]);
-                  return false;
-                }}
-                onRemove={() => setLetterFileList([])}
+        <Form form={form} layout="vertical" className={styles.issueForm}>
+          <div className={styles.ocrHeader}>
+            <div className={styles.ocrIcon}>AI</div>
+            <div>
+              <strong>AI 识别或手动填写推荐函信息</strong>
+              <p>可上传附件自动识别，也可直接填写；核对无误后下发。</p>
+            </div>
+            {letterFileList.length ? (
+              <span
+                className={aiRecognizing ? styles.ocrPending : styles.ocrDone}
               >
-                <Button icon={<UploadOutlined />}>选择推荐函文件</Button>
-              </Upload>
-            </Form.Item>
+                {aiRecognizing ? "正在识别" : "识别完成"}
+              </span>
+            ) : null}
+          </div>
+          <Form.Item
+            label="推荐函附件（可选）"
+            className={styles.attachmentItem}
+          >
+            <Upload
+              accept=".pdf,.doc,.docx"
+              maxCount={1}
+              fileList={letterFileList}
+              beforeUpload={(file) => {
+                setLetterFileList([file]);
+                form.resetFields();
+                return false;
+              }}
+              onRemove={() => {
+                setLetterFileList([]);
+              }}
+            >
+              <Button icon={<UploadOutlined />}>选择推荐函文件</Button>
+            </Upload>
+          </Form.Item>
+          <div className={styles.recognitionPanel}>
+            <div className={styles.recognitionTitle}>
+              <span>{letterFileList.length ? "识别结果" : "推荐函信息"}</span>
+              <small>
+                {letterFileList.length
+                  ? "以下字段可人工修改"
+                  : "无需上传附件，可直接手动填写"}
+              </small>
+            </div>
+            <div className={styles.formGrid}>
+              <Form.Item
+                label="推荐函编号"
+                name="letter"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  disabled={aiRecognizing}
+                  placeholder="请输入推荐函编号"
+                />
+              </Form.Item>
+              <Form.Item
+                label="拟任董事"
+                name="director"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  prefix={<UserAddOutlined />}
+                  disabled={aiRecognizing}
+                  placeholder="请输入拟任董事姓名"
+                />
+              </Form.Item>
+              <Form.Item
+                label="文件名称"
+                name="documentName"
+                rules={[{ required: true }]}
+              >
+                <Input disabled={aiRecognizing} placeholder="请输入文件名称" />
+              </Form.Item>
+              <Form.Item
+                label="印发时间"
+                name="issueTime"
+                rules={[{ required: true }]}
+              >
+                <Input disabled={aiRecognizing} placeholder="请输入印发时间" />
+              </Form.Item>
+              <Form.Item
+                className={styles.descriptionField}
+                label="任职说明"
+                name="appointmentDescription"
+                rules={[{ required: true }]}
+              >
+                <Input.TextArea
+                  autoSize={{ minRows: 3, maxRows: 6 }}
+                  disabled={aiRecognizing}
+                  placeholder="请输入推荐及撤回任职说明"
+                />
+              </Form.Item>
+            </div>
           </div>
         </Form>
       </Modal>

@@ -43,6 +43,21 @@
 .auditSummary span { font-size:10px; color:#778395; text-align:right; }
 .issueForm { margin-top:18px; }
 .formGrid { display:grid; grid-template-columns:1fr 1fr; column-gap:16px; }
+.ocrHeader { display:flex; align-items:center; gap:12px; margin-bottom:18px; padding:15px 17px; border:1px solid #dce7fb; border-radius:13px; background:linear-gradient(110deg,#f2f6ff,#f9fbff); }
+.ocrIcon { display:grid; flex:0 0 40px; height:40px; place-items:center; border-radius:12px; color:#fff; background:linear-gradient(145deg,#5485f5,#3158c9); box-shadow:0 5px 13px rgba(49,88,201,.2); font-size:13px; font-weight:700; letter-spacing:.3px; }
+.ocrHeader strong { color:#203253; font-size:14px; }
+.ocrHeader p { margin:3px 0 0; color:#77849a; font-size:12px; }
+.ocrPending,.ocrDone { margin-left:auto; padding:5px 10px; border-radius:999px; font-size:11px; white-space:nowrap; }
+.ocrPending { color:#946200; background:#fff5d8; }
+.ocrDone { color:#16714b; background:#e5f7ed; }
+.attachmentItem { margin-bottom:16px; }
+.recognitionPanel { padding:18px 18px 2px; border:1px solid #e4e9f1; border-radius:13px; background:#fff; }
+.recognitionTitle { display:flex; align-items:baseline; gap:10px; margin-bottom:16px; }
+.recognitionTitle span { color:#2c3a52; font-size:14px; font-weight:700; }
+.recognitionTitle small { color:#8c96a7; font-size:11px; }
+.descriptionField { grid-column:1 / -1; }
+.ocrEmpty { display:flex; align-items:center; gap:9px; margin-top:8px; padding:18px; border:1px dashed #d8dfeb; border-radius:12px; color:#8994a6; background:#fafbfd; font-size:12px; }
+.ocrEmpty :global(.anticon) { color:#6d88d8; font-size:16px; }
 .messagePreview { display:flex; gap:12px; padding:14px; border:1px solid #cce0ff; border-radius:10px; background:#f3f8ff; color:#175ba8; }
 .messagePreview>svg { font-size:20px; }
 .messagePreview b { color:#17365d; }

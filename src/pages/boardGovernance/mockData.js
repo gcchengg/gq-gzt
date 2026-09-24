@@ -14,7 +14,7 @@ export const navigationItems = [
   { key: "appointment", label: "董事聘任", icon: SolutionOutlined },
   {
     key: "director-special-tasks",
-    label: "下发董事专项任务",
+    label: "董事专项任务",
     icon: SendOutlined,
   },
   { key: "preparation", label: "履职准备", icon: CalendarOutlined },

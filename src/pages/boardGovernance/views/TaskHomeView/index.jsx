@@ -191,9 +191,26 @@ export default function TaskHomeView({
     setActiveCategory(taskSelection.category);
     setActiveDepartment(taskSelection.department);
   }, [location.state]);
-  const confirmationPlans = dutyPlans.filter((item) =>
-    ["待确认", "已完成"].includes(item.status),
-  );
+  const confirmationPlans = [
+    {
+      id: "monthly-report",
+      title: "2026年月度履职报告完善",
+      reportType: "月度报告",
+      description: "完善2026年8月履职报告",
+    },
+    {
+      id: "quarterly-report",
+      title: "2026年季度履职报告完善",
+      reportType: "季度报告",
+      description: "完善2026三季度履职报告",
+    },
+    {
+      id: "annual-report",
+      title: "2026年度履职报告完善",
+      reportType: "年度报告",
+      description: "完善2026年度履职报告",
+    },
+  ];
   const generatedPlans = ["会议计划", "培训计划", "调研计划"]
     .map((type) =>
       dutyPlans.find((item) => item.type === type && item.taskStatus),
@@ -218,7 +235,7 @@ export default function TaskHomeView({
       },
       {
         key: "special-task",
-        label: "下发董事专项任务",
+        label: "董事专项任务",
         groups: [
           {
             department: "董事专项任务",
@@ -352,7 +369,8 @@ export default function TaskHomeView({
     ],
   );
   const visibleTaskCategories = taskCategories.filter(({ key }) => {
-    if (role === "director") return key === "plan-creation";
+    if (role === "director")
+      return ["plan-creation", "confirmation"].includes(key);
     if (role === "auditLegalDepartment") return key === "appointment";
     if (role === "groupOffice") return key === "special-task";
     if (role !== "groupOffice" && key === "special-task") return false;
@@ -626,23 +644,19 @@ export default function TaskHomeView({
               ))
             : null}
           {selectedCategoryKey === "confirmation"
-            ? currentGroup?.records.map((plan) => (
-                <article className={styles.taskRow} key={plan.id}>
+            ? currentGroup?.records.map((task) => (
+                <article className={styles.taskRow} key={task.id}>
                   <div>
-                    <h3>
-                      {plan.dutyYear}
-                      {plan.dutyQuarter} · {plan.content}
-                    </h3>
+                    <h3>{task.title}</h3>
                     <p>
-                      确认责任人：{plan.confirmOwner}　　任职企业：
-                      {plan.servingCompany}　　工作类别：{plan.workCategory}
-                      　　状态：{plan.status}　　任务描述：完善年度履职报告
+                      董事：张铁斌　　任职企业：xxx　　任务描述：
+                      {task.description}
                     </p>
                   </div>
                   <aside>
-                    <StatusPill>{plan.status}</StatusPill>
+                    <StatusPill>待完善</StatusPill>
                     <Link
-                      to={`/boardGovernance/duty-tasks?taskType=confirmation&planId=${plan.id}`}
+                      to={`/boardGovernance/management/D-01?tab=reports&reportType=${encodeURIComponent(task.reportType)}`}
                     >
                       去执行
                     </Link>
