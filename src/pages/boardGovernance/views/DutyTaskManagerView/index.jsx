@@ -48,10 +48,10 @@ const executionFieldsByType = {
       "text",
       "一汽股权2026年董事会第二次会议",
     ],
-    ["meetingDate", "会议 / 活动日期", "text", "2026-01-28"],
+    ["meetingDate", "会议时间", "text", "2026-01-28"],
     [
       "meetingFormat",
-      "会议形式",
+      "会议地点",
       "select",
       "现场召开",
       ["现场召开", "视频会议", "通讯会议"],
@@ -64,7 +64,7 @@ const executionFieldsByType = {
       ["现场参会", "视频参会", "通讯参会"],
     ],
     ["proposalCount", "议案数量", "number", 2],
-    ["dutyDays", "履职天数", "number", 2],
+    // ["dutyDays", "履职天数", "number", 2],
   ],
   培训计划: [
     [

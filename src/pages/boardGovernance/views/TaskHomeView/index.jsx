@@ -150,19 +150,7 @@ export default function TaskHomeView({
         .filter(Boolean),
     [appointmentCases],
   );
-  const visibleAppointmentTasks = useMemo(() => {
-    if (role === "auditLegalDepartment") {
-      return appointmentTasks.filter(
-        (item) => item.status === "待完成工商变更",
-      );
-    }
-    if (role === "adminDepartment") {
-      return appointmentTasks.filter(
-        (item) => item.status !== "待完成工商变更",
-      );
-    }
-    return appointmentTasks;
-  }, [appointmentTasks, role]);
+  const visibleAppointmentTasks = appointmentTasks;
   const taskGroups = useMemo(
     () =>
       handbookDepartments.map((department) => {
@@ -371,7 +359,6 @@ export default function TaskHomeView({
   const visibleTaskCategories = taskCategories.filter(({ key }) => {
     if (role === "director")
       return ["plan-creation", "confirmation"].includes(key);
-    if (role === "auditLegalDepartment") return key === "appointment";
     if (role === "groupOffice") return key === "special-task";
     if (role !== "groupOffice" && key === "special-task") return false;
     return key !== "annual-plan-confirmation";

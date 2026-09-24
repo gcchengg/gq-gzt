@@ -1269,7 +1269,7 @@ export function PreparationWorkspace({
               ? null
               : {
                   key: "annual-plan",
-                  label: "年度履职计划编排",
+                  label: "年度履职计划编制",
                   children: (
                     <div className={styles.annualPlanTab}>
                       <SectionCard title="准备阶段进度">
@@ -1278,7 +1278,7 @@ export function PreparationWorkspace({
                           responsive={false}
                           labelPlacement="vertical"
                           size="small"
-                          current={annualPlanStep}
+                          current={planMode === "planning" ? 0 : annualPlanStep}
                           items={[
                             { title: "计划制定" },
                             { title: "计划全部提交" },

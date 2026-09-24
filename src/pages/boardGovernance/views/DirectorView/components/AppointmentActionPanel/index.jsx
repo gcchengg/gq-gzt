@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Modal, Switch, Upload } from "antd";
+import { Button, Input, Modal, Switch, Upload } from "antd";
 import {
   CloudUploadOutlined,
   FieldTimeOutlined,
@@ -30,7 +30,7 @@ const PROCESS_STEPS = [
     title: "配置系统权限并纳入组织架构",
     owner: "综合管理部-数字化",
     icon: "🔐",
-    hint: "开通工作台账号，同步人员、岗位与任期信息",
+    hint: "开通平台权限，提供各平台使用手册",
   },
   {
     key: "change",
@@ -85,7 +85,9 @@ export default function AppointmentActionPanel({
               当前步骤 · {currentStep + 1} / {PROCESS_STEPS.length}
             </span>
           </div> */}
-          <h3>董事简历</h3>
+          <h3>
+            {currentStepKey === "permission" ? "平台权限配置" : "董事简历"}
+          </h3>
           <p>{PROCESS_STEPS[currentStep].hint}</p>
         </div>
 
@@ -217,12 +219,24 @@ function PermissionStep({ item, roleLabel, allowedActions, onUpdate }) {
   const [permissionDone, setPermissionDone] = useState(
     Boolean(item?.permissionDone),
   );
+  const [situationDescription, setSituationDescription] = useState(
+    item?.situationDescription || "",
+  );
+  const [manualFiles, setManualFiles] = useState(
+    (item?.platformManuals || []).map((file, index) => ({
+      uid: file.uid || `platform-manual-${index}`,
+      name: file.name || file,
+      status: "done",
+    })),
+  );
   const canOperate = allowedActions?.includes("permission");
 
   const save = () => {
     onUpdate(
       {
         permissionDone,
+        situationDescription,
+        platformManuals: manualFiles.map(({ uid, name }) => ({ uid, name })),
         currentStep: 3,
         status: "待完成工商变更",
         owner: "综合管理部-董办 / 王珂",
@@ -265,6 +279,30 @@ function PermissionStep({ item, roleLabel, allowedActions, onUpdate }) {
                 onChange={setPermissionDone}
               />
             </label>
+          </div>
+          <div className={styles.permissionField}>
+            <label htmlFor="permission-situation">情况说明</label>
+            <Input.TextArea
+              id="permission-situation"
+              rows={3}
+              value={situationDescription}
+              onChange={(event) => setSituationDescription(event.target.value)}
+              placeholder="请填写平台权限开通及组织架构纳入情况"
+            />
+          </div>
+          <div className={styles.permissionField}>
+            <label>各平台使用手册</label>
+            <Dragger
+              accept=".pdf,.doc,.docx,.ppt,.pptx"
+              multiple
+              beforeUpload={() => false}
+              fileList={manualFiles}
+              onChange={({ fileList }) => setManualFiles(fileList)}
+            >
+              <CloudUploadOutlined />
+              <p>点击或拖拽上传各平台使用手册</p>
+              <small>支持 PDF、DOC、DOCX、PPT、PPTX，可上传多个文件</small>
+            </Dragger>
           </div>
           <div className={styles.actionBar}>
             <span></span>

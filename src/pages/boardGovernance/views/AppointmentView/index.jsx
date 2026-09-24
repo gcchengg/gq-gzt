@@ -28,13 +28,7 @@ export default function AppointmentView({
   const navigate = useNavigate();
   const canIssueLetter = role === "groupOffice";
   const [openIssue, setOpenIssue] = useState(false);
-  const visibleCases = useMemo(
-    () =>
-      role === "auditLegalDepartment"
-        ? cases.filter((item) => item.status === "待完成工商变更")
-        : cases,
-    [cases, role],
-  );
+  const visibleCases = cases;
   const appointmentDirectors = useMemo(
     () =>
       visibleCases.map((item) => {

@@ -11,6 +11,7 @@ import {
   Popconfirm,
   Select,
   Space,
+  Table,
 } from "antd";
 import {
   CheckCircleOutlined,
@@ -19,8 +20,6 @@ import {
   RocketOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import { confirmationOwners } from "../../../../dutyPlanData";
-import { dutyQuarters, dutyYears } from "../../../../dutyPlanOptions";
 import {
   DataTable,
   SectionCard,
@@ -31,6 +30,36 @@ import { buildAnnualPlanConfirmationTask } from "../../../../annualPlanConfirmat
 import { buildAnnualDutyPlanReport } from "./annualPlanReport.js";
 import styles from "./index.module.less";
 
+const workCategories = [
+  "董事会",
+  "调研",
+  "子企业重要会议",
+  "能力培训",
+  "专项交流",
+  "督导子企业落实工作",
+  "解决子企业发展问题",
+  "其他",
+];
+
+const planTypeByWorkCategory = {
+  董事会: "会议计划",
+  调研: "调研计划",
+  子企业重要会议: "会议计划",
+  能力培训: "培训计划",
+  专项交流: "交流计划",
+  督导子企业落实工作: "督导计划",
+  解决子企业发展问题: "问题解决计划",
+  其他: "其他计划",
+};
+
+const normalizeWorkCategory = (value) =>
+  ({
+    参加董事会: "董事会",
+    参加调研: "调研",
+    参加能力培训: "能力培训",
+    参加子企业重要会议: "子企业重要会议",
+  })[value] || value;
+
 export default function DutyPlanWorkspace({
   embedded = false,
   mode = "default",
@@ -38,6 +67,7 @@ export default function DutyPlanWorkspace({
   onCreateOpenChange,
   plans,
   onDeletePlan,
+  onCreatePlan,
   onSubmitPlan,
   onGenerateTasks,
   annualGenerated,
@@ -91,12 +121,27 @@ export default function DutyPlanWorkspace({
     form.resetFields();
   };
 
-  const savePlan = () => {
-    const values = form.getFieldsValue();
+  const savePlan = async () => {
+    const values = await form.validateFields();
+    const plan = {
+      directorName: activeDirector.name,
+      servingCompany: activeDirector.company,
+      dutyYear: "2026年",
+      dutyQuarter: "四季度",
+      type: planTypeByWorkCategory[values.workCategory],
+      owner: "待指定",
+      confirmOwner: activeDirector.name,
+      ...values,
+    };
+    onCreatePlan?.(plan);
     setPlanSummaries((current) => [
       ...current,
       {
-        ...values,
+        directorName: activeDirector.name,
+        dutyType: "年度",
+        dutyYear: plan.dutyYear,
+        dutyQuarter: plan.dutyQuarter,
+        confirmOwners: [activeDirector.name],
         id: `plan-summary-${Date.now()}`,
         submittedAt: new Date().toLocaleString("zh-CN", { hour12: false }),
       },
@@ -197,11 +242,48 @@ export default function DutyPlanWorkspace({
       render: (_, row) => renderPlanActions(row),
     },
   ];
+  const planningColumns = [
+    {
+      title: "工作类别",
+      dataIndex: "workCategory",
+      width: "17%",
+      onCell: (row) => ({
+        rowSpan: row.categoryRowSpan,
+        className: row.categoryRowSpan ? styles.planningCategoryCell : "",
+      }),
+      render: (value) => <strong>{value}</strong>,
+    },
+    { title: "序号", dataIndex: "sequence", width: "8%", align: "center" },
+    { title: "工作内容", dataIndex: "content", width: "32%" },
+    {
+      title: "计划开展时间",
+      dataIndex: "date",
+      width: "18%",
+      align: "center",
+      render: (value) => value?.replaceAll("-", "/") || "",
+    },
+    { title: "预期达成目标", dataIndex: "target", width: "25%" },
+  ];
+  const planningRows = workCategories.flatMap((workCategory) => {
+    const categoryPlans = plans.filter(
+      (plan) => normalizeWorkCategory(plan.workCategory) === workCategory,
+    );
+    const rows = categoryPlans.map((plan, index) => ({
+      ...plan,
+      sequence: index + 1,
+    }));
+    if (!rows.length) return [];
+    rows[0].categoryRowSpan = rows.length;
+    rows.slice(1).forEach((row) => {
+      row.categoryRowSpan = 0;
+    });
+    return rows;
+  });
 
   return (
     <>
       <SectionCard
-        title="年度履职计划编排"
+        title="年度履职计划编制"
         className={embedded ? styles.embeddedPlanCard : ""}
         extra={
           mode !== "confirmation" ? (
@@ -216,36 +298,62 @@ export default function DutyPlanWorkspace({
           ) : null
         }
       >
-        <div className={styles.planCards}>
-          {planSummaries.map((summary) => (
-            <Descriptions
-              key={summary.id}
+        {mode === "planning" ? (
+          <div className={styles.planningTable}>
+            <Table
+              rowKey="id"
+              size="middle"
               bordered
-              size="small"
-              column={2}
-              items={[
-                { key: "name", label: "姓名", children: summary.directorName },
-                { key: "type", label: "履职类型", children: summary.dutyType },
-                { key: "year", label: "履职年度", children: summary.dutyYear },
-                {
-                  key: "quarter",
-                  label: "履职季度",
-                  children: summary.dutyQuarter,
-                },
-                {
-                  key: "owners",
-                  label: "确认责任人",
-                  children: summary.confirmOwners?.join("、"),
-                },
-                {
-                  key: "time",
-                  label: "提交时间",
-                  children: summary.submittedAt,
-                },
-              ]}
+              pagination={false}
+              tableLayout="fixed"
+              dataSource={planningRows}
+              columns={planningColumns}
             />
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className={styles.planCards}>
+            {planSummaries.map((summary) => (
+              <Descriptions
+                key={summary.id}
+                bordered
+                size="small"
+                column={2}
+                items={[
+                  {
+                    key: "name",
+                    label: "姓名",
+                    children: summary.directorName,
+                  },
+                  {
+                    key: "type",
+                    label: "履职类型",
+                    children: summary.dutyType,
+                  },
+                  {
+                    key: "year",
+                    label: "履职年度",
+                    children: summary.dutyYear,
+                  },
+                  {
+                    key: "quarter",
+                    label: "履职季度",
+                    children: summary.dutyQuarter,
+                  },
+                  {
+                    key: "owners",
+                    label: "确认责任人",
+                    children: summary.confirmOwners?.join("、"),
+                  },
+                  {
+                    key: "time",
+                    label: "提交时间",
+                    children: summary.submittedAt,
+                  },
+                ]}
+              />
+            ))}
+          </div>
+        )}
       </SectionCard>
       {mode !== "planning" ? (
         <SectionCard
@@ -367,41 +475,43 @@ export default function DutyPlanWorkspace({
         afterOpenChange={(open) => {
           if (!open) return;
           form.setFieldsValue({
-            directorName: activeDirector.name,
-            dutyType: "年度",
-            dutyYear: "2026年",
-            dutyQuarter: "四季度",
-            confirmOwners: [activeDirector.name],
+            workCategory: "董事会",
           });
         }}
         destroyOnHidden
         width={680}
       >
         <Form form={form} layout="vertical" preserve={false}>
-          <div className={styles.formGrid}>
-            <Form.Item name="directorName" label="姓名">
-              <Input disabled />
-            </Form.Item>
-            <Form.Item name="dutyType" label="履职类型">
-              <Select
-                options={["年度", "季度", "月度"].map((value) => ({ value }))}
-              />
-            </Form.Item>
-            <Form.Item name="dutyYear" label="履职年度">
-              <Select options={dutyYears.map((value) => ({ value }))} />
-            </Form.Item>
-            <Form.Item name="dutyQuarter" label="履职季度">
-              <Select options={dutyQuarters.map((value) => ({ value }))} />
-            </Form.Item>
-          </div>
-          <Form.Item name="confirmOwners" label="确认责任人">
+          <Form.Item
+            name="workCategory"
+            label="工作类别"
+            rules={[{ required: true, message: "请选择工作类别" }]}
+          >
             <Select
-              mode="multiple"
-              placeholder="请选择确认责任人（可多选）"
-              options={[
-                ...new Set([activeDirector.name, ...confirmationOwners]),
-              ].map((value) => ({ value }))}
+              placeholder="请选择工作类别"
+              options={workCategories.map((value) => ({ value, label: value }))}
             />
+          </Form.Item>
+          <Form.Item
+            name="content"
+            label="工作内容"
+            rules={[{ required: true, message: "请填写工作内容" }]}
+          >
+            <Input.TextArea rows={3} placeholder="请填写计划开展的工作内容" />
+          </Form.Item>
+          <Form.Item
+            name="date"
+            label="计划开展时间"
+            rules={[{ required: true, message: "请选择计划开展时间" }]}
+          >
+            <Input type="date" />
+          </Form.Item>
+          <Form.Item
+            name="target"
+            label="预期达成目标"
+            rules={[{ required: true, message: "请填写预期达成目标" }]}
+          >
+            <Input.TextArea rows={3} placeholder="请填写预期达成目标" />
           </Form.Item>
         </Form>
       </Modal>

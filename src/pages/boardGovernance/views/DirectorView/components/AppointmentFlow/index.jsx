@@ -140,7 +140,7 @@ function ProcessCard({ currentStep = 0 }) {
       owner: "综合管理部-体系数字化",
       icon: "🔐",
     },
-    { title: "工商变更", owner: "综合管理部-董办", icon: "🏢" },
+    { title: "工商变更", owner: "审计风控与法务部", icon: "🏢" },
   ];
 
   const isDone = (idx) => idx < currentStep;

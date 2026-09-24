@@ -25,7 +25,6 @@ import styles from "./index.module.less";
 const roleOptions = [
   { key: "groupOffice", label: "集团董办", avatar: "董" },
   { key: "adminDepartment", label: "综合管理部", avatar: "综" },
-  { key: "auditLegalDepartment", label: "审计封控与法务部", avatar: "审" },
   { key: "director", label: "董事", avatar: "董" },
 ];
 
@@ -34,14 +33,12 @@ const roleMenuKeys = {
   adminDepartment: navigationItems
     .filter(({ key }) => key !== "director-special-tasks")
     .map(({ key }) => key),
-  auditLegalDepartment: ["home", "appointment"],
   director: ["home", "management", "duty-tasks"],
 };
 
 const roleDefaultPage = {
   groupOffice: "appointment",
   adminDepartment: "home",
-  auditLegalDepartment: "home",
   director: "home",
 };
 
@@ -157,10 +154,6 @@ export default function BoardGovernanceShell({
                   items: [
                     { key: "groupOffice", label: "集团董办" },
                     { key: "adminDepartment", label: "综合管理部" },
-                    {
-                      key: "auditLegalDepartment",
-                      label: "审计封控与法务部",
-                    },
                     { key: "director", label: "董事" },
                   ],
                   onClick: ({ key }) => handleRoleChange(key),
