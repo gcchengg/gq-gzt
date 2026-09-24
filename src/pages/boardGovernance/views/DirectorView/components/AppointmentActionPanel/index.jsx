@@ -86,7 +86,11 @@ export default function AppointmentActionPanel({
             </span>
           </div> */}
           <h3>
-            {currentStepKey === "permission" ? "平台权限配置" : "董事简历"}
+            {currentStepKey === "permission"
+              ? "平台权限配置"
+              : currentStepKey === "change"
+                ? "工商变更"
+                : "董事简历"}
           </h3>
           <p>{PROCESS_STEPS[currentStep].hint}</p>
         </div>
@@ -318,6 +322,16 @@ function PermissionStep({ item, roleLabel, allowedActions, onUpdate }) {
 
 /* ─── Step 3: 工商变更 ─── */
 function ChangeStep({ item, roleLabel, allowedActions, onUpdate }) {
+  const [situationDescription, setSituationDescription] = useState(
+    item?.changeSituationDescription || "",
+  );
+  const [changeFiles, setChangeFiles] = useState(
+    (item?.changeDocuments || []).map((file, index) => ({
+      uid: file.uid || `change-document-${index}`,
+      name: file.name || file,
+      status: "done",
+    })),
+  );
   const canOperate = allowedActions?.includes("change");
 
   const confirm = () => {
@@ -329,6 +343,11 @@ function ChangeStep({ item, roleLabel, allowedActions, onUpdate }) {
       onOk: () =>
         onUpdate(
           {
+            changeSituationDescription: situationDescription,
+            changeDocuments: changeFiles.map(({ uid, name }) => ({
+              uid,
+              name,
+            })),
             currentStep: 4,
             status: "已完成",
             owner: "已归档",
@@ -348,6 +367,30 @@ function ChangeStep({ item, roleLabel, allowedActions, onUpdate }) {
         </p>
       ) : (
         <>
+          <div className={styles.permissionField}>
+            <label htmlFor="change-situation-description">情况说明</label>
+            <Input.TextArea
+              id="change-situation-description"
+              rows={3}
+              value={situationDescription}
+              onChange={(event) => setSituationDescription(event.target.value)}
+              placeholder="请填写工商变更办理情况"
+            />
+          </div>
+          <div className={styles.permissionField}>
+            <label>工商变更相关文件</label>
+            <Dragger
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+              multiple
+              beforeUpload={() => false}
+              fileList={changeFiles}
+              onChange={({ fileList }) => setChangeFiles(fileList)}
+            >
+              <CloudUploadOutlined />
+              <p>点击或拖拽上传工商变更相关文件</p>
+              <small>支持 PDF、Word、Excel、JPG、PNG，可上传多个文件</small>
+            </Dragger>
+          </div>
           <div className={styles.changeConfirm}>
             <SmileOutlined className={styles.changeIcon} />
             <div>
