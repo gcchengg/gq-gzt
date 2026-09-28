@@ -234,7 +234,7 @@ export default function TaskHomeView({
                 description: "向拟任董事发起推荐函下发与聘任流程",
                 status: "待办理",
                 deadline: "2026-09-30",
-                href: "/boardGovernance/appointment",
+                href: "/boardGovernance/appointment?action=issue-letter",
               },
               {
                 id: "SPECIAL-EVALUATION",

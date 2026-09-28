@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Checkbox,
@@ -73,6 +74,7 @@ export default function DutyPlanWorkspace({
   annualGenerated,
   activeDirector,
 }) {
+  const navigate = useNavigate();
   const [resultPlan, setResultPlan] = useState(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [selectedAnnualIds, setSelectedAnnualIds] = useState(null);
@@ -585,6 +587,17 @@ export default function DutyPlanWorkspace({
             if (submit) onGenerateTasks?.();
           }}
           onClose={() => setReportOpen(false)}
+          onSubmitComplete={() => {
+            setReportOpen(false);
+            navigate("/boardGovernance/home", {
+              state: {
+                taskSelection: {
+                  category: "duty",
+                  department: "已确认履职计划任务",
+                },
+              },
+            });
+          }}
         />
       </Drawer>
     </>

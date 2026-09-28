@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { SendOutlined } from "@ant-design/icons";
 import TaskIssueDrawer from "@/components/TaskIssueDrawer";
@@ -26,8 +26,16 @@ export default function AppointmentView({
   onIssueCreated,
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const canIssueLetter = role === "groupOffice";
-  const [openIssue, setOpenIssue] = useState(false);
+  const [openIssue, setOpenIssue] = useState(
+    () => new URLSearchParams(location.search).get("action") === "issue-letter",
+  );
+  useEffect(() => {
+    setOpenIssue(
+      new URLSearchParams(location.search).get("action") === "issue-letter",
+    );
+  }, [location.search]);
   const visibleCases = cases;
   const appointmentDirectors = useMemo(
     () =>
