@@ -351,7 +351,7 @@ export default function TaskHomeView({
     if (role === "director")
       return ["plan-creation", "confirmation"].includes(key);
     if (role === "groupOffice")
-      return ["appointment", "duty-evaluation", "duty"].includes(key);
+      return ["appointment", "duty-evaluation"].includes(key);
     return key !== "annual-plan-confirmation";
   });
   const currentCategory =
