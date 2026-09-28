@@ -49,13 +49,7 @@ const executionFieldsByType = {
       "一汽股权2026年董事会第二次会议",
     ],
     ["meetingDate", "会议时间", "text", "2026-01-28"],
-    [
-      "meetingFormat",
-      "会议地点",
-      "select",
-      "现场召开",
-      ["现场召开", "视频会议", "通讯会议"],
-    ],
+    ["meetingFormat", "会议地点", "text", ""],
     [
       "attendanceFormat",
       "参会形式 / 参加方式",
@@ -813,6 +807,12 @@ export default function DutyTaskManagerView({
                     <Input.TextArea rows={3} />
                   </Form.Item>
                 ))}
+              <Form.Item name="supplementNote" label="补充说明">
+                <Input.TextArea
+                  rows={3}
+                  placeholder="填写希望补充给董事的事项说明或办理提示"
+                />
+              </Form.Item>
               <Form.Item label="补充材料">
                 <Dragger
                   multiple

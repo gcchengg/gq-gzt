@@ -24,7 +24,7 @@ import styles from "./index.module.less";
 
 const roleOptions = [
   { key: "groupOffice", label: "集团董办", avatar: "董" },
-  { key: "adminDepartment", label: "综合管理部", avatar: "综" },
+  { key: "adminDepartment", label: "一汽股权", avatar: "股" },
   { key: "director", label: "董事", avatar: "董" },
 ];
 
@@ -153,7 +153,7 @@ export default function BoardGovernanceShell({
                 menu={{
                   items: [
                     { key: "groupOffice", label: "集团董办" },
-                    { key: "adminDepartment", label: "综合管理部" },
+                    { key: "adminDepartment", label: "一汽股权" },
                     { key: "director", label: "董事" },
                   ],
                   onClick: ({ key }) => handleRoleChange(key),

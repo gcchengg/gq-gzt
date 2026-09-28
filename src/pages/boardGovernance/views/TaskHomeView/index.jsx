@@ -169,9 +169,7 @@ export default function TaskHomeView({
       }),
     [handbookMaterials],
   );
-  const [activeCategory, setActiveCategory] = useState(
-    role === "groupOffice" ? "special-task" : "appointment",
-  );
+  const [activeCategory, setActiveCategory] = useState("appointment");
   const [activeDepartment, setActiveDepartment] = useState("");
   useEffect(() => {
     const taskSelection = location.state?.taskSelection;
@@ -215,38 +213,22 @@ export default function TaskHomeView({
         groups: [
           {
             department: "董事聘任",
-            records: visibleAppointmentTasks,
+            records:
+              role === "groupOffice"
+                ? [
+                    {
+                      id: "SPECIAL-LETTER",
+                      title: "下发董事推荐函",
+                      description: "向拟任董事发起推荐函下发与聘任流程",
+                      status: "待办理",
+                      deadline: "2026-09-30",
+                      href: "/boardGovernance/appointment?action=issue-letter",
+                    },
+                  ]
+                : visibleAppointmentTasks,
             completed: 0,
-            pending: visibleAppointmentTasks.length,
-          },
-        ],
-      },
-      {
-        key: "special-task",
-        label: "董事专项任务",
-        groups: [
-          {
-            department: "董事专项任务",
-            records: [
-              {
-                id: "SPECIAL-LETTER",
-                title: "下发董事推荐函",
-                description: "向拟任董事发起推荐函下发与聘任流程",
-                status: "待办理",
-                deadline: "2026-09-30",
-                href: "/boardGovernance/appointment?action=issue-letter",
-              },
-              {
-                id: "SPECIAL-EVALUATION",
-                title: "发起评价",
-                description: "发起董事年度履职评价专项任务",
-                status: "待办理",
-                deadline: "2026-10-15",
-                href: "/boardGovernance/director-special-tasks",
-              },
-            ],
-            completed: 0,
-            pending: 2,
+            pending:
+              role === "groupOffice" ? 1 : visibleAppointmentTasks.length,
           },
         ],
       },
@@ -334,13 +316,22 @@ export default function TaskHomeView({
       },
       {
         key: "duty-evaluation",
-        label: "履职评价",
+        label: "董事评价",
         groups: [
           {
-            department: "履职评价",
-            records: [],
+            department: "董事评价",
+            records: [
+              {
+                id: "SPECIAL-EVALUATION",
+                title: "发起评价",
+                description: "发起董事年度履职评价",
+                status: "待办理",
+                deadline: "2026-10-15",
+                href: "/boardGovernance/director-special-tasks",
+              },
+            ],
             completed: 0,
-            pending: 0,
+            pending: 1,
           },
         ],
       },
@@ -359,8 +350,8 @@ export default function TaskHomeView({
   const visibleTaskCategories = taskCategories.filter(({ key }) => {
     if (role === "director")
       return ["plan-creation", "confirmation"].includes(key);
-    if (role === "groupOffice") return key === "special-task";
-    if (role !== "groupOffice" && key === "special-task") return false;
+    if (role === "groupOffice")
+      return ["appointment", "duty-evaluation", "duty"].includes(key);
     return key !== "annual-plan-confirmation";
   });
   const currentCategory =
@@ -589,6 +580,24 @@ export default function TaskHomeView({
             : null}
           {selectedCategoryKey === "appointment"
             ? currentGroup?.records.map((item) => {
+                if (item.id === "SPECIAL-LETTER") {
+                  return (
+                    <article className={styles.taskRow} key={item.id}>
+                      <div>
+                        <h3>{item.title}</h3>
+                        <p>
+                          截止时间：{item.deadline}
+                          　　发送人：集团董办　　描述：
+                          {item.description}
+                        </p>
+                      </div>
+                      <aside>
+                        <StatusPill>{item.status}</StatusPill>
+                        <Link to={item.href}>去执行</Link>
+                      </aside>
+                    </article>
+                  );
+                }
                 const taskMeta = appointmentTaskMeta[item.status] || {
                   owner: item.owner,
                   description: item.status,
@@ -613,7 +622,7 @@ export default function TaskHomeView({
                 );
               })
             : null}
-          {selectedCategoryKey === "special-task"
+          {selectedCategoryKey === "duty-evaluation"
             ? currentGroup?.records.map((item) => (
                 <article className={styles.taskRow} key={item.id}>
                   <div>

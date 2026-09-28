@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Input, Modal, Switch, Upload } from "antd";
+import { Button, Input, Modal, Upload } from "antd";
 import {
   CloudUploadOutlined,
   FieldTimeOutlined,
@@ -220,9 +220,6 @@ function ResumeStep({ item, roleLabel, allowedActions, onUpdate }) {
 
 /* ─── Step 2: 配置系统权限并纳入组织架构 ─── */
 function PermissionStep({ item, roleLabel, allowedActions, onUpdate }) {
-  const [permissionDone, setPermissionDone] = useState(
-    Boolean(item?.permissionDone),
-  );
   const [situationDescription, setSituationDescription] = useState(
     item?.situationDescription || "",
   );
@@ -238,7 +235,6 @@ function PermissionStep({ item, roleLabel, allowedActions, onUpdate }) {
   const save = () => {
     onUpdate(
       {
-        permissionDone,
         situationDescription,
         platformManuals: manualFiles.map(({ uid, name }) => ({ uid, name })),
         currentStep: 3,
@@ -258,32 +254,6 @@ function PermissionStep({ item, roleLabel, allowedActions, onUpdate }) {
         </p>
       ) : (
         <>
-          <div className={styles.switches}>
-            <label className={styles.switchRow}>
-              <div>
-                <b>开通董事工作台账号</b>
-                <span>账号、密码及初始登录指引</span>
-              </div>
-              <Switch
-                checked={permissionDone}
-                checkedChildren="已完成"
-                unCheckedChildren="未完成"
-                onChange={setPermissionDone}
-              />
-            </label>
-            <label className={styles.switchRow}>
-              <div>
-                <b>纳入组织架构</b>
-                <span>同步人员、岗位与任期信息</span>
-              </div>
-              <Switch
-                checked={permissionDone}
-                checkedChildren="已完成"
-                unCheckedChildren="未完成"
-                onChange={setPermissionDone}
-              />
-            </label>
-          </div>
           <div className={styles.permissionField}>
             <label htmlFor="permission-situation">情况说明</label>
             <Input.TextArea

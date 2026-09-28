@@ -265,6 +265,12 @@ export default function DutyPlanWorkspace({
       render: (value) => value?.replaceAll("-", "/") || "",
     },
     { title: "预期达成目标", dataIndex: "target", width: "25%" },
+    {
+      title: "状态",
+      dataIndex: "status",
+      width: "12%",
+      render: (value) => <StatusPill>{value || "草稿"}</StatusPill>,
+    },
   ];
   const planningRows = workCategories.flatMap((workCategory) => {
     const categoryPlans = plans.filter(
@@ -311,6 +317,41 @@ export default function DutyPlanWorkspace({
               dataSource={planningRows}
               columns={planningColumns}
             />
+            <div className={styles.planFooter}>
+              <div className={styles.planFooterCopy}>
+                <strong>计划状态</strong>
+                <span>可先保存当前编制进度，提交后将更新计划状态。</span>
+              </div>
+              <Space>
+                <Button onClick={() => message.success("年度履职计划已保存")}>
+                  保存
+                </Button>
+                <Button
+                  type="primary"
+                  disabled={
+                    !planningRows.some((plan) => plan.status === "草稿")
+                  }
+                  onClick={() => {
+                    const draftIds = planningRows
+                      .filter((plan) => plan.status === "草稿")
+                      .map((plan) => plan.id);
+                    if (!draftIds.length) return;
+                    onSubmitPlan?.(draftIds);
+                    message.success(`已提交 ${draftIds.length} 项年度履职计划`);
+                    navigate("/boardGovernance/home", {
+                      state: {
+                        taskSelection: {
+                          category: "duty",
+                          department: "已确认履职计划任务",
+                        },
+                      },
+                    });
+                  }}
+                >
+                  提交
+                </Button>
+              </Space>
+            </div>
           </div>
         ) : (
           <div className={styles.planCards}>
