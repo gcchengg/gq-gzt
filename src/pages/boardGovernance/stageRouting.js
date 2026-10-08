@@ -37,6 +37,27 @@ export function resolveBoardGovernanceLocation(pathname, search = "") {
     };
   }
 
+  if (key === "duty-tasks" && query.get("taskType") === "suggestion") {
+    const suggestionId = query.get("bizId");
+    return {
+      key,
+      resource: "list",
+      id: null,
+      redirectTo: suggestionId
+        ? `/boardGovernance/duty-suggestions/${encodeURIComponent(suggestionId)}`
+        : "/boardGovernance/duty-suggestions",
+    };
+  }
+
+  if (key === "duty-suggestions") {
+    return {
+      key,
+      resource: rest[0] ? "suggestion" : "list",
+      id: rest[0] || null,
+      redirectTo: null,
+    };
+  }
+
   if (key === "appointment") {
     return {
       key,

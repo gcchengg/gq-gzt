@@ -33,7 +33,7 @@ const roleMenuKeys = {
   adminDepartment: navigationItems
     .filter(({ key }) => key !== "director-special-tasks")
     .map(({ key }) => key),
-  director: ["home", "management", "duty-tasks"],
+  director: ["home", "management", "duty-tasks", "duty-suggestions"],
 };
 
 const roleDefaultPage = {
@@ -56,9 +56,30 @@ export default function BoardGovernanceShell({
   const menuItems = useMemo(
     () =>
       navigationItems
-        .filter(({ key }) => visibleMenuKeys.includes(key))
+        .filter(
+          ({ key, parentKey }) => visibleMenuKeys.includes(key) && !parentKey,
+        )
         .map(({ key, label, icon: Icon }) => {
           const path = `/boardGovernance/${key}`;
+          if (key === "duty-tasks") {
+            return {
+              key: "duty-tasks-menu",
+              icon: <Icon />,
+              label,
+              children: [
+                {
+                  key: path,
+                  label: <Link to={path}>履职任务管理</Link>,
+                },
+                {
+                  key: "/boardGovernance/duty-suggestions",
+                  label: (
+                    <Link to="/boardGovernance/duty-suggestions">履职建议</Link>
+                  ),
+                },
+              ],
+            };
+          }
           return {
             key: path,
             icon: <Icon />,
@@ -113,6 +134,7 @@ export default function BoardGovernanceShell({
             mode="inline"
             inlineCollapsed={collapsed}
             selectedKeys={[`/boardGovernance/${activeKey}`]}
+            defaultOpenKeys={["duty-tasks-menu"]}
             items={menuItems}
           />
           <div className="gq-app-sidebar-footer">

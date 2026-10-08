@@ -1,0 +1,14 @@
+.page { display: grid; gap: 16px; min-width: 0; }
+.filters { display: flex; gap: 12px; margin-bottom: 14px; }
+.filters :global(.ant-input-search) { width: min(440px, 100%); }
+.filters :global(.ant-select) { min-width: 150px; }
+.personSelect { min-width: 280px; }
+.detailGrid { display: grid; gap: 16px; }
+.formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.hint { color: #77849a; font-size: 12px; }
+.notice { margin-bottom: 14px; }
+@media (max-width: 700px) {
+  .filters { flex-direction: column; }
+  .filters :global(.ant-input-search), .filters :global(.ant-select), .personSelect { width: 100%; }
+  .formGrid { grid-template-columns: 1fr; }
+}

@@ -1466,7 +1466,6 @@ export function DutyManagement({
   onGenerateDutyReport,
   onSaveDutyReport,
   onReceiveDutyReport,
-  suggestionTasks,
 }) {
   return (
     <div className={`${styles.layout} ${compact ? styles.compactLayout : ""}`}>
@@ -1531,7 +1530,6 @@ export function DutyManagement({
             { key: "overview", label: "履职概览" },
             { key: "plan", label: "履职计划" },
             { key: "events", label: "履职记录" },
-            { key: "suggestions", label: "意见建议" },
             { key: "reports", label: "成果报告" },
           ]}
         />
@@ -1549,7 +1547,6 @@ export function DutyManagement({
           onGenerateDutyReport={onGenerateDutyReport}
           onSaveDutyReport={onSaveDutyReport}
           onReceiveDutyReport={onReceiveDutyReport}
-          suggestionTasks={suggestionTasks}
         />
       </section>
     </div>
@@ -1690,7 +1687,6 @@ function TabContent({
   onGenerateDutyReport,
   onSaveDutyReport,
   onReceiveDutyReport,
-  suggestionTasks,
 }) {
   const plans = dutyPlans.filter((item) => item.directorName === director.name);
   const events = taskEventsFromPlans(plans);
@@ -1699,10 +1695,6 @@ function TabContent({
   if (tab === "plan") return <SyncedPlan plans={plans} compact={compact} />;
   if (tab === "events")
     return <SyncedEvents events={events} onEvent={onEvent} compact={compact} />;
-  if (tab === "suggestions")
-    return (
-      <SyncedSuggestions suggestionTasks={suggestionTasks} compact={compact} />
-    );
   if (tab === "reports")
     return (
       <DutyReportWorkspace
@@ -2094,61 +2086,6 @@ function SyncedEvents({ events, onEvent, compact = false }) {
             title: "任务状态",
             dataIndex: "status",
             render: (value) => <StatusPill>{value}</StatusPill>,
-          },
-        ]}
-      />
-    </SectionCard>
-  );
-}
-
-function SyncedSuggestions({ suggestionTasks, compact = false }) {
-  const rows = suggestionTasks;
-  return (
-    <SectionCard
-      title="意见建议落实"
-      extra={<span>来源于履职任务办理结果</span>}
-    >
-      <DataTable
-        rows={rows}
-        scroll={compact ? undefined : { x: "max-content" }}
-        columns={[
-          { title: "类型", dataIndex: "type", width: compact ? 96 : undefined },
-          {
-            title: "意见建议",
-            dataIndex: "content",
-            width: compact ? 140 : 380,
-          },
-          {
-            title: "来源任务",
-            dataIndex: "source",
-            width: compact ? 108 : undefined,
-          },
-          {
-            title: "责任部门",
-            dataIndex: "owner",
-            width: compact ? 108 : undefined,
-          },
-          {
-            title: "完成期限",
-            dataIndex: "deadline",
-            width: compact ? 96 : undefined,
-          },
-          // {
-          //   title: "进度",
-          //   dataIndex: "progress",
-          //   width: compact ? 118 : undefined,
-          //   render: (value) => <ProgressCell value={value} />,
-          // },
-          {
-            title: "状态",
-            dataIndex: "status",
-            width: compact ? 72 : undefined,
-            render: (value) => <StatusPill>{value}</StatusPill>,
-          },
-          {
-            title: "操作",
-            width: compact ? 72 : undefined,
-            render: (_, row) => <Link>查看</Link>,
           },
         ]}
       />

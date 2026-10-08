@@ -1,5 +1,13 @@
-1.boardGovernance/preparation/directors/D-02?tab=annual-plan&planMode=confirmation
-路径下的页面，点击【生成年度计划并创建任务】后弹出modal，点击【提交】应该跳转到 /boardGovernance/home中
-履职任务管理tab
-2./boardGovernance/home 集团董办角色下，【董事专项任务】tab，下发董事推荐函 任务点击去执行，跳转到
-boardGovernance/appointment 页面没问题，但是默认要弹出下发董事推荐函modal
+1.右上角 角色筛选，把综合管理部 改名为 一汽股权
+2.boardGovernance/appointment/AP-D-06 页面中当状态为配置系统权限并纳入组织架构时的页面，隐藏开通董事工作台账号和纳入组织架构两个switch的相关内容
+3./boardGovernance/preparation/directors/D-02?tab=annual-plan&planMode=planning 抽屉页中，底部添加保存和提交，table中增加状态列，分贝有草稿和
+已提交，提交后状态发生改变，提交后跳转到/boardGovernance/home页面中【履职任务管理】tab中
+4.boardGovernance/duty-tasks?bizId=PLAN-001 抽屉页中
+这里会议“会议地点”改为手写输入 去掉下拉；补充材料上面加一个补充说明，可以手写输入 补充要发给董事的关于这个的说明文字啥的
+
+
+1./boardGovernance/home 当集团董办角色下，现在【董事专项任务】下面有两个任务
+分别是下发董事推荐函 和 发起评价
+应该拆分为两个任务，分别为一个是董事聘任（下发推荐函）  一个是 董事评价（发起评价），删除原有的【董事专项任务】
+
+集团董办角色下，董事聘任只能看到下发推荐函任务，其余角色不能看到下发推荐函任务

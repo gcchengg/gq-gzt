@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import TaskIssueDrawer from "@/components/TaskIssueDrawer";
 import {
   DutyManagement,
   EventDetailDrawer,
   buildManagementDemoPlans,
   buildManagementDemoReports,
-  buildManagementDemoSuggestions,
 } from "../DirectorView";
 import DirectorStageTable from "../DirectorStageTable";
 import StageBlocked from "../StageBlocked";
@@ -29,7 +28,6 @@ export default function ManagementView({
   materials,
   dutyPlans,
   dutyReports,
-  suggestionTasks,
   generatedDirectorNames,
   onGenerateDutyReport,
   onSaveDutyReport,
@@ -39,10 +37,14 @@ export default function ManagementView({
   const [searchParams] = useSearchParams();
   const requestedTab = searchParams.get("tab");
   const requestedReportType = searchParams.get("reportType");
-  const [tab, setTab] = useState(requestedTab || "overview");
+  const [tab, setTab] = useState(
+    requestedTab === "suggestions" ? "overview" : requestedTab || "overview",
+  );
   const [event, setEvent] = useState(null);
   useEffect(() => {
-    setTab(requestedTab || "overview");
+    setTab(
+      requestedTab === "suggestions" ? "overview" : requestedTab || "overview",
+    );
   }, [requestedTab, id]);
   const scopedDirectors =
     role === "director"
@@ -59,18 +61,12 @@ export default function ManagementView({
   const visibleReports = dutyReports.filter(
     (item) => item.directorName === director?.name,
   );
-  const visibleSuggestions = suggestionTasks.filter(
-    (item) => item.directorName === director?.name,
-  );
   const managementPlans = visiblePlans.length
     ? visiblePlans
     : buildManagementDemoPlans(director);
   const managementReports = visibleReports.length
     ? visibleReports
     : buildManagementDemoReports(director, managementPlans);
-  const managementSuggestions = visibleSuggestions.length
-    ? visibleSuggestions
-    : buildManagementDemoSuggestions(director, managementPlans);
 
   return (
     <div className={styles.page}>
@@ -104,6 +100,13 @@ export default function ManagementView({
       >
         {director && canOpen ? (
           <>
+            <div className={styles.suggestionLink}>
+              <Link
+                to={`/boardGovernance/duty-suggestions?directorName=${encodeURIComponent(director.name)}`}
+              >
+                查看{director.name}的履职建议
+              </Link>
+            </div>
             <DutyManagement
               compact
               director={director}
@@ -118,7 +121,6 @@ export default function ManagementView({
               onGenerateDutyReport={onGenerateDutyReport}
               onSaveDutyReport={onSaveDutyReport}
               onReceiveDutyReport={onReceiveDutyReport}
-              suggestionTasks={managementSuggestions}
             />
             <EventDetailDrawer event={event} onClose={() => setEvent(null)} />
           </>

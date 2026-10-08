@@ -27,6 +27,13 @@ import CompanyMonitoringView from "./views/CompanyMonitoringView";
 import EvaluationResourceView from "./views/EvaluationResourceView";
 import MobileDirectorView from "./views/MobileDirectorView";
 import DirectorSpecialTaskView from "./views/DirectorSpecialTaskView";
+import DutySuggestionView from "./views/DutySuggestionView";
+import {
+  closeSuggestion,
+  createSuggestion,
+  dispatchSuggestion,
+  saveSuggestionProgress,
+} from "./suggestionWorkflow";
 
 const validKeys = new Set([
   "home",
@@ -44,6 +51,7 @@ const validKeys = new Set([
   "material-task",
   "plan-confirm-task",
   "duty-tasks",
+  "duty-suggestions",
   "roles",
   "director-special-tasks",
 ]);
@@ -310,41 +318,59 @@ export default function BoardGovernancePage() {
         const exists = current.some((item) => item.id === suggestionId);
         if (exists) return current;
         const plan = dutyPlans.find((item) => item.id === planId);
+        if (!plan) return current;
         return [
           ...current,
           {
-            id: suggestionId,
-            directorName: plan?.directorName,
+            ...createSuggestion({
+              id: suggestionId,
+              directorName: plan.directorName,
+              sourceTask: plan,
+              content: values.resultSuggestion,
+              initiatorRole: "director",
+              initiatorName: plan.directorName,
+              now: getNow(),
+            }),
             type: "履职建议类",
-            content: values.resultSuggestion,
-            source: plan?.content,
-            owner: plan?.owner,
-            assignee: plan?.taskAssignee,
-            deadline: values.actualDate || plan?.date,
-            progress: 0,
-            status: "待办理",
-            handlingPlan: "",
-            result: "",
-            feedback: "",
-            files: [],
           },
         ];
       });
     }
   };
-  const saveSuggestionTask = (taskId, values, submit = false) => {
+  const createDutySuggestion = (values, dispatchFields = null) => {
+    const created = createSuggestion({
+      ...values,
+      id: `SUG-${crypto.randomUUID()}`,
+      now: getNow(),
+    });
+    const next = dispatchFields
+      ? dispatchSuggestion(created, dispatchFields, getNow())
+      : created;
+    setSuggestionTasks((current) => [next, ...current]);
+    return next;
+  };
+  const dispatchDutySuggestion = (taskId, values) => {
+    const item = suggestionTasks.find((task) => task.id === taskId);
+    if (!item) throw new Error("履职建议不存在");
+    const updated = dispatchSuggestion(item, values, getNow());
     setSuggestionTasks((current) =>
-      current.map((item) =>
-        item.id === taskId
-          ? {
-              ...item,
-              ...values,
-              status: submit ? "已完成" : "办理中",
-              progress: submit ? 100 : values.progress,
-              completedAt: submit ? getNow() : item.completedAt,
-            }
-          : item,
-      ),
+      current.map((item) => (item.id === taskId ? updated : item)),
+    );
+  };
+  const saveDutySuggestionProgress = (taskId, values) => {
+    const item = suggestionTasks.find((task) => task.id === taskId);
+    if (!item) throw new Error("履职建议不存在");
+    const updated = saveSuggestionProgress(item, values, getNow());
+    setSuggestionTasks((current) =>
+      current.map((entry) => (entry.id === taskId ? updated : entry)),
+    );
+  };
+  const closeDutySuggestion = (taskId, values) => {
+    const item = suggestionTasks.find((task) => task.id === taskId);
+    if (!item) throw new Error("履职建议不存在");
+    const updated = closeSuggestion(item, values, getNow());
+    setSuggestionTasks((current) =>
+      current.map((entry) => (entry.id === taskId ? updated : entry)),
     );
   };
   const generateDutyReport = (director, completedPlans, values) => {
@@ -498,7 +524,7 @@ export default function BoardGovernancePage() {
           (item) => item.status === "已接收",
         ).length,
         completedSuggestionCount: suggestionTasks.filter(
-          (item) => item.status === "已完成",
+          (item) => item.status === "已关闭",
         ).length,
       },
       ...values,
@@ -541,8 +567,19 @@ export default function BoardGovernancePage() {
         onComplete={completeDutyTask}
         onSubmitMaterial={submitMaterials}
         onSavePlan={saveDutyPlanConfirmation}
-        suggestionTasks={suggestionTasks}
-        onSaveSuggestion={saveSuggestionTask}
+      />
+    ),
+    "duty-suggestions": (
+      <DutySuggestionView
+        role={role}
+        resource={resolved.resource}
+        id={resolved.id}
+        suggestions={suggestionTasks}
+        plans={dutyPlans}
+        onCreate={createDutySuggestion}
+        onDispatch={dispatchDutySuggestion}
+        onSaveProgress={saveDutySuggestionProgress}
+        onClose={closeDutySuggestion}
       />
     ),
     roles: <RoleConfigView />,
@@ -592,7 +629,6 @@ export default function BoardGovernancePage() {
         materials={handbookMaterials}
         dutyPlans={dutyPlans}
         dutyReports={dutyReports}
-        suggestionTasks={suggestionTasks}
         generatedDirectorNames={generatedDirectorNames}
         onGenerateDutyReport={generateDutyReport}
         onSaveDutyReport={saveDutyReport}

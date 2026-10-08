@@ -106,7 +106,7 @@ export default function DutyEvaluationWorkspace({
   const receivedReports = reports.filter((item) => item.status === "已接收");
   const completedPlans = plans.filter((item) => item.taskStatus === "已完成");
   const completedSuggestions = suggestionTasks.filter(
-    (item) => item.status === "已完成",
+    (item) => item.status === "已关闭",
   );
   const submittedCount = evaluators.filter(
     (item) => item.status === "已提交",

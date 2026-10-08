@@ -26,7 +26,7 @@
 | `src/pages/boardGovernance/suggestionWorkflow.js` | 纯状态操作、输入校验、角色可见范围与待办筛选 |
 | `src/pages/boardGovernance/suggestionWorkflow.test.js` | 状态、关联、权限和历史数据行为测试 |
 | `src/pages/boardGovernance/dutySuggestionData.js` | 演示建议初始数据及确定的来源任务关联 |
-| `src/pages/boardGovernance/views/DutySuggestionView/index.jsx` | 独立列表、详情、角色表单、空态和办理时间线 |
+| `src/pages/boardGovernance/views/DutySuggestionView/index.jsx` | 独立列表、路由驱动的详情抽屉、角色表单、空态和办理时间线 |
 | `src/pages/boardGovernance/views/DutySuggestionView/index.module.less` | 本模块布局和窄屏样式 |
 | `src/pages/boardGovernance/index.jsx` | 根状态、建议操作回调和新视图挂载 |
 | `src/pages/boardGovernance/stageRouting.js` | 新列表/详情路由解析与旧建议深链跳转 |
@@ -132,7 +132,7 @@ test("mounts the independent duty suggestion workflow", async () => {
 });
 ```
 
-- [ ] **Step 2: 实现页面。** `resource === "list"` 渲染 `PageHeader`、搜索、状态和责任人筛选、`DataTable`；`resource === "suggestion"` 通过 `id` 取建议并显示详情或错误态。董事的 `Form` 只有任务 Select 与建议 TextArea；董办额外显示责任信息；负责人表单显示落实方案、进度、反馈、佐证和结果。提交前调用 `form.validateFields()`，关闭时仅要求结果。建议详情里的每次操作调用相应回调，成功后显示 `message.success`。用 `Timeline` 展示 `history`，窄屏下表格允许横向滚动。
+- [ ] **Step 2: 实现页面。** 始终渲染 `PageHeader`、搜索、状态和责任人筛选、`DataTable`；`resource === "suggestion"` 时通过 `id` 打开右侧 `Drawer`，显示详情或错误态，关闭时导航回列表并保留查询参数。董事的 `Form` 只有任务 Select 与建议 TextArea；董办额外显示责任信息；负责人表单显示落实方案、进度、反馈、佐证和结果。提交前调用 `form.validateFields()`，关闭时仅要求结果。建议详情里的每次操作调用相应回调，成功后显示 `message.success`。用 `Timeline` 展示 `history`，窄屏下表格允许横向滚动。
 
 ```jsx
 const [searchParams] = useSearchParams();
@@ -178,7 +178,7 @@ test("suggestion fulfillment follows duty task management on the company home", 
 });
 ```
 
-- [ ] **Step 2: 在 `TaskHomeView` 的 `taskCategories` 中把“履职建议落实”放在 `duty` 分组之后。** 使用 `suggestionFulfillmentTasks(suggestionTasks)` 生成部门组；“待董办补充”仍只在建议列表提醒董办。把现有 `selectedCategoryKey === "suggestion"` 的旧链接改为新详情链接、旧“已完成”判断改为“已关闭”；列表行显示建议、责任人、状态，没待办时显示清晰空态。
+- [ ] **Step 2: 在 `TaskHomeView` 的 `taskCategories` 中把“履职建议落实”放在 `duty` 分组之后。** 下方直接列待办，不设置二级 tab 或按部门拆分；行标题区分“综合管理部董办的任务”和“其他任务”。前者列“待董办补充”，后者列已下发未关闭，点击时带入责任人筛选。初始演示数据让两类任务各有一条；列表行显示建议、责任人、状态，没待办时显示清晰空态。
 - [ ] **Step 3: 执行 `node --test src/pages/boardGovernance/suggestionWorkflow.test.js src/pages/boardGovernance/stageRouting.test.js src/pages/boardGovernance/index.test.js` 与 `pnpm vite.build`。** 预期新增及本功能更新的测试通过、构建成功。通过应用界面切换董事/一汽股权角色，手动走一遍“发起 → 董办下发 → 责任人保存进展 → 关闭”，核对首页数量、建议列表和详情同步。
 - [ ] **Step 4: 检查 `git diff --check`、`git status --short`，只提交本功能文件。** 提交信息 `feat: connect duty suggestions to company task home`；不要暂存 `需求/` 中原有未提交文件。
 

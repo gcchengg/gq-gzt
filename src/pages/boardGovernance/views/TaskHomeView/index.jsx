@@ -266,14 +266,6 @@ export default function TaskHomeView({
           },
         ],
       },
-      // {
-      //   key: "suggestion",
-      //   label: "意见建议落实任务",
-      //   groups: buildDepartmentGroups(
-      //     suggestionTasks,
-      //     (item) => item.status === "已完成",
-      //   ),
-      // },
       {
         key: "duty",
         label: "履职任务管理",
@@ -286,6 +278,22 @@ export default function TaskHomeView({
             ).length,
             pending: generatedPlans.filter(
               (item) => item.taskStatus !== "已完成",
+            ).length,
+          },
+        ],
+      },
+      {
+        key: "suggestion",
+        label: "履职建议落实",
+        groups: [
+          {
+            department: "履职建议待办",
+            records: suggestionTasks.filter((item) =>
+              ["待董办补充", "待落实", "办理中"].includes(item.status),
+            ),
+            completed: 0,
+            pending: suggestionTasks.filter((item) =>
+              ["待董办补充", "待落实", "办理中"].includes(item.status),
             ).length,
           },
         ],
@@ -441,6 +449,7 @@ export default function TaskHomeView({
           })}
         </section>
         {selectedCategoryKey !== "duty" &&
+        selectedCategoryKey !== "suggestion" &&
         selectedCategoryKey !== "confirmation" ? (
           <section className={styles.tabStrip} aria-label="责任部门">
             {currentCategory.groups.map((item) => (
@@ -477,8 +486,8 @@ export default function TaskHomeView({
               <button type="button">＋　手动创建</button>
             ) : null}
             {selectedCategoryKey === "suggestion" ? (
-              <Link to="/boardGovernance/duty-tasks?taskType=suggestion">
-                进入意见建议任务管理
+              <Link to="/boardGovernance/duty-suggestions">
+                进入履职建议列表
               </Link>
             ) : null}
           </header>
@@ -714,23 +723,39 @@ export default function TaskHomeView({
             ? currentGroup?.records.map((task) => (
                 <article className={styles.taskRow} key={task.id}>
                   <div>
-                    <h3>{task.content}</h3>
+                    <h3>
+                      {task.status === "待董办补充"
+                        ? "综合管理部董办的任务"
+                        : "责任人任务"}
+                      {" · "}
+                      {task.content}
+                    </h3>
                     <p>
-                      来源：{task.source}　　责任部门：{task.owner}　　负责人：
-                      {task.assignee}　　完成期限：{task.deadline}
+                      来源：{task.source}　　责任部门：
+                      {task.owner || "待董办明确"}　　负责人：
+                      {task.assignee || "待董办明确"}　　完成期限：
+                      {task.deadline || "待董办明确"}
                     </p>
                   </div>
                   <aside>
                     <StatusPill>{task.status}</StatusPill>
                     <Link
-                      to={`/boardGovernance/duty-tasks?taskType=suggestion&bizId=${task.id}`}
+                      to={`/boardGovernance/duty-suggestions/${task.id}${task.assignee ? `?assignee=${encodeURIComponent(task.assignee)}` : ""}`}
                     >
-                      {task.status === "已完成" ? "去执行" : "去办理"}
+                      {task.status === "待董办补充"
+                        ? "补充并下发"
+                        : task.status === "已关闭"
+                          ? "查看详情"
+                          : "去办理"}
                     </Link>
                   </aside>
                 </article>
               ))
             : null}
+          {selectedCategoryKey === "suggestion" &&
+          !currentGroup?.records.length ? (
+            <p className={styles.emptyHint}>暂无待办理的履职建议</p>
+          ) : null}
         </section>
       </main>
     </div>

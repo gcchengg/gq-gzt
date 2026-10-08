@@ -21,6 +21,12 @@ export const navigationItems = [
   { key: "management", label: "履职管理", icon: TeamOutlined },
   { key: "duty-evaluation", label: "履职评价", icon: AuditOutlined },
   { key: "duty-tasks", label: "履职任务", icon: CheckSquareOutlined },
+  {
+    key: "duty-suggestions",
+    label: "履职建议",
+    parentKey: "duty-tasks",
+    icon: SendOutlined,
+  },
   { key: "roles", label: "履职角色配置", icon: SettingOutlined },
 ];
 

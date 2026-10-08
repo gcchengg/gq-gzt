@@ -119,8 +119,6 @@ export default function DutyTaskManagerView({
   onComplete,
   onSubmitMaterial,
   onSavePlan,
-  suggestionTasks,
-  onSaveSuggestion,
   annualPlanConfirmationTasks = [],
   onSaveAnnualPlanConfirmation,
   onRoleChange,
@@ -133,7 +131,6 @@ export default function DutyTaskManagerView({
   const requestedTaskType = searchParams.get("taskType");
   const requestedTaskTypeIsValid = [
     "duty",
-    "suggestion",
     "material",
     "confirmation",
     "annual-plan-confirmation",
@@ -146,7 +143,6 @@ export default function DutyTaskManagerView({
         ? requestedTaskType
         : "duty";
   const [form] = Form.useForm();
-  const [suggestionForm] = Form.useForm();
   const [files, setFiles] = useState([]);
   const tasks = useMemo(() => plans.filter((item) => item.taskStatus), [plans]);
   const visibleAnnualPlanConfirmationTasks = useMemo(
@@ -160,10 +156,6 @@ export default function DutyTaskManagerView({
   );
   const selectedTask =
     activeTaskType === "duty" ? tasks.find((item) => item.id === bizId) : null;
-  const selectedSuggestion =
-    activeTaskType === "suggestion"
-      ? suggestionTasks.find((item) => item.id === bizId)
-      : null;
   const selectedPlan =
     activeTaskType === "confirmation"
       ? plans.find((item) => item.id === planId)
@@ -209,31 +201,8 @@ export default function DutyTaskManagerView({
     );
   }, [form, selectedTask]);
 
-  useEffect(() => {
-    if (!selectedSuggestion) return;
-    suggestionForm.setFieldsValue({
-      handlingPlan: selectedSuggestion.handlingPlan,
-      result: selectedSuggestion.result,
-      feedback: selectedSuggestion.feedback,
-      progress: selectedSuggestion.progress,
-    });
-    setFiles(
-      (selectedSuggestion.files || []).map((name, index) => ({
-        uid: `${selectedSuggestion.id}-${index}`,
-        name,
-        status: "done",
-      })),
-    );
-  }, [selectedSuggestion, suggestionForm]);
-
   const openTask = (task) => {
     navigate(`/boardGovernance/duty-tasks?taskType=duty&bizId=${task.id}`);
-  };
-
-  const openSuggestion = (task) => {
-    navigate(
-      `/boardGovernance/duty-tasks?taskType=suggestion&bizId=${task.id}`,
-    );
   };
 
   const openMaterialTask = (task) => {
@@ -265,7 +234,6 @@ export default function DutyTaskManagerView({
             : "/boardGovernance/duty-tasks",
     );
     form.resetFields();
-    suggestionForm.resetFields();
     setFiles([]);
   };
 
@@ -281,22 +249,8 @@ export default function DutyTaskManagerView({
     closeTask();
   };
 
-  const saveSuggestion = async (submit) => {
-    const values = await suggestionForm.validateFields();
-    onSaveSuggestion(
-      selectedSuggestion.id,
-      { ...values, files: files.map((file) => file.name) },
-      submit,
-    );
-    message.success(submit ? "意见建议落实任务已完成" : "办理进展已保存");
-    closeTask();
-  };
-
   const pendingCount = tasks.filter(
     (item) => item.taskStatus !== "已完成",
-  ).length;
-  const suggestionPendingCount = suggestionTasks.filter(
-    (item) => item.status !== "已完成",
   ).length;
   const materialTasks = useMemo(() => {
     const byDepartment = materials.reduce((groups, item) => {
@@ -337,25 +291,21 @@ export default function DutyTaskManagerView({
       ? materialTasks.find((item) => item.department === department)
       : null;
   const currentTotal =
-    activeTaskType === "suggestion"
-      ? suggestionTasks.length
-      : activeTaskType === "material"
-        ? materialTasks.length
-        : activeTaskType === "annual-plan-confirmation"
-          ? visibleAnnualPlanConfirmationTasks.length
-          : activeTaskType === "confirmation"
-            ? plans.length
-            : tasks.length;
+    activeTaskType === "material"
+      ? materialTasks.length
+      : activeTaskType === "annual-plan-confirmation"
+        ? visibleAnnualPlanConfirmationTasks.length
+        : activeTaskType === "confirmation"
+          ? plans.length
+          : tasks.length;
   const currentPending =
-    activeTaskType === "suggestion"
-      ? suggestionPendingCount
-      : activeTaskType === "material"
-        ? materialPendingCount
-        : activeTaskType === "annual-plan-confirmation"
-          ? annualPlanPendingCount
-          : activeTaskType === "confirmation"
-            ? confirmationPendingCount
-            : pendingCount;
+    activeTaskType === "material"
+      ? materialPendingCount
+      : activeTaskType === "annual-plan-confirmation"
+        ? annualPlanPendingCount
+        : activeTaskType === "confirmation"
+          ? confirmationPendingCount
+          : pendingCount;
 
   return (
     <div className={styles.page}>
@@ -398,10 +348,6 @@ export default function DutyTaskManagerView({
           }
           items={[
             { key: "duty", label: `履职计划任务 ${tasks.length}` },
-            // {
-            //   key: "suggestion",
-            //   label: `意见建议落实 ${suggestionTasks.length}`,
-            // },
             {
               key: "material",
               label: `履职手册资料 ${materialTasks.length}`,
@@ -447,39 +393,6 @@ export default function DutyTaskManagerView({
                 render: (_, row) => (
                   <Button type="link" onClick={() => openTask(row)}>
                     {row.taskStatus === "已完成" ? "查看/修改" : "办理"}
-                  </Button>
-                ),
-              },
-            ]}
-          />
-        ) : null}
-        {activeTaskType === "suggestion" ? (
-          <DataTable
-            rows={suggestionTasks}
-            columns={[
-              { title: "意见建议", dataIndex: "content", width: 330 },
-              { title: "来源", dataIndex: "source", width: 190 },
-              { title: "责任部门", dataIndex: "owner", width: 180 },
-              { title: "负责人", dataIndex: "assignee", width: 100 },
-              { title: "完成期限", dataIndex: "deadline", width: 120 },
-              {
-                title: "进度",
-                dataIndex: "progress",
-                width: 150,
-                render: (value) => <Progress percent={value} size="small" />,
-              },
-              {
-                title: "状态",
-                dataIndex: "status",
-                width: 100,
-                render: (value) => <StatusPill>{value}</StatusPill>,
-              },
-              {
-                title: "操作",
-                width: 100,
-                render: (_, row) => (
-                  <Button type="link" onClick={() => openSuggestion(row)}>
-                    {row.status === "已完成" ? "查看/修改" : "去办理"}
                   </Button>
                 ),
               },
@@ -619,13 +532,11 @@ export default function DutyTaskManagerView({
             ? `${selectedAnnualPlan.directorName} · 年度履职计划确认/调整`
             : selectedTask
               ? `${selectedTask.content} · 履职任务执行详情`
-              : selectedSuggestion
-                ? `${selectedSuggestion.content} · 意见建议落实办理`
-                : selectedMaterial
-                  ? `${selectedMaterial.department} · 履职手册资料更新`
-                  : selectedPlan
-                    ? `${selectedPlan.content} · 年度履职计划确认`
-                    : "任务不存在"
+              : selectedMaterial
+                ? `${selectedMaterial.department} · 履职手册资料更新`
+                : selectedPlan
+                  ? `${selectedPlan.content} · 年度履职计划确认`
+                  : "任务不存在"
         }
         onClose={closeTask}
         extra={
@@ -633,8 +544,6 @@ export default function DutyTaskManagerView({
             <StatusPill>{selectedAnnualPlan.status}</StatusPill>
           ) : selectedTask ? (
             <StatusPill>{selectedTask.taskStatus}</StatusPill>
-          ) : selectedSuggestion ? (
-            <StatusPill>{selectedSuggestion.status}</StatusPill>
           ) : selectedMaterial ? (
             <StatusPill>{selectedMaterial.status}</StatusPill>
           ) : selectedPlan ? (
@@ -832,121 +741,6 @@ export default function DutyTaskManagerView({
                 {selectedTask.taskStatus === "已完成"
                   ? "保存修改"
                   : "确认并下发任务通知"}
-              </Button>
-            </div>
-          </div>
-        ) : selectedSuggestion ? (
-          <div className={styles.drawerContent}>
-            <div className={styles.taskHero}>
-              {selectedSuggestion.status === "已完成" ? (
-                <CheckCircleOutlined />
-              ) : (
-                <UserOutlined />
-              )}
-              <div>
-                <span>当前负责人 · {selectedSuggestion.assignee}</span>
-                <h3>{selectedSuggestion.content}</h3>
-                <p>{selectedSuggestion.source}</p>
-              </div>
-            </div>
-            <Steps
-              size="small"
-              current={selectedSuggestion.status === "已完成" ? 3 : 2}
-              items={[
-                { title: "建议形成" },
-                { title: "任务派发" },
-                { title: "落实办理" },
-                { title: "成果归档" },
-              ]}
-            />
-            <Descriptions
-              bordered
-              column={2}
-              items={[
-                {
-                  key: "director",
-                  label: "提出董事",
-                  children: selectedSuggestion.directorName,
-                },
-                {
-                  key: "type",
-                  label: "建议类型",
-                  children: selectedSuggestion.type,
-                },
-                {
-                  key: "owner",
-                  label: "责任部门",
-                  children: selectedSuggestion.owner,
-                },
-                {
-                  key: "assignee",
-                  label: "责任人",
-                  children: selectedSuggestion.assignee,
-                },
-                {
-                  key: "source",
-                  label: "来源事项",
-                  children: selectedSuggestion.source,
-                },
-                {
-                  key: "deadline",
-                  label: "完成期限",
-                  children: selectedSuggestion.deadline,
-                },
-              ]}
-            />
-            <Form form={suggestionForm} layout="vertical">
-              <Form.Item
-                name="handlingPlan"
-                label="落实方案"
-                rules={[{ required: true, message: "请填写落实方案" }]}
-              >
-                <Input.TextArea
-                  rows={4}
-                  placeholder="说明落实步骤、责任分工和时间安排"
-                />
-              </Form.Item>
-              <Form.Item
-                name="progress"
-                label="办理进度"
-                rules={[{ required: true, message: "请填写办理进度" }]}
-              >
-                <InputNumber min={0} max={100} suffix="%" />
-              </Form.Item>
-              <Form.Item
-                name="result"
-                label="落实结果"
-                rules={[{ required: true, message: "请填写落实结果" }]}
-              >
-                <Input.TextArea
-                  rows={4}
-                  placeholder="填写已完成工作和形成成果"
-                />
-              </Form.Item>
-              <Form.Item name="feedback" label="反馈说明">
-                <Input.TextArea rows={3} placeholder="填写向董事反馈的内容" />
-              </Form.Item>
-              <Form.Item label="佐证材料">
-                <Dragger
-                  multiple
-                  beforeUpload={() => false}
-                  fileList={files}
-                  onChange={({ fileList }) => setFiles(fileList)}
-                >
-                  <InboxOutlined />
-                  <p>上传落实方案、反馈函、成果文件等佐证材料</p>
-                </Dragger>
-              </Form.Item>
-            </Form>
-            <div className={styles.actionBar}>
-              <Button onClick={closeTask}>取消</Button>
-              {selectedSuggestion.status !== "已完成" ? (
-                <Button onClick={() => saveSuggestion(false)}>保存进展</Button>
-              ) : null}
-              <Button type="primary" onClick={() => saveSuggestion(true)}>
-                {selectedSuggestion.status === "已完成"
-                  ? "保存修改"
-                  : "提交完成"}
               </Button>
             </div>
           </div>
