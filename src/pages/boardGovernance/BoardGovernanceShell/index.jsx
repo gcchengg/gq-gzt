@@ -69,7 +69,7 @@ export default function BoardGovernanceShell({
               children: [
                 {
                   key: path,
-                  label: <Link to={path}>履职任务管理</Link>,
+                  label: <Link to={path}>履职任务列表</Link>,
                 },
                 {
                   key: "/boardGovernance/duty-suggestions",
