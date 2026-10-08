@@ -162,7 +162,7 @@ export default function DirectorSpecialTaskView() {
             icon={<PlusOutlined />}
             onClick={() => setCreateOpen(true)}
           >
-            下发董事专项
+            下发董事专项任务
           </Button>
         }
       >
@@ -188,7 +188,7 @@ export default function DirectorSpecialTaskView() {
       <Modal
         open={createOpen}
         width={780}
-        title="下发董事专项"
+        title="下发董事专项任务"
         okText="确认下发"
         cancelText="取消"
         onOk={createTask}

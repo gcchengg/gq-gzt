@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { SendOutlined } from "@ant-design/icons";
-import TaskIssueDrawer from "@/components/TaskIssueDrawer";
 import AppointmentFlow from "../DirectorView/components/AppointmentFlow";
 import DirectorStageTable from "../DirectorStageTable";
 import StageBlocked from "../StageBlocked";
@@ -137,16 +136,6 @@ export default function AppointmentView({
           />
         )}
       </StageDetailDrawer>
-      {role === "groupOffice" ? (
-        <TaskIssueDrawer
-          zIndex={12120}
-          title="任务浮窗"
-          defaultTaskType="500"
-          onSubmit={(payload) => {
-            console.log(payload);
-          }}
-        />
-      ) : null}
     </div>
   );
 }

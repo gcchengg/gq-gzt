@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import TaskIssueDrawer from "@/components/TaskIssueDrawer";
 import {
   DutyManagement,
   EventDetailDrawer,
@@ -144,16 +143,6 @@ export default function ManagementView({
           />
         )}
       </StageDetailDrawer>
-      {role === "director" ? (
-        <TaskIssueDrawer
-          zIndex={12120}
-          title="任务浮窗"
-          defaultTaskType="500"
-          onSubmit={(payload) => {
-            console.log(payload);
-          }}
-        />
-      ) : null}
     </div>
   );
 }
