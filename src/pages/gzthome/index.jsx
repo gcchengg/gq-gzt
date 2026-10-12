@@ -446,17 +446,21 @@ function TaskPanel() {
           href: `/zj/list?expertEnrollmentId=${encodeURIComponent(item.id)}`,
         }));
     }
-    return state.tasks
-      .filter((item) =>
-        activeTab === "锁定排期"
-          ? item.stage === "待运营排期"
-          : item.stage === "匹配中",
-      )
-      .map((item) => ({
-        title: `${item.project || item.id} · ${activeTab}`,
-        description: `项目：${item.project || item.id}；当前阶段：${item.stage}`,
-        href: `/zj/tasks?taskId=${encodeURIComponent(item.id)}`,
-      }));
+    const matchingTasks = state.tasks.filter((item) => item.stage === "匹配中");
+    const taskList =
+      activeTab === "锁定排期"
+        ? state.tasks.filter((item) => item.stage === "待运营排期")
+        : [
+            ...matchingTasks,
+            ...["服务中", "待评价"]
+              .map((stage) => state.tasks.find((item) => item.stage === stage))
+              .filter(Boolean),
+          ];
+    return taskList.map((item) => ({
+      title: `${item.project || item.id} · ${activeTab}`,
+      description: `项目：${item.project || item.id}；当前阶段：${item.stage}`,
+      href: `/zj/tasks?taskId=${encodeURIComponent(item.id)}`,
+    }));
   }, [activeTab, state.invitations, state.tasks]);
   const taskRows = isExpertHome
     ? expertTaskRows
@@ -473,13 +477,24 @@ function TaskPanel() {
             : null,
         ].filter(Boolean);
   const showSecondary = taskRows.length > 1;
+  const showMultiple = taskRows.length > 2;
   const rowsClassName = useMemo(
-    () => ["rows", showSecondary ? "show-secondary" : ""].join(" "),
-    [showSecondary],
+    () =>
+      [
+        "rows",
+        showSecondary ? "show-secondary" : "",
+        showMultiple ? "show-multiple" : "",
+      ].join(" "),
+    [showMultiple, showSecondary],
   );
   const panelClassName = useMemo(
-    () => ["list-panel", showSecondary ? "show-secondary" : ""].join(" "),
-    [showSecondary],
+    () =>
+      [
+        "list-panel",
+        showSecondary ? "show-secondary" : "",
+        showMultiple ? "show-multiple" : "",
+      ].join(" "),
+    [showMultiple, showSecondary],
   );
   useEffect(() => {
     setActiveTab(taskFromUrl);

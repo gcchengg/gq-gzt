@@ -961,7 +961,7 @@ export const tasks = [
     field: "智能网联",
     expert: "宋语桐",
     expertId: "EX20260063",
-    stage: "待补充",
+    stage: "待评价",
     due: "09-18",
     budget: "¥15,000",
     progress: 75,

@@ -1,7 +1,7 @@
 import {
-  BellOutlined,
   CheckCircleOutlined,
   DatabaseOutlined,
+  DownloadOutlined,
   FileSearchOutlined,
   PlusOutlined,
   SafetyCertificateOutlined,
@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   Descriptions,
+  DatePicker,
   Drawer,
   Form,
   Input,
@@ -73,6 +74,44 @@ const statusColor = {
 
 function dateText(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+function getEnrollmentDate(expert) {
+  const candidates = [
+    expert.enrolledAt,
+    ...(expert.appointmentHistory || []).flatMap((item) => [
+      item.signedAt,
+      item.sentAt,
+    ]),
+    ...(expert.history || [])
+      .filter((item) => /正式入库|正式聘用入库/.test(item.text || ""))
+      .map((item) => item.at),
+  ];
+  const dates = candidates
+    .map(
+      (value) => String(value || "").match(/\d{4}[-/]\d{1,2}[-/]\d{1,2}/)?.[0],
+    )
+    .filter(Boolean)
+    .map((value) => {
+      const [year, month, day] = value.replaceAll("/", "-").split("-");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    })
+    .sort();
+  return dates[0] || "";
+}
+function getExitDate(expert) {
+  const value =
+    expert.dismissal?.effectiveDate ||
+    expert.history?.find((item) => /解聘|退出专家库/.test(item.text || ""))?.at;
+  const match = String(value || "").match(/\d{4}[-/]\d{1,2}[-/]\d{1,2}/)?.[0];
+  if (!match) return "";
+  const [year, month, day] = match.replaceAll("/", "-").split("-");
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+}
+function isWithinRange(value, start, end) {
+  return Boolean(value && (!start || value >= start) && (!end || value <= end));
+}
+function matchesOptionalRange(value, start, end) {
+  return (!start && !end) || isWithinRange(value, start, end);
 }
 function fixedTermEnd(start) {
   const date = new Date(`${start}T00:00:00`);
@@ -993,28 +1032,123 @@ function ExpertList({ embedded = false }) {
   const { experts } = useExpertStore();
   const [keyword, setKeyword] = useState("");
   const [field, setField] = useState();
+  const [quickStatus, setQuickStatus] = useState();
   const [status, setStatus] = useState();
+  const [enrollmentRange, setEnrollmentRange] = useState(null);
+  const [exitRange, setExitRange] = useState(null);
   const [selected, setSelected] = useState(null);
   const [exitExpert, setExitExpert] = useState(null);
   const [exitReason, setExitReason] = useState("");
   const statusCounts = useMemo(() => {
-    const counts = {};
-    experts.forEach((item) => {
-      counts[item.status] = (counts[item.status] || 0) + 1;
-    });
-    return counts;
+    const availableStatuses = new Set(["可用", "忙碌"]);
+    return {
+      可用: experts.filter((item) => item.status === "可用").length,
+      忙碌: experts.filter((item) => item.status === "忙碌").length,
+      不可用: experts.filter((item) => !availableStatuses.has(item.status))
+        .length,
+    };
   }, [experts]);
   const rows = useMemo(
     () =>
-      experts.filter(
-        (x) =>
+      experts.filter((x) => {
+        const enrollmentDate = getEnrollmentDate(x);
+        const exitDate = getExitDate(x);
+        const enrollmentStart = enrollmentRange?.[0]?.format("YYYY-MM-DD");
+        const enrollmentEnd = enrollmentRange?.[1]?.format("YYYY-MM-DD");
+        const exitStart = exitRange?.[0]?.format("YYYY-MM-DD");
+        const exitEnd = exitRange?.[1]?.format("YYYY-MM-DD");
+        return (
           (!keyword ||
             [x.name, x.company, x.id, ...x.tags].join(" ").includes(keyword)) &&
           (!field || x.field === field) &&
-          (!status || x.status === status),
-      ),
-    [experts, keyword, field, status],
+          matchesOptionalRange(
+            enrollmentDate,
+            enrollmentStart,
+            enrollmentEnd,
+          ) &&
+          (x.status !== "已解聘" ||
+            matchesOptionalRange(exitDate, exitStart, exitEnd)) &&
+          (!quickStatus ||
+            (quickStatus === "不可用"
+              ? !["可用", "忙碌"].includes(x.status)
+              : x.status === quickStatus)) &&
+          (!status || x.status === status)
+        );
+      }),
+    [experts, keyword, field, quickStatus, status, enrollmentRange, exitRange],
   );
+  function exportExperts() {
+    const enrollmentStart = enrollmentRange?.[0]?.format("YYYY-MM-DD");
+    const enrollmentEnd = enrollmentRange?.[1]?.format("YYYY-MM-DD");
+    const exitStart = exitRange?.[0]?.format("YYYY-MM-DD");
+    const exitEnd = exitRange?.[1]?.format("YYYY-MM-DD");
+    if ((!enrollmentStart || !enrollmentEnd) && (!exitStart || !exitEnd)) {
+      message.warning("请至少选择完整的入库时间段或解聘时间段");
+      return;
+    }
+    const headers = [
+      "专家编号",
+      "姓名",
+      "单位",
+      "变动类型",
+      "变动时间",
+      "入库时间",
+      "解聘生效时间",
+      "专家状态",
+      "领域",
+      "等级",
+      "聘期开始",
+      "聘期结束",
+      "综合评分",
+    ];
+    const values = experts.flatMap((expert) => {
+      const enrollmentDate = getEnrollmentDate(expert);
+      const exitDate = getExitDate(expert);
+      const base = [expert.id, expert.name, expert.company];
+      const details = [
+        enrollmentDate,
+        exitDate,
+        expert.status,
+        expert.field,
+        expert.level,
+        expert.termStart,
+        expert.termEnd,
+        expert.score,
+      ];
+      const movements = [];
+      if (
+        enrollmentStart &&
+        enrollmentEnd &&
+        isWithinRange(enrollmentDate, enrollmentStart, enrollmentEnd)
+      )
+        movements.push([...base, "入库", enrollmentDate, ...details]);
+      if (
+        expert.status === "已解聘" &&
+        exitStart &&
+        exitEnd &&
+        isWithinRange(exitDate, exitStart, exitEnd)
+      )
+        movements.push([...base, "出库", exitDate, ...details]);
+      return movements;
+    });
+    const csv = [headers, ...values]
+      .map((line) =>
+        line
+          .map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`)
+          .join(","),
+      )
+      .join("\r\n");
+    const blob = new Blob(["\uFEFF", csv], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `专家入库出库_入库${enrollmentStart || "未筛选"}-${enrollmentEnd || "未筛选"}_解聘${exitStart || "未筛选"}-${exitEnd || "未筛选"}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    message.success(`已导出 ${values.length} 条入库/出库记录`);
+  }
   function requestExit(expert) {
     setExitExpert(expert);
     setExitReason(
@@ -1073,6 +1207,18 @@ function ExpertList({ embedded = false }) {
       ),
     },
     { title: "单位", dataIndex: "company", ellipsis: true },
+    {
+      title: "入库时间",
+      key: "enrolledAt",
+      width: 130,
+      render: (_, expert) => getEnrollmentDate(expert) || "—",
+    },
+    {
+      title: "解聘生效时间",
+      key: "exitDate",
+      width: 140,
+      render: (_, expert) => getExitDate(expert) || "—",
+    },
     {
       title: "领域与标签",
       dataIndex: "field",
@@ -1143,7 +1289,9 @@ function ExpertList({ embedded = false }) {
               <p>一人一档，统一检索专家能力、履历、服务与合规信息</p>
             </div>
             <div className={wb.headActions}>
-              <Button>导出</Button>
+              <Button icon={<DownloadOutlined />} onClick={exportExperts}>
+                导出
+              </Button>
               <Button type="primary" icon={<PlusOutlined />}>
                 邀请专家
               </Button>
@@ -1153,8 +1301,11 @@ function ExpertList({ embedded = false }) {
         <div className={wb.stageStrip}>
           <button
             type="button"
-            className={`${wb.stageItem} ${status ? "" : wb.active}`}
-            onClick={() => setStatus()}
+            className={`${wb.stageItem} ${quickStatus || status ? "" : wb.active}`}
+            onClick={() => {
+              setQuickStatus();
+              setStatus();
+            }}
           >
             <span>
               <i style={{ background: "#2563eb" }} />
@@ -1167,8 +1318,11 @@ function ExpertList({ embedded = false }) {
               type="button"
               key={item}
               title={expertStatusHint(item)}
-              className={`${wb.stageItem} ${status === item ? wb.active : ""}`}
-              onClick={() => setStatus(status === item ? undefined : item)}
+              className={`${wb.stageItem} ${quickStatus === item ? wb.active : ""}`}
+              onClick={() => {
+                setQuickStatus(quickStatus === item ? undefined : item);
+                setStatus();
+              }}
             >
               <span>
                 <i style={{ background: expertStatusTone(item) }} />
@@ -1199,22 +1353,63 @@ function ExpertList({ embedded = false }) {
                 value: v,
               }))}
             />
+            <Select
+              allowClear
+              placeholder="专家状态"
+              style={{ width: 180 }}
+              value={status}
+              onChange={(value) => {
+                setStatus(value);
+                setQuickStatus();
+              }}
+              options={[...new Set(experts.map((x) => x.status))].map((v) => ({
+                label: v,
+                value: v,
+              }))}
+            />
+            <DatePicker.RangePicker
+              allowClear
+              value={enrollmentRange}
+              onChange={setEnrollmentRange}
+              placeholder={["入库开始日期", "入库结束日期"]}
+              style={{ width: 280 }}
+            />
+            <DatePicker.RangePicker
+              allowClear
+              value={exitRange}
+              onChange={setExitRange}
+              placeholder={["解聘开始日期", "解聘结束日期"]}
+              style={{ width: 280 }}
+            />
+            <Button icon={<DownloadOutlined />} onClick={exportExperts}>
+              导出
+            </Button>
             <Button
               onClick={() => {
                 setKeyword("");
                 setField();
+                setQuickStatus();
                 setStatus();
+                setEnrollmentRange(null);
+                setExitRange(null);
               }}
             >
               重置
             </Button>
             <span className={wb.filterMeta}>共 {rows.length} 位</span>
           </section>
-          {status ? (
+          {quickStatus || status ? (
             <div className={wb.tableTop}>
               <span className={wb.filterChip}>
-                已按「{status}」筛选
-                <Button type="link" size="small" onClick={() => setStatus()}>
+                已按「{status || quickStatus}」筛选
+                <Button
+                  type="link"
+                  size="small"
+                  onClick={() => {
+                    setQuickStatus();
+                    setStatus();
+                  }}
+                >
                   清除
                 </Button>
               </span>
@@ -1328,9 +1523,6 @@ function Operations() {
       warningDays: 90,
     },
   );
-  const [notices, setNotices] = useState(
-    saved.notices || { sms: true, mini: true, todo: true, expiry: true },
-  );
   const defaultFees = [
     ["外聘", "两院院士", 2500, "税后"],
     ["外聘", "高级专家", 2000, "税后"],
@@ -1381,18 +1573,6 @@ function Operations() {
       count: `${fees.length} 条标准`,
       icon: DatabaseOutlined,
     },
-    {
-      title: "表单与模板",
-      desc: "邀请函、聘书、承诺、评价及消息模板",
-      count: "6 个模板",
-      icon: FileSearchOutlined,
-    },
-    {
-      title: "通知与日志",
-      desc: "消息触达、权限范围及关键操作日志",
-      count: "4 项通知",
-      icon: BellOutlined,
-    },
   ];
   const templates = [
     ["专家合作邀请函", "入库邀请", "V1.2"],
@@ -1409,35 +1589,12 @@ function Operations() {
     status: "生效中",
     updated: "2026-09-05",
   }));
-  const audits = [
-    {
-      key: 1,
-      time: "2026-09-07 15:20",
-      actor: "管理员·郑华峰",
-      action: "调整候选匹配权重",
-      result: "成功",
-    },
-    {
-      key: 2,
-      time: "2026-09-06 11:08",
-      actor: "运营部·王琳",
-      action: "启用咨询记录 V1.4",
-      result: "成功",
-    },
-    {
-      key: 3,
-      time: "2026-09-05 17:42",
-      actor: "系统",
-      action: "同步专家费用标准",
-      result: "成功",
-    },
-  ];
   function saveConfig() {
     const total = Object.values(weights).reduce((a, b) => a + b, 0);
     if (total !== 100) return message.error("匹配权重合计必须为100%");
     localStorage.setItem(
       "expert-operations-config-v1",
-      JSON.stringify({ weights, categories, domains, rules, notices, fees }),
+      JSON.stringify({ weights, categories, domains, rules, fees }),
     );
     message.success("运营配置已保存到当前浏览器，并生成演示版本 V2.4");
   }
@@ -1756,61 +1913,12 @@ function Operations() {
           />
         </>
       );
-    return (
-      <>
-        <div className={styles.panelHead}>
-          <div>
-            <h3>通知开关与操作审计</h3>
-            <p>通知失败不阻断业务，关键操作必须留痕</p>
-          </div>
-          <Tag color="green">运行正常</Tag>
-        </div>
-        <Descriptions
-          bordered
-          column={2}
-          items={[
-            ["sms", "短信通知"],
-            ["mini", "小程序消息"],
-            ["todo", "工作台待办"],
-            ["expiry", "聘期与签署到期提醒"],
-          ].map(([key, label]) => ({
-            key,
-            label,
-            children: (
-              <Switch
-                checked={notices[key]}
-                onChange={(checked) =>
-                  setNotices({ ...notices, [key]: checked })
-                }
-                checkedChildren="启用"
-                unCheckedChildren="停用"
-              />
-            ),
-          }))}
-        />
-        <h3 className={styles.sectionTitle}>最近操作日志</h3>
-        <Table
-          size="small"
-          pagination={false}
-          dataSource={audits}
-          columns={[
-            { title: "时间", dataIndex: "time" },
-            { title: "操作人", dataIndex: "actor" },
-            { title: "操作内容", dataIndex: "action" },
-            {
-              title: "结果",
-              dataIndex: "result",
-              render: (v) => <Tag color="success">{v}</Tag>,
-            },
-          ]}
-        />
-      </>
-    );
+    return null;
   }
   return (
     <Shell
       title="运营管理"
-      subtitle="集中维护专家库规则、标准、模板和通知策略"
+      subtitle="集中维护专家库规则、费用标准与业务模板"
       actions={
         <Button type="primary" onClick={saveConfig}>
           保存当前配置
@@ -1895,7 +2003,7 @@ function ExpertManagement() {
   const [panel, setPanel] = useState(() =>
     location.state?.expertManagementTab === "enrollment" || initialSelectedId
       ? "enrollment"
-      : "experts",
+      : "enrollment",
   );
   const [innerTab, setInnerTab] = useState(
     initialSelectedId ? "invitations" : "pool",
@@ -1920,7 +2028,6 @@ function ExpertManagement() {
               <PageHelp page="专家管理" compact />
               {panel === "experts" ? (
                 <>
-                  <Button>导出</Button>
                   <Button
                     type="primary"
                     icon={<PlusOutlined />}
@@ -1944,11 +2051,11 @@ function ExpertManagement() {
             </div>
           }
           items={[
-            { key: "experts", label: "在库专家" },
             {
               key: "enrollment",
               label: `入库办理（${invitations.length}）`,
             },
+            { key: "experts", label: "在库专家" },
           ]}
         />
         <div className={panel === "experts" ? undefined : wb.hiddenPanel}>

@@ -8,7 +8,7 @@ import {
 
 const KEY = "expert-talent-pc-v6";
 export const demoNotice =
-  "本地前端演示：数据仅保存在当前浏览器；短信、审批及小程序同步均未接真实服务。";
+  "本地前端演示：数据仅保存在当前浏览器；短信通知与审批均未接真实服务。";
 
 export const people = [
   {
@@ -461,13 +461,13 @@ const seed = {
       letterTemplate: "专家合作邀请函（标准版）",
       expiry: "2026-09-30",
       stage: "资料完善中",
-      agreed: false,
+      agreed: true,
       submitted: false,
       history: invitationHistory([
         [
           "2026-09-01 09:12:00",
           "股权运营部（演示）",
-          "发送《专家合作邀请函（标准版）》YQH-2026-001；短信仅作小程序查看通知",
+          "发送《专家合作邀请函（标准版）》YQH-2026-001，并记录短信通知",
         ],
       ]),
     },
@@ -871,7 +871,71 @@ const seed = {
       ]),
     },
   ],
-  sms: [],
+  sms: [
+    {
+      id: "SMS-DEMO-001",
+      invitationId: "INV-DEMO-1",
+      type: "短信",
+      name: "张明",
+      address: "13800005208",
+      content:
+        "【专家人才库】张明老师，您的专家合作邀请函已生成，工作人员将与您联系。",
+      at: "2026-09-01 09:12:00",
+      status: "已发送",
+    },
+    {
+      id: "EMAIL-DEMO-001",
+      invitationId: "INV-DEMO-1",
+      type: "邮件",
+      name: "张明",
+      address: "zhangming@example.com",
+      content: "专家合作邀请函已生成，工作人员将与您联系。",
+      at: "2026-09-01 09:12:00",
+      status: "已发送",
+    },
+    {
+      id: "SMS-DEMO-002",
+      invitationId: "INV-DEMO-2",
+      type: "短信",
+      name: "许文博",
+      address: "13800005209",
+      content:
+        "【专家人才库】许文博老师，您的专家合作邀请函已生成，工作人员将与您联系。",
+      at: "2026-09-02 10:00:00",
+      status: "已发送",
+    },
+    {
+      id: "EMAIL-DEMO-002",
+      invitationId: "INV-DEMO-2",
+      type: "邮件",
+      name: "许文博",
+      address: "xuwenbo@example.com",
+      content: "专家合作邀请函已生成，工作人员将与您联系。",
+      at: "2026-09-02 10:00:00",
+      status: "已发送",
+    },
+    {
+      id: "SMS-DEMO-003",
+      invitationId: "INV-DEMO-3",
+      type: "短信",
+      name: "唐欣然",
+      address: "13800005210",
+      content:
+        "【专家人才库】唐欣然老师，您的专家合作邀请函已生成，工作人员将与您联系。",
+      at: "2026-09-03 11:00:00",
+      status: "已发送",
+    },
+    {
+      id: "EMAIL-DEMO-003",
+      invitationId: "INV-DEMO-3",
+      type: "邮件",
+      name: "唐欣然",
+      address: "tangxinran@example.com",
+      content: "专家合作邀请函已生成，工作人员将与您联系。",
+      at: "2026-09-03 11:00:00",
+      status: "已发送",
+    },
+  ],
   tasks: tasks.map(enrichDemoTask),
 };
 function normalize(saved) {
@@ -887,7 +951,14 @@ function normalize(saved) {
     candidates: Array.isArray(saved.candidates)
       ? saved.candidates
       : structuredClone(seed.candidates),
-    sms: Array.isArray(saved.sms) ? saved.sms : [],
+    sms: Array.isArray(saved.sms)
+      ? saved.sms.map((item) => ({
+          ...item,
+          type: item.type || "短信",
+          address: item.address || item.phone || "—",
+          status: item.status || "--",
+        }))
+      : [],
   };
   const savedExperts = Array.isArray(saved.experts) ? saved.experts : [];
   next.experts = structuredClone(experts).map((fallback) => {
@@ -900,7 +971,14 @@ function normalize(saved) {
     migrated.appointmentHistory = Array.isArray(migrated.appointmentHistory)
       ? migrated.appointmentHistory
       : [];
-    migrated.history = Array.isArray(migrated.history) ? migrated.history : [];
+    migrated.history = Array.isArray(migrated.history)
+      ? migrated.history.map((entry) => ({
+          ...entry,
+          text: String(entry.text || "")
+            .replaceAll("；短信通知/邮件发送推荐函", "，并记录短信通知")
+            .replaceAll("小程序", "线上渠道"),
+        }))
+      : [];
     return migrated;
   });
   savedExperts
@@ -916,7 +994,7 @@ function normalize(saved) {
       }),
     );
   next.invitations = next.invitations.map((item) => {
-    const migrated = { ...item };
+    const migrated = { ...item, agreed: true };
     if (migrated.stage === "待总办会审议") migrated.stage = "领导审批中";
     if (migrated.stage === "总办会通过·待聘任") migrated.stage = "待签发聘书";
     if (migrated.stage === "总办会未通过") migrated.stage = "审批退回";
@@ -938,6 +1016,11 @@ function normalize(saved) {
       next.candidates.push(structuredClone(item));
     }
   });
+  seed.sms.forEach((item) => {
+    if (!next.sms.some((entry) => entry.id === item.id)) {
+      next.sms.push(structuredClone(item));
+    }
+  });
   next.tasks = next.tasks.map((task) => {
     const migratedTask = { ...task };
     if (migratedTask.stage === "调用受理中") migratedTask.stage = "匹配中";
@@ -949,6 +1032,7 @@ function normalize(saved) {
       migratedTask.stage = "服务中";
     if (migratedTask.stage === "已完成") migratedTask.stage = "已评价完成";
     if (migratedTask.stage === "待验收") migratedTask.stage = "待评价";
+    if (migratedTask.stage === "待补充") migratedTask.stage = "待评价";
     delete migratedTask.commitment;
     migratedTask.evaluations = Array.isArray(migratedTask.evaluations)
       ? migratedTask.evaluations
@@ -963,7 +1047,6 @@ function normalize(saved) {
     const shouldShowSignedDemo = [
       "服务中",
       "履约中",
-      "待补充",
       "待评价",
       "已评价完成",
       "已完成",
@@ -1217,45 +1300,6 @@ function enrichDemoTask(task) {
           "排期已锁定，任务进入服务中，成果与验收已解锁",
         ],
         ["2026-09-05 16:40:00", "专家/经办人（演示）", "保存咨询记录草稿"],
-      ]),
-    };
-  }
-  if (task.stage === "待补充") {
-    const version = {
-      number: 1,
-      at: "2026-09-04 16:20:00",
-      content: record.judgment,
-      attachment: record.attachment,
-    };
-    return {
-      ...signedBase,
-      revisionDeadline: "2026-09-18",
-      versions: [version],
-      acceptance: [
-        {
-          at: "2026-09-05 11:08:00",
-          actor: "PC需求部门（演示）",
-          text: "退回补充：请补充客户验证与量产进度的量化依据",
-          version: 1,
-          deadline: "2026-09-18",
-        },
-      ],
-      history: taskHistory([
-        [
-          "2026-09-01 10:06:18",
-          "股权运营部（演示）",
-          "排期已锁定，任务进入服务中，成果与验收已解锁",
-        ],
-        [
-          "2026-09-04 16:20:00",
-          "专家/经办人（演示）",
-          "正式提交咨询记录 v1，进入待评价",
-        ],
-        [
-          "2026-09-05 11:08:00",
-          "PC需求部门（演示）",
-          "退回补充：请补充客户验证与量产进度的量化依据",
-        ],
       ]),
     };
   }

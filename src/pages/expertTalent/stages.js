@@ -60,20 +60,10 @@ export const taskStageMeta = {
     tone: "#08979c",
     hint: "人选已确认，等待锁定服务时间",
   },
-  履约中: {
-    color: "processing",
-    tone: "#1677ff",
-    hint: "专家已确认合作，可填写咨询记录",
-  },
   服务中: {
     color: "processing",
     tone: "#1677ff",
     hint: "专家已确认合作，咨询服务进行中",
-  },
-  待补充: {
-    color: "warning",
-    tone: "#d48806",
-    hint: "成果已退回，等待专家补充",
   },
   待评价: {
     color: "blue",
@@ -93,7 +83,6 @@ export const taskStageStrip = [
   "匹配中",
   "待运营排期",
   "服务中",
-  "待补充",
   "待评价",
   "已评价完成",
 ];
@@ -105,6 +94,11 @@ export const taskStageHint = (stage) => taskStageMeta[stage]?.hint || "";
 export const expertStatusMeta = {
   可用: { color: "success", tone: "#389e0d", hint: "可发起调用" },
   忙碌: { color: "processing", tone: "#1677ff", hint: "当前有在办任务" },
+  不可用: {
+    color: "default",
+    tone: "#94a3b8",
+    hint: "除可用、忙碌外的全部专家状态",
+  },
   待续聘: { color: "warning", tone: "#d48806", hint: "聘期临近，需办理续聘" },
   续聘审批中: {
     color: "geekblue",
@@ -120,15 +114,7 @@ export const expertStatusMeta = {
   已解聘: { color: "default", tone: "#94a3b8", hint: "已退出专家库" },
 };
 
-export const expertStatusStrip = [
-  "可用",
-  "忙碌",
-  "待续聘",
-  "续聘审批中",
-  "待签发续聘聘书",
-  "限制调用",
-  "已解聘",
-];
+export const expertStatusStrip = ["可用", "忙碌", "不可用"];
 export const expertStatusColor = (status) =>
   expertStatusMeta[status]?.color || "default";
 export const expertStatusTone = (status) =>

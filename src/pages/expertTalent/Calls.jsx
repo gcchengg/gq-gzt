@@ -1,4 +1,8 @@
-import { PlusOutlined, WarningOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  UploadOutlined,
+  WarningOutlined,
+} from "@ant-design/icons";
 import {
   Alert,
   Button,
@@ -17,6 +21,7 @@ import {
   Tabs,
   Tag,
   Timeline,
+  Upload,
   message,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -35,6 +40,8 @@ import {
 
 const fields = [
   ["project", "项目名称"],
+  ["projectLevel", "项目等级"],
+  ["field", "所属领域"],
   ["projectInvestment", "项目投资额（万元）"],
   ["department", "需求发起部门"],
   ["applicant", "申请人"],
@@ -45,6 +52,33 @@ const fields = [
   ["delivery", "交付与验收要求"],
 ];
 const textAreaFields = new Set(["background", "problem", "delivery"]);
+function attachmentMetadata(file, index = 0) {
+  const source = typeof file === "string" ? { name: file } : file || {};
+  return {
+    uid: String(source.uid || `consultation-attachment-${index}`),
+    name: String(source.name || "未命名附件"),
+    type: String(source.type || ""),
+    size: Number(source.size) || 0,
+    status: "done",
+  };
+}
+
+function attachmentsFromRecord(record) {
+  if (Array.isArray(record?.attachments))
+    return record.attachments.map(attachmentMetadata);
+  const legacyName = record?.attachment;
+  return legacyName
+    ? [attachmentMetadata({ uid: "legacy-attachment", name: legacyName })]
+    : [];
+}
+
+function formatFileSize(size) {
+  if (!size) return "";
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 const feeStandards = {
   "外聘专家·两院院士": 2500,
   "外聘专家·高级专家": 2000,
@@ -107,6 +141,7 @@ export default function Calls() {
   const [scheduleStart, setScheduleStart] = useState("");
   const [scheduleEnd, setScheduleEnd] = useState("");
   const [supportNote, setSupportNote] = useState("");
+  const [attachmentFiles, setAttachmentFiles] = useState([]);
   const [opinion, setOpinion] = useState("");
   const [deadline, setDeadline] = useState("");
   const [preview, setPreview] = useState(null);
@@ -134,8 +169,11 @@ export default function Calls() {
         : [],
     [record],
   );
-  const canSelectCandidate = ["匹配中", "待运营排期"].includes(record?.stage);
-  const canEditConsultation = ["履约中", "服务中", "待补充"].includes(
+  // The department owns candidate selection only during matching. Once the
+  // task reaches scheduling, the selected expert and rationale are frozen.
+  const canSelectCandidate = record?.stage === "匹配中";
+  const canEditConsultation = ["履约中", "服务中"].includes(record?.stage);
+  const hasSubmittedConsultation = ["待评价", "已评价完成"].includes(
     record?.stage,
   );
   const filterOptions = useMemo(
@@ -397,11 +435,15 @@ export default function Calls() {
       persist(
         (store) => {
           const task = store.tasks.find((item) => item.id === selected);
-          task.consultationRecord = {
-            ...(task.consultationRecord || {}),
+          const savedRecord = {
             ...values,
+            attachments: attachmentFiles.map(attachmentMetadata),
             savedAt: new Date().toLocaleString("zh-CN"),
           };
+          savedRecord.attachment = savedRecord.attachments
+            .map((file) => file.name)
+            .join("、");
+          task.consultationRecord = savedRecord;
           if (submit) {
             const number = (task.versions?.length || 0) + 1;
             task.versions = [
@@ -410,7 +452,13 @@ export default function Calls() {
                 number,
                 at: new Date().toLocaleString("zh-CN"),
                 content: values.judgment,
-                attachment: values.attachment || "咨询记录.pdf（演示）",
+                attachment: savedRecord.attachment,
+                record: {
+                  ...savedRecord,
+                  attachments: savedRecord.attachments.map((file) => ({
+                    ...file,
+                  })),
+                },
               },
             ];
             task.stage = "待评价";
@@ -474,20 +522,28 @@ export default function Calls() {
   function openTask(task) {
     if (task.stage === "草稿") return edit(task);
     setSelected(task.id);
-    setCandidate(null);
-    setMatchReason("");
-    setAdjusted(false);
-    setDepartmentConfirmed(false);
+    setCandidate(task.stage === "待运营排期" ? task.expertId || null : null);
+    setMatchReason(task.stage === "待运营排期" ? task.matchReason || "" : "");
+    setAdjusted(Boolean(task.stage === "待运营排期" && task.matchAdjusted));
+    setDepartmentConfirmed(task.stage === "待运营排期");
     const [start = "", end = ""] = String(task.lockedSchedule || "")
       .split(" 至 ")
       .map((value) => value.trim());
     setScheduleStart(start);
     setScheduleEnd(end);
     setSupportNote(task.supportNote || "");
+    const latestVersion = task.versions?.at(-1);
+    const consultationRecord =
+      task.consultationRecord || latestVersion?.record || null;
+    setAttachmentFiles(
+      attachmentsFromRecord(
+        consultationRecord || { attachment: latestVersion?.attachment },
+      ),
+    );
     setOpinion("");
     setDeadline("");
     consultationForm.resetFields();
-    consultationForm.setFieldsValue(task.consultationRecord || {});
+    consultationForm.setFieldsValue(consultationRecord || {});
     evaluationForm.resetFields();
     evaluationForm.setFieldsValue(
       task.evaluation || { delivery: 45, response: 27, attitude: 18 },
@@ -557,6 +613,17 @@ export default function Calls() {
             value={taskKeyword}
             onChange={(event) => setTaskKeyword(event.target.value)}
             placeholder="项目名称 / 工单号 / 专家"
+          />
+          <Select
+            allowClear
+            style={{ width: 150 }}
+            value={taskStage}
+            onChange={setTaskStage}
+            placeholder="任务状态"
+            options={taskStageStrip.map((stage) => ({
+              value: stage,
+              label: stage,
+            }))}
           />
           <Select
             allowClear
@@ -694,7 +761,22 @@ export default function Calls() {
               label={label}
               rules={[{ required: true, whitespace: true }]}
             >
-              {key === "serviceTime" ? (
+              {key === "projectLevel" ? (
+                <Select
+                  options={["Ⅰ类", "Ⅱ类"].map((value) => ({
+                    value,
+                    label: value,
+                  }))}
+                />
+              ) : key === "field" ? (
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={[...new Set(experts.map((item) => item.field))].map(
+                    (value) => ({ value, label: value }),
+                  )}
+                />
+              ) : key === "serviceTime" ? (
                 <Input type="datetime-local" />
               ) : key === "due" ? (
                 <Input type="date" />
@@ -900,7 +982,7 @@ export default function Calls() {
                         description={
                           canSelectCandidate
                             ? "点击单选框或专家所在行均可选择；灰色候选人表示当前不可新增调用或回避校验未通过。"
-                            : `当前任务状态为“${record.stage}”，候选表仅供查看。任务进入“匹配中”后才允许选择。`
+                            : `当前任务状态为“${record.stage}”，人选、选定理由和需求部门确认已锁定，候选表仅供查看。`
                         }
                       />
                       <Input.Search
@@ -1023,20 +1105,19 @@ export default function Calls() {
                         >
                           需求部门已核对推荐依据、回避提示和项目适配情况
                         </Checkbox>
-                        <Button
-                          type="primary"
-                          disabled={
-                            !canSelectCandidate ||
-                            !candidate ||
-                            !departmentConfirmed ||
-                            !matchReason.trim()
-                          }
-                          onClick={confirmExpert}
-                        >
-                          {record.stage === "待运营排期"
-                            ? "重新确认人选"
-                            : "需求部门确认人选"}
-                        </Button>
+                        {canSelectCandidate ? (
+                          <Button
+                            type="primary"
+                            disabled={
+                              !candidate ||
+                              !departmentConfirmed ||
+                              !matchReason.trim()
+                            }
+                            onClick={confirmExpert}
+                          >
+                            需求部门确认人选
+                          </Button>
+                        ) : null}
                       </div>
                       {record.expertId ? (
                         <Alert
@@ -1097,10 +1178,18 @@ export default function Calls() {
                     <div className={wb.stack}>
                       {!canEditConsultation ? (
                         <Alert
-                          type="warning"
+                          type={hasSubmittedConsultation ? "info" : "warning"}
                           showIcon
-                          message="咨询记录尚未解锁"
-                          description="任务进入服务中后，才可填写咨询记录。"
+                          message={
+                            hasSubmittedConsultation
+                              ? "咨询记录已提交"
+                              : "咨询记录尚未解锁"
+                          }
+                          description={
+                            hasSubmittedConsultation
+                              ? "以下为已提交的咨询记录版本，仅供查看。"
+                              : "任务进入服务中后，才可填写咨询记录。"
+                          }
                         />
                       ) : (
                         <>
@@ -1216,8 +1305,31 @@ export default function Calls() {
                             >
                               <Input.TextArea rows={3} />
                             </Form.Item>
-                            <Form.Item name="attachment" label="成果附件">
-                              <Input placeholder="如：技术研判意见.pdf（演示）" />
+                            <Form.Item label="成果附件">
+                              <Upload
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+                                multiple
+                                fileList={attachmentFiles}
+                                beforeUpload={() => false}
+                                onChange={({ fileList }) =>
+                                  setAttachmentFiles(
+                                    fileList.map(attachmentMetadata),
+                                  )
+                                }
+                              >
+                                <Button icon={<UploadOutlined />}>
+                                  上传成果附件
+                                </Button>
+                              </Upload>
+                              <div
+                                style={{
+                                  color: "#8c8c8c",
+                                  fontSize: 12,
+                                  marginTop: 8,
+                                }}
+                              >
+                                演示环境记录文件名称、类型和大小，不会上传至服务器。
+                              </div>
                             </Form.Item>
                           </Form>
                           <Space>
@@ -1238,6 +1350,8 @@ export default function Calls() {
                               onClick={() =>
                                 setConsultationPreview({
                                   ...consultationForm.getFieldsValue(),
+                                  attachments:
+                                    attachmentFiles.map(attachmentMetadata),
                                   task: record,
                                 })
                               }
@@ -1247,17 +1361,125 @@ export default function Calls() {
                           </Space>
                         </>
                       )}
-                      {record.versions?.length
-                        ? record.versions.map((version) => (
-                            <section key={version.number} className={wb.block}>
-                              <h4>
-                                正式咨询记录 v{version.number} · {version.at}
-                              </h4>
-                              <p>{version.content}</p>
-                              <p>{version.attachment}</p>
-                            </section>
-                          ))
-                        : null}
+                      {record.versions?.length ? (
+                        <div className={wb.stack}>
+                          <h3 className={wb.sectionTitle}>已提交咨询记录</h3>
+                          {[...record.versions]
+                            .sort(
+                              (left, right) =>
+                                Number(right.number || 0) -
+                                Number(left.number || 0),
+                            )
+                            .map((version) => {
+                              const submittedRecord =
+                                version.record ||
+                                (record.versions.length === 1
+                                  ? record.consultationRecord || {}
+                                  : {});
+                              const attachments = Array.isArray(
+                                submittedRecord.attachments,
+                              )
+                                ? submittedRecord.attachments
+                                : [];
+                              const legacyAttachment =
+                                submittedRecord.attachment ||
+                                version.attachment;
+                              return (
+                                <Card
+                                  key={`${version.number}-${version.at}`}
+                                  size="small"
+                                  title={`正式咨询记录 v${version.number || 1} · ${version.at || "时间未记录"}`}
+                                >
+                                  <Descriptions
+                                    bordered
+                                    size="small"
+                                    column={2}
+                                    items={[
+                                      {
+                                        key: "consultDate",
+                                        label: "咨询日期",
+                                        children:
+                                          submittedRecord.consultDate || "—",
+                                      },
+                                      {
+                                        key: "minutes",
+                                        label: "咨询时长",
+                                        children: submittedRecord.minutes
+                                          ? `${submittedRecord.minutes} 分钟`
+                                          : "—",
+                                      },
+                                      {
+                                        key: "purpose",
+                                        label: "咨询核心目的",
+                                        span: 2,
+                                        children:
+                                          submittedRecord.purpose || "—",
+                                      },
+                                      {
+                                        key: "questions",
+                                        label: "咨询问题与专家答复",
+                                        span: 2,
+                                        children: (
+                                          <div
+                                            style={{ whiteSpace: "pre-wrap" }}
+                                          >
+                                            {submittedRecord.questions || "—"}
+                                          </div>
+                                        ),
+                                      },
+                                      {
+                                        key: "facts",
+                                        label: "事实类",
+                                        span: 2,
+                                        children: submittedRecord.facts || "—",
+                                      },
+                                      {
+                                        key: "judgment",
+                                        label: "判断类",
+                                        span: 2,
+                                        children:
+                                          submittedRecord.judgment ||
+                                          version.content ||
+                                          "—",
+                                      },
+                                      {
+                                        key: "basis",
+                                        label: "逻辑类",
+                                        span: 2,
+                                        children: submittedRecord.basis || "—",
+                                      },
+                                      {
+                                        key: "attachments",
+                                        label: "成果附件",
+                                        span: 2,
+                                        children: attachments.length ? (
+                                          <Space direction="vertical" size={4}>
+                                            {attachments.map((file, index) => (
+                                              <span
+                                                key={
+                                                  file.uid ||
+                                                  `${file.name}-${index}`
+                                                }
+                                              >
+                                                {file.name} ·{" "}
+                                                {file.type || "文件"}
+                                                {formatFileSize(file.size)
+                                                  ? ` · ${formatFileSize(file.size)}`
+                                                  : ""}
+                                              </span>
+                                            ))}
+                                          </Space>
+                                        ) : (
+                                          legacyAttachment || "—"
+                                        ),
+                                      },
+                                    ]}
+                                  />
+                                </Card>
+                              );
+                            })}
+                        </div>
+                      ) : null}
                       {["待评价", "已评价完成"].includes(record.stage) ? (
                         <section className={wb.block}>
                           <h3 className={wb.sectionTitle}>
@@ -1550,6 +1772,15 @@ export default function Calls() {
                 { key: 6, label: "专家姓名", children: record?.expert },
                 { key: 7, label: "咨询方式", children: record?.serviceMode },
                 { key: 8, label: "所属领域", children: record?.field },
+                {
+                  key: 9,
+                  label: "成果附件",
+                  span: 2,
+                  children:
+                    consultationPreview.attachments
+                      ?.map((file) => file.name)
+                      .join("、") || "—",
+                },
                 ...[
                   ["purpose", "咨询核心目的"],
                   ["questions", "咨询问题与专家答复"],

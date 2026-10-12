@@ -1,4 +1,10 @@
-import { PlusOutlined, WarningOutlined } from "@ant-design/icons";
+import {
+  FileTextOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  UploadOutlined,
+  WarningOutlined,
+} from "@ant-design/icons";
 import {
   Alert,
   Button,
@@ -17,6 +23,7 @@ import {
   Tag,
   Timeline,
   message,
+  Upload,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -70,6 +77,12 @@ const profileLabels = {
   consent: "诚信、保密、利益关联及个人信息授权声明",
 };
 const lockedStages = ["领导审批中", "待签发聘书", "已正式入库"];
+const displayedStage = (stage) =>
+  ({
+    领导审批中: "审批中",
+    待签发聘书: "审批通过",
+    审批退回: "审批驳回",
+  })[stage] || stage;
 const defaultChecks = [
   {
     key: "completeness",
@@ -94,7 +107,7 @@ const defaultChecks = [
   },
 ];
 const DEFAULT_INVITATION_NOTE =
-  "您好！一汽股权投资（天津）有限公司诚邀您加入专家人才库，发挥您在相关领域的专业经验，为公司投资决策、产业研究及项目咨询提供专业支持。请您进入微信小程序“个人中心—入库邀请”查看合作邀请函，并确认是否接受邀请。后续入库资料及办理流程由工作人员与您联系，感谢您的支持！";
+  "您好！一汽股权投资（天津）有限公司诚邀您加入专家人才库，发挥您在相关领域的专业经验，为公司投资决策、产业研究及项目咨询提供专业支持。后续入库资料及办理流程由工作人员与您联系，感谢您的支持！";
 const drawerHiddenProfileFields = new Set([
   "roles",
   "travel",
@@ -156,6 +169,15 @@ function ageLimitDate(birth, limit) {
   if (Number.isNaN(date.getTime())) return "";
   date.setFullYear(date.getFullYear() + limit);
   return dateText(date);
+}
+function escapeHtml(value) {
+  return String(value || "").replace(
+    /[&<>"']/g,
+    (char) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        char
+      ],
+  );
 }
 function lastUpdatedAt(record) {
   const history = record?.history;
@@ -228,18 +250,22 @@ export default function Enrollment({
   const setActiveTab = onInnerTabChange ?? setUncontrolledTab;
   const [stageFilter, setStageFilter] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [letterPreview, setLetterPreview] = useState(null);
   const [selected, setSelected] = useState(null);
   const [approvalDetailId, setApprovalDetailId] = useState(null);
   const [opinion, setOpinion] = useState("");
   const [applicationOpen, setApplicationOpen] = useState(false);
   const [appointmentOpen, setAppointmentOpen] = useState(false);
+  const [appointmentFiles, setAppointmentFiles] = useState([]);
   const [inviteForm] = Form.useForm();
   const [applicationForm] = Form.useForm();
   const [appointmentForm] = Form.useForm();
   const [profileForm] = Form.useForm();
   const [profileOpen, setProfileOpen] = useState(false);
-  const inviteValues = Form.useWatch([], inviteForm) || {};
   const record = state.invitations.find((item) => item.id === selected);
+  const approvalRecord = state.invitations.find(
+    (item) => item.id === approvalDetailId,
+  );
   const visibleProfileEntries = Object.entries(record?.profile || {}).filter(
     ([key]) => !drawerHiddenProfileFields.has(key),
   );
@@ -248,13 +274,9 @@ export default function Enrollment({
     complete(record) &&
     applicationComplete(record) &&
     checksConfirmed(record);
-  const approvalRecord = state.invitations.find(
-    (item) => item.id === approvalDetailId,
-  );
   const inviteCandidates = state.candidates.filter(
     (item) => item.status === "待邀请",
   );
-  const sms = `【专家人才库】您收到合作邀请，请进入微信小程序「个人中心—入库邀请」查看《${inviteValues.letterTemplate || "专家合作邀请函"}》并确认。本短信仅作通知。`;
 
   const stageCounts = useMemo(() => {
     const counts = {};
@@ -279,6 +301,42 @@ export default function Enrollment({
     } catch {
       message.error("本地存储失败，未保存");
       return false;
+    }
+  }
+  function deleteCandidate(candidate) {
+    const invitationId = candidate.invitationId;
+    if (
+      persist((store) => {
+        store.candidates = store.candidates.filter(
+          (item) => item.id !== candidate.id,
+        );
+        if (invitationId) {
+          store.invitations = store.invitations.filter(
+            (item) => item.id !== invitationId,
+          );
+        }
+      }, "推荐名单已删除") &&
+      invitationId === selected
+    ) {
+      setSelected(null);
+    }
+  }
+  function deleteInvitation(invitation) {
+    if (
+      persist((store) => {
+        store.invitations = store.invitations.filter(
+          (item) => item.id !== invitation.id,
+        );
+        const candidate = store.candidates.find(
+          (item) => item.invitationId === invitation.id,
+        );
+        if (candidate) {
+          candidate.status = "待邀请";
+          delete candidate.invitationId;
+        }
+      }, "入库办理记录已删除")
+    ) {
+      if (selected === invitation.id) setSelected(null);
     }
   }
   function openInvite(ids = []) {
@@ -328,13 +386,13 @@ export default function Enrollment({
               letterTemplate: values.letterTemplate,
               invitationNote: values.invitationNote,
               stage: "资料完善中",
-              agreed: false,
+              agreed: true,
               submitted: false,
               checks: structuredClone(defaultChecks),
               history: [
                 log(
                   "股权运营部（演示）",
-                  `发送《${values.letterTemplate}》${letterNo}；短信仅作小程序查看通知`,
+                  `生成《${values.letterTemplate}》${letterNo}，并记录短信/邮件通知`,
                 ),
               ],
             });
@@ -343,22 +401,36 @@ export default function Enrollment({
             );
             source.status = "已转邀请";
             source.invitationId = invitationId;
-            store.sms.unshift({
-              id: uid("SMS"),
-              invitationId,
-              name: candidate.name,
-              phone: candidate.phone,
-              content: sms,
-              at: new Date().toLocaleString("zh-CN"),
-              status: "模拟记录·未真实发送",
-            });
+            const notificationContent = `【专家人才库】${candidate.name}老师，您的专家合作邀请函已生成，工作人员将与您联系。`;
+            const notifiedAt = new Date().toLocaleString("zh-CN");
+            store.sms.unshift(
+              {
+                id: uid("SMS"),
+                invitationId,
+                type: "短信",
+                name: candidate.name,
+                address: candidate.phone,
+                content: notificationContent,
+                at: notifiedAt,
+                status: "已发送",
+              },
+              {
+                id: uid("EMAIL"),
+                invitationId,
+                type: "邮件",
+                name: candidate.name,
+                address: candidate.email || "未填写邮箱",
+                content: notificationContent,
+                at: notifiedAt,
+                status: "已发送",
+              },
+            );
           }),
-        "已生成合作邀请函及短信通知记录",
+        "已生成合作邀请函及短信/邮件通知记录",
       )
     ) {
       setInviteOpen(false);
       setActiveTab("invitations");
-      navigate("/zj/");
     }
   }
   function openApplication() {
@@ -381,15 +453,47 @@ export default function Enrollment({
   }
   function openAppointment() {
     const today = dateText(new Date());
+    const year = new Date().getFullYear();
+    const sequence = state.invitations.reduce((max, item) => {
+      const match = item.appointment?.number?.match(
+        new RegExp(`^PS-${year}-(\\d+)$`),
+      );
+      return match ? Math.max(max, Number(match[1])) : max;
+    }, 0);
+    const number = `PS-${year}-${String(sequence + 1).padStart(3, "0")}`;
     appointmentForm.resetFields();
     appointmentForm.setFieldsValue({
+      number,
+      termStart: today,
+      termEnd: fixedTermEnd(today),
+    });
+    generateAppointmentFile({
+      number,
       termStart: today,
       termEnd: fixedTermEnd(today),
     });
     setAppointmentOpen(true);
   }
+  function generateAppointmentFile(values = appointmentForm.getFieldsValue()) {
+    if (!record) return;
+    const number = values.number || "聘书编号待生成";
+    const content = `<!doctype html><html><head><meta charset="utf-8"><title>专家聘书-${escapeHtml(record.name)}</title><style>body{font-family:serif;color:#222;margin:48px auto;max-width:760px;line-height:2}h1{text-align:center;font-size:28px;margin:40px 0}p{font-size:16px;text-indent:2em}.meta{text-align:right;margin-top:60px}</style></head><body><h1>专家聘书</h1><p>${escapeHtml(record.name)}老师：</p><p>经审核，聘请您担任一汽股权投资（天津）有限公司专家，为公司投资决策、产业研究及项目咨询提供专业支持。</p><p>聘书编号：${escapeHtml(number)}</p><p>聘期：${escapeHtml(values.termStart || "待定")} 至 ${escapeHtml(values.termEnd || "待定")}（三年）</p><p class="meta">一汽股权投资（天津）有限公司<br>${dateText(new Date())}</p></body></html>`;
+    const file = new File([content], `专家聘书-${record.name}-${number}.doc`, {
+      type: "application/msword",
+    });
+    setAppointmentFiles([
+      {
+        uid: `generated-${Date.now()}`,
+        name: file.name,
+        status: "done",
+        source: "自动生成",
+        originFileObj: file,
+      },
+    ]);
+  }
   async function submitAppointment() {
     const values = await appointmentForm.validateFields();
+    if (!appointmentFiles.length) return message.error("请生成或上传聘书文件");
     const expectedEnd = fixedTermEnd(values.termStart);
     if (values.termEnd !== expectedEnd)
       return message.error(`聘期固定为3年，结束日期应为${expectedEnd}`);
@@ -416,6 +520,7 @@ export default function Enrollment({
               throw new Error("状态已变化，请刷新后重试");
             item.appointment = {
               ...values,
+              attachment: appointmentFiles[0].name,
               years: 3,
               ageLimit: limit,
               ageLimitDate: limitDate,
@@ -461,6 +566,7 @@ export default function Enrollment({
                 risk: "正常",
                 termStart: item.appointment.termStart,
                 termEnd: item.appointment.termEnd,
+                enrolledAt: dateText(new Date()),
                 appointmentHistory: [{ ...item.appointment }],
                 history: [
                   {
@@ -529,32 +635,6 @@ export default function Enrollment({
     }
     return false;
   }
-  function decideApproval(passed) {
-    if (!record || record.stage !== "领导审批中") return;
-    if (!opinion.trim()) return message.warning("请填写分管领导审批意见");
-    if (
-      persist(
-        (store) => {
-          const item = store.invitations.find((entry) => entry.id === selected);
-          if (!item || item.stage !== "领导审批中")
-            throw new Error("状态已变化，请刷新后重试");
-          item.stage = passed ? "待签发聘书" : "审批退回";
-          item.history.push(
-            log(
-              "分管领导（线上审批演示）",
-              `${passed ? "审批通过，进入待签发聘书" : "审批退回"}：${opinion.trim()}`,
-            ),
-          );
-        },
-        passed ? "审批完成，已生成聘书签发待办" : "审批已退回",
-      )
-    ) {
-      setOpinion("");
-      setSelected(null);
-      setStageFilter("");
-      if (passed) navigate("/zj/");
-    }
-  }
   function persistPendingMaterials(nextStage) {
     if (!record || record.stage !== "资料完善中") return false;
     const profile = draftProfile(record);
@@ -614,7 +694,9 @@ export default function Enrollment({
       title: "当前阶段",
       dataIndex: "stage",
       width: 130,
-      render: (value) => <Tag color={stageColor(value)}>{value}</Tag>,
+      render: (value) => (
+        <Tag color={stageColor(value)}>{displayedStage(value)}</Tag>
+      ),
     },
     {
       title: "最近更新",
@@ -625,7 +707,7 @@ export default function Enrollment({
     {
       title: "操作",
       key: "action",
-      width: 170,
+      width: 250,
       render: (_, item) => (
         <Space>
           <Button
@@ -642,14 +724,29 @@ export default function Enrollment({
               审批详情
             </Button>
           ) : null}
+          {item.stage === "资料完善中" ? (
+            <Popconfirm
+              title="确认删除这条入库办理记录？"
+              description="删除后关联推荐人员将恢复为待邀请，通知记录保留。"
+              okText="确认删除"
+              cancelText="取消"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => deleteInvitation(item)}
+            >
+              <Button type="link" danger>
+                删除
+              </Button>
+            </Popconfirm>
+          ) : null}
         </Space>
       ),
     },
   ];
   const smsColumns = [
+    { title: "通知方式", dataIndex: "type", width: 100 },
     { title: "接收人", dataIndex: "name", width: 110 },
-    { title: "手机号", dataIndex: "phone", width: 140 },
-    { title: "短信内容", dataIndex: "content", minWidth: 320, ellipsis: true },
+    { title: "手机号 / 邮箱", dataIndex: "address", width: 200 },
+    { title: "通知内容", dataIndex: "content", minWidth: 320, ellipsis: true },
     { title: "记录时间", dataIndex: "at", width: 180 },
     {
       title: "状态",
@@ -704,25 +801,7 @@ export default function Enrollment({
     if (record.stage === "领导审批中") {
       return (
         <div>
-          <Alert
-            type="info"
-            showIcon
-            message="已发起分管领导审批"
-            description="审批通过后进入待签发聘书状态，并在任务首页生成聘书签发待办。"
-          />
-          <Input.TextArea
-            rows={3}
-            value={opinion}
-            onChange={(event) => setOpinion(event.target.value)}
-            placeholder="分管领导审批意见（必填）"
-            style={{ marginTop: 12 }}
-          />
-          <Space style={{ marginTop: 12 }}>
-            <Button onClick={() => decideApproval(false)}>审批退回</Button>
-            <Button type="primary" onClick={() => decideApproval(true)}>
-              审批通过
-            </Button>
-          </Space>
+          <Alert type="info" showIcon message="审批中" description="" />
         </div>
       );
     }
@@ -799,7 +878,19 @@ export default function Enrollment({
               {
                 key: "pool",
                 label: `初始推荐名单（${state.candidates.length}）`,
-                children: <CandidatePool onInvite={openInvite} />,
+                children: (
+                  <CandidatePool
+                    onInvite={openInvite}
+                    onDeleteCandidate={deleteCandidate}
+                    onViewInvitation={(candidate) =>
+                      setLetterPreview(
+                        state.invitations.find(
+                          (item) => item.id === candidate.invitationId,
+                        ),
+                      )
+                    }
+                  />
+                ),
               },
               {
                 key: "invitations",
@@ -830,7 +921,7 @@ export default function Enrollment({
                         >
                           <span>
                             <i style={{ background: stageTone(stage) }} />
-                            {stage}
+                            {displayedStage(stage)}
                           </span>
                           <b>{stageCounts[stage] || 0}</b>
                         </button>
@@ -841,7 +932,7 @@ export default function Enrollment({
                       <div className={styles.tableTools}>
                         {stageFilter ? (
                           <span className={styles.filterChip}>
-                            已按「{stageFilter}」筛选
+                            已按「{displayedStage(stageFilter)}」筛选
                             <Button
                               type="link"
                               size="small"
@@ -867,14 +958,12 @@ export default function Enrollment({
               },
               {
                 key: "sms",
-                label: `短信通知记录（${state.sms.length}）`,
+                label: `短信/邮件通知记录（${state.sms.length}）`,
                 children: (
                   <>
                     <div className={styles.tableTop}>
-                      <strong>短信通知记录</strong>
-                      <span>
-                        共 {state.sms.length} 条 · 仅模拟记录，未真实发送
-                      </span>
+                      <strong>短信/邮件通知记录</strong>
+                      <span>共 {state.sms.length} 条</span>
                     </div>
                     <Table
                       tableLayout="auto"
@@ -885,7 +974,7 @@ export default function Enrollment({
                       pagination={{ pageSize: 10, showSizeChanger: false }}
                       locale={{
                         emptyText:
-                          "尚未生成短信通知记录，发起合作邀请后自动记录",
+                          "尚未生成通知记录，发起合作邀请后自动记录短信和邮件通知",
                       }}
                     />
                   </>
@@ -902,7 +991,7 @@ export default function Enrollment({
         onCancel={() => setInviteOpen(false)}
         onOk={sendInvitation}
         width={780}
-        okText="生成邀请函并记录短信通知"
+        okText="生成邀请函并通知"
         cancelText="取消"
       >
         <Form form={inviteForm} layout="vertical">
@@ -947,10 +1036,53 @@ export default function Enrollment({
           <Alert
             type="info"
             showIcon
-            message="短信只负责提醒，不替代正式合作邀请函"
-            description={sms}
+            message="生成邀请函后将自动记录短信和邮件通知"
+            description="通知记录会保存在短信/邮件通知记录中，供后续查询。正式环境提交时将同时发送短信和邮件。"
           />
         </Form>
+      </Modal>
+
+      <Modal
+        title="专家合作邀请函"
+        open={!!letterPreview}
+        onCancel={() => setLetterPreview(null)}
+        footer={[
+          <Button key="close" onClick={() => setLetterPreview(null)}>
+            关闭
+          </Button>,
+          <Button
+            key="download"
+            type="primary"
+            onClick={() => {
+              if (!letterPreview) return;
+              const printWindow = window.open("", "_blank");
+              if (!printWindow) {
+                message.error("浏览器阻止了打印窗口，请允许弹出窗口后重试");
+                return;
+              }
+              printWindow.document.write(
+                `<!doctype html><html><head><meta charset="utf-8"><title>${letterPreview.letterNo || "专家合作邀请函"}</title><style>body{font-family:serif;color:#222;margin:60px auto;max-width:760px;line-height:2}h1{text-align:center;font-size:26px;margin:50px 0}p{font-size:16px;text-indent:2em}.meta{text-align:right;margin-top:60px}</style></head><body><h1>${letterPreview.letterTemplate || "专家合作邀请函"}</h1><p>${letterPreview.name}老师：</p><p>${letterPreview.invitationNote || DEFAULT_INVITATION_NOTE}</p><p class="meta">一汽股权投资（天津）有限公司<br>邀请函编号：${letterPreview.letterNo || "--"}<br>${new Date().toLocaleDateString("zh-CN")}</p><script>window.onload=()=>window.print()<\/script></body></html>`,
+              );
+              printWindow.document.close();
+            }}
+          >
+            下载 PDF
+          </Button>,
+        ]}
+        width={760}
+      >
+        {letterPreview ? (
+          <div className={styles.letterPreview}>
+            <h2>{letterPreview.letterTemplate || "专家合作邀请函"}</h2>
+            <p>{letterPreview.name}老师：</p>
+            <p>{letterPreview.invitationNote || DEFAULT_INVITATION_NOTE}</p>
+            <div>
+              一汽股权投资（天津）有限公司
+              <br />
+              邀请函编号：{letterPreview.letterNo || "--"}
+            </div>
+          </div>
+        ) : null}
       </Modal>
 
       <Drawer
@@ -987,7 +1119,9 @@ export default function Enrollment({
                     key: "stage",
                     label: "当前阶段",
                     children: (
-                      <Tag color={stageColor(record.stage)}>{record.stage}</Tag>
+                      <Tag color={stageColor(record.stage)}>
+                        {displayedStage(record.stage)}
+                      </Tag>
                     ),
                   },
                   {
@@ -1051,7 +1185,7 @@ export default function Enrollment({
                   type="info"
                   showIcon
                   message="尚未填写专家履历资料"
-                  description="履历由发起邀约的人维护，专家在小程序只需确认合作邀请。"
+                  description="请由经办人员补充并保存专家履历资料。"
                 />
               )}
               <div>
@@ -1133,12 +1267,6 @@ export default function Enrollment({
         ) : null}
       </Drawer>
 
-      <ApprovalDetailModal
-        record={approvalRecord}
-        open={!!approvalRecord}
-        onClose={() => setApprovalDetailId(null)}
-      />
-
       <Modal
         title="填写《专家推荐表》"
         open={applicationOpen}
@@ -1172,7 +1300,7 @@ export default function Enrollment({
           className={styles.formAlert}
           type="info"
           showIcon
-          message="履历由发起邀约的人维护，专家在小程序只需确认合作邀请。"
+          message="请由经办人员补充并保存专家履历资料。"
         />
         <Form form={profileForm} layout="vertical">
           {profileFormFields.map(([key, label]) => (
@@ -1221,6 +1349,7 @@ export default function Enrollment({
         onOk={submitAppointment}
         width={680}
         okText="发送聘书"
+        cancelText="取消"
       >
         <Form form={appointmentForm} layout="vertical">
           <Alert
@@ -1229,14 +1358,8 @@ export default function Enrollment({
             showIcon
             message={`聘期固定3年；${record?.profile?.category || "普通专家"}年龄上限为${ageLimitFor(record?.profile?.category)}周岁。`}
           />
-          <Form.Item
-            name="number"
-            label="聘书编号"
-            rules={[
-              { required: true, whitespace: true, message: "请输入聘书编号" },
-            ]}
-          >
-            <Input />
+          <Form.Item name="number" label="聘书编号">
+            <Input readOnly />
           </Form.Item>
           <div className={styles.formRow}>
             <Form.Item
@@ -1262,21 +1385,71 @@ export default function Enrollment({
               <Input type="date" disabled />
             </Form.Item>
           </div>
-          <Form.Item
-            name="attachment"
-            label="聘书文件"
-            rules={[
-              {
-                required: true,
-                whitespace: true,
-                message: "请登记聘书文件",
-              },
-            ]}
-          >
-            <Input placeholder="如：专家聘书-待签署.pdf" />
+          <Form.Item label="聘书文件" required>
+            <div className={styles.appointmentFileSection}>
+              <div className={styles.appointmentFileCard}>
+                <div className={styles.appointmentFileIcon}>
+                  <FileTextOutlined />
+                </div>
+                <div className={styles.appointmentFileInfo}>
+                  <strong>
+                    {appointmentFiles[0]?.name || "尚未生成聘书文件"}
+                  </strong>
+                  <span>
+                    {appointmentFiles[0]?.source || "请生成文件或上传已有文件"}
+                  </span>
+                </div>
+                <Button
+                  type="link"
+                  icon={<ReloadOutlined />}
+                  onClick={() => generateAppointmentFile()}
+                >
+                  重新生成
+                </Button>
+              </div>
+              <Upload.Dragger
+                className={styles.appointmentUpload}
+                accept=".doc,.docx,.pdf"
+                maxCount={1}
+                fileList={[]}
+                showUploadList={false}
+                beforeUpload={(file) => {
+                  setAppointmentFiles([
+                    {
+                      uid: file.uid,
+                      name: file.name,
+                      status: "done",
+                      source: "已上传新文件",
+                      originFileObj: file,
+                    },
+                  ]);
+                  return false;
+                }}
+              >
+                <p className={styles.appointmentUploadIcon}>
+                  <UploadOutlined />
+                </p>
+                <p className={styles.appointmentUploadTitle}>
+                  上传新文件替换当前聘书
+                </p>
+                <p className={styles.appointmentUploadHint}>
+                  点击选择或拖拽文件至此，支持 DOC、DOCX、PDF
+                </p>
+              </Upload.Dragger>
+              {!appointmentFiles.length ? (
+                <span className={styles.appointmentFileError}>
+                  请生成或上传聘书文件
+                </span>
+              ) : null}
+            </div>
           </Form.Item>
         </Form>
       </Modal>
+      <ApprovalDetailModal
+        record={approvalRecord}
+        open={!!approvalRecord}
+        onClose={() => setApprovalDetailId(null)}
+      />
     </div>
   );
 }

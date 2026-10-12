@@ -1,5 +1,15 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Select, Table, Tag, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Select,
+  Table,
+  Tag,
+  message,
+} from "antd";
 import { useMemo, useState } from "react";
 import { uid, updateStore, useExpertStore } from "../../store";
 import styles from "./index.module.less";
@@ -12,6 +22,7 @@ const fields = [
   ["company", "单位"],
   ["title", "职务"],
   ["phone", "手机号"],
+  ["email", "邮箱"],
   ["source", "人员来源"],
   ["department", "推荐部门"],
   ["recommender", "推荐人"],
@@ -20,7 +31,11 @@ const fields = [
 const requiredFields = ["name", "gender", "phone"];
 const dash = (value) => value || "--";
 
-export default function CandidatePool({ onInvite }) {
+export default function CandidatePool({
+  onInvite,
+  onViewInvitation,
+  onDeleteCandidate,
+}) {
   const state = useExpertStore();
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [keyword, setKeyword] = useState("");
@@ -113,6 +128,36 @@ export default function CandidatePool({ onInvite }) {
       width: 100,
       render: (value) => (
         <Tag color={value === "待邀请" ? "processing" : "success"}>{value}</Tag>
+      ),
+    },
+    {
+      title: "操作",
+      key: "action",
+      width: 190,
+      render: (_, row) => (
+        <>
+          {row.status === "已转邀请" && row.invitationId ? (
+            <Button type="link" onClick={() => onViewInvitation?.(row)}>
+              查看邀请函
+            </Button>
+          ) : null}
+          <Popconfirm
+            title="确认删除这条推荐名单？"
+            description={
+              row.invitationId
+                ? "关联的入库办理记录也会一并删除。"
+                : "删除后无法恢复。"
+            }
+            okText="确认删除"
+            cancelText="取消"
+            okButtonProps={{ danger: true }}
+            onConfirm={() => onDeleteCandidate?.(row)}
+          >
+            <Button type="link" danger>
+              删除
+            </Button>
+          </Popconfirm>
+        </>
       ),
     },
   ];

@@ -52,6 +52,21 @@
 .drawerFooter { display: flex; justify-content: flex-end; gap: 8px; }
 
 .formRow { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0 16px; }
+.letterPreview { max-width: 680px; min-height: 300px; margin: 0 auto; padding: 28px 36px; border: 1px solid #e5e7eb; color: #303642; font-family: serif; font-size: 15px; line-height: 2; }
+.letterPreview h2 { margin: 0 0 32px; text-align: center; font-size: 22px; }
+.letterPreview p { text-indent: 2em; }
+.letterPreview > div { margin-top: 40px; text-align: right; }
+.appointmentFileSection { display: flex; flex-direction: column; gap: 12px; }
+.appointmentFileCard { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #dbe7f5; border-radius: 10px; background: #f8fbff; }
+.appointmentFileIcon { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border-radius: 9px; background: #e8f1ff; color: #2563eb; font-size: 20px; }
+.appointmentFileInfo { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 4px; }
+.appointmentFileInfo strong { overflow: hidden; color: #303642; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.appointmentFileInfo span { color: #7b8494; font-size: 12px; }
+.appointmentUpload { padding: 8px 12px; border-radius: 10px; background: #fff; }
+.appointmentUploadIcon { margin: 0 0 6px; color: #6682aa; font-size: 20px; }
+.appointmentUploadTitle { margin: 0 0 4px; color: #303642; font-size: 13px; font-weight: 500; }
+.appointmentUploadHint { margin: 0; color: #8992a1; font-size: 12px; }
+.appointmentFileError { color: #cf1322; font-size: 12px; }
 .formAlert { margin-bottom: 16px; }
 
 .paperForm {

@@ -27,7 +27,8 @@ body,
   overflow: hidden;
   background: #ffffff;
   color: var(--text);
-  font-family: "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-family:
+    "Microsoft YaHei", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
   letter-spacing: 0;
 }
@@ -42,9 +43,7 @@ input {
   height: 100vh;
   min-height: 858px;
   position: relative;
-  background:
-    linear-gradient(180deg, #f9fafc 0, #ffffff 110px),
-    #ffffff;
+  background: linear-gradient(180deg, #f9fafc 0, #ffffff 110px), #ffffff;
 }
 
 .topbar {
@@ -238,21 +237,51 @@ input {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 83% 48%, rgba(255, 255, 255, 0.88) 0, rgba(255, 255, 255, 0.68) 48px, transparent 135px),
-    linear-gradient(90deg, #ffffff 0, rgba(255, 255, 255, 0.92) 63%, rgba(246, 248, 255, 0.75) 100%);
+    radial-gradient(
+      circle at 83% 48%,
+      rgba(255, 255, 255, 0.88) 0,
+      rgba(255, 255, 255, 0.68) 48px,
+      transparent 135px
+    ),
+    linear-gradient(
+      90deg,
+      #ffffff 0,
+      rgba(255, 255, 255, 0.92) 63%,
+      rgba(246, 248, 255, 0.75) 100%
+    );
   z-index: 1;
 }
 
 .metric-card.red::before {
   background:
-    radial-gradient(circle at 83% 48%, rgba(255, 255, 255, 0.92) 0, rgba(255, 255, 255, 0.72) 50px, transparent 136px),
-    linear-gradient(90deg, #ffffff 0, rgba(255, 255, 255, 0.94) 61%, rgba(255, 247, 247, 0.8) 100%);
+    radial-gradient(
+      circle at 83% 48%,
+      rgba(255, 255, 255, 0.92) 0,
+      rgba(255, 255, 255, 0.72) 50px,
+      transparent 136px
+    ),
+    linear-gradient(
+      90deg,
+      #ffffff 0,
+      rgba(255, 255, 255, 0.94) 61%,
+      rgba(255, 247, 247, 0.8) 100%
+    );
 }
 
 .metric-card.teal::before {
   background:
-    radial-gradient(circle at 83% 48%, rgba(255, 255, 255, 0.92) 0, rgba(255, 255, 255, 0.72) 50px, transparent 136px),
-    linear-gradient(90deg, #ffffff 0, rgba(255, 255, 255, 0.94) 61%, rgba(240, 255, 250, 0.82) 100%);
+    radial-gradient(
+      circle at 83% 48%,
+      rgba(255, 255, 255, 0.92) 0,
+      rgba(255, 255, 255, 0.72) 50px,
+      transparent 136px
+    ),
+    linear-gradient(
+      90deg,
+      #ffffff 0,
+      rgba(255, 255, 255, 0.94) 61%,
+      rgba(240, 255, 250, 0.82) 100%
+    );
 }
 
 .metric-text {
@@ -609,6 +638,10 @@ input {
   height: 226px;
 }
 
+.list-panel.show-multiple {
+  height: auto;
+}
+
 .list-title-row {
   height: 54px;
   display: flex;
@@ -691,6 +724,12 @@ input {
 
 .rows.show-secondary {
   height: 172px;
+}
+
+.rows.show-multiple {
+  height: auto;
+  max-height: 430px;
+  overflow-y: auto;
 }
 
 .task-row {
