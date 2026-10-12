@@ -113,6 +113,12 @@ function isWithinRange(value, start, end) {
 function matchesOptionalRange(value, start, end) {
   return (!start && !end) || isWithinRange(value, start, end);
 }
+function visibleExpertStatus(status) {
+  return ["续聘审批中", "限制调用"].includes(status) ? "不可用" : status;
+}
+function isVisibleInPool(expert) {
+  return !["续聘审批中", "限制调用"].includes(expert.status);
+}
 function fixedTermEnd(start) {
   const date = new Date(`${start}T00:00:00`);
   if (Number.isNaN(date.getTime())) return "";
@@ -416,7 +422,13 @@ function Dashboard() {
   );
 }
 
-function ExpertDrawer({ expert, open, onClose }) {
+function ExpertDrawer({
+  expert,
+  open,
+  onClose,
+  initialAction,
+  onActionHandled,
+}) {
   const navigate = useNavigate();
   const { tasks } = useExpertStore();
   const [renewOpen, setRenewOpen] = useState(false);
@@ -426,6 +438,13 @@ function ExpertDrawer({ expert, open, onClose }) {
   const [renewForm] = Form.useForm();
   const [letterForm] = Form.useForm();
   const [dismissForm] = Form.useForm();
+  useEffect(() => {
+    if (!open || !expert || !initialAction) return;
+    if (initialAction === "renew" && expert.status === "待续聘") openRenewal();
+    if (initialAction === "letter" && expert.status === "待签发续聘聘书")
+      openLetter();
+    onActionHandled?.();
+  }, [open, expert?.id, expert?.status, initialAction]);
   if (!expert) return null;
   const warning = warningInfo(expert);
   const limitDate = ageLimitDate(expert);
@@ -637,10 +656,11 @@ function ExpertDrawer({ expert, open, onClose }) {
               {expert.name}{" "}
               <Tag
                 color={
-                  expertStatusColor(expert.status) || statusColor[expert.status]
+                  expertStatusColor(visibleExpertStatus(expert.status)) ||
+                  statusColor[visibleExpertStatus(expert.status)]
                 }
               >
-                {expert.status}
+                {visibleExpertStatus(expert.status)}
               </Tag>
             </h2>
             <p>
@@ -1030,6 +1050,10 @@ function ExpertDrawer({ expert, open, onClose }) {
 
 function ExpertList({ embedded = false }) {
   const { experts } = useExpertStore();
+  const visibleExperts = useMemo(
+    () => experts.filter(isVisibleInPool),
+    [experts],
+  );
   const [keyword, setKeyword] = useState("");
   const [field, setField] = useState();
   const [quickStatus, setQuickStatus] = useState();
@@ -1037,20 +1061,22 @@ function ExpertList({ embedded = false }) {
   const [enrollmentRange, setEnrollmentRange] = useState(null);
   const [exitRange, setExitRange] = useState(null);
   const [selected, setSelected] = useState(null);
+  const [initialAction, setInitialAction] = useState(null);
   const [exitExpert, setExitExpert] = useState(null);
   const [exitReason, setExitReason] = useState("");
   const statusCounts = useMemo(() => {
     const availableStatuses = new Set(["可用", "忙碌"]);
     return {
-      可用: experts.filter((item) => item.status === "可用").length,
-      忙碌: experts.filter((item) => item.status === "忙碌").length,
-      不可用: experts.filter((item) => !availableStatuses.has(item.status))
-        .length,
+      可用: visibleExperts.filter((item) => item.status === "可用").length,
+      忙碌: visibleExperts.filter((item) => item.status === "忙碌").length,
+      不可用: visibleExperts.filter(
+        (item) => !availableStatuses.has(item.status),
+      ).length,
     };
-  }, [experts]);
+  }, [visibleExperts]);
   const rows = useMemo(
     () =>
-      experts.filter((x) => {
+      visibleExperts.filter((x) => {
         const enrollmentDate = getEnrollmentDate(x);
         const exitDate = getExitDate(x);
         const enrollmentStart = enrollmentRange?.[0]?.format("YYYY-MM-DD");
@@ -1072,10 +1098,18 @@ function ExpertList({ embedded = false }) {
             (quickStatus === "不可用"
               ? !["可用", "忙碌"].includes(x.status)
               : x.status === quickStatus)) &&
-          (!status || x.status === status)
+          (!status || visibleExpertStatus(x.status) === status)
         );
       }),
-    [experts, keyword, field, quickStatus, status, enrollmentRange, exitRange],
+    [
+      visibleExperts,
+      keyword,
+      field,
+      quickStatus,
+      status,
+      enrollmentRange,
+      exitRange,
+    ],
   );
   function exportExperts() {
     const enrollmentStart = enrollmentRange?.[0]?.format("YYYY-MM-DD");
@@ -1101,14 +1135,14 @@ function ExpertList({ embedded = false }) {
       "聘期结束",
       "综合评分",
     ];
-    const values = experts.flatMap((expert) => {
+    const values = visibleExperts.flatMap((expert) => {
       const enrollmentDate = getEnrollmentDate(expert);
       const exitDate = getExitDate(expert);
       const base = [expert.id, expert.name, expert.company];
       const details = [
         enrollmentDate,
         exitDate,
-        expert.status,
+        visibleExpertStatus(expert.status),
         expert.field,
         expert.level,
         expert.termStart,
@@ -1240,7 +1274,14 @@ function ExpertList({ embedded = false }) {
       dataIndex: "status",
       width: 130,
       render: (v) => (
-        <Tag color={expertStatusColor(v) || statusColor[v]}>{v}</Tag>
+        <Tag
+          color={
+            expertStatusColor(visibleExpertStatus(v)) ||
+            statusColor[visibleExpertStatus(v)]
+          }
+        >
+          {visibleExpertStatus(v)}
+        </Tag>
       ),
     },
     { title: "历史项目数", dataIndex: "projects", width: 100 },
@@ -1257,9 +1298,31 @@ function ExpertList({ embedded = false }) {
     { title: "可服务时间", dataIndex: "availability", width: 120 },
     {
       title: "操作",
-      width: 190,
+      width: 290,
       render: (_, r) => (
         <Space size={0}>
+          {r.status === "待续聘" ? (
+            <Button
+              type="link"
+              onClick={() => {
+                setSelected(r);
+                setInitialAction("renew");
+              }}
+            >
+              发起续聘
+            </Button>
+          ) : null}
+          {r.status === "待签发续聘聘书" ? (
+            <Button
+              type="link"
+              onClick={() => {
+                setSelected(r);
+                setInitialAction("letter");
+              }}
+            >
+              登记续聘聘书
+            </Button>
+          ) : null}
           <Button type="link" onClick={() => setSelected(r)}>
             查看档案
           </Button>
@@ -1311,7 +1374,7 @@ function ExpertList({ embedded = false }) {
               <i style={{ background: "#2563eb" }} />
               全部专家
             </span>
-            <b>{experts.length}</b>
+            <b>{visibleExperts.length}</b>
           </button>
           {expertStatusStrip.map((item) => (
             <button
@@ -1362,10 +1425,11 @@ function ExpertList({ embedded = false }) {
                 setStatus(value);
                 setQuickStatus();
               }}
-              options={[...new Set(experts.map((x) => x.status))].map((v) => ({
-                label: v,
-                value: v,
-              }))}
+              options={[
+                ...new Set(
+                  visibleExperts.map((x) => visibleExpertStatus(x.status)),
+                ),
+              ].map((v) => ({ label: v, value: v }))}
             />
             <DatePicker.RangePicker
               allowClear
@@ -1431,7 +1495,12 @@ function ExpertList({ embedded = false }) {
       <ExpertDrawer
         expert={experts.find((item) => item.id === selected?.id)}
         open={!!selected}
-        onClose={() => setSelected(null)}
+        initialAction={initialAction}
+        onActionHandled={() => setInitialAction(null)}
+        onClose={() => {
+          setSelected(null);
+          setInitialAction(null);
+        }}
       />
       <Modal
         title="申请退出专家库"
