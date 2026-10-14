@@ -151,7 +151,7 @@ export default function DirectorSpecialTaskView() {
     <div className={styles.page}>
       <PageHeader
         eyebrow="DIRECTOR SPECIAL TASKS"
-        title="董事专项任务"
+        title="下发董事专项任务"
         subtitle="集团董办统一下发董事评价及其他专项办理任务"
       />
       <SectionCard
@@ -188,7 +188,7 @@ export default function DirectorSpecialTaskView() {
       <Modal
         open={createOpen}
         width={780}
-        title="下发董事专项任务"
+        title="董事专项任务"
         okText="确认下发"
         cancelText="取消"
         onOk={createTask}

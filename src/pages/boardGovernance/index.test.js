@@ -325,16 +325,25 @@ test("provides an operable three-type duty plan lifecycle", async () => {
 });
 
 test("connects handbook department tasks with the preparation table", async () => {
-  const [page, home, taskHome, task, director, historyDrawer, materialData] =
-    await Promise.all([
-      read("./index.jsx"),
-      read("./views/HomeView/index.jsx"),
-      read("./views/TaskHomeView/index.jsx"),
-      read("./views/MaterialTaskView/index.jsx"),
-      read("./views/DirectorView/index.jsx"),
-      read("./views/DirectorView/components/MaterialHistoryDrawer/index.jsx"),
-      read("./handbookData.js"),
-    ]);
+  const [
+    page,
+    home,
+    taskHome,
+    task,
+    director,
+    planWorkspace,
+    historyDrawer,
+    materialData,
+  ] = await Promise.all([
+    read("./index.jsx"),
+    read("./views/HomeView/index.jsx"),
+    read("./views/TaskHomeView/index.jsx"),
+    read("./views/MaterialTaskView/index.jsx"),
+    read("./views/DirectorView/index.jsx"),
+    read("./views/DirectorView/components/DutyPlanWorkspace/index.jsx"),
+    read("./views/DirectorView/components/MaterialHistoryDrawer/index.jsx"),
+    read("./handbookData.js"),
+  ]);
   for (const department of [
     "综合管理部-办公室",
     "股权运营部",
@@ -376,16 +385,15 @@ test("connects handbook department tasks with the preparation table", async () =
   assert.match(director, /disabled=\{!materials\.length \|\| !allSubmitted\}/);
   assert.match(director, /label: "董事履职手册"/);
   assert.match(director, /label: "年度履职计划编排"/);
-  for (const step of [
-    "计划制定",
-    "计划全部提交",
-    "年度履职计划生成",
-    "自动创建履职任务",
-  ]) {
-    assert.match(director, new RegExp(step));
-  }
-  assert.match(director, /<Steps[\s\S]{0,220}current=\{annualPlanStep\}/);
-  assert.match(director, /annualPlanGenerated\s*\? 4/);
+  assert.match(director, /key: "planning", label: "计划制定"/);
+  assert.match(director, /key: "generation", label: "年度履职计划生成"/);
+  assert.match(director, /activeKey=\{activeAnnualTab\}/);
+  assert.match(planWorkspace, /name="taskAssignee"/);
+  assert.match(
+    planWorkspace,
+    /onConfirm=\{\(\) => onDeletePlan\?\.\(row\.id\)\}/,
+  );
+  assert.match(planWorkspace, /dataSource=\{submittedRows\}/);
   const dutyPlanData = await read("./dutyPlanData.js");
   assert.equal((dutyPlanData.match(/id: "PLAN-D02-/g) || []).length, 3);
   assert.match(director, /const previewColumns = \[/);

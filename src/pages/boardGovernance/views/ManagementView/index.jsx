@@ -57,11 +57,12 @@ export default function ManagementView({
   const visiblePlans = dutyPlans.filter(
     (item) => item.directorName === director?.name,
   );
+  const generatedPlans = visiblePlans.filter((item) => item.taskStatus);
   const visibleReports = dutyReports.filter(
     (item) => item.directorName === director?.name,
   );
-  const managementPlans = visiblePlans.length
-    ? visiblePlans
+  const managementPlans = generatedPlans.length
+    ? generatedPlans
     : buildManagementDemoPlans(director);
   const managementReports = visibleReports.length
     ? visibleReports

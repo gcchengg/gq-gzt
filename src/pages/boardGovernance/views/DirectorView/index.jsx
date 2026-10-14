@@ -627,14 +627,15 @@ function DirectorLifecycleDrawer({
   const visiblePlans = dutyPlans.filter(
     (item) => item.directorName === director?.name,
   );
+  const generatedPlans = visiblePlans.filter((item) => item.taskStatus);
   const visibleReports = dutyReports.filter(
     (item) => item.directorName === director?.name,
   );
   const visibleSuggestions = suggestionTasks.filter(
     (item) => item.directorName === director?.name,
   );
-  const managementPlans = visiblePlans.length
-    ? visiblePlans
+  const managementPlans = generatedPlans.length
+    ? generatedPlans
     : buildManagementDemoPlans(director);
   const managementReports = visibleReports.length
     ? visibleReports
@@ -977,6 +978,7 @@ export function PreparationWorkspace({
 }) {
   const [historyMaterial, setHistoryMaterial] = useState(null);
   const [planComposerOpen, setPlanComposerOpen] = useState(false);
+  const [annualTabSelection, setAnnualTabSelection] = useState(null);
   const [selectedMaterialIds, setSelectedMaterialIds] = useState([]);
   const [materialEditor, setMaterialEditor] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -988,19 +990,19 @@ export function PreparationWorkspace({
   const directorPlans = dutyPlans.filter(
     (item) => item.directorName === director.name,
   );
-  const annualPlanGenerated = generatedDirectorNames.includes(director.name);
   const allPlansSubmitted =
     directorPlans.length > 0 &&
     directorPlans.every((item) =>
       ["已提交", "待确认", "已完成"].includes(item.status),
     );
-  const annualPlanStep = annualPlanGenerated
-    ? 4
-    : allPlansSubmitted
-      ? 2
-      : directorPlans.length
-        ? 1
-        : 0;
+  const activeAnnualTab =
+    annualTabSelection?.directorId === director.id
+      ? annualTabSelection.key
+      : planMode === "planning"
+        ? "planning"
+        : planMode === "confirmation" || allPlansSubmitted
+          ? "generation"
+          : "planning";
   const openMaterialEditor = (record = null) => {
     materialForm.resetFields();
     materialForm.setFieldsValue(
@@ -1272,37 +1274,35 @@ export function PreparationWorkspace({
                   label: "年度履职计划编制",
                   children: (
                     <div className={styles.annualPlanTab}>
-                      <SectionCard title="准备阶段进度">
-                        <Steps
-                          direction="horizontal"
-                          responsive={false}
-                          labelPlacement="vertical"
-                          size="small"
-                          current={planMode === "planning" ? 0 : annualPlanStep}
-                          items={[
-                            { title: "计划制定" },
-                            { title: "计划全部提交" },
-                            { title: "年度履职计划生成" },
-                            { title: "自动创建履职任务" },
-                          ]}
-                        />
-                      </SectionCard>
+                      <Tabs
+                        activeKey={activeAnnualTab}
+                        onChange={(key) => {
+                          setPlanComposerOpen(false);
+                          setAnnualTabSelection({
+                            directorId: director.id,
+                            key,
+                          });
+                        }}
+                        items={[
+                          { key: "planning", label: "计划制定" },
+                          { key: "generation", label: "年度履职计划生成" },
+                        ]}
+                      />
                       <DutyPlanWorkspace
                         embedded={embedded}
-                        mode={planMode}
+                        mode={activeAnnualTab}
                         createOpen={planComposerOpen}
                         onCreateOpenChange={setPlanComposerOpen}
                         plans={directorPlans}
                         onCreatePlan={onCreateDutyPlan}
                         onDeletePlan={onDeleteDutyPlan}
                         onSubmitPlan={onSubmitDutyPlan}
-                        onGenerateTasks={() =>
-                          onGenerateDutyTasks(director.name)
+                        onGenerateTasks={(planIds) =>
+                          onGenerateDutyTasks(director.name, planIds)
                         }
-                        onSubmitAnnualPlanReport={(report) =>
-                          onSubmitAnnualPlanReport?.(director, report)
-                        }
-                        annualGenerated={annualPlanGenerated}
+                        annualGenerated={generatedDirectorNames.includes(
+                          director.name,
+                        )}
                         activeDirector={director}
                       />
                     </div>

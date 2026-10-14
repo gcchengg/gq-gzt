@@ -238,10 +238,12 @@ export default function BoardGovernancePage() {
       ),
     );
   };
-  const generateDutyTasks = (directorName) => {
+  const generateDutyTasks = (directorName, planIds) => {
+    const selectedPlanIds = Array.isArray(planIds) ? new Set(planIds) : null;
     setDutyPlans((current) =>
       current.map((item) =>
-        item.directorName === directorName
+        item.directorName === directorName &&
+        (!selectedPlanIds || selectedPlanIds.has(item.id))
           ? {
               ...item,
               taskStatus: item.taskStatus || "待执行",

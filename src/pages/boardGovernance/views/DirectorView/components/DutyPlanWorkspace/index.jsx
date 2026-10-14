@@ -42,6 +42,8 @@ const workCategories = [
   "其他",
 ];
 
+const responsiblePeople = ["阮迪", "周航", "陈哲", "孙博", "李晨光", "刘欣然"];
+
 const planTypeByWorkCategory = {
   董事会: "会议计划",
   调研: "调研计划",
@@ -78,6 +80,8 @@ export default function DutyPlanWorkspace({
   const [resultPlan, setResultPlan] = useState(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [selectedAnnualIds, setSelectedAnnualIds] = useState(null);
+  const [selectedGenerationIds, setSelectedGenerationIds] = useState([]);
+  const [savedGenerationIds, setSavedGenerationIds] = useState(null);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
   const [planSummaries, setPlanSummaries] = useState(() => [
     {
@@ -148,7 +152,7 @@ export default function DutyPlanWorkspace({
         submittedAt: new Date().toLocaleString("zh-CN", { hour12: false }),
       },
     ]);
-    message.success("年度履职计划已保存");
+    message.success("计划草稿已保存");
     closeComposer();
   };
 
@@ -227,6 +231,12 @@ export default function DutyPlanWorkspace({
     { title: "工作类别", dataIndex: "workCategory", width: 170 },
     { title: "计划内容", dataIndex: "content", width: 260 },
     { title: "责任部门", dataIndex: "owner", width: 160 },
+    {
+      title: "责任人",
+      dataIndex: "taskAssignee",
+      width: 110,
+      render: (value) => value || "待指定",
+    },
     { title: "确认责任人", dataIndex: "confirmOwner", width: 120 },
     { title: "计划时间", dataIndex: "date", width: 120 },
     { title: "预期成果", dataIndex: "target", width: 240 },
@@ -248,53 +258,101 @@ export default function DutyPlanWorkspace({
     {
       title: "工作类别",
       dataIndex: "workCategory",
-      width: "17%",
+      width: "12%",
       onCell: (row) => ({
         rowSpan: row.categoryRowSpan,
         className: row.categoryRowSpan ? styles.planningCategoryCell : "",
       }),
       render: (value) => <strong>{value}</strong>,
     },
-    { title: "序号", dataIndex: "sequence", width: "8%", align: "center" },
-    { title: "工作内容", dataIndex: "content", width: "32%" },
+    { title: "序号", dataIndex: "sequence", width: "6%", align: "center" },
+    { title: "工作内容", dataIndex: "content", width: "23%" },
+    {
+      title: "责任人",
+      dataIndex: "taskAssignee",
+      width: "10%",
+      render: (value) => value || "待指定",
+    },
     {
       title: "计划开展时间",
       dataIndex: "date",
-      width: "18%",
+      width: "12%",
       align: "center",
       render: (value) => value?.replaceAll("-", "/") || "",
     },
-    { title: "预期达成目标", dataIndex: "target", width: "25%" },
+    { title: "预期达成目标", dataIndex: "target", width: "16%" },
     {
       title: "状态",
       dataIndex: "status",
-      width: "12%",
+      width: "8%",
       render: (value) => <StatusPill>{value || "草稿"}</StatusPill>,
     },
+    {
+      title: "操作",
+      width: "13%",
+      render: (_, row) =>
+        row.status === "草稿" ? (
+          <Space size={0}>
+            <Button type="link" size="small" onClick={() => submitPlan(row)}>
+              提交
+            </Button>
+            <Popconfirm
+              title="删除该计划草稿？"
+              okText="删除"
+              cancelText="取消"
+              onConfirm={() => onDeletePlan?.(row.id)}
+            >
+              <Button type="link" size="small" danger>
+                删除
+              </Button>
+            </Popconfirm>
+          </Space>
+        ) : (
+          "—"
+        ),
+    },
   ];
-  const planningRows = workCategories.flatMap((workCategory) => {
-    const categoryPlans = plans.filter(
-      (plan) => normalizeWorkCategory(plan.workCategory) === workCategory,
-    );
-    const rows = categoryPlans.map((plan, index) => ({
-      ...plan,
-      sequence: index + 1,
-    }));
-    if (!rows.length) return [];
-    rows[0].categoryRowSpan = rows.length;
-    rows.slice(1).forEach((row) => {
-      row.categoryRowSpan = 0;
+  const buildPlanRows = (planItems) =>
+    workCategories.flatMap((workCategory) => {
+      const categoryPlans = planItems.filter(
+        (plan) => normalizeWorkCategory(plan.workCategory) === workCategory,
+      );
+      const rows = categoryPlans.map((plan, index) => ({
+        ...plan,
+        sequence: index + 1,
+      }));
+      if (!rows.length) return [];
+      rows[0].categoryRowSpan = rows.length;
+      rows.slice(1).forEach((row) => {
+        row.categoryRowSpan = 0;
+      });
+      return rows;
     });
-    return rows;
-  });
+  const planningRows = buildPlanRows(plans);
+  const submittedRows = buildPlanRows(
+    plans.filter((plan) => plan.status !== "草稿"),
+  );
+  const generatedRows = submittedRows.filter((plan) => plan.taskStatus);
+  const allPlansSubmitted =
+    plans.length > 0 &&
+    plans.every((plan) => ["已提交", "待确认", "已完成"].includes(plan.status));
+  const openGenerationDrawer = () => {
+    const availableIds = submittedRows.map((plan) => plan.id);
+    setSelectedGenerationIds(
+      savedGenerationIds?.directorId === activeDirector.id
+        ? savedGenerationIds.ids.filter((id) => availableIds.includes(id))
+        : availableIds,
+    );
+    setReportOpen(true);
+  };
 
   return (
     <>
       <SectionCard
-        title="年度履职计划编制"
+        title={mode === "generation" ? "年度履职计划生成" : "年度履职计划编制"}
         className={embedded ? styles.embeddedPlanCard : ""}
         extra={
-          mode !== "confirmation" ? (
+          mode !== "confirmation" && mode !== "generation" ? (
             <Space wrap>
               <Button
                 icon={<PlusOutlined />}
@@ -319,38 +377,72 @@ export default function DutyPlanWorkspace({
             />
             <div className={styles.planFooter}>
               <div className={styles.planFooterCopy}>
-                <strong>计划状态</strong>
-                <span>可先保存当前编制进度，提交后将更新计划状态。</span>
+                <strong>
+                  草稿 {plans.length - submittedRows.length} 项，已提交{" "}
+                  {submittedRows.length} 项
+                </strong>
+                <span>草稿可单独提交或删除，也可一次提交全部草稿。</span>
               </div>
-              <Space>
-                <Button onClick={() => message.success("年度履职计划已保存")}>
-                  保存
-                </Button>
+              <Button
+                type="primary"
+                disabled={!planningRows.some((plan) => plan.status === "草稿")}
+                onClick={() => {
+                  const draftIds = planningRows
+                    .filter((plan) => plan.status === "草稿")
+                    .map((plan) => plan.id);
+                  if (!draftIds.length) return;
+                  onSubmitPlan?.(draftIds);
+                  message.success(`已提交 ${draftIds.length} 项年度履职计划`);
+                }}
+              >
+                提交全部草稿
+              </Button>
+            </div>
+          </div>
+        ) : mode === "generation" ? (
+          <div className={styles.planningTable}>
+            <p className={styles.modalTip}>
+              汇总已提交的计划，确认后直接生成年度履职计划及对应履职任务。
+            </p>
+            <Table
+              rowKey="id"
+              size="middle"
+              bordered
+              pagination={false}
+              tableLayout="fixed"
+              dataSource={submittedRows}
+              columns={planningColumns.slice(0, -1)}
+            />
+            <div className={styles.planFooter}>
+              <div className={styles.planFooterCopy}>
+                <strong>
+                  {annualGenerated
+                    ? `年度计划已生成，${generatedRows.length} 项履职任务已创建`
+                    : allPlansSubmitted
+                      ? `${submittedRows.length} 项计划已全部提交`
+                      : `已提交 ${submittedRows.length} / ${plans.length} 项计划`}
+                </strong>
+                <span>全部计划提交后，可在生成抽屉中选择要纳入的计划。</span>
+              </div>
+              {annualGenerated ? (
+                <Space>
+                  <Button onClick={openGenerationDrawer}>
+                    查看年度履职计划
+                  </Button>
+                  <Link to={`/boardGovernance/management/${activeDirector.id}`}>
+                    <Button type="primary">查看已创建任务</Button>
+                  </Link>
+                </Space>
+              ) : (
                 <Button
                   type="primary"
-                  disabled={
-                    !planningRows.some((plan) => plan.status === "草稿")
-                  }
-                  onClick={() => {
-                    const draftIds = planningRows
-                      .filter((plan) => plan.status === "草稿")
-                      .map((plan) => plan.id);
-                    if (!draftIds.length) return;
-                    onSubmitPlan?.(draftIds);
-                    message.success(`已提交 ${draftIds.length} 项年度履职计划`);
-                    navigate("/boardGovernance/home", {
-                      state: {
-                        taskSelection: {
-                          category: "duty",
-                          department: "已确认履职计划任务",
-                        },
-                      },
-                    });
-                  }}
+                  icon={<RocketOutlined />}
+                  disabled={!allPlansSubmitted}
+                  onClick={openGenerationDrawer}
                 >
-                  提交
+                  生成年度计划并创建任务
                 </Button>
-              </Space>
+              )}
             </div>
           </div>
         ) : (
@@ -398,7 +490,7 @@ export default function DutyPlanWorkspace({
           </div>
         )}
       </SectionCard>
-      {mode !== "planning" ? (
+      {mode !== "planning" && mode !== "generation" ? (
         <SectionCard
           title="履职计划确认明细"
           className={embedded ? styles.embeddedPlanCard : ""}
@@ -509,9 +601,9 @@ export default function DutyPlanWorkspace({
       ) : null}
 
       <Modal
-        open={mode !== "confirmation" && createOpen}
+        open={(mode === "planning" || mode === "default") && createOpen}
         title="新增年度履职计划"
-        okText="提交"
+        okText="保存草稿"
         cancelText="取消"
         onOk={savePlan}
         onCancel={closeComposer}
@@ -533,6 +625,20 @@ export default function DutyPlanWorkspace({
             <Select
               placeholder="请选择工作类别"
               options={workCategories.map((value) => ({ value, label: value }))}
+            />
+          </Form.Item>
+          <Form.Item
+            name="taskAssignee"
+            label="责任人"
+            rules={[{ required: true, message: "请选择责任人" }]}
+          >
+            <Select
+              showSearch
+              placeholder="请选择责任人"
+              options={responsiblePeople.map((value) => ({
+                value,
+                label: value,
+              }))}
             />
           </Form.Item>
           <Form.Item
@@ -615,31 +721,138 @@ export default function DutyPlanWorkspace({
         ) : null}
       </Drawer>
       <Drawer
-        title="年度履职计划选择"
+        title={
+          mode === "generation" ? "确认生成年度履职计划" : "年度履职计划选择"
+        }
         open={reportOpen}
         width={1100}
         onClose={() => setReportOpen(false)}
       >
-        <AnnualPlanConfirmTaskView
-          generation
-          task={annualSelectionTask}
-          onSave={(_id, ids, submit) => {
-            setSelectedAnnualIds(ids);
-            if (submit) onGenerateTasks?.();
-          }}
-          onClose={() => setReportOpen(false)}
-          onSubmitComplete={() => {
-            setReportOpen(false);
-            navigate("/boardGovernance/home", {
-              state: {
-                taskSelection: {
-                  category: "duty",
-                  department: "已确认履职计划任务",
+        {mode === "generation" ? (
+          <div className={styles.planningTable}>
+            <Descriptions
+              bordered
+              column={2}
+              items={[
+                {
+                  key: "director",
+                  label: "董事",
+                  children: activeDirector.name,
                 },
-              },
-            });
-          }}
-        />
+                {
+                  key: "company",
+                  label: "任职企业",
+                  children: activeDirector.company,
+                },
+                { key: "year", label: "计划年度", children: "2026年" },
+                {
+                  key: "count",
+                  label: "计划数量",
+                  children: `${annualGenerated ? generatedRows.length : submittedRows.length} 项`,
+                },
+              ]}
+            />
+            <p className={styles.modalTip}>
+              {annualGenerated
+                ? "以下计划已纳入年度履职计划，并创建了对应履职任务。"
+                : `请勾选纳入年度履职计划的事项，当前已选 ${selectedGenerationIds.length} 项。`}
+            </p>
+            <Table
+              rowKey="id"
+              size="middle"
+              bordered
+              pagination={false}
+              tableLayout="fixed"
+              dataSource={annualGenerated ? generatedRows : submittedRows}
+              rowSelection={
+                annualGenerated
+                  ? undefined
+                  : {
+                      columnWidth: 44,
+                      selectedRowKeys: selectedGenerationIds,
+                      onChange: setSelectedGenerationIds,
+                    }
+              }
+              columns={planningColumns.slice(0, -1)}
+            />
+            <div className={styles.planFooter}>
+              <div className={styles.planFooterCopy}>
+                <strong>
+                  {annualGenerated
+                    ? `已生成 ${generatedRows.length} 项履职任务`
+                    : `将生成 ${selectedGenerationIds.length} 项履职任务`}
+                </strong>
+                {!annualGenerated ? (
+                  <span>请核对计划内容与责任人后确认生成。</span>
+                ) : null}
+              </div>
+              {annualGenerated ? (
+                <Button onClick={() => setReportOpen(false)}>关闭</Button>
+              ) : (
+                <Space>
+                  <Button onClick={() => setReportOpen(false)}>取消</Button>
+                  <Button
+                    disabled={!selectedGenerationIds.length}
+                    onClick={() => {
+                      setSavedGenerationIds({
+                        directorId: activeDirector.id,
+                        ids: selectedGenerationIds,
+                      });
+                      message.success(
+                        `已保存 ${selectedGenerationIds.length} 项计划的选择结果`,
+                      );
+                    }}
+                  >
+                    保存选择
+                  </Button>
+                  <Popconfirm
+                    title="确认生成年度履职计划并创建任务？"
+                    description={`本次将为已选的 ${selectedGenerationIds.length} 项计划创建履职任务。`}
+                    okText="确认生成"
+                    cancelText="返回检查"
+                    onConfirm={() => {
+                      if (!allPlansSubmitted || !selectedGenerationIds.length)
+                        return;
+                      onGenerateTasks?.(selectedGenerationIds);
+                      setReportOpen(false);
+                      message.success("年度履职计划已生成，履职任务已创建");
+                    }}
+                  >
+                    <Button
+                      type="primary"
+                      disabled={
+                        !allPlansSubmitted || !selectedGenerationIds.length
+                      }
+                    >
+                      确认生成并创建任务
+                    </Button>
+                  </Popconfirm>
+                </Space>
+              )}
+            </div>
+          </div>
+        ) : (
+          <AnnualPlanConfirmTaskView
+            generation
+            task={annualSelectionTask}
+            onSave={(_id, ids, submit) => {
+              setSelectedAnnualIds(ids);
+              if (submit) onGenerateTasks?.();
+            }}
+            onClose={() => setReportOpen(false)}
+            onSubmitComplete={() => {
+              setReportOpen(false);
+              navigate("/boardGovernance/home", {
+                state: {
+                  taskSelection: {
+                    category: "duty",
+                    department: "已确认履职计划任务",
+                  },
+                },
+              });
+            }}
+          />
+        )}
       </Drawer>
     </>
   );
