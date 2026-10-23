@@ -44,6 +44,11 @@ import EvaluationAnalytics from "./components/EvaluationAnalytics";
 import EvaluationRecordsDrawer from "./components/EvaluationRecordsDrawer";
 import Enrollment from "./Enrollment";
 import Calls from "./Calls";
+import ExpertSession from "./components/ExpertSession";
+import ExpertSettlementProfile from "./components/ExpertSettlementProfile";
+import SettlementWorkspace from "./components/SettlementWorkspace";
+import { useExpertConfig, saveExpertConfig } from "./configStore";
+import { canCallExpert } from "./settlement";
 import GztHome from "../gzthome";
 import { log, uid, updateStore, useExpertStore } from "./store";
 import {
@@ -431,6 +436,7 @@ function ExpertDrawer({
 }) {
   const navigate = useNavigate();
   const { tasks } = useExpertStore();
+  const [profileParams] = useSearchParams();
   const [renewOpen, setRenewOpen] = useState(false);
   const [letterOpen, setLetterOpen] = useState(false);
   const [dismissOpen, setDismissOpen] = useState(false);
@@ -455,12 +461,12 @@ function ExpertDrawer({
   const canDismiss =
     warning.ageWarning &&
     ["可用", "忙碌", "限制调用", "待续聘"].includes(expert.status);
-  const formallyEmployed =
-    (expert.appointmentHistory || []).some(
-      (item) => item.status === "已签署" || item.signedAt,
-    ) && daysUntil(expert.termEnd) >= 0;
-  const canCall =
-    formallyEmployed && !["限制调用", "已解聘"].includes(expert.status);
+  const formallyEmployed = canCallExpert({
+    ...expert,
+    status: "可用",
+    risk: "正常",
+  });
+  const canCall = canCallExpert(expert);
   const callTip = !formallyEmployed
     ? "尚未正式聘用或聘期已结束，不可发起调用"
     : ["限制调用", "已解聘"].includes(expert.status)
@@ -678,7 +684,15 @@ function ExpertDrawer({
           </div>
         </div>
         <Tabs
+          defaultActiveKey={
+            profileParams.get("expertId") === expert.id ? "settlement" : "basic"
+          }
           items={[
+            {
+              key: "settlement",
+              label: "计费与结算",
+              children: <ExpertSettlementProfile expertId={expert.id} />,
+            },
             {
               key: "basic",
               label: "基本档案",
@@ -1050,6 +1064,7 @@ function ExpertDrawer({
 
 function ExpertList({ embedded = false }) {
   const { experts } = useExpertStore();
+  const [expertParams] = useSearchParams();
   const visibleExperts = useMemo(
     () => experts.filter(isVisibleInPool),
     [experts],
@@ -1061,6 +1076,13 @@ function ExpertList({ embedded = false }) {
   const [enrollmentRange, setEnrollmentRange] = useState(null);
   const [exitRange, setExitRange] = useState(null);
   const [selected, setSelected] = useState(null);
+  useEffect(() => {
+    const id = expertParams.get("expertId");
+    if (id) {
+      const expert = experts.find((item) => item.id === id);
+      if (expert) setSelected(expert);
+    }
+  }, [expertParams, experts]);
   const [initialAction, setInitialAction] = useState(null);
   const [exitExpert, setExitExpert] = useState(null);
   const [exitReason, setExitReason] = useState("");
@@ -1541,87 +1563,32 @@ function Tasks() {
 }
 
 function Operations() {
-  const saved = useMemo(() => {
-    try {
-      return (
-        JSON.parse(localStorage.getItem("expert-operations-config-v1")) || {}
-      );
-    } catch {
-      return {};
-    }
-  }, []);
+  const saved = useExpertConfig();
+  const state = useExpertStore();
   const [selected, setSelected] = useState("标签与分类");
-  const [weights, setWeights] = useState(
-    saved.weights || {
-      tag: 35,
-      scene: 20,
-      quality: 15,
-      trace: 10,
-      time: 10,
-      balance: 10,
-    },
+  const [weights, setWeights] = useState(saved.weights);
+  const [categories, setCategories] = useState(saved.categories);
+  const [domains, setDomains] = useState(saved.domains);
+  const [positions, setPositions] = useState(saved.positions);
+  const [disabledDictionaries, setDisabledDictionaries] = useState(
+    saved.disabledDictionaries,
   );
-  const [categories, setCategories] = useState(
-    saved.categories || [
-      "产业研究",
-      "技术研发",
-      "资本运营",
-      "财务法务",
-      "企业运营",
-      "高层次专家",
-    ],
-  );
-  const [domains, setDomains] = useState(
-    saved.domains || [
-      "智能网联",
-      "新能源动力",
-      "汽车软件",
-      "产业投资",
-      "公司治理",
-      "财务审计",
-      "供应链",
-      "海外合规",
-    ],
-  );
-  const [rules, setRules] = useState(
-    saved.rules || {
-      normalAge: 65,
-      highAge: 70,
-      termYears: 3,
-      minYears: 8,
-      warningDays: 90,
-    },
-  );
-  const defaultFees = [
-    ["外聘", "两院院士", 2500, "税后"],
-    ["外聘", "高级专家", 2000, "税后"],
-    ["外聘", "正高级职称 / 教授", 1500, "税后"],
-    ["外聘", "副高级职称 / 副教授", 1000, "税后"],
-    ["外聘", "中级职称", 800, "税后"],
-    ["外聘", "其他人员", 500, "税后"],
-    ["内部", "首席科学家", 2000, "业余 / 税前（工作时间1500）"],
-    ["内部", "专家、总师、正高级", 1500, "业余 / 税前（工作时间1000）"],
-    ["内部", "主任级、副高级", 800, "业余 / 税前（工作时间500）"],
-    ["内部", "主管级、中级", 600, "业余 / 税前（工作时间400）"],
-    ["内部", "其他人员", 400, "业余 / 税前（工作时间250）"],
-  ];
-  const [fees, setFees] = useState(
-    saved.fees ||
-      defaultFees.map(([source, level, amount, note], index) => ({
-        key: index,
-        source,
-        level,
-        amount,
-        note,
-        status: "启用",
-      })),
-  );
+  const [rules, setRules] = useState(saved.rules);
+  const [fees, setFees] = useState(saved.fees);
+  const [closing, setClosing] = useState(saved.closing);
+  function changeDictionary(key, values, previous, setter) {
+    setter([...new Set([...previous, ...values])]);
+    setDisabledDictionaries((current) => ({
+      ...current,
+      [key]: previous.filter((value) => !values.includes(value)),
+    }));
+  }
   const [templatePreview, setTemplatePreview] = useState(null);
   const configs = [
     {
       title: "标签与分类",
       desc: "专家类别、主领域、细分方向和技术关键词",
-      count: `${categories.length + domains.length} 项`,
+      count: `${categories.length + domains.length + positions.length} 项`,
       icon: TeamOutlined,
     },
     {
@@ -1643,6 +1610,12 @@ function Operations() {
       icon: DatabaseOutlined,
     },
   ];
+  configs.push({
+    title: "结账与计费",
+    desc: "月结日、时刻及统一时长折算",
+    count: "Asia/Shanghai",
+    icon: DatabaseOutlined,
+  });
   const templates = [
     ["专家合作邀请函", "入库邀请", "V1.2"],
     ["专家聘书", "聘书签署", "V1.1"],
@@ -1659,19 +1632,36 @@ function Operations() {
     updated: "2026-09-05",
   }));
   function saveConfig() {
-    const total = Object.values(weights).reduce((a, b) => a + b, 0);
-    if (total !== 100) return message.error("匹配权重合计必须为100%");
-    localStorage.setItem(
-      "expert-operations-config-v1",
-      JSON.stringify({ weights, categories, domains, rules, fees }),
-    );
-    message.success("运营配置已保存到当前浏览器，并生成演示版本 V2.4");
+    try {
+      const next = saveExpertConfig({
+        ...saved,
+        weights,
+        categories,
+        domains,
+        positions,
+        disabledDictionaries,
+        rules,
+        fees,
+        closing,
+      });
+      setFees(next.fees);
+      message.success(`运营配置已保存，版本 V${next.version}`);
+    } catch (error) {
+      message.error(error.message);
+    }
   }
   function updateFee(key, field, value) {
     setFees((current) =>
       current.map((fee) =>
         fee.key === key
-          ? { ...fee, [field]: field === "amount" ? Number(value) : value }
+          ? {
+              ...fee,
+              [field]: ["amount", "workAmount"].includes(field)
+                ? value === "" && field === "workAmount"
+                  ? undefined
+                  : Number(value)
+                : value,
+            }
           : fee,
       ),
     );
@@ -1681,8 +1671,11 @@ function Operations() {
       ...current,
       {
         key: `fee-${Date.now()}`,
-        source: "外聘",
+        source: "外部",
         level: "新费用标准",
+        basis: "待确认",
+        validFrom: "",
+        validTo: "",
         amount: 0,
         note: "待补充",
         status: "启用",
@@ -1690,6 +1683,55 @@ function Operations() {
     ]);
   }
   function content() {
+    if (selected === "结账与计费")
+      return (
+        <Form layout="vertical">
+          <Form.Item label="结账日">
+            <Select
+              value={closing.day}
+              options={[
+                { value: 0, label: "每月最后一日" },
+                ...Array.from({ length: 28 }, (_, i) => ({
+                  value: i + 1,
+                  label: `每月${i + 1}日`,
+                })),
+              ]}
+              onChange={(day) => setClosing((value) => ({ ...value, day }))}
+            />
+          </Form.Item>
+          <Form.Item label="结账时间（北京时间）">
+            <Input
+              type="time"
+              value={closing.time}
+              onChange={(event) =>
+                setClosing((value) => ({ ...value, time: event.target.value }))
+              }
+            />
+          </Form.Item>
+          <Form.Item label="计费折算规则">
+            <Select
+              value={closing.billingRule}
+              options={[
+                {
+                  value: "halfDay",
+                  label: "按计费天数：税前半天标准 × 天数 × 2",
+                },
+                {
+                  value: "legacy",
+                  label: "原时长规则：不足2小时折半、超过2天部分减半",
+                },
+              ]}
+              onChange={(billingRule) =>
+                setClosing((value) => ({ ...value, billingRule }))
+              }
+            />
+          </Form.Item>
+          <Alert
+            type="info"
+            message="页面运行期间检查到期结账，再次打开可补跑。截止后审批的报销进入下一结算月；本期不涉及税务及外部付款。"
+          />
+        </Form>
+      );
     if (selected === "标签与分类")
       return (
         <>
@@ -1701,25 +1743,32 @@ function Operations() {
             <Tag color="blue">可编辑</Tag>
           </div>
           <Form layout="vertical">
-            <Form.Item label="专家类别">
-              <Select
-                mode="tags"
-                value={categories}
-                onChange={setCategories}
-                options={categories.map((value) => ({ value }))}
-              />
-            </Form.Item>
-            <Form.Item label="主领域">
-              <Select
-                mode="tags"
-                value={domains}
-                onChange={setDomains}
-                options={domains.map((value) => ({ value }))}
-              />
-            </Form.Item>
+            {[
+              ["categories", "专家类别", categories, setCategories],
+              ["domains", "主领域", domains, setDomains],
+              ["positions", "职务 / 职称", positions, setPositions],
+            ].map(([key, label, values, setter]) => (
+              <Form.Item key={key} label={label}>
+                <Select
+                  mode="tags"
+                  value={values.filter(
+                    (value) => !disabledDictionaries[key]?.includes(value),
+                  )}
+                  options={values.map((value) => ({
+                    value,
+                    label: disabledDictionaries[key]?.includes(value)
+                      ? `${value}（已停用，选择可恢复）`
+                      : value,
+                  }))}
+                  onChange={(next) =>
+                    changeDictionary(key, next, values, setter)
+                  }
+                />
+              </Form.Item>
+            ))}
             <Alert
               type="info"
-              message="可直接输入新类别或领域，按回车加入。已被专家档案使用的标签，正式系统中应停用而不是直接删除。"
+              message="运营可输入新增选项；移除已选项即停用，历史引用保留。履历录入仅可选择启用项，不允许自由新增。"
             />
           </Form>
         </>
@@ -1837,7 +1886,7 @@ function Operations() {
             <div>
               <h3>专家咨询费用标准</h3>
               <p>
-                可编辑来源、职级、半天标准和计税说明；实际支付仍以财务审批为准
+                统一维护计费等级与税前半天标准；原税后金额须由业务确认后维护，本系统不自动换算
               </p>
             </div>
             <Space>
@@ -1852,6 +1901,7 @@ function Operations() {
             pagination={false}
             rowKey="key"
             dataSource={fees}
+            scroll={{ x: 1500 }}
             columns={[
               {
                 title: "来源",
@@ -1860,7 +1910,7 @@ function Operations() {
                   <Select
                     value={v}
                     style={{ width: 100 }}
-                    options={["外聘", "内部"].map((value) => ({
+                    options={["外部", "内部"].map((value) => ({
                       value,
                       label: value,
                     }))}
@@ -1895,7 +1945,63 @@ function Operations() {
                 ),
               },
               {
-                title: "计税及时间说明",
+                title: "工作时间（元/半天）",
+                dataIndex: "workAmount",
+                render: (value, record) => (
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="留空同常规"
+                    value={value ?? ""}
+                    onChange={(event) =>
+                      updateFee(record.key, "workAmount", event.target.value)
+                    }
+                  />
+                ),
+              },
+              {
+                title: "金额口径",
+                dataIndex: "basis",
+                render: (value, record) => (
+                  <Select
+                    value={value}
+                    style={{ width: 150 }}
+                    options={["税后待确认", "待确认", "税前"].map((item) => ({
+                      value: item,
+                      label: item === "税前" ? "已确认税前金额" : item,
+                    }))}
+                    onChange={(value) => updateFee(record.key, "basis", value)}
+                  />
+                ),
+              },
+              {
+                title: "生效日期",
+                dataIndex: "validFrom",
+                render: (value, record) => (
+                  <Input
+                    type="date"
+                    value={value}
+                    onChange={(event) =>
+                      updateFee(record.key, "validFrom", event.target.value)
+                    }
+                  />
+                ),
+              },
+              {
+                title: "失效日期",
+                dataIndex: "validTo",
+                render: (value, record) => (
+                  <Input
+                    type="date"
+                    value={value}
+                    onChange={(event) =>
+                      updateFee(record.key, "validTo", event.target.value)
+                    }
+                  />
+                ),
+              },
+              {
+                title: "备注说明",
                 dataIndex: "note",
                 render: (v, record) => (
                   <Input
@@ -1927,7 +2033,7 @@ function Operations() {
             style={{ marginTop: 14 }}
             type="info"
             message="计费说明"
-            description="不足2小时按半天标准折半，2至4小时按半天计算；超过2天的，第1至2天按标准，第3天起按标准的50%执行。差旅费按对应等级另行承担。"
+            description="申请和报销统一读取本页标准；0.5天为一个半天。折算方式在结账与计费中统一设置。停用及未确认税前的标准不能用于报销提交，历史审批保存原规则快照。"
           />
         </>
       );
@@ -2072,12 +2178,15 @@ function ExpertManagement() {
   const [panel, setPanel] = useState(() =>
     location.state?.expertManagementTab === "enrollment" || initialSelectedId
       ? "enrollment"
-      : "enrollment",
+      : "experts",
   );
   const [innerTab, setInnerTab] = useState(
     initialSelectedId ? "invitations" : "pool",
   );
   const [inviteTick, setInviteTick] = useState(0);
+  useEffect(() => {
+    if (searchParams.get("expertId")) setPanel("experts");
+  }, [searchParams]);
 
   useEffect(() => {
     if (location.state?.expertManagementTab !== "enrollment") return;
@@ -2144,10 +2253,11 @@ function ExpertManagement() {
   );
 }
 
-export default function ExpertTalent() {
+function ExpertTalentPage() {
   const { pathname } = useLocation();
   if (pathname === "/zj" || pathname === "/zj/") return <ExpertWorkbench />;
-  if (pathname === "/zj/pool") return <Dashboard />;
+  if (pathname === "/zj/pool") return <ExpertPool />;
+  if (pathname === "/zj/settlement") return <SettlementPage />;
   if (pathname === "/zj/list") return <ExpertManagement />;
   if (pathname === "/zj/tasks") return <Tasks />;
   if (pathname === "/zj/operations") return <Operations />;
@@ -2162,5 +2272,30 @@ export default function ExpertTalent() {
     );
   if (pathname === "/expertTalentTasks") return <Tasks />;
   if (pathname === "/expertTalentOperations") return <Operations />;
+  return <ExpertPool />;
+}
+
+function ExpertPool() {
+  const [params] = useSearchParams();
+  if (params.get("workspace") === "settlement") {
+    const next = new URLSearchParams(params);
+    next.delete("workspace");
+    return <Navigate replace to={`/zj/settlement?${next}`} />;
+  }
   return <Dashboard />;
+}
+function SettlementPage() {
+  return (
+    <Shell title="费用结算" subtitle="专家调用报销台账、审批详情与月度汇总">
+      <SettlementWorkspace />
+    </Shell>
+  );
+}
+export default function ExpertTalent() {
+  return (
+    <>
+      <ExpertSession />
+      <ExpertTalentPage />
+    </>
+  );
 }

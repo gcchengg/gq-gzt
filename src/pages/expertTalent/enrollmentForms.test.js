@@ -7,7 +7,7 @@ import {
   profileRequiredComplete,
 } from "./enrollmentForms.js";
 
-test("draft profile prefills identity fields and defaults id type to 身份证", () => {
+test("draft profile prefills known identity only and never invents birth or certificate", () => {
   const draft = draftProfile({
     name: "张明",
     gender: "男",
@@ -19,8 +19,8 @@ test("draft profile prefills identity fields and defaults id type to 身份证",
   assert.equal(draft.gender, "男");
   assert.equal(draft.phone, "13800005208");
   assert.equal(draft.idType, "身份证");
-  assert.ok(draft.birth);
-  assert.ok(draft.idNo);
+  assert.equal(draft.birth, "");
+  assert.equal(draft.idNo, "");
   assert.equal(draft.company, "示例研究机构");
   assert.equal(draft.position, "首席研究员");
 });

@@ -1,0 +1,99 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.projectRight {
+  padding: 16px 0;
+  min-width: 298px;
+  :global(.ant-steps-vertical > .ant-steps-item .ant-steps-item-icon) {
+    margin-right: 4px;
+  }
+  :global(.ant-steps-item-title) {
+    padding-right: 0;
+    width: 100%;
+  }
+}
+.projectTitleWraper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.projectApproval {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 22px 18px;
+}
+.projectApprovalTitle {
+  font-size: 16px;
+  font-weight: 500;
+}
+.approvalStatus {
+  font-size: 12px;
+  color: #828290;
+}
+.stepTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e5e6e9;
+  margin-bottom: 16px;
+}
+.titleLeft {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.stepIndex {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+.titleRight {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.approved {
+  color: #00b42a;
+  background: #e2f9e7;
+}
+.processing {
+  color: #fd7310;
+  background: #ffeedb;
+}
+.rejected {
+  color: #ff4d4f;
+  background: #fff1f1;
+}
+.waiting,
+.submitted {
+  color: #666672;
+  background: #f0f0f3;
+}
+.stepTime {
+  font-size: 12px;
+  color: #666;
+}
+.stepRemark {
+  font-size: 13px;
+  color: #333;
+  overflow-wrap: anywhere;
+}
+.stepRejected {
+  font-size: 13px;
+  color: #ff4d4f;
+  overflow-wrap: anywhere;
+}
+.stepImg {
+  width: 12px;
+  height: 12px;
+}

@@ -41,19 +41,16 @@ function filled(value) {
 function pick(existing, fallback) {
   return filled(existing) ? existing : fallback || "";
 }
-function demoIdNo(birth) {
-  return `220102${String(birth || DEMO_BIRTH).replaceAll("-", "")}001X`;
-}
 
 export function draftProfile(record = {}) {
   const profile = record.profile || {};
-  const birth = pick(profile.birth, DEMO_BIRTH);
+  const birth = pick(profile.birth, record.birth);
   return {
     name: pick(profile.name, record.name),
     gender: pick(profile.gender, record.gender) || "男",
     birth,
     idType: pick(profile.idType, DEFAULT_ID_TYPE),
-    idNo: pick(profile.idNo, demoIdNo(birth)),
+    idNo: pick(profile.idNo, record.idNo),
     phone: pick(profile.phone, record.phone),
     email: pick(profile.email, record.email),
     company: pick(profile.company, record.company),
@@ -73,6 +70,11 @@ export function draftProfile(record = {}) {
     service: profile.service || "",
     travel: profile.travel || "",
     attachment: profile.attachment || "",
+    expertType: profile.expertType || record.expertType || "",
+    feeId: profile.feeId || record.feeId || "",
+    accountName: profile.accountName || "",
+    bankName: profile.bankName || "",
+    bankAccount: profile.bankAccount || "",
     consent: profile.consent !== false,
   };
 }

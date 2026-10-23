@@ -26,7 +26,15 @@ import {
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { experts } from "./data";
+import { useExpertConfig } from "./configStore";
+import {
+  calculateAllowance,
+  canCallExpert,
+  currentActor,
+  settlementProfile,
+} from "./settlement";
+import { effectiveFee } from "./config";
+import Reimbursement from "./components/Reimbursement";
 import { demoNotice, log, uid, updateStore, useExpertStore } from "./store";
 import styles from "./Calls.module.less";
 import wb from "./workbench.module.less";
@@ -79,36 +87,9 @@ function formatFileSize(size) {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-const feeStandards = {
-  "外聘专家·两院院士": 2500,
-  "外聘专家·高级专家": 2000,
-  "外聘专家·正高级/教授": 1500,
-  "外聘专家·副高级/副教授": 1000,
-  "外聘专家·中级职称": 800,
-  "外聘专家·其他人员": 500,
-  "内部专家·专家/总师/正高级·业余": 1500,
-  "内部专家·专家/总师/正高级·工作": 1000,
-  "内部专家·主任级/副高级·业余": 800,
-  "内部专家·主任级/副高级·工作": 500,
-  "内部专家·主管级/中级·业余": 600,
-  "内部专家·主管级/中级·工作": 400,
-  "内部专家·其他人员·业余": 400,
-  "内部专家·其他人员·工作": 250,
-};
-
-function calculateFee(standard = 0, hours = 0) {
-  const value = Number(hours) || 0;
-  if (!value || !standard) return 0;
-  const halfDays = value < 2 ? 0.5 : Math.ceil(value / 4);
-  return Math.round(
-    standard * Math.min(halfDays, 4) +
-      standard * 0.5 * Math.max(halfDays - 4, 0),
-  );
-}
-
 function scoreCandidate(expert, task) {
   const fieldMatch = expert.field === task.field;
-  const available = expert.status === "可用";
+  const available = expert.status === "可用" && canCallExpert(expert);
   const avoidancePassed = expert.risk === "正常";
   return {
     score:
@@ -126,6 +107,35 @@ export default function Calls() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const state = useExpertStore();
+  const experts = state.experts;
+  const config = useExpertConfig();
+  const actor = currentActor(state);
+  function calculateFee(standard = 0, hours = 0) {
+    const minutes = Number(hours || 0) * 60;
+    return (
+      calculateAllowance(
+        [{ minutes, days: Math.ceil(minutes / 240) / 2 }],
+        { amount: Number(standard) || 0 },
+        "业余",
+        config.closing.billingRule,
+      ) / 100
+    );
+  }
+  function selectIntent(id) {
+    const expert = experts.find((item) => item.id === id);
+    const profile = settlementProfile(state, id);
+    const fee = config.fees.find(
+      (item) => item.key === profile?.feeId && item.status === "启用",
+    );
+    form.setFieldsValue({
+      expertId: id,
+      expert: expert?.name,
+      field: expert?.field,
+      feeId: fee?.key,
+      feeLevel: fee ? `${fee.source}·${fee.level}` : undefined,
+      feeStandard: fee?.basis === "税前" ? fee.amount : undefined,
+    });
+  }
   const [editing, setEditing] = useState(null);
   const [selected, setSelected] = useState(null);
   const [form] = Form.useForm();
@@ -167,7 +177,7 @@ export default function Calls() {
             }))
             .toSorted((a, b) => b.recommendation.score - a.recommendation.score)
         : [],
-    [record],
+    [record, experts],
   );
   // The department owns candidate selection only during matching. Once the
   // task reaches scheduling, the selected expert and rationale are frozen.
@@ -234,6 +244,8 @@ export default function Calls() {
     }
   }
   function edit(task, presetExpert) {
+    if (task && task.applicantId !== actor.id)
+      return message.warning("仅原调用人可编辑调用");
     const chosen =
       presetExpert ||
       (task?.expertId
@@ -248,7 +260,8 @@ export default function Calls() {
             budget: Number(String(task.budget).replace(/[^\d.]/g, "")),
           }
         : {
-            applicant: "郑华峰",
+            applicant: actor.name,
+            department: actor.department,
             contact: "138****5208 / zhenghf@example.com",
             expertId: chosen?.id,
             expert: chosen?.name,
@@ -256,6 +269,7 @@ export default function Calls() {
             serviceMode: "会议形式",
           },
     );
+    if (chosen) selectIntent(chosen.id);
   }
   useEffect(() => {
     if (searchParams.get("create") !== "1") return;
@@ -274,6 +288,18 @@ export default function Calls() {
   async function save(submit) {
     const values = submit ? await form.validateFields() : form.getFieldsValue();
     if (
+      state.tasks.find((item) => item.id === editing.id)?.applicantId &&
+      state.tasks.find((item) => item.id === editing.id).applicantId !==
+        actor.id
+    )
+      return message.warning("仅原调用人可提交调用");
+    if (
+      submit &&
+      values.expertId &&
+      !canCallExpert(experts.find((item) => item.id === values.expertId))
+    )
+      return message.warning("意向专家聘任或风险条件不满足，请重新选择");
+    if (
       persist(
         (store) => {
           let task = store.tasks.find((item) => item.id === editing.id);
@@ -289,6 +315,9 @@ export default function Calls() {
           }
           const chosen = experts.find((item) => item.id === values.expertId);
           Object.assign(task, values, {
+            applicantId: task.applicantId || actor.id,
+            applicant: task.applicant || actor.name,
+            freeService: values.freeService === true,
             expert: chosen?.name || values.expert || "待确认",
             estimatedFee: calculateFee(values.feeStandard, values.serviceHours),
             stage: submit ? "匹配中" : "草稿",
@@ -339,6 +368,15 @@ export default function Calls() {
         const task = store.tasks.find((item) => item.id === selected);
         task.expert = expert.name;
         task.expertId = expert.id;
+        const profile = settlementProfile(store, expert.id);
+        const fee = config.fees.find((item) => item.key === profile?.feeId);
+        task.feeId = fee?.key;
+        task.feeLevel = fee ? `${fee.source}·${fee.level}` : "待维护计费资料";
+        task.feeStandard = fee?.basis === "税前" ? fee.amount : undefined;
+        task.estimatedFee =
+          fee?.basis === "税前"
+            ? calculateFee(fee.amount, task.serviceHours)
+            : undefined;
         task.matchReason = matchReason;
         task.matchScore = result.score;
         task.matchAdjusted = adjusted;
@@ -744,14 +782,13 @@ export default function Calls() {
               allowClear
               showSearch
               optionFilterProp="label"
-              options={experts.map((item) => ({
-                value: item.id,
-                label: `${item.name} · ${item.company} · ${item.field}`,
-              }))}
-              onChange={(id) => {
-                const item = experts.find((expert) => expert.id === id);
-                form.setFieldsValue({ expert: item?.name, field: item?.field });
-              }}
+              options={experts
+                .filter((item) => canCallExpert(item))
+                .map((item) => ({
+                  value: item.id,
+                  label: `${item.name} · ${item.company} · ${item.field}`,
+                }))}
+              onChange={selectIntent}
             />
           </Form.Item>
           {fields.map(([key, label]) => (
@@ -783,7 +820,7 @@ export default function Calls() {
               ) : textAreaFields.has(key) ? (
                 <Input.TextArea rows={2} />
               ) : (
-                <Input />
+                <Input readOnly={key === "applicant"} />
               )}
             </Form.Item>
           ))}
@@ -800,23 +837,34 @@ export default function Calls() {
             />
           </Form.Item>
           <Form.Item
-            name="feeLevel"
-            label="专家来源与职级"
+            name="feeId"
+            label="专家来源与计费等级（运营标准）"
             rules={[{ required: true }]}
           >
             <Select
-              options={Object.keys(feeStandards).map((value) => ({
-                value,
-                label: value,
-              }))}
-              onChange={(value) =>
-                form.setFieldValue("feeStandard", feeStandards[value])
-              }
+              options={config.fees
+                .filter(
+                  (fee) =>
+                    fee.status === "启用" &&
+                    fee.basis === "税前" &&
+                    effectiveFee(fee, new Date().toLocaleDateString("sv-SE")),
+                )
+                .map((fee) => ({
+                  value: fee.key,
+                  label: `${fee.source}·${fee.level}`,
+                }))}
+              onChange={(key) => {
+                const fee = config.fees.find((item) => item.key === key);
+                form.setFieldsValue({
+                  feeStandard: fee?.amount,
+                  feeLevel: fee ? `${fee.source}·${fee.level}` : "",
+                });
+              }}
             />
           </Form.Item>
           <Form.Item
             name="feeStandard"
-            label="对应单日津贴标准（元/人/半天，自动关联）"
+            label="税前津贴标准（元/人/半天，自动关联）"
             rules={[{ required: true }]}
           >
             <InputNumber min={0} readOnly style={{ width: "100%" }} />
@@ -829,12 +877,22 @@ export default function Calls() {
             <InputNumber min={0.5} step={0.5} style={{ width: "100%" }} />
           </Form.Item>
           <Alert
-            message={`预计服务总费用（税后）：${calculateFee(feeStandard, serviceHours).toLocaleString()} 元`}
-            description="不足2小时按半天标准折半，2至4小时按半天计算；超过2天的部分按标准的50%计算。差旅费另行据实登记。"
+            message={`预计服务总费用（税前）：${calculateFee(feeStandard, serviceHours).toLocaleString()} 元`}
+            description={
+              config.closing.billingRule === "legacy"
+                ? "按运营原时长规则折算：不足2小时折半，超过2天部分减半。"
+                : "按运营税前半天标准计算；预计小时按4小时折为一个半天，实际报销以服务明细为准。"
+            }
           />
+          <Form.Item name="freeService" valuePropName="checked">
+            <Checkbox>本次为无偿调用（无需生成报销单）</Checkbox>
+          </Form.Item>
+          <Form.Item name="feeLevel" hidden>
+            <Input />
+          </Form.Item>
           <Form.Item
             name="budget"
-            label="预算上限（元，0 表示无偿）"
+            label="预算上限（元；无偿调用请勾选上方标识）"
             rules={[{ required: true }, { type: "number", min: 0 }]}
           >
             <InputNumber min={0} style={{ width: "100%" }} />
@@ -906,7 +964,7 @@ export default function Calls() {
                 },
                 {
                   key: "fee",
-                  label: "预计服务总费用（税后）",
+                  label: "预计服务总费用（税前）",
                   children: `${preview.estimatedFee || 0} 元`,
                 },
               ]}
@@ -933,6 +991,13 @@ export default function Calls() {
               </span>
             </div>
             <Tabs
+              key={`${record.id}-${searchParams.get("tab") || "detail"}`}
+              defaultActiveKey={
+                record.stage === "已评价完成" &&
+                searchParams.get("tab") === "reimbursement"
+                  ? "reimbursement"
+                  : "detail"
+              }
               items={[
                 {
                   key: "detail",
@@ -1645,6 +1710,15 @@ export default function Calls() {
                     </div>
                   ),
                 },
+                ...(record.stage === "已评价完成"
+                  ? [
+                      {
+                        key: "reimbursement",
+                        label: "调用报销",
+                        children: <Reimbursement taskId={record.id} />,
+                      },
+                    ]
+                  : []),
               ]}
             />
           </div>

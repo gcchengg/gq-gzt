@@ -28,6 +28,9 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Enrollment.module.less";
+import { useExpertConfig } from "./configStore";
+import { dictionaryOptions, validDictionary } from "./config";
+import { mask } from "./settlement";
 import ApprovalDetailModal from "./components/ApprovalDetailModal";
 import CandidatePool from "./components/CandidatePool";
 import PageHelp from "./components/PageHelp";
@@ -64,7 +67,12 @@ const profileLabels = {
   experience: "工作经历、起止时间、岗位",
   years: "从业年限",
   category: "专家类别",
-  domain: "主领域 / 细分方向",
+  domain: "主领域",
+  expertType: "专家内外部身份",
+  feeId: "计费等级",
+  accountName: "收款户名",
+  bankName: "开户行",
+  bankAccount: "收款账号",
   keywords: "关联领域与技术关键词",
   projects: "代表项目和本人职责",
   roles: "可承担角色",
@@ -135,7 +143,12 @@ const profileFormFields = [
   ["experience", "工作经历、起止时间、岗位"],
   ["years", "从业年限"],
   ["category", "专家类别"],
-  ["domain", "主领域 / 细分方向"],
+  ["domain", "主领域"],
+  ["expertType", "专家内外部身份"],
+  ["feeId", "计费等级（运营费用标准）"],
+  ["accountName", "收款户名（可后续补齐）"],
+  ["bankName", "开户行"],
+  ["bankAccount", "收款账号"],
   ["keywords", "关联领域与技术关键词"],
   ["projects", "代表项目和本人职责"],
   ["roles", "可承担角色"],
@@ -186,6 +199,7 @@ function lastUpdatedAt(record) {
 }
 
 function PaperApplication({ readOnly = false, values }) {
+  const config = useExpertConfig();
   return (
     <div className={styles.paperForm}>
       <div className={styles.paperTitle}>专家推荐表</div>
@@ -203,7 +217,17 @@ function PaperApplication({ readOnly = false, values }) {
                   rules={[{ required: true, whitespace: true }]}
                   className={styles.paperField}
                 >
-                  {key === "gender" ? (
+                  {key === "position" ? (
+                    <Select
+                      showSearch
+                      optionFilterProp="label"
+                      options={dictionaryOptions(
+                        config,
+                        "positions",
+                        values?.position,
+                      )}
+                    />
+                  ) : key === "gender" ? (
                     <Select
                       options={["男", "女"].map((value) => ({ value }))}
                       variant="borderless"
@@ -245,6 +269,7 @@ export default function Enrollment({
 }) {
   const navigate = useNavigate();
   const state = useExpertStore();
+  const config = useExpertConfig();
   const [uncontrolledTab, setUncontrolledTab] = useState("pool");
   const activeTab = innerTab ?? uncontrolledTab;
   const setActiveTab = onInnerTabChange ?? setUncontrolledTab;
@@ -261,6 +286,8 @@ export default function Enrollment({
   const [applicationForm] = Form.useForm();
   const [appointmentForm] = Form.useForm();
   const [profileForm] = Form.useForm();
+  const profileExpertType = Form.useWatch("expertType", profileForm);
+  const profileValues = Form.useWatch([], profileForm) || {};
   const [profileOpen, setProfileOpen] = useState(false);
   const record = state.invitations.find((item) => item.id === selected);
   const approvalRecord = state.invitations.find(
@@ -543,6 +570,21 @@ export default function Enrollment({
               store.experts.unshift({
                 id: `EX${new Date().getFullYear()}${String(store.experts.length + 1).padStart(4, "0")}`,
                 sourceInvitationId: item.id,
+                idType: item.profile?.idType,
+                idNo: item.profile?.idNo,
+                expertType: item.profile?.expertType,
+                feeId: item.profile?.feeId,
+                settlement: {
+                  idType: item.profile?.idType || "身份证",
+                  idNo: item.profile?.idNo || "",
+                  expertType: item.profile?.expertType || "",
+                  feeId: item.profile?.feeId || "",
+                  accountName: item.profile?.accountName || "",
+                  bankName: item.profile?.bankName || "",
+                  bankAccount: item.profile?.bankAccount || "",
+                  accountConfirmed: false,
+                  accountVersion: 1,
+                },
                 name: item.name,
                 initials: item.name?.slice(0, 1) || "专",
                 title: item.profile?.position || item.title,
@@ -589,6 +631,23 @@ export default function Enrollment({
   }
   async function saveProfile() {
     const values = await profileForm.validateFields();
+    for (const [field, dictionary] of [
+      ["position", "positions"],
+      ["category", "categories"],
+      ["domain", "domains"],
+    ]) {
+      if (!validDictionary(config, dictionary, values[field]))
+        return message.warning(
+          "请从运营启用字典中选择职务/职称、专家类别和主领域",
+        );
+    }
+    const fee = config.fees.find(
+      (item) =>
+        item.key === values.feeId &&
+        item.source === values.expertType &&
+        item.status === "启用",
+    );
+    if (!fee) return message.warning("请选择与内外部身份一致的有效计费等级");
     if (
       persist((store) => {
         const item = store.invitations.find((entry) => entry.id === selected);
@@ -1172,12 +1231,16 @@ export default function Enrollment({
                   items={visibleProfileEntries.map(([key, value]) => ({
                     key,
                     label: profileLabels[key] || key,
-                    children:
-                      typeof value === "boolean"
-                        ? value
-                          ? "已确认"
-                          : "未确认"
-                        : value,
+                    children: ["idNo", "bankAccount"].includes(key)
+                      ? mask(value)
+                      : key === "feeId"
+                        ? config.fees.find((fee) => fee.key === value)?.level ||
+                          "待关联"
+                        : typeof value === "boolean"
+                          ? value
+                            ? "已确认"
+                            : "未确认"
+                          : value,
                   }))}
                 />
               ) : (
@@ -1309,12 +1372,55 @@ export default function Enrollment({
               name={key}
               label={label}
               rules={
-                profileRequiredFields.includes(key)
+                profileRequiredFields.includes(key) ||
+                [
+                  "position",
+                  "category",
+                  "domain",
+                  "expertType",
+                  "feeId",
+                ].includes(key)
                   ? [{ required: true, whitespace: true }]
                   : []
               }
             >
-              {key === "gender" ? (
+              {["position", "category", "domain"].includes(key) ? (
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  placeholder="请选择运营启用项"
+                  options={dictionaryOptions(
+                    config,
+                    {
+                      position: "positions",
+                      category: "categories",
+                      domain: "domains",
+                    }[key],
+                    profileValues[key],
+                  )}
+                />
+              ) : key === "expertType" ? (
+                <Select
+                  options={["内部", "外部"].map((value) => ({ value }))}
+                  onChange={() => profileForm.setFieldValue("feeId", undefined)}
+                />
+              ) : key === "feeId" ? (
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  placeholder="请先选择内外部身份"
+                  options={config.fees
+                    .filter(
+                      (fee) =>
+                        fee.source === profileExpertType &&
+                        fee.status === "启用",
+                    )
+                    .map((fee) => ({
+                      value: fee.key,
+                      label: `${fee.level} · ${fee.basis}`,
+                    }))}
+                />
+              ) : key === "gender" ? (
                 <Select options={["男", "女"].map((value) => ({ value }))} />
               ) : key === "idType" ? (
                 <Select

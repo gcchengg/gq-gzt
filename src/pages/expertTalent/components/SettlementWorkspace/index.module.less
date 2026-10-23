@@ -1,0 +1,37 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.tableCard {
+  border-radius: 14px;
+  border: 1px solid #e6eaf2;
+}
+.actionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: #53677f;
+}
+.secondary {
+  display: block;
+  color: #718298;
+  margin-top: 4px;
+  white-space: normal;
+}
+.opinion {
+  width: 300px;
+}
+@media (max-width: 850px) {
+  .filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}

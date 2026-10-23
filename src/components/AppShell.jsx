@@ -105,6 +105,7 @@ export default function AppShell() {
     "/zj/pool",
     "/zj/list",
     "/zj/tasks",
+    "/zj/settlement",
     "/zj/operations",
     "/experttalentpool",
     "/experttalentlist",
@@ -128,6 +129,11 @@ export default function AppShell() {
             { id: "expert-pool", title: "专家库看板", key: "/zj/pool" },
             { id: "expert-list", title: "专家管理", key: "/zj/list" },
             { id: "expert-tasks", title: "调用管理", key: "/zj/tasks" },
+            {
+              id: "expert-settlement",
+              title: "费用结算",
+              key: "/zj/settlement",
+            },
             {
               id: "expert-operations",
               title: "运营管理",

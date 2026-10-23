@@ -1,0 +1,1826 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>月度经营报告</title>
+    <style>
+    /* ====== 以下样式与原型 report-template.html 相同（仅展开排版） ====== */
+    :root {
+        --navy: #123c67;
+        --blue: #1767c4;
+        --ink: #192c40;
+        --muted: #617287;
+        --line: #dde5ee;
+        --bg: #f3f6fa;
+        --red: #b53b42;
+        --green: #13775d;
+        --amber: #94601b;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    }
+
+    button, a, summary {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+        font: inherit;
+        cursor: pointer;
+    }
+
+    button:focus-visible, a:focus-visible, summary:focus-visible {
+        outline: 3px solid #e3ae30;
+        outline-offset: 4px;
+    }
+
+    header {
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .top {
+        max-width: 1240px;
+        padding: 19px 28px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-weight: 650;
+    }
+
+    .mark {
+        width: 35px;
+        height: 35px;
+        background: var(--navy);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-size: 18px;
+        border-radius: 7px;
+    }
+
+    .meta {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .print {
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--navy);
+        padding: 7px 15px;
+        font-size: 14px;
+    }
+
+    .wrap {
+        max-width: 1240px;
+        margin: auto;
+        padding: 24px 28px 44px;
+    }
+
+    .nav {
+        display: flex;
+        gap: 6px;
+        padding: 5px;
+        background: #e8eef5;
+        border-radius: 9px;
+        margin-bottom: 26px;
+        width: fit-content;
+        max-width: 100%;
+    }
+
+    .nav a {
+        padding: 9px 22px;
+        border-radius: 6px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .nav a.active {
+        background: #fff;
+        color: var(--navy);
+        box-shadow: 0 2px 6px #14375512;
+    }
+
+    .report-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 29px;
+        letter-spacing: -.5px;
+        line-height: 1.35;
+        margin: 0 0 5px;
+    }
+
+    h2 {
+        font-size: 20px;
+        margin: 0;
+        font-weight: 650;
+    }
+
+    h3 {
+        font-size: 16px;
+        margin: 0 0 9px;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    .period {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    .stamp {
+        color: var(--navy);
+        font-size: 14px;
+        border-left: 3px solid var(--blue);
+        padding-left: 13px;
+    }
+
+    .summary {
+        background: var(--navy);
+        color: #fff;
+        padding: 24px 28px;
+        border-radius: 10px;
+        display: grid;
+        grid-template-columns: 1fr 210px;
+        gap: 30px;
+    }
+
+    .eyebrow {
+        font-size: 13px;
+        letter-spacing: 1px;
+        color: #b8cee5;
+        margin-bottom: 8px;
+    }
+
+    .summary h2 {
+        font-size: 24px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+
+    .summary p {
+        color: #d9e5f2;
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    .hero-num {
+        border-left: 1px solid #ffffff33;
+        padding-left: 25px;
+        align-self: center;
+    }
+
+    .hero-num strong {
+        font-size: 35px;
+        display: block;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .hero-num span {
+        font-size: 13px;
+        color: #c1d5ea;
+    }
+
+    .scope-note {
+        font-size: 13px;
+        color: var(--muted);
+        padding: 10px 2px 2px;
+    }
+
+    .kpis {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 14px;
+        margin: 20px 0 24px;
+    }
+
+    .kpi {
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 19px 20px;
+        border-radius: 9px;
+    }
+
+    .kpi-label {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    .kpi-value {
+        font-size: 30px;
+        font-weight: 650;
+        letter-spacing: -.5px;
+        line-height: 1.5;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .unit {
+        font-size: 13px;
+        color: var(--muted);
+        margin-left: 5px;
+        font-weight: 400;
+    }
+
+    .kpi-sub {
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .good {
+        color: var(--green);
+    }
+
+    .bad {
+        color: var(--red);
+    }
+
+    .warn {
+        color: var(--amber);
+    }
+
+    .duo {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .panel {
+        padding: 23px 24px;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        min-width: 0;
+    }
+
+    .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 27px 0 14px;
+    }
+
+    .section-no {
+        font-size: 12px;
+        color: var(--blue);
+        font-weight: 700;
+        background: #e2edfb;
+        border-radius: 4px;
+        padding: 3px 7px;
+    }
+
+    .legend {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+
+    .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: var(--blue);
+        margin-right: 5px;
+        border-radius: 2px;
+    }
+
+    .dot.gray {
+        background: #d7e0eb;
+    }
+
+    .dot.red {
+        background: var(--red);
+    }
+
+    .chartrow {
+        margin-bottom: 17px;
+    }
+
+    .bar-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 14px;
+        margin-bottom: 7px;
+    }
+
+    .bar-head span:last-child {
+        font-variant-numeric: tabular-nums;
+    }
+
+    .track {
+        position: relative;
+        height: 28px;
+        border-radius: 3px;
+        background: #f1f5f9;
+        overflow: hidden;
+    }
+
+    .targetbar {
+        position: absolute;
+        height: 7px;
+        top: 4px;
+        background: #cbd7e5;
+        border-radius: 2px;
+    }
+
+    .actualbar {
+        position: absolute;
+        height: 8px;
+        top: 15px;
+        background: var(--blue);
+        border-radius: 2px;
+        min-width: 1px;
+    }
+
+    .actualbar.negative {
+        background: var(--red);
+    }
+
+    .zero {
+        position: absolute;
+        top: 0;
+        height: 28px;
+        width: 1px;
+        background: #8495a9;
+    }
+
+    .bar-caption {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 3px;
+    }
+
+    .chart-note {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.6;
+    }
+
+    .finding {
+        display: flex;
+        gap: 13px;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .finding:first-of-type {
+        padding-top: 0;
+    }
+
+    .finding:last-child {
+        border-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .finding b {
+        font-size: 13px;
+        color: var(--blue);
+        padding-top: 3px;
+    }
+
+    .finding p {
+        font-size: 15px;
+        line-height: 1.75;
+    }
+
+    .tablewrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    th {
+        background: #edf2f8;
+        color: #50657c;
+        font-weight: 550;
+        text-align: right;
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    td {
+        padding: 13px 14px;
+        border-bottom: 1px solid #edf1f6;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    tr:last-child td {
+        border-bottom: 0;
+    }
+
+    th:first-child, td:first-child {
+        text-align: left;
+    }
+
+    td:first-child {
+        min-width: 175px;
+    }
+
+    td small {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    tbody tr:first-child {
+        font-weight: 650;
+        background: #f7faff;
+    }
+
+    td .tiny {
+        display: block;
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--muted);
+    }
+
+    .note {
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 9px;
+        line-height: 1.7;
+    }
+
+    .forecast {
+        display: grid;
+        grid-template-columns: repeat(3,1fr);
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .forecast-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--blue);
+        border-radius: 8px;
+        padding: 19px 22px;
+    }
+
+    .forecast-card .amount {
+        font-size: 29px;
+        font-weight: 650;
+        line-height: 1.6;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .forecast-card p {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    .f-bottom {
+        display: flex;
+        justify-content: space-between;
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
+        margin-top: 12px;
+        font-size: 13px;
+    }
+
+    .forecast-note {
+        background: #eaf1fa;
+        border-left: 3px solid #7a9dc9;
+        border-radius: 0 6px 6px 0;
+        padding: 15px 19px;
+        font-size: 15px;
+    }
+
+    .forecast-note p+p {
+        margin-top: 8px;
+    }
+
+    .tasks {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .task {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 20px 22px;
+    }
+
+    .task-top {
+        display: flex;
+        align-items: start;
+        gap: 12px;
+        justify-content: space-between;
+    }
+
+    .badge {
+        font-size: 12px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+        background: #edf3fb;
+        color: var(--navy);
+    }
+
+    .badge.attention {
+        background: #fff0e0;
+        color: #8d571c;
+    }
+
+    .task p {
+        font-size: 14px;
+        line-height: 1.8;
+        margin: 5px 0 9px;
+    }
+
+    .task-label {
+        color: var(--muted);
+    }
+
+    .task footer {
+        font-size: 12px;
+        color: var(--muted);
+        border-top: 1px solid #edf1f6;
+        margin-top: 13px;
+        padding-top: 10px;
+    }
+
+    .sources {
+        margin-top: 28px;
+        border-top: 1px solid #ccd8e5;
+        padding-top: 16px;
+    }
+
+    .sources summary {
+        cursor: pointer;
+        color: var(--navy);
+        font-size: 14px;
+        font-weight: 600;
+        padding: 5px 0;
+    }
+
+    .sources ul {
+        padding-left: 21px;
+        color: var(--muted);
+        font-size: 14px;
+    }
+
+    .sources li {
+        margin-bottom: 10px;
+    }
+
+    .source-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 14px 0;
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .end {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 26px;
+        gap: 14px;
+    }
+
+    .download {
+        color: var(--navy);
+    }
+
+    @media(max-width:900px) {
+        .top {
+            padding: 15px 20px;
+        }
+        .wrap {
+            padding: 20px;
+        }
+        .duo {
+            grid-template-columns: 1fr;
+        }
+        .kpis {
+            grid-template-columns: 1fr 1fr;
+        }
+        .summary {
+            grid-template-columns: 1fr 170px;
+            gap: 18px;
+        }
+        .summary h2 {
+            font-size: 22px;
+        }
+        .nav {
+            width: 100%;
+        }
+        .nav a {
+            flex: 1;
+            padding: 9px 10px;
+        }
+        .forecast-card {
+            padding: 17px;
+        }
+        .tasks {
+            gap: 12px;
+        }
+        .task {
+            padding: 18px;
+        }
+        .stamp {
+            display: none;
+        }
+    }
+
+    @media(max-width:600px) {
+        .top {
+            padding: 13px 16px;
+        }
+        .brand {
+            font-size: 15px;
+            gap: 8px;
+        }
+        .mark {
+            width: 30px;
+            height: 30px;
+        }
+        .top .meta {
+            display: none;
+        }
+        .print {
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+        .wrap {
+            padding: 16px 14px 30px;
+        }
+        .nav {
+            gap: 3px;
+            margin-bottom: 22px;
+        }
+        .nav a {
+            font-size: 13px;
+            padding: 9px 3px;
+        }
+        .report-title {
+            margin-bottom: 15px;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .period {
+            font-size: 13px;
+        }
+        .summary {
+            display: block;
+            padding: 20px;
+        }
+        .summary h2 {
+            font-size: 21px;
+        }
+        .summary p {
+            font-size: 14px;
+        }
+        .hero-num {
+            margin-top: 16px;
+            padding: 12px 0 0;
+            border-left: 0;
+            border-top: 1px solid #ffffff33;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+        }
+        .hero-num strong {
+            font-size: 27px;
+        }
+        .hero-num span {
+            font-size: 12px;
+        }
+        .scope-note {
+            font-size: 12px;
+        }
+        .kpis {
+            gap: 10px;
+            margin: 14px 0 20px;
+        }
+        .kpi {
+            padding: 14px 13px;
+        }
+        .kpi-label {
+            font-size: 13px;
+        }
+        .kpi-value {
+            font-size: 26px;
+        }
+        .kpi-sub {
+            font-size: 12px;
+        }
+        .unit {
+            font-size: 12px;
+        }
+        .panel {
+            padding: 19px 17px;
+        }
+        .panel-head {
+            margin-bottom: 14px;
+        }
+        h2 {
+            font-size: 18px;
+        }
+        .finding p {
+            font-size: 14px;
+        }
+        .forecast {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .forecast-card {
+            padding: 15px 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 15px;
+        }
+        .forecast-card h3 {
+            margin-bottom: 2px;
+        }
+        .forecast-card .amount {
+            font-size: 26px;
+            grid-column: 1;
+        }
+        .forecast-card>p {
+            grid-column: 1;
+            font-size: 13px;
+        }
+        .f-bottom {
+            grid-column: 2;
+            grid-row: 1/4;
+            border: 0;
+            border-left: 1px solid var(--line);
+            padding: 0 0 0 15px;
+            margin: 0;
+            flex-direction: column;
+            justify-content: center;
+            gap: 7px;
+        }
+        .forecast-note {
+            font-size: 14px;
+            padding: 14px 16px;
+        }
+        .tasks {
+            grid-template-columns: 1fr;
+        }
+        .task h3 {
+            font-size: 16px;
+        }
+        .section-title {
+            margin-top: 24px;
+        }
+        .source-grid {
+            grid-template-columns: 1fr;
+        }
+        .end {
+            display: block;
+        }
+        .end span {
+            display: block;
+            margin: 6px 0;
+        }
+        td, th {
+            padding: 11px 12px;
+        }
+        .tablewrap {
+            scrollbar-width: thin;
+        }
+        .bar-head {
+            font-size: 13px;
+        }
+        .bar-caption {
+            font-size: 12px;
+        }
+        .source-grid {
+            overflow-wrap: anywhere;
+        }
+    }
+
+    @media print {
+        body {
+            background: white;
+            font-size: 12px;
+        }
+        .top, .nav, .print, .download {
+            display: none;
+        }
+        .wrap {
+            max-width: none;
+            padding: 0;
+        }
+        .summary {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+        .kpis {
+            gap: 8px;
+        }
+        .kpi {
+            padding: 12px;
+        }
+        .kpi-value {
+            font-size: 23px;
+        }
+        .duo {
+            grid-template-columns: 1fr 1fr;
+        }
+        .panel, .task, .forecast-card, .summary {
+            break-inside: avoid;
+        }
+        .tasks {
+            grid-template-columns: 1fr 1fr;
+        }
+        .forecast {
+            grid-template-columns: repeat(3,1fr);
+        }
+        .tablewrap {
+            overflow: visible;
+        }
+        table {
+            font-size: 10px;
+        }
+        td, th {
+            padding: 8px 5px;
+        }
+        .sources {
+            font-size: 11px;
+        }
+        .scope-note, .note {
+            font-size: 11px;
+        }
+        h1 {
+            font-size: 25px;
+        }
+        h2 {
+            font-size: 17px;
+        }
+        .summary h2 {
+            font-size: 20px;
+        }
+        .summary p {
+            font-size: 13px;
+        }
+        .finding p {
+            font-size: 12px;
+        }
+        .task p {
+            font-size: 12px;
+        }
+        .end {
+            margin-top: 15px;
+        }
+        @page {
+            size: A4;
+            margin: 12mm;
+        }
+    }
+
+    .kpi-value {
+        font-size: clamp(22px,2.3vw,29px);
+    }
+
+    .kpi {
+        min-width: 0;
+    }
+
+    .task footer {
+        overflow-wrap: anywhere;
+    }
+
+    .scope-note {
+        line-height: 1.8;
+    }
+
+    @media(max-width:600px) {
+        .kpi-value {
+            font-size: 21px;
+        }
+        .kpi-value .unit {
+            display: block;
+            margin: 0;
+        }
+        .bar-caption {
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+        .bar-head {
+            flex-wrap: wrap;
+        }
+        .forecast-card .amount {
+            font-size: 23px;
+        }
+    }
+
+    .forecast-note {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.8;
+    }
+
+    .forecast-note p {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .kpi-prefix {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 400;
+    }
+
+    .task p {
+        white-space: pre-line;
+    }
+
+    .task-label {
+        font-weight: 600;
+    }
+
+    .task-badges {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .task-badges .badge {
+        font-size: 11px;
+    }
+
+    .performance-table .expandable-row>td, .forecast-table .expandable-row>td {
+        font-weight: 700;
+        color: var(--navy);
+    }
+
+    .performance-table tbody tr.expandable-row>td {
+        border-top: 1px solid #d4e7df;
+        border-bottom: 1px solid #d4e7df;
+    }
+
+    .performance-table tbody tr.expandable-row>td:nth-child(-n+4) {
+        background: #f5f9fe!important;
+    }
+
+    .performance-table tbody tr.expandable-row>td:nth-child(n+5) {
+        background: #f4faf7!important;
+    }
+
+    .performance-table tbody tr.expandable-row:hover>td:nth-child(-n+4) {
+        background: #eaf3fc!important;
+    }
+
+    .performance-table tbody tr.expandable-row:hover>td:nth-child(n+5) {
+        background: #e6f4ee!important;
+    }
+
+    .forecast-table tbody tr.expandable-row>td {
+        border-top: 1px solid #d4e7df;
+        border-bottom: 1px solid #d4e7df;
+    }
+
+    .forecast-table tbody tr.expandable-row>td:nth-child(2), .forecast-table tbody tr.expandable-row>td:nth-child(3) {
+        background: #f5f9fe!important;
+    }
+
+    .forecast-table tbody tr.expandable-row>td:nth-child(n+4) {
+        background: #f4faf7!important;
+    }
+
+    .forecast-table tbody tr.expandable-row:hover>td:nth-child(2), .forecast-table tbody tr.expandable-row:hover>td:nth-child(3) {
+        background: #eaf3fc!important;
+    }
+
+    .forecast-table tbody tr.expandable-row:hover>td:nth-child(n+4) {
+        background: #e6f4ee!important;
+    }
+
+    .forecast-table thead th {
+        background: #eaf1fa;
+        color: var(--muted);
+        text-align: center;
+    }
+
+    .forecast-table thead th:nth-child(2), .forecast-table thead th:nth-child(3) {
+        background: #e2edfb;
+        color: #123c67;
+    }
+
+    .forecast-table thead th:nth-child(n+4) {
+        background: #e2f0ec;
+        color: #23594b;
+    }
+
+    .forecast-table tbody td:nth-child(2), .forecast-table tbody td:nth-child(3) {
+        background: #f5f9fe;
+    }
+
+    .forecast-table tbody td:nth-child(n+4) {
+        background: #f4faf7;
+    }
+
+    .forecast-table tbody tr:hover td {
+        background: #eef5fb;
+    }
+
+    .performance-table tbody td:nth-child(2), .performance-table tbody td:nth-child(3), .performance-table tbody td:nth-child(4) {
+        background: #f5f9fe!important;
+    }
+
+    .performance-table tbody td:nth-child(n+5) {
+        background: #f4faf7!important;
+    }
+
+    .forecast-table tbody td:nth-child(2), .forecast-table tbody td:nth-child(3) {
+        background: #f5f9fe!important;
+    }
+
+    .forecast-table tbody td:nth-child(n+4) {
+        background: #f4faf7!important;
+    }
+
+    .performance-table tbody td:first-child, .forecast-table tbody td:first-child {
+        background: #f5f9fe!important;
+    }
+
+    .performance-table tbody tr.expandable-row td:first-child, .forecast-table tbody tr.expandable-row td:first-child {
+        background: #eaf3fc!important;
+    }
+
+    .task-overview {
+        background: #eaf1fa;
+        border-radius: 8px;
+        padding: 20px 22px;
+        margin-bottom: 22px;
+    }
+
+    .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+        gap: 22px;
+    }
+
+    .overview-grid h4 {
+        margin: 0 0 6px;
+        color: var(--navy);
+        font-size: 15px;
+    }
+
+    .overview-grid p {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .subject-tasks {
+        margin: 20px 0 26px;
+    }
+
+    .subject-tasks>summary {
+        cursor: pointer;
+        color: var(--navy);
+        padding: 12px 0;
+        border-bottom: 2px solid #cad9e8;
+        margin-bottom: 14px;
+        font-size: 19px;
+        font-weight: 650;
+    }
+
+    .subject-tasks>summary small {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--muted);
+        margin-left: 16px;
+    }
+
+    @media(max-width:600px) {
+        .overview-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .task-overview {
+            padding: 18px;
+        }
+        .subject-tasks>summary small {
+            display: block;
+            margin: 4px 0 0 20px;
+        }
+    }
+
+    .management-summary {
+        background: #fff;
+        border: 1px solid #cbdceb;
+        border-left: 4px solid var(--blue);
+        border-radius: 8px;
+        padding: 17px 21px;
+        margin: 0 0 18px;
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+    }
+
+    .management-summary strong {
+        color: var(--navy);
+        white-space: nowrap;
+        font-size: 15px;
+    }
+
+    .management-summary p {
+        font-size: 15px;
+        line-height: 1.75;
+        color: #304861;
+    }
+
+    .management-summary strong:before {
+        content: "";
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--blue);
+        margin: 0 8px 2px 0;
+    }
+
+    @media(max-width:600px) {
+        .management-summary {
+            display: block;
+            padding: 15px 16px;
+        }
+        .management-summary strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .management-summary p {
+            font-size: 14px;
+        }
+    }
+
+    .task-section-title {
+        margin: 14px 0 3px!important;
+        font-weight: 700;
+        color: var(--navy);
+        line-height: 1.4;
+    }
+
+    .task-body {
+        margin: 0 0 8px!important;
+        overflow-wrap: break-word;
+        word-break: break-word;
+    }
+
+    .metric-details {
+        margin: 12px 0 25px;
+    }
+
+    .metric-details summary {
+        cursor: pointer;
+        color: var(--navy);
+        font-weight: 650;
+        padding: 12px 0;
+    }
+
+    .metric-details section {
+        margin: 12px 0;
+    }
+
+    .metric-details h3 {
+        font-size: 15px;
+        color: var(--navy);
+        margin: 12px 0;
+    }
+
+    .metric-details table {
+        font-size: 13px;
+    }
+
+    .performance-table thead th {
+        text-align: center;
+    }
+
+    .performance-table thead tr:first-child th[colspan="3"] {
+        background: #e2edfb;
+        color: #123c67;
+    }
+
+    .performance-table thead tr:first-child th[colspan="4"] {
+        background: #e2f0ec;
+        color: #23594b;
+        border-left: 2px solid #b6c8d6;
+    }
+
+    .performance-table thead tr:nth-child(2) th:nth-child(n+4) {
+        background: #edf6f2;
+    }
+
+    .performance-table thead tr:nth-child(2) th:nth-child(4), .performance-table tbody td:nth-child(5) {
+        border-left: 2px solid #b6c8d6;
+    }
+
+    .performance-table tbody td:nth-child(n+5) {
+        background: #f4faf7;
+    }
+
+    .performance-table tbody tr:first-child td:nth-child(n+5) {
+        background: #eaf5ef;
+    }
+
+    .single-report .child-row {
+        display: none!important;
+    }
+
+    .single-report .child-row.is-visible {
+        display: table-row!important;
+    }
+
+    .performance-table .expandable-row {
+        cursor: pointer;
+    }
+
+    .row-toggle {
+        border: 0;
+        background: transparent;
+        color: var(--blue);
+        font-size: 20px;
+        width: 24px;
+        padding: 0;
+        margin-right: 4px;
+        vertical-align: -2px;
+    }
+
+    .child-row {
+        display: none;
+        background: #fafcff!important;
+    }
+
+    .child-row.is-visible {
+        display: table-row;
+    }
+
+    .child-row td:first-child {
+        padding-left: 42px;
+        color: #536b83;
+    }
+
+    .expandable-row.is-open {
+        background: #eef5fd!important;
+    }
+
+    .expandable-row.is-open .row-toggle {
+        font-weight: 700;
+    }
+
+    .summary {
+        display: block;
+    }
+
+    .summary h2 {
+        font-size: 25px;
+    }
+
+    .summary p {
+        max-width: 980px;
+    }
+
+    .hero-num {
+        display: none;
+    }
+
+    .kpis {
+        grid-template-columns: repeat(3,1fr);
+    }
+
+    .kpi-sub {
+        font-size: 13px;
+    }
+
+    .kpi-sub .good {
+        color: var(--green);
+    }
+
+    .kpi-sub .bad {
+        color: var(--red);
+    }
+
+    @media(max-width:600px) {
+        .kpis {
+            grid-template-columns: 1fr;
+        }
+        .summary h2 {
+            font-size: 21px;
+        }
+    }
+
+    /* ====== v2 新增样式 ====== */
+
+    /* 10 种报告的页签：放不下时换行，页签文字不折行 */
+    .nav {
+        flex-wrap: wrap;
+    }
+
+    .nav a {
+        white-space: nowrap;
+        padding: 9px 16px;
+    }
+
+    /* 明细中有“上级”的行再缩进一级（下级数值已包含在上级中） */
+    .child-row.is-level2 td:first-child {
+        padding-left: 72px;
+    }
+
+    /* 核心结论、预测说明保留接口文字中的换行 */
+    .summary p,
+    .forecast-note p {
+        white-space: pre-line;
+    }
+
+    .empty-state {
+        padding: 48px 0;
+        color: var(--muted);
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+<header>
+    <div class="top">
+        <div class="brand">
+            <span class="mark" aria-hidden="true">月</span>
+            <div>月度经营报告<span class="meta"> &nbsp; MONTHLY REVIEW</span></div>
+        </div>
+        <div class="actions"><span class="meta" id="period-meta"></span></div>
+    </div>
+</header>
+
+<main class="wrap">
+    <nav class="nav" id="report-nav" aria-label="报告类型"></nav>
+    <div id="report"><p class="empty-state">正在等待报告数据…</p></div>
+    <noscript>请启用浏览器 JavaScript 以查看报告。</noscript>
+</main>
+
+<script>
+/*
+ * 月度经营报告模板 v2
+ *
+ * 数据：fin_get_monthly_report_v2（或 fin_generate_monthly_report_v2）返回的 data，
+ *       即 {investment: {...}, fund: {...}, asset: {...}, single: {...}, single_hongqi: {...}, ...}。
+ *       每份报告的字段与原型 report-data.example.json 一致，另带 key、navLabel、period、scopeNote、tableNote。
+ *
+ * 传入方式（任选其一）：
+ *   1. 父页面 postMessage（跨域 iframe 推荐）：
+ *        iframe.contentWindow.postMessage({type: 'monthly-report-data', data: data, active: 'single'}, '*');
+ *      active 可选，指定默认打开的报告键。
+ *   2. 同源 iframe 直接调用：iframe.contentWindow.renderMonthlyReport(data, 'single');
+ *   3. 生成静态文件：把脚本中的占位注释 REPORT_DATA 连同其后的 null 一起替换为 JSON 文本。
+ *
+ * 页面加载完成后会向父页面发送 {type: 'monthly-report-ready'}，收到后再发送数据即可；
+ * 每次渲染后发送 {type: 'monthly-report-height', height: 像素高度}，父页面可据此调整 iframe 高度。
+ * 切换报告用地址 hash（#investment、#single_hongqi 等）。
+ */
+(function () {
+    'use strict';
+
+    /* 允许发送数据的父页面来源，例如 ['https://example.faw.cn']；为空表示不限制 */
+    var ALLOWED_ORIGINS = [];
+
+    /* 静态生成时替换这里 */
+    var EMBEDDED_DATA = /*REPORT_DATA*/null;
+
+    var reports = null;
+    var preferredKey = null;
+
+    /* 原型 report-data.example.json 没有 period 等 v2 新增字段时使用的通用文字 */
+    var DEFAULT_PERIOD = {
+        title: '', meta: '', month: '', ytd: '',
+        nextTitle: '下月', quarterTitle: '季度', annual: '全年', annualTitle: '全年'
+    };
+
+    function withDefaults(key, r) {
+        var copy = Object.assign({}, r);
+        copy.period = Object.assign({}, DEFAULT_PERIOD, r.period || {});
+        copy.navLabel = r.navLabel || r.name || key;
+        copy.reportType = r.reportType || (key.indexOf('single') === 0 ? '单体' : '板块');
+        copy.metrics = r.metrics || [];
+        copy.taskGroups = r.taskGroups || [];
+        return copy;
+    }
+
+    /* ---------------------------------------------------------------- 格式化 */
+
+    function esc(value) {
+        return String(value === null || value === undefined ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    /* 金额、户数：四舍五入取整、千分位；null、0、-0 及四舍五入后为 0 的值显示空白（与原型一致） */
+    function fmt(n) {
+        if (n === null || n === undefined || isNaN(Number(n)) || Math.round(Number(n)) === 0) {
+            return '';
+        }
+        return Number(n).toLocaleString('zh-CN', {maximumFractionDigits: 0});
+    }
+
+    function sign(n) {
+        return (n > 0 ? '+' : '') + fmt(n);
+    }
+
+    function diff(actual, target) {
+        return actual === null || actual === undefined || target === null || target === undefined
+            ? null
+            : actual - target;
+    }
+
+    /* 完成率仅在目标大于 0 且实际非负时计算 */
+    function rate(actual, target) {
+        return target > 0 && actual !== null && actual !== undefined && actual >= 0
+            ? (actual / target * 100).toFixed(1) + '%'
+            : '—';
+    }
+
+    function color(n) {
+        return n === null ? '' : (n >= 0 ? 'good' : 'bad');
+    }
+
+    function gap(actual, target) {
+        var d = diff(actual, target);
+        return d === null ? '' : '<span class="' + color(d) + '">' + sign(d) + '</span>';
+    }
+
+    /* ---------------------------------------------------------------- 数据与导航 */
+
+    function reportKeys() {
+        return reports ? Object.keys(reports) : [];
+    }
+
+    function currentKey() {
+        var keys = reportKeys();
+        var fromHash = decodeURIComponent(location.hash.slice(1));
+        if (keys.indexOf(fromHash) >= 0) {
+            return fromHash;
+        }
+        if (preferredKey && keys.indexOf(preferredKey) >= 0) {
+            return preferredKey;
+        }
+        return keys[0];
+    }
+
+    function renderNav(activeKey) {
+        document.getElementById('report-nav').innerHTML = reportKeys().map(function (key) {
+            var r = withDefaults(key, reports[key]);
+            var active = key === activeKey;
+            return '<a href="#' + esc(key) + '"' + (active ? ' class="active" aria-current="page"' : '') + '>'
+                + esc(r.navLabel || r.name) + '</a>';
+        }).join('');
+    }
+
+    /* ---------------------------------------------------------------- 各区块 */
+
+    function profitCards(r) {
+        var p = r.profit;
+        var P = r.period;
+        var cards = [
+            [P.month + '利润', p[1], p[0]],
+            [P.ytd + '累计利润', p[3], p[2]],
+            [P.annual + '利润预测', p[9], p[8]]
+        ];
+        return cards.map(function (card) {
+            var name = card[0], actual = card[1], target = card[2];
+            var d = diff(actual, target);
+            return '<article class="kpi">'
+                + '<div class="kpi-label">' + esc(name) + '</div>'
+                + '<div class="kpi-value ' + (d !== null && d < 0 ? 'bad' : '') + '">' + fmt(actual) + '<span class="unit">万元</span></div>'
+                + '<div class="kpi-sub">目标 ' + fmt(target) + ' 万元 · <span class="' + color(d) + '">'
+                + (d === null ? '' : (d >= 0 ? '超目标 ' : '偏差 ') + sign(d) + ' 万元') + '</span></div>'
+                + '</article>';
+        }).join('');
+    }
+
+    /* otherKpis: [名称, 累计目标, 本年累计完成, 全年目标, 全年预测, 单位, 目标期间] */
+    function otherKpiCards(r) {
+        return (r.otherKpis || []).map(function (kpi) {
+            var name = kpi[0], completed = kpi[2], yearTarget = kpi[3], unit = kpi[5], targetPeriod = kpi[6] || '全年';
+            var remaining = diff(yearTarget, completed);
+            return '<article class="kpi secondary-kpi">'
+                + '<div class="kpi-label">' + esc(name) + '</div>'
+                + '<div class="kpi-value"><span class="kpi-prefix">本年累计完成</span> ' + fmt(completed) + '<span class="unit">' + esc(unit) + '</span></div>'
+                + '<div class="kpi-sub">' + esc(targetPeriod) + '目标 ' + fmt(yearTarget) + ' ' + esc(unit)
+                + ' · 待实现 ' + fmt(remaining) + ' ' + esc(unit) + '</div>'
+                + '</article>';
+        }).join('');
+    }
+
+    function detailsOf(r, metricName) {
+        return (r.metricDetails || {})[metricName] || [];
+    }
+
+    /* 明细行：[名称, 10位数组, 上级]；有上级的行再缩进一级 */
+    function childRowClass(detail, group) {
+        return 'child-row ' + group + (detail[2] ? ' is-level2' : '');
+    }
+
+    function toggleCell(hasDetails, label, unit) {
+        return '<td>' + (hasDetails ? '<button class="row-toggle" aria-label="展开明细">＋</button>' : '')
+            + esc(label) + '<span class="tiny">' + esc(unit) + '</span></td>';
+    }
+
+    function performanceRow(label, unit, v, details, index) {
+        var group = 'detail-' + index;
+        var head = '<tr class="' + (details.length ? 'expandable-row' : '') + '"'
+            + (details.length ? ' data-expand="' + group + '"' : '') + '>'
+            + toggleCell(details.length > 0, label, unit)
+            + '<td>' + fmt(v[0]) + '</td><td>' + fmt(v[1]) + '</td><td>' + gap(v[1], v[0]) + '</td>'
+            + '<td>' + fmt(v[2]) + '</td><td>' + fmt(v[3]) + '</td><td>' + gap(v[3], v[2]) + '</td><td>' + rate(v[3], v[2]) + '</td>'
+            + '</tr>';
+        var children = details.map(function (detail) {
+            var cv = detail[1];
+            return '<tr class="' + childRowClass(detail, group) + '"><td>' + esc(detail[0]) + '</td>'
+                + '<td>' + fmt(cv[0]) + '</td><td>' + fmt(cv[1]) + '</td><td>' + gap(cv[1], cv[0]) + '</td>'
+                + '<td>' + fmt(cv[2]) + '</td><td>' + fmt(cv[3]) + '</td><td>' + gap(cv[3], cv[2]) + '</td><td>' + rate(cv[3], cv[2]) + '</td>'
+                + '</tr>';
+        }).join('');
+        return head + children;
+    }
+
+    function performanceTable(r) {
+        var P = r.period;
+        var body = r.metrics.map(function (metric, index) {
+            return performanceRow(metric[0], metric[1], metric[2], detailsOf(r, metric[0]), index);
+        }).join('');
+        return '<div class="tablewrap" tabindex="0" role="region" aria-label="经营指标，可横向滚动">'
+            + '<table class="performance-table"><thead>'
+            + '<tr><th rowspan="2">适用指标</th><th colspan="3">' + esc(P.month) + '当月</th><th colspan="4">' + esc(P.ytd) + '累计</th></tr>'
+            + '<tr><th>当月目标</th><th>当月实际</th><th>当月偏差</th><th>累计目标</th><th>累计实际</th><th>累计偏差</th><th>累计完成率</th></tr>'
+            + '</thead><tbody>' + body + '</tbody></table></div>'
+            + '<p class="note">偏差＝实际−同期目标；正数表示高于目标。“—”表示不计算。手机端表格可左右滑动。'
+            + (r.tableNote ? ' ' + esc(r.tableNote) : '') + '</p>';
+    }
+
+    /* profit 下标：4/5 下月目标/预测，6/7 季度，8/9 年度 */
+    function forecastCards(r) {
+        var p = r.profit;
+        var P = r.period;
+        var items = [[P.nextTitle, 4], [P.quarterTitle, 6], [P.annualTitle, 8]];
+        return items.map(function (item) {
+            var title = item[0], i = item[1];
+            var target = p[i], forecast = p[i + 1];
+            var status = forecast < 0
+                ? '预计亏损'
+                : (target < 0 ? '较亏损目标改善' : '完成率 ' + rate(forecast, target));
+            return '<article class="forecast-card">'
+                + '<h3>' + esc(title) + '</h3>'
+                + '<div class="amount ' + (forecast < 0 ? 'bad' : '') + '">' + fmt(forecast) + '<span class="unit">万元</span></div>'
+                + '<p>目标 ' + fmt(target) + ' 万元</p>'
+                + '<div class="f-bottom"><span>偏差 ' + gap(forecast, target) + ' 万元</span>'
+                + '<span class="' + color(diff(forecast, target)) + '">' + status + '</span></div>'
+                + '</article>';
+        }).join('');
+    }
+
+    function forecastTable(r) {
+        var annual = r.period.annual;
+        var body = r.metrics.map(function (metric, index) {
+            var name = metric[0], unit = metric[1], v = metric[2];
+            var details = detailsOf(r, name);
+            var group = 'forecast-' + index;
+            var head = '<tr class="' + (details.length ? 'expandable-row' : '') + '"'
+                + (details.length ? ' data-expand="' + group + '"' : '') + '>'
+                + toggleCell(details.length > 0, name, unit)
+                + v.slice(4).map(function (z) { return '<td>' + fmt(z) + '</td>'; }).join('')
+                + '</tr>';
+            var children = details.map(function (detail) {
+                return '<tr class="' + childRowClass(detail, group) + '"><td>' + esc(detail[0]) + '</td>'
+                    + detail[1].slice(4).map(function (z) { return '<td>' + fmt(z) + '</td>'; }).join('')
+                    + '</tr>';
+            }).join('');
+            return head + children;
+        }).join('');
+        return '<details style="margin-top:12px" class="sources">'
+            + '<summary>查看各适用指标的下月、季度与' + esc(annual) + '预测</summary>'
+            + '<div class="tablewrap" tabindex="0" role="region" aria-label="各指标预测，可横向滚动">'
+            + '<table class="forecast-table"><thead><tr><th>指标</th><th>下月目标</th><th>下月预测</th><th>季度目标</th><th>季度预测</th>'
+            + '<th>' + esc(annual) + '目标</th><th>' + esc(annual) + '预测</th></tr></thead>'
+            + '<tbody>' + body + '</tbody></table></div></details>';
+    }
+
+    function taskOverview(r) {
+        return '<section class="task-overview"><h3>重点任务概述</h3><div class="overview-grid">'
+            + r.taskGroups.map(function (group) {
+                return '<article><h4>' + esc(group.name) + '</h4><p>' + esc(group.summary) + '</p></article>';
+            }).join('')
+            + '</div></section>';
+    }
+
+    function taskSection(title, content) {
+        if (!content || content.trim() === '' || content.trim() === '未获取数据') {
+            return '';
+        }
+        return '<p class="task-section-title">' + title + '</p><p class="task-body">' + esc(content) + '</p>';
+    }
+
+    /* tasks: [达成标签, 事项名称, 当前进展, 下一步计划, 责任部门/责任人, 拖期标签, 卡点, 后续补救措施] */
+    function taskCard(task) {
+        var status = task[0], name = task[1], done = task[2], next = task[3];
+        var owner = task[4], delay = task[5], bottleneck = task[6], remedy = task[7];
+        var badges = (status ? '<span class="badge ' + (status === '全年预计无法达成' ? 'attention' : '') + '">' + esc(status) + '</span>' : '')
+            + (delay ? '<span class="badge attention">' + esc(delay) + '</span>' : '');
+        return '<article class="task">'
+            + '<div class="task-top"><h3>' + esc(name) + '</h3><div class="task-badges">' + badges + '</div></div>'
+            + '<p class="task-section-title">当前进展</p><p class="task-body">' + esc(done) + '</p>'
+            + taskSection('卡点', bottleneck)
+            + taskSection('后续补救措施', remedy)
+            + '<p class="task-section-title">下一步计划</p><p class="task-body">' + esc(next) + '</p>'
+            + '<footer>' + esc(owner) + '</footer>'
+            + '</article>';
+    }
+
+    function taskGroups(r) {
+        return r.taskGroups.map(function (group, index) {
+            return '<details class="subject-tasks"' + (index === 0 ? ' open' : '') + '>'
+                + '<summary><span>' + esc(group.name) + '</span><small>' + group.tasks.length + '项重点任务 · 点击收起 / 展开</small></summary>'
+                + '<div class="tasks">' + group.tasks.map(taskCard).join('') + '</div>'
+                + '</details>';
+        }).join('');
+    }
+
+    function notesSection(r) {
+        var notes = r.notes || [];
+        return '<details class="sources" hidden><summary>数据口径与待核实事项（' + notes.length + '项）</summary><ul>'
+            + notes.map(function (note) { return '<li>' + esc(note) + '</li>'; }).join('')
+            + '</ul></details>';
+    }
+
+    function sectionTitle(no, title) {
+        return '<div class="section-title"><span class="section-no">' + no + '</span><h2>' + title + '</h2></div>';
+    }
+
+    /* ---------------------------------------------------------------- 渲染 */
+
+    function render() {
+        var container = document.getElementById('report');
+        var key = currentKey();
+        if (!key) {
+            container.innerHTML = '<p class="empty-state">正在等待报告数据…</p>';
+            notifyHeight();
+            return;
+        }
+        var r = withDefaults(key, reports[key]);
+        var P = r.period;
+
+        document.body.classList.toggle('single-report', r.reportType === '单体');
+        var periodPrefix = P.title ? P.title + ' · ' : '';
+        document.title = periodPrefix + r.scope + '月度经营报告';
+        document.getElementById('period-meta').textContent = P.meta;
+        renderNav(key);
+
+        container.innerHTML = ''
+            + '<div class="report-title"><div><h1>' + esc(r.name) + '月度经营报告</h1>'
+            + '<div class="period">' + (P.title ? esc(P.title) + ' &nbsp; / &nbsp; ' : '') + esc(r.scope) + '</div></div></div>'
+            + '<section class="summary"><div><div class="eyebrow">核心结论</div>'
+            + '<h2>' + esc(r.headline) + '</h2><p>' + esc(r.summary) + '</p></div></section>'
+            + '<p class="scope-note">' + esc(r.scopeNote) + '</p>'
+            + '<div class="kpis">' + profitCards(r) + otherKpiCards(r) + '</div>'
+            + sectionTitle('01', '当月及累计指标完成情况')
+            + performanceTable(r)
+            + sectionTitle('02', '经营预测')
+            + '<div class="forecast">' + forecastCards(r) + '</div>'
+            + '<div class="forecast-note"><p>' + esc(r.outlook) + '</p><p>' + esc(r.forecastExtra) + '</p></div>'
+            + forecastTable(r)
+            + sectionTitle('03', '重点任务完成情况与下一步')
+            + taskOverview(r)
+            + taskGroups(r)
+            + notesSection(r)
+            + '<div class="end"><span>' + esc(periodPrefix) + esc(r.scope) + ' · 内部经营分析</span></div>';
+        notifyHeight();
+    }
+
+    function setData(data, activeKey) {
+        if (!data || typeof data !== 'object') {
+            return;
+        }
+        reports = data;
+        preferredKey = activeKey || null;
+        render();
+    }
+
+    /* ---------------------------------------------------------------- 与父页面通信 */
+
+    function postToParent(message) {
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage(message, '*');
+        }
+    }
+
+    function notifyHeight() {
+        postToParent({type: 'monthly-report-height', height: document.documentElement.scrollHeight});
+    }
+
+    window.addEventListener('message', function (event) {
+        if (ALLOWED_ORIGINS.length && ALLOWED_ORIGINS.indexOf(event.origin) < 0) {
+            return;
+        }
+        var message = event.data || {};
+        if (message.type === 'monthly-report-data') {
+            setData(message.data, message.active);
+        }
+    });
+
+    /* 展开 / 收起明细行 */
+    document.addEventListener('click', function (event) {
+        var row = event.target.closest('[data-expand]');
+        if (!row) {
+            return;
+        }
+        var group = row.dataset.expand;
+        var open = row.classList.toggle('is-open');
+        document.querySelectorAll('.' + group).forEach(function (child) {
+            child.classList.toggle('is-visible', open);
+        });
+        var button = row.querySelector('.row-toggle');
+        if (button) {
+            button.textContent = open ? '−' : '＋';
+        }
+        notifyHeight();
+    });
+
+    /* 重点任务分组展开收起后，页面高度会变 */
+    document.addEventListener('toggle', notifyHeight, true);
+    window.addEventListener('hashchange', render);
+    window.addEventListener('resize', notifyHeight);
+
+    window.renderMonthlyReport = setData;
+
+    if (EMBEDDED_DATA) {
+        setData(EMBEDDED_DATA);
+    } else {
+        render();
+    }
+    postToParent({type: 'monthly-report-ready'});
+})();
+</script>
+</body>
+</html>

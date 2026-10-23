@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import "./index.css";
 import { useExpertStore } from "../expertTalent/store";
+import { currentActor } from "../expertTalent/settlement";
 const taskKeyMap = {
   topicApproval: "议题审批",
   meetingVote: "三会表决",
@@ -32,7 +33,13 @@ const taskTabs = [
   "任务管理",
 ];
 const djgTaskTabs = ["下发推荐函", "可比公司维护", "外派高管履职分析"];
-const expertTaskTabs = ["专家入库", "聘书签发", "专家调用", "锁定排期"];
+const expertTaskTabs = [
+  "专家入库",
+  "聘书签发",
+  "专家调用",
+  "锁定排期",
+  "调用报销",
+];
 const metrics = [
   { label: "总待办数", value: "4450" },
   { label: "总逾期数", value: "0", tone: "red" },
@@ -431,6 +438,26 @@ function TaskPanel() {
   const primaryTask = taskCopyByCard[activeTab];
   const secondaryTask = secondaryTaskCopyByCard[activeTab];
   const expertTaskRows = useMemo(() => {
+    const actor = currentActor(state);
+    if (activeTab === "调用报销")
+      return state.tasks
+        .filter(
+          (task) =>
+            task.id !== "RW202609015" &&
+            task.stage === "已评价完成" &&
+            !task.freeService &&
+            task.applicantId === actor.id &&
+            !state.reimbursements.some(
+              (record) =>
+                record.taskId === task.id &&
+                !["已退回", "草稿", "已作废"].includes(record.status),
+            ),
+        )
+        .map((task) => ({
+          title: `${task.project} · 调用报销`,
+          description: "评价已完成，由原调用人录入税前报销",
+          href: `/zj/tasks?taskId=${encodeURIComponent(task.id)}&tab=reimbursement`,
+        }));
     if (activeTab === "专家入库" || activeTab === "聘书签发") {
       return state.invitations
         .filter((item) =>
@@ -461,7 +488,7 @@ function TaskPanel() {
       description: `项目：${item.project || item.id}；当前阶段：${item.stage}`,
       href: `/zj/tasks?taskId=${encodeURIComponent(item.id)}`,
     }));
-  }, [activeTab, state.invitations, state.tasks]);
+  }, [activeTab, state]);
   const taskRows = isExpertHome
     ? expertTaskRows
     : activeTab === "可比公司维护"

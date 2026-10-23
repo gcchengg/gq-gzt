@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { experts, tasks } from "./data";
+import { normalizeSettlement } from "./settlement";
+import { seedSettlementDemo } from "./settlementDemo";
 import {
   applicationFormComplete,
   applicationFromProfile,
@@ -944,7 +946,7 @@ function normalize(saved) {
     !Array.isArray(saved.invitations) ||
     !Array.isArray(saved.tasks)
   )
-    return structuredClone(seed);
+    return normalizeSettlement(structuredClone(seed));
   const next = {
     ...structuredClone(seed),
     ...saved,
@@ -1076,13 +1078,24 @@ function normalize(saved) {
       next.tasks.push(structuredClone(item));
     }
   });
-  return next;
+  return normalizeSettlement(next);
 }
 let state;
 try {
   state = normalize(JSON.parse(localStorage.getItem(KEY)));
 } catch {
-  state = structuredClone(seed);
+  state = normalizeSettlement(structuredClone(seed));
+}
+try {
+  const shouldPersist =
+    !state.settlementDemoVersion ||
+    state.actorId ||
+    state.settlementStatusVersion !== 1;
+  seedSettlementDemo(state);
+  state.settlementStatusVersion = 1;
+  if (shouldPersist) localStorage.setItem(KEY, JSON.stringify(state));
+} catch (error) {
+  console.warn("结算演示数据初始化失败", error);
 }
 const listeners = new Set();
 window.addEventListener("storage", (event) => {
@@ -1094,6 +1107,7 @@ window.addEventListener("storage", (event) => {
     /* ignore malformed cross-tab data */
   }
 });
+export const getExpertState = () => state;
 export function updateStore(mutator) {
   const next = structuredClone(state);
   mutator(next);
